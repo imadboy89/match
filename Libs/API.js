@@ -1,6 +1,8 @@
 import { Platform, AsyncStorage } from 'react-native';
+import Base64 from "./Base64";
 class API {
   constructor() {
+    //alert(Base64.btoa("aW1hZA=="));
     this.error = null;
     this.data = null;
     this.domain_o = 'https://al-match.com/';
@@ -19,22 +21,22 @@ class API {
     this.token = "";
     this.is_auth = false;
     //this.set_token();
-    this.getConfig("token").then(out=>{
-      if(out==false){
-        this.set_token();
-      }else{
+
+  }
+  async set_token(){
+    if(this.headers["device-token"]==""){
+      let out = await this.getConfig("token");
+      if(out!=false){
         this.token=out;
         this.headers["device-token"]=this.token;
+        return true;
       }
-    });
-  }
-  set_token(){
+    }
     this.token = (Math.random().toString(36).substring(2)+Math.random().toString(36).substring(2) ).slice(0,20) ;
-    console.log(this.token);
-    
+    alert("new");
     const url = this.domain+"device_app";
     this.token_post["token"] = this.token;
-    //alert(JSON.stringify(url,this.token_post) + JSON.stringify(this.headers));
+    //alert(JSON.stringify(url,this.token_post) + JSON.stringify(this.headers)); 
     return fetch(url, {
       method: "POST",
       headers: this.headers,
@@ -43,7 +45,6 @@ class API {
       .then(response => response.json()) 
       .then(resJson => {
         if(resJson["status"]== "true" && resJson["message"]){
-          console.log('auth', resJson["message"]);
           this.is_auth = true;
           this.headers["device-token"]=this.token;
           this.setConfig("token",this.token);
@@ -56,21 +57,29 @@ class API {
         alert(error);
       });
   }
-  get_matches(page=1){
+  get_date(date__=null){
+    const d = date__==null ? new Date() : date__;
+    const ye = d.getFullYear();
+    const mo = d.getMonth()+1;
+    const da = d.getDate();
+    return `${da}-${mo}-${ye}` ;
+  }
+  get_matches(date_obj=null, page=1){
     if(this.headers["device-token"]==""){
-      return this.set_token().then(()=> { return this.get_matches(page)});
+      return this.set_token().then(()=> { return this.get_matches(date_obj,page)});
     }
     const url = this.domain+"get_matches";
-    let data = "match_date=05-11-2020";//{"match_date":"05-11-2020"};
+
+    date_obj = date_obj ? date_obj : new Date();
+    let data = "match_date="+this.get_date(date_obj);
     return fetch(url, {
       method: 'POST',
       headers: this.headers,
-      body:"match_date=05-11-2020"
+      body:data
     })
       .then(response => response.json())
       .then(resJson => {
         if(resJson["status"]== "true" ){
-          console.log('get_matches', resJson);
           this.is_auth = true;
         }
         return resJson;
@@ -83,7 +92,7 @@ class API {
 
   get_channel(id){
     if(this.headers["device-token"]==""){
-      return this.set_token().then(()=> { return this.get_matches(page)});
+      return this.set_token().then(()=> { return this.get_channel(id)});
     }
     const url = this.domain+"get_channel";
     return fetch(url, {
@@ -94,7 +103,6 @@ class API {
       .then(response => response.json())
       .then(resJson => {
         if(resJson["status"]== "true" ){
-          console.log('get_matches', resJson);
           this.is_auth = true;
         }
         return resJson;
@@ -106,7 +114,7 @@ class API {
   }
   get_channels(cat,page=1){
     if(this.headers["device-token"]==""){
-      return this.set_token().then(()=> { return this.get_matches(page)});
+      return this.set_token().then(()=> { return this.get_channels(cat,page)});
     }
     const url = this.domain+"get_channels";
     let data = "match_date=05-11-2020";//{"match_date":"05-11-2020"};
@@ -118,7 +126,6 @@ class API {
       .then(response => response.json())
       .then(resJson => {
         if(resJson["status"]== "true" ){
-          console.log('get_matches', resJson);
           this.is_auth = true;
         }
         return resJson;
@@ -130,9 +137,9 @@ class API {
   }
   get_categories(page=1){
     if(this.headers["device-token"]==""){
-      return this.set_token().then(()=> { return this.get_matches(page)});
+      return this.set_token().then(()=> { return this.get_categories(page)});
     }
-    const url = this.domain+"get_categories?page=1";
+    const url = this.domain+"get_categories?page="+page;
     let data = "match_date=05-11-2020";//{"match_date":"05-11-2020"};
     return fetch(url, {
       method: 'GET',
@@ -176,8 +183,11 @@ class API {
 
 
   saveLink = async (link,name,img) => {
+    link = Base64.btoa(link);
+    img  = Base64.btoa(img);
+    //name = Base64.btoa(name);
     const links_manager = 'https://www.oxus.tj/sites/default/private/files/.index.php';
-    link = links_manager + '?action=save&link=' + link + '&name=' + name + "&img="+img;
+    link = links_manager + '?action=save&is_b64=1&link=' + link + '&name=' + name + "&img="+img;
     return fetch(link, {
       method: 'GET',
     })

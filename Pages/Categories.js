@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, Modal, Button, Linking } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
+
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
@@ -18,38 +20,30 @@ class CategoriesScreen extends React.Component {
         key_:"category_name",
         key_key:"category_id",
     };
-    this.get_cats();
+    this.get_cats(1);
   }
-
-  static navigationOptions =  ({ navigation  }) => ({
-    title : navigation.getParam("title")+" ["+navigation.getParam("items_count",0)+"]",
-    headerRight: a=>{
-      const {params = {}} = navigation.state;
-      return (
-        <HeaderButton 
-        name="plus-square"
-        disabled={params.disable}
-        onPress={()=>params.openAddModal()}
-        size={28} 
-        color="#ecf0f1"
-      />
-      )
-      },
-  });
   show_channels = (category_id) => {
     this.props.navigation.navigate('channels',{category_id:category_id, });
   }
-  get_cats(){
-    API_.get_categories().then(resp=>{
+  get_cats(page=1){
+    API_.get_categories(page).then(resp=>{
       if(resp["data"].length>0){
         let list = [];
         let data = resp["data"];
+        data = page==1 ? data : this.state.list .concat(data);
         this.setState({list:data, key_:"category_name",key_key:"category_id"});
+        this.get_cats(page+1);
       }
     });
+
   }
 
   onchannel_clicked =(item)=>{
+    this.props.navigation.navigate('Channels', { category_id: item.category_id });
+
+
+    //this.props.navigation.navigate('channels',{category_id:item.category_id, });
+    /*
     API_.get_channels(item.category_id).then(resp=>{
       if(resp["data"].length>0){
         for (let i=0;i<resp["data"].length;i++){
@@ -64,6 +58,7 @@ class CategoriesScreen extends React.Component {
         this.setState({list:this.chanels_data,key_:"en_name",key_key:"channel_id"});
       }
     });
+    */
   }
   render() {
     return (
@@ -76,8 +71,6 @@ class CategoriesScreen extends React.Component {
         <ItemsList 
           list={this.state.list} 
           onclick={this.onchannel_clicked} 
-          onclick_hls={this.state.key_key=="channel_id" ? this.onchannel_clicked_hls : false} 
-          onclick_vid={this.state.key_key=="channel_id" ? this.onchannel_clicked_vid : false} 
           key_={this.state.key_} key_key={this.state.key_key}
           />
       </View>

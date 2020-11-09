@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { Text, View, StyleSheet, Modal, Button, Linking } from 'react-native';
+import React from "react";
+import { Text, View, StyleSheet, Modal, Button, Linking, Picker, } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
@@ -9,7 +9,7 @@ import { useRoute } from '@react-navigation/native';
 let list = [
 
           ];
-class ChannelsScreen extends React.Component {
+class ChannelScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -19,23 +19,17 @@ class ChannelsScreen extends React.Component {
         key_:"en_name",
         key_key:"channel_id",
         url:'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
+        actionType:"IPTV",
+        channel:null,
     };
-    this.get_channels();
+    this.get_channel();
 
   }
-  get_channels(){
-      API_.get_channels(this.props.route.params.category_id).then(resp=>{
-        if(resp["data"].length>0){
-          for (let i=0;i<resp["data"].length;i++){
-            API_.get_channel(resp["data"][i].channel_id).then(resp=>{
-              this.chanels_data[i].en_name = resp["data"].en_name;
-              this.setState({list:[]});
-              this.setState({list:this.chanels_data});
-            });
-          }
-          let list = [];
-          this.chanels_data = resp["data"];
-          this.setState({list:this.chanels_data});
+  get_channel(){
+      this.channel_photo = this.props.route.params.channel_photo;
+      API_.get_channel(this.props.route.params.channel_id).then(resp=>{
+        if(resp["data"] && resp["data"]["en_name"] ){
+          this.setState({channel:resp["data"]});
         }
       });
   }
@@ -106,20 +100,49 @@ class ChannelsScreen extends React.Component {
       }
     });
   }
-  onchannel_clicked =(item)=>{
-    this.props.navigation.navigate('Channel', { channel_id: item.channel_id,channel_photo:item.channel_photo });
+
+  onch_clicked(serv){
+    console.log(serv.SecureUrl);
+    console.log(this.state.channel["name"] +",,"+ API_.domain_o+this.channel_photophoto);
+    let url = serv.SecureUrl;
+    let name = this.state.channel["name"];
+    let img = API_.domain_o+this.channel_photo;
+    if (this.state.actionType=="IPTV"){
+      API_.saveLink(serv.SecureUrl,this.state.channel["name"],API_.domain_o+this.channel_photo).then(out=>notifyMessage("Link saved"));
+      
+    }else if ("PLAYER"){
+       Linking.canOpenURL(url).then(supported=>{
+         if(supported){
+           Linking.openURL(url).then(out=>{notifyMessage("Opening channel.");});
+         }else{
+           notifyMessage("This link is not supported : "+url);
+         }
+       });
+    }
   }
   render() {
+    let servers_list = this.state.channel ?
+      this.state.channel.channel_servers.map(serv => (
+        <View style={{margin:10}}>
+          <Button onPress={()=>this.onch_clicked(serv)}  key={serv.id} title={serv.name} style={{margin:10}}></Button>
+        </View>
+      ))
+    : null;
     return (
       <View style={styles.container}>
         <Text> Matches list {this.state.modalVisible_match}</Text>
-        <ItemsList 
-          list={this.state.list} 
-          onclick={this.onchannel_clicked} 
-          onclick_hls={this.state.key_key=="channel_id" ? this.onchannel_clicked_hls : false} 
-          onclick_vid={this.state.key_key=="channel_id" ? this.onchannel_clicked_vid : false} 
-          key_={this.state.key_} key_key={this.state.key_key}
-          />
+        <Text> name : {this.state.channel? this.state.channel.en_name : ""}</Text>
+        <Text> Matches {this.state.channel? this.state.channel.en_name : ""}</Text>
+        <Picker
+              selectedValue={this.state.actionType}
+              style={{ height: 50, width: 150 }}
+              onValueChange={(itemValue, itemIndex) => this.setState({actionType:itemValue})}
+            >
+              <Picker.Item label="IPTV" value="IPTV" />
+              <Picker.Item label="PLAYER" value="PLAYER" />
+        </Picker>
+
+        {servers_list}
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
       </View>
     );
@@ -142,4 +165,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChannelsScreen;
+export default ChannelScreen;

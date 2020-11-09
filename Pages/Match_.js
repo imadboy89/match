@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal } from 'react-native';
+import { Text, View, StyleSheet, Modal, Button } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 let list = {};
 class MatchScreen extends React.Component {
@@ -9,7 +10,9 @@ class MatchScreen extends React.Component {
     super(props);
     this.state = {
         list:list,
-        modalVisible_match:false
+        modalVisible_match:false,
+        show_datPicker : false
+
     };
     /*
     API_.get_matches().then(resp=>{
@@ -24,7 +27,20 @@ class MatchScreen extends React.Component {
     });
     */
   }
-
+ onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    this.date = currentDate;
+    alert(currentDate);
+  };
+show_DateP(date){
+  return <DateTimePicker
+          testID="datePicker"
+          value={date}
+          mode="date"
+          display="default"
+          onChange={this.onChange}
+        />
+}
   render_modal_credentials(){
     
   return (          
@@ -50,8 +66,11 @@ class MatchScreen extends React.Component {
     return (
       <View style={styles.container}>
         <Text> Matches list</Text>
+        <Button title="pick date" onPress={this.setState({show_datPicker:true})} ></Button>
         <ItemsList list={this.state.list} />
         {this.render_modal_credentials()}
+
+        { this.state.show_datPicker ? this.show_DateP() : null }
       </View>
     );
   }
