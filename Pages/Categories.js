@@ -20,6 +20,25 @@ class CategoriesScreen extends React.Component {
     };
     this.get_cats();
   }
+
+  static navigationOptions =  ({ navigation  }) => ({
+    title : navigation.getParam("title")+" ["+navigation.getParam("items_count",0)+"]",
+    headerRight: a=>{
+      const {params = {}} = navigation.state;
+      return (
+        <HeaderButton 
+        name="plus-square"
+        disabled={params.disable}
+        onPress={()=>params.openAddModal()}
+        size={28} 
+        color="#ecf0f1"
+      />
+      )
+      },
+  });
+  show_channels = (category_id) => {
+    this.props.navigation.navigate('channels',{category_id:category_id, });
+  }
   get_cats(){
     API_.get_categories().then(resp=>{
       if(resp["data"].length>0){

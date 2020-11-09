@@ -5,7 +5,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import HomeScreen from './Pages/Home';
-import CategoriesScreen from './Pages/channels';
+import CategoriesScreen from './Pages/Categories';
+import channelsScreen from './Pages/channels';
 import API from './Libs/API';
 
 API_ = new API();
@@ -19,9 +20,31 @@ function SettingsScreen() {
 
 const Tab = createBottomTabNavigator();
 
+const StackNav = createStackNavigator(
+  {
+    TabNavigator: {
+      screen: AppTabNavigator,
+      navigationOptions: {
+        headerMode: "none",
+        header: null
+      }
+    },
+    channelsScreen: {
+      screen: channelsScreen,
+      navigationOptions: {
+        headerMode: "none",
+        header: null
+      }
+    },
+  },
+  {
+    initialRouteName: "TabNavigator"
+  }
+);
+
 function MyTabs() {
   return (
-    <Tab.Navigator
+    <StackNav.Navigator
       screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
@@ -44,9 +67,9 @@ function MyTabs() {
           size : 20
         }}
     >
-      <Tab.Screen style={{fontSize:20}} name="Home" component={HomeScreen} />
-      <Tab.Screen style={{fontSize:20}}  name="Channels" component={CategoriesScreen} />
-    </Tab.Navigator>
+      <StackNav.Screen style={{fontSize:20}} name="Home" component={HomeScreen} />
+      <StackNav.Screen style={{fontSize:20}}  name="Channels" component={CategoriesScreen} />
+    </StackNav.Navigator>
   );
 }
 
