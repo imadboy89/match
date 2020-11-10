@@ -1,31 +1,50 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal } from 'react-native';
+import { Text, View, StyleSheet, Modal, Button } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-let list = [
-            {key: 'Devin'},
-            {key: 'Dan'},
 
-          ];
 class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        list:list,
-        modalVisible_match:false
+        list:[],
+        modalVisible_match:false,
+        show_datPicker : false
     };
-    API_.get_matches().then(resp=>{
+  this.get_matches(new Date(2020,10,7));
+  }
+get_matches(date_obj=null){
+      API_.get_matches(date_obj).then(resp=>{
       if(resp["status"]=="true"){
         let list = [];
-        let data = resp["data"]["الدوري الاوروبي"];
+        let data = Object.keys(resp["data"]).map(k =>{
+          return {"title":k, data:resp["data"][k]}; 
+        });
         this.setState({list:data});
         for(let i=0;i<data.length;i++){
           
         }
       }
     });
-  }
+}
+ onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    this.date = currentDate;
+    this.setState({show_datPicker:false,list:[]});
+    this.get_matches(currentDate);
+  };
+show_DateP(){
+  this.date = this.date ? this.date : new Date() ;
+  return  (<DateTimePicker
+          testID="datePicker"
+          value={new Date()}
+          mode="date"
+          display="default"
+          onChange={this.onChange}
+        />);
+}
 
   render_modal_credentials(){
     
@@ -54,8 +73,11 @@ class HomeScreen extends React.Component {
     return (
       <View style={styles.container}>
         <Text> Matches list {this.state.modalVisible_match}</Text>
+        <Button title="pick date" onPress={()=>this.setState({show_datPicker:true})} ></Button>
+
         <ItemsList list={this.state.list} onclick={this.onMatch_clicked} key_="home_team" key_key="id"/>
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
+        { this.state.show_datPicker ? this.show_DateP() : null }
       </View>
     );
   }
