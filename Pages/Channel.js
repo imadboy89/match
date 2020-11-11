@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet, Modal, Button, Linking, Picker, } from 'react-native';
+import { Text, View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
@@ -21,6 +21,7 @@ class ChannelScreen extends React.Component {
         url:'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
         actionType:"IPTV",
         channel:null,
+        
     };
     this.get_channel();
 
@@ -103,7 +104,7 @@ class ChannelScreen extends React.Component {
 
   onch_clicked(serv){
     console.log(serv.SecureUrl);
-    console.log(this.state.channel["name"] +",,"+ API_.domain_o+this.channel_photophoto);
+    console.log(this.state.channel["name"] +",,"+ API_.domain_o+this.channel_photo);
     let url = serv.SecureUrl;
     let name = this.state.channel["name"];
     let img = API_.domain_o+this.channel_photo;
@@ -123,46 +124,80 @@ class ChannelScreen extends React.Component {
   render() {
     let servers_list = this.state.channel ?
       this.state.channel.channel_servers.map(serv => (
-        <View style={{margin:10}}>
-          <Button onPress={()=>this.onch_clicked(serv)}  key={serv.id} title={serv.name} style={{margin:10}}></Button>
+        <View style={{margin:8}}>
+          <Button onPress={()=>this.onch_clicked(serv)}  key={serv.id} title={serv.name} style={{margin:5}}></Button>
         </View>
       ))
     : null;
     return (
-      <View style={styles.container}>
-        <Text> Matches list {this.state.modalVisible_match}</Text>
-        <Text> name : {this.state.channel? this.state.channel.en_name : ""}</Text>
-        <Text> Matches {this.state.channel? this.state.channel.en_name : ""}</Text>
-        <Picker
-              selectedValue={this.state.actionType}
-              style={{ height: 50, width: 150 }}
-              onValueChange={(itemValue, itemIndex) => this.setState({actionType:itemValue})}
-            >
-              <Picker.Item label="IPTV" value="IPTV" />
-              <Picker.Item label="PLAYER" value="PLAYER" />
-        </Picker>
+      <ScrollView style={{backgroundColor: '#000',}}  contentContainerStyle={styles.container}>
+      <View style={styles.channel_logo_v}>
+        { this.channel_photo ?  <Image style={styles.channel_logo} source={{uri: API_.domain_o+this.channel_photo}} />: null}
+         </View>
+        <View style={styles.info_cont}>
+          <Text style={styles.info_text}> Name : {this.state.channel && this.state.channel.en_name ? this.state.channel.en_name : ""}</Text>
+          <Text style={styles.info_text}> Language :{this.state.channel && this.state.channel.language? this.state.channel.language : ""}</Text>
+          <Text style={styles.info_text}> Type :{this.state.channel && this.state.channel.type? this.state.channel.type : ""}</Text>
+          
+          <Picker
+                selectedValue={this.state.actionType}
+                style={{ height: 50, width: 150 }}
+                onValueChange={(itemValue, itemIndex) => this.setState({actionType:itemValue})}
+              >
+                <Picker.Item label="IPTV" value="IPTV" />
+                <Picker.Item label="PLAYER" value="PLAYER" />
+          </Picker>
 
-        {servers_list}
+          {servers_list}
+        </View>
+        
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
-      </View>
+        </ScrollView >
     );
   }
 }
 
 const styles = StyleSheet.create({
+  container_scrl: {
+    flex: 1,
+    //backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#ecf0f1',
-    padding: 8,
+    //backgroundColor: '#bd7bc1',
+    flexDirection: 'column',
+    backgroundColor: '#000',
+    color : "#fff",
   },
-  paragraph: {
-    margin: 24,
+  info_cont: {
+    flex: 4,
+    //justifyContent: 'center',
+    padding: 5,
     fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color : "#fff",
+    backgroundColor: '#000',
+    //backgroundColor: '#8e5858',
   },
+  info_text:{
+    fontSize: 18,
+    color : "#fff",
+  },
+  channel_logo:{
+    aspectRatio: 1,
+    width: "100%",
+    height: "100%",
+    resizeMode: 'contain',
+  },
+  channel_logo_v:{
+    width: "100%",
+    flex :1,
+    padding:5,
+    alignContent:"center",
+    alignItems:"center",
+    alignSelf:"center",
+  }
 });
 
 export default ChannelScreen;

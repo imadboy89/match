@@ -1,5 +1,9 @@
-import { Platform, AsyncStorage } from 'react-native';
+import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+
 import Base64 from "./Base64";
+
+//https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
     //alert(Base64.btoa("aW1hZA=="));
@@ -33,7 +37,7 @@ class API {
       }
     }
     this.token = (Math.random().toString(36).substring(2)+Math.random().toString(36).substring(2) ).slice(0,20) ;
-    alert("new");
+    notifyMessage("new");
     const url = this.domain+"device_app";
     this.token_post["token"] = this.token;
     //alert(JSON.stringify(url,this.token_post) + JSON.stringify(this.headers)); 
@@ -64,6 +68,13 @@ class API {
     const da = d.getDate();
     return `${da}-${mo}-${ye}` ;
   }
+  get_date2(date__=null){
+    const d = date__==null ? new Date() : date__;
+    const ye = d.getFullYear();
+    const mo = d.getMonth()+1;
+    const da = d.getDate();
+    return `${ye}-${mo}-${da}` ;
+  }
   get_matches(date_obj=null, page=1){
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_matches(date_obj,page)});
@@ -72,6 +83,7 @@ class API {
 
     date_obj = date_obj ? date_obj : new Date();
     let data = "match_date="+this.get_date(date_obj);
+    console.log(url);
     return fetch(url, {
       method: 'POST',
       headers: this.headers,
@@ -89,7 +101,31 @@ class API {
         this.error = error;
       });
   }
+  get_match(match_id){
+    if(this.headers["device-token"]==""){
+      return this.set_token().then(()=> { return this.get_matches(match_id)});
+    }
+    if(match_id==undefined){
+      notifyMessage("match id invalid");
+    }
+    const url = this.domain+"match_details";
 
+    let data = "match_id="+match_id;
+    console.log(url);
+    return fetch(url, {
+      method: 'POST',
+      headers: this.headers,
+      body:data
+    })
+      .then(response => response.json())
+      .then(resJson => {
+        return resJson;
+      })
+      .catch(error => {
+        console.log('ERROR', error);
+        this.error = error;
+      });
+  }
   get_channel(id){
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_channel(id)});
@@ -147,7 +183,7 @@ class API {
     })
       .then(response => response.json())
       .then(resJson => {
-        if(resJson["data"].length>0 ){
+        if(resJson && resJson["data"] && resJson["data"].length>0 ){
         }
         return resJson;
       })
@@ -199,6 +235,28 @@ class API {
         this.error = error;
       });
   };
+
+
+  get_url_content(url){
+
+    const q_url  = "https://developers.facebook.com/tools/debug/?q=";
+    const sc_url = "https://developers.facebook.com/tools/debug/echo/?q=";
+    url = encodeURIComponent(url) 
+
+    return fetch(q_url+url, {
+      method: 'GET',
+    })
+      .then(response => {
+        return fetch(sc_url+url, {
+          method: 'GET',
+        })
+      })
+
+      .catch(error => {
+        console.log('ERROR', error);
+        this.error = error;
+      });
+  }
 }
 
 export default API;

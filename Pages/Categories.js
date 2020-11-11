@@ -22,8 +22,8 @@ class CategoriesScreen extends React.Component {
     };
     this.get_cats(1);
   }
-  show_channels = (category_id) => {
-    this.props.navigation.navigate('channels',{category_id:category_id, });
+  show_channels = (category) => {
+    this.props.navigation.navigate('channels',{category_id:category.category_id,category_name: category.category_name});
   }
   get_cats(page=1){
     API_.get_categories(page).then(resp=>{
@@ -39,31 +39,13 @@ class CategoriesScreen extends React.Component {
   }
 
   onchannel_clicked =(item)=>{
-    this.props.navigation.navigate('Channels', { category_id: item.category_id });
+    this.props.navigation.navigate('Channels',{category_id:item.category_id,category_name: item.category_name});
 
-
-    //this.props.navigation.navigate('channels',{category_id:item.category_id, });
-    /*
-    API_.get_channels(item.category_id).then(resp=>{
-      if(resp["data"].length>0){
-        for (let i=0;i<resp["data"].length;i++){
-          API_.get_channel(resp["data"][i].channel_id).then(resp=>{
-            this.chanels_data[i].en_name = resp["data"].en_name;
-            this.setState({list:[]});
-            this.setState({list:this.chanels_data,key_:"en_name",key_key:"channel_id"});
-          });
-        }
-        let list = [];
-        this.chanels_data = resp["data"];
-        this.setState({list:this.chanels_data,key_:"en_name",key_key:"channel_id"});
-      }
-    });
-    */
   }
   render() {
     return (
       <View style={styles.container}>
-        <Text> Matches list {this.state.modalVisible_match}</Text>
+        <Text style={styles.title}>Channels</Text>
         <Button
           title="Categories"
           onPress={()=>{ this.get_cats();}}
@@ -83,14 +65,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#ecf0f1',
-    padding: 8,
+    backgroundColor: '#000',
+    color : "#fff",
   },
-  paragraph: {
-    margin: 24,
-    fontSize: 18,
+  title: {
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
+    color : "#fff",
   },
 });
 

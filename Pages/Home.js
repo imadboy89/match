@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal, Button } from 'react-native';
+import { Text, View, StyleSheet, Modal, Button, TouchableOpacity } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import IconButton from "../components/IconButton";
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -11,16 +11,21 @@ class HomeScreen extends React.Component {
     this.state = {
         list:[],
         modalVisible_match:false,
-        show_datPicker : false
+        show_datPicker : false,
+        matches_date:new Date(),
     };
-  this.get_matches(new Date(2020,10,7));
+  this.get_matches(this.state.matches_date);
+
   }
+
+  
 get_matches(date_obj=null){
       API_.get_matches(date_obj).then(resp=>{
       if(resp["status"]=="true"){
         let list = [];
         let data = Object.keys(resp["data"]).map(k =>{
-          return {"title":k, data:resp["data"][k]}; 
+          let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] ? resp["data"][k][0]["league_badge"]["path"] : false;
+          return {"title":k,"img":img, data:resp["data"][k]}; 
         });
         this.setState({list:data});
         for(let i=0;i<data.length;i++){
@@ -31,15 +36,14 @@ get_matches(date_obj=null){
 }
  onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    this.date = currentDate;
-    this.setState({show_datPicker:false,list:[]});
+    this.setState({show_datPicker:false,list:[],matches_date:currentDate});
     this.get_matches(currentDate);
   };
 show_DateP(){
-  this.date = this.date ? this.date : new Date() ;
+  alert("show_DateP");
   return  (<DateTimePicker
           testID="datePicker"
-          value={new Date()}
+          value={this.state.matches_date}
           mode="date"
           display="default"
           onChange={this.onChange}
@@ -67,17 +71,38 @@ show_DateP(){
       );
 }
   onMatch_clicked =(item)=>{
-    this.setState({modalVisible_match:true,match:item});
+    //API_.get_matche(item.id).then(out=>console.log(out));
+    this.props.navigation.navigate('Match', { match_id: item.id });
+    //this.setState({modalVisible_match:true,match:item});
   }
   render() {
+    
     return (
       <View style={styles.container}>
-        <Text> Matches list {this.state.modalVisible_match}</Text>
-        <Button title="pick date" onPress={()=>this.setState({show_datPicker:true})} ></Button>
+        <Text style={styles.title}> Matches list</Text>
+        <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",}} >
+          <IconButton title="pick date"  name="minus" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+            this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
+            this.setState({list:[]});
+            this.get_matches(this.state.matches_date);
+          }}  />
+            <Text style={[styles.title,]} >
+              {API_.get_date2(this.state.matches_date)}
+            </Text>
+          <IconButton title="pick date"  name="plus" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+            this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
+            this.setState({list:[]});
+            this.get_matches(this.state.matches_date);
+          }}  />
+          <IconButton title="pick date"  name="edit" size={styles.title.fontSize} style={styles.icons} onPress={()=>this.setState({show_datPicker:true})}  />
+        </View>
 
-        <ItemsList list={this.state.list} onclick={this.onMatch_clicked} key_="home_team" key_key="id"/>
-        {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
         { this.state.show_datPicker ? this.show_DateP() : null }
+        
+        <ItemsList list={this.state.list} onclick={this.onMatch_clicked} key_="home_team" key_key="id"  />
+        {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
+
+        
       </View>
     );
   }
@@ -88,15 +113,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#ecf0f1',
-    padding: 8,
+    backgroundColor: '#000',
+    color : "#fff",
   },
-  paragraph: {
-    margin: 24,
-    fontSize: 18,
+
+  text:{
+    color : "#fff",
+    marginRight:10,justifyContent: 'center',alignItems: 'center'
+  },
+  title: {
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
+    color : "#d1d8e0",
   },
+  icons:{
+    marginLeft:10,
+    marginRight:10,
+
+  }
 });
 
 export default HomeScreen;

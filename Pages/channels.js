@@ -19,25 +19,28 @@ class ChannelsScreen extends React.Component {
         key_:"en_name",
         key_key:"channel_id",
         url:'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
+        category_name:"",
     };
+
     this.get_channels();
 
   }
   get_channels(){
-      API_.get_channels(this.props.route.params.category_id).then(resp=>{
-        if(resp["data"].length>0){
-          for (let i=0;i<resp["data"].length;i++){
-            API_.get_channel(resp["data"][i].channel_id).then(resp=>{
-              this.chanels_data[i].en_name = resp["data"].en_name;
-              this.setState({list:[]});
-              this.setState({list:this.chanels_data});
-            });
-          }
-          let list = [];
-          this.chanels_data = resp["data"];
-          this.setState({list:this.chanels_data});
+    this.category_name = this.props.route.params.category_name;
+    API_.get_channels(this.props.route.params.category_id).then(resp=>{
+      if(resp["data"].length>0){
+        for (let i=0;i<resp["data"].length;i++){
+          API_.get_channel(resp["data"][i].channel_id).then(resp=>{
+            this.chanels_data[i].en_name = resp["data"].en_name;
+            this.setState({list:[]});
+            this.setState({list:this.chanels_data});
+          });
         }
-      });
+        let list = [];
+        this.chanels_data = resp["data"];
+        this.setState({list:this.chanels_data});
+      }
+    });
   }
   render_ReactHlsPlayer(){
     if (this.state.player_type == 1){
@@ -112,7 +115,7 @@ class ChannelsScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text> Matches list {this.state.modalVisible_match}</Text>
+        <Text style={styles.title}>{this.category_name}</Text>
         <ItemsList 
           list={this.state.list} 
           onclick={this.onchannel_clicked} 
@@ -131,14 +134,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#ecf0f1',
-    padding: 8,
+    backgroundColor: '#000',
+    color : "#fff",
   },
   paragraph: {
     margin: 24,
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color : "#d1d8e0",
   },
 });
 
