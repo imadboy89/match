@@ -32,7 +32,6 @@
     "react-native-tab-view": "^2.15.1",
     "react-native-vector-icons": "*",
     "react-native-video": "*",
-    "react-native-web": "~0.13.12",
     "react-native-webview": "^10.10.2"
   },
   "devDependencies": {
