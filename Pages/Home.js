@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal, Button, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Modal, Button, TouchableOpacity, Platform } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -13,21 +13,26 @@ class HomeScreen extends React.Component {
         modalVisible_match:false,
         show_datPicker : false,
         matches_date:new Date(),
+        loading :true,
     };
   this.get_matches(this.state.matches_date);
 
   }
 
-  
-get_matches(date_obj=null){
+
+  get_matches(date_obj=null){
       API_.get_matches(date_obj).then(resp=>{
       if(resp["status"]=="true"){
         let list = [];
         let data = Object.keys(resp["data"]).map(k =>{
-          let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] ? resp["data"][k][0]["league_badge"]["path"] : false;
+          let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
+                    ? resp["data"][k][0]["league_badge"]["path"] : false;
+          for(let i=0;i<resp["data"][k].length;i++){
+            resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
+          }
           return {"title":k,"img":img, data:resp["data"][k]}; 
         });
-        this.setState({list:data});
+        this.setState({list:data,loading:false});
         for(let i=0;i<data.length;i++){
           
         }
@@ -36,12 +41,16 @@ get_matches(date_obj=null){
 }
  onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    this.setState({show_datPicker:false,list:[],matches_date:currentDate});
+    this.setState({show_datPicker: false ,list:[],matches_date:currentDate,loading:true});
     this.get_matches(currentDate);
+    
   };
 show_DateP(){
-  alert("show_DateP");
   return  (<DateTimePicker
+            style={{
+              color: '#fff',
+              backgroundColor: '#000',
+            }}
           testID="datePicker"
           value={this.state.matches_date}
           mode="date"
@@ -81,28 +90,33 @@ show_DateP(){
       <View style={styles.container}>
         <Text style={styles.title}> Matches list</Text>
         <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",}} >
-          <IconButton title="pick date"  name="minus" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+          <IconButton 
+            disabled={this.state.loading}
+            title="pick date"  name="minus" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
             this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
-            this.setState({list:[]});
+            this.setState({list:[],loading:true});
             this.get_matches(this.state.matches_date);
           }}  />
             <Text style={[styles.title,]} >
               {API_.get_date2(this.state.matches_date)}
             </Text>
-          <IconButton title="pick date"  name="plus" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+          <IconButton title="pick date"  
+            disabled={this.state.loading}
+            name="plus" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
             this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
-            this.setState({list:[]});
+            this.setState({list:[],loading:true});
             this.get_matches(this.state.matches_date);
           }}  />
-          <IconButton title="pick date"  name="edit" size={styles.title.fontSize} style={styles.icons} onPress={()=>this.setState({show_datPicker:true})}  />
+          <IconButton 
+            disabled={this.state.loading}
+            title="pick date"  name="edit" size={styles.title.fontSize} style={styles.icons} onPress={()=>this.setState({show_datPicker:true})}  />
         </View>
 
-        { this.state.show_datPicker ? this.show_DateP() : null }
         
-        <ItemsList list={this.state.list} onclick={this.onMatch_clicked} key_="home_team" key_key="id"  />
+        <ItemsList loading={this.state.loading} list={this.state.list} onclick={this.onMatch_clicked} key_="home_team" key_key="id"  />
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
 
-        
+      { this.state.show_datPicker ? this.show_DateP() : null }       
       </View>
     );
   }

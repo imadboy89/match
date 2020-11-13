@@ -3,8 +3,8 @@ import { Text, View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Imag
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
-import {Video} from 'expo';
-import { useRoute } from '@react-navigation/native';
+import Video from 'expo';
+import Loading from "../components/Loader";
 
 let list = [
 
@@ -21,6 +21,7 @@ class ChannelScreen extends React.Component {
         url:'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
         actionType:"IPTV",
         channel:null,
+        loading:true,
         
     };
     this.get_channel();
@@ -30,7 +31,7 @@ class ChannelScreen extends React.Component {
       this.channel_photo = this.props.route.params.channel_photo;
       API_.get_channel(this.props.route.params.channel_id).then(resp=>{
         if(resp["data"] && resp["data"]["en_name"] ){
-          this.setState({channel:resp["data"]});
+          this.setState({channel:resp["data"],loading:false});
         }
       });
   }
@@ -103,8 +104,6 @@ class ChannelScreen extends React.Component {
   }
 
   onch_clicked(serv){
-    console.log(serv.SecureUrl);
-    console.log(this.state.channel["name"] +",,"+ API_.domain_o+this.channel_photo);
     let url = serv.SecureUrl;
     let name = this.state.channel["name"];
     let img = API_.domain_o+this.channel_photo;
@@ -134,6 +133,8 @@ class ChannelScreen extends React.Component {
       <View style={styles.channel_logo_v}>
         { this.channel_photo ?  <Image style={styles.channel_logo} source={{uri: API_.domain_o+this.channel_photo}} />: null}
          </View>
+         <View style={styles.info_cont}>
+         { this.state.loading ? <Loading /> : 
         <View style={styles.info_cont}>
           <Text style={styles.info_text}> Name : {this.state.channel && this.state.channel.en_name ? this.state.channel.en_name : ""}</Text>
           <Text style={styles.info_text}> Language :{this.state.channel && this.state.channel.language? this.state.channel.language : ""}</Text>
@@ -141,7 +142,7 @@ class ChannelScreen extends React.Component {
           
           <Picker
                 selectedValue={this.state.actionType}
-                style={{ height: 50, width: 150 }}
+                style={{ height: 50, width: 150,backgroundColor:"#2c3e50",color:"#fff" }}
                 onValueChange={(itemValue, itemIndex) => this.setState({actionType:itemValue})}
               >
                 <Picker.Item label="IPTV" value="IPTV" />
@@ -150,7 +151,8 @@ class ChannelScreen extends React.Component {
 
           {servers_list}
         </View>
-        
+        }
+        </View>
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
         </ScrollView >
     );

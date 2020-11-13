@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
-import { useRoute } from '@react-navigation/native';
+import Loading from '../components/Loader';
 
 let list = [
 
@@ -20,6 +20,7 @@ class Matchcreen extends React.Component {
         channel:null,
         matche_details:{},
         visible_tab : "general",
+        loading:true,
     };
     this.get_Match(this.props.route.params.match_id);
 
@@ -27,7 +28,7 @@ class Matchcreen extends React.Component {
   get_Match(id){
       API_.get_match(id).then(resp=>{
         if(resp["data"] && resp["data"][0] ){
-          this.setState({matche_details:resp["data"][0]});
+          this.setState({matche_details:resp["data"][0],loading:false});
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
         }
@@ -72,7 +73,6 @@ class Matchcreen extends React.Component {
             <Text style={i==0?styles.stats_frag_r_ :styles.stats_frag_r}>{row ? row.away : ""}</Text>
           </View>);
     });
-    console.log(stats);
     return (
       <View style={styles.view_tab}>
         {stats ? stats : null}
@@ -83,30 +83,31 @@ class Matchcreen extends React.Component {
     let players = {};
     for(let i=0;i<data.length;i++){
       let el = data[i];
-      players[parseInt(el.lineup_position)] = el;
+      let position = parseInt(el.lineup_position)>0 ? parseInt(el.lineup_position) : i+1;
+      players[position] = el;
     }
-    console.log(players);
+    
     return (
       <View style={styles.view_tab}>
       <ImageBackground style={styles.background_pitch} source={require('../assets/ptch.jpg')} >
         <View style={styles.view_inline}>
-          <Text style={styles.lineup_player}>{players[1].lineup_player}</Text>
+          <Text style={styles.lineup_player}>{players[1] ? players[1].lineup_player : ""}</Text>
         </View> 
         <View style={styles.view_inline}>
-          <Text style={styles.lineup_player}>{players[2].lineup_player}</Text>
-          <Text style={styles.lineup_player}>{players[5].lineup_player}</Text>
-          <Text style={styles.lineup_player}>{players[4].lineup_player}</Text>
-          <Text style={styles.lineup_player}>{players[3].lineup_player}</Text>
+          <Text style={styles.lineup_player}>{players[2] ? players[2].lineup_player : ""}</Text>
+          <Text style={styles.lineup_player}>{players[5] ? players[5].lineup_player : ""}</Text>
+          <Text style={styles.lineup_player}>{players[4] ? players[4].lineup_player : ""}</Text>
+          <Text style={styles.lineup_player}>{players[3] ? players[3].lineup_player : ""}</Text>
         </View> 
         <View style={styles.view_inline}>
-          <Text style={styles.lineup_player}>{players[7].lineup_player}</Text>
-          <Text style={styles.lineup_player}>{players[8].lineup_player}</Text>
-          <Text style={styles.lineup_player}>{players[10].lineup_player}</Text>
-          <Text style={styles.lineup_player}>{players[6].lineup_player}</Text>
+          <Text style={styles.lineup_player}>{players[7] ? players[7].lineup_player : ""}</Text>
+          <Text style={styles.lineup_player}>{players[8] ? players[8].lineup_player : ""}</Text>
+          <Text style={styles.lineup_player}>{players[10] ? players[10].lineup_player : ""}</Text>
+          <Text style={styles.lineup_player}>{players[6] ? players[6].lineup_player : ""}</Text>
         </View> 
         <View style={styles.view_inline}>
-          <Text style={styles.lineup_player}>{players[11].lineup_player}</Text>
-          <Text style={styles.lineup_player}>{players[9].lineup_player}</Text>
+          <Text style={styles.lineup_player}>{players[11] ? players[11].lineup_player : ""}</Text>
+          <Text style={styles.lineup_player}>{players[9] ? players[9].lineup_player : ""}</Text>
         </View> 
       </ImageBackground>
       </View> 
@@ -115,7 +116,7 @@ class Matchcreen extends React.Component {
   get_View_lineup(){
     if( this.state.matche_details=={} || this.state.matche_details.home_lineup==undefined || this.state.matche_details.away_lineup==undefined ||
       this.state.matche_details.home_lineup.length<11 || this.state.matche_details.away_lineup.length<11) 
-      return <View style={styles.view_tab}> <Text >Line-up not available</Text></View>;
+      return <View style={styles.view_tab}><Text style={styles.title}>Line-up not available</Text></View>;
     const is_home = this.state.lineup_type==undefined || this.state.lineup_type=="home" ;
     return (
       <View style={styles.view_tab}>
@@ -142,10 +143,15 @@ class Matchcreen extends React.Component {
           <Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"})}/>
           <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/>
         </View>
-        { this.state.matche_details!={} && this.state.visible_tab=="general" ? this.get_View_general() : null}
-        { this.state.matche_details!={} && this.state.visible_tab=="stats"   ? this.get_View_stats()   : null}
-        { this.state.matche_details!={} && this.state.visible_tab=="lineup"   ? this.get_View_lineup() : null}
-
+        <View style={{flex:1}}>
+        {this.state.loading ? <Loading /> :
+            <View style={{flex:1}}>
+            { this.state.matche_details!={} && this.state.visible_tab=="general" ? this.get_View_general() : null}
+            { this.state.matche_details!={} && this.state.visible_tab=="stats"   ? this.get_View_stats()   : null}
+            { this.state.matche_details!={} && this.state.visible_tab=="lineup"   ? this.get_View_lineup() : null}
+          </View>
+        }
+        </View>
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
         
       </View>
@@ -171,7 +177,6 @@ const styles = StyleSheet.create({
     marginTop:10,
     flexDirection:'row', 
     flexWrap:'wrap',
-    flex: 1 ,
   },
   view_tab:{
     marginTop:10,

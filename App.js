@@ -11,7 +11,9 @@ import ChannelsScreen from './Pages/Channels';
 import ChannelScreen from './Pages/Channel';
 import FSScreen from './Pages/FS';
 import Matchcreen from './Pages/Match';
-
+import NewsScreen from './Pages/News';
+import ArticleScreen from './Pages/Article';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 /*
@@ -22,7 +24,7 @@ if (!I18nManager.isRTL) {
 let screenHeader = {
   headerStyle: {
     backgroundColor: '#4b6584',
-    height: 50,
+    height: 80,
     },
   headerTintColor: '#fff',
   headerTitleStyle: {
@@ -32,7 +34,10 @@ let screenHeader = {
   }
 
 notifyMessage = function(msg: string,title: string) {
-
+    if(API_.isWeb){
+      alert(msg);
+      return;
+    }
     Alert.alert(
       title!=undefined ? title : "Message",
       msg,
@@ -54,6 +59,7 @@ function SettingsScreen() {
 const StackNav = createBottomTabNavigator();
 const ChannelsStack = createStackNavigator();
 const MatchesStack = createStackNavigator();
+const NewsStack = createStackNavigator();
 
 
 function ChannelsStackScreen() {
@@ -76,6 +82,14 @@ function MatchesStackScreen() {
     </MatchesStack.Navigator>
   );
 }
+function NewsStackScreen() {
+  return (
+    <NewsStack.Navigator>
+      <NewsStack.Screen options={screenHeader} name="News" component={NewsScreen} />
+      <NewsStack.Screen options={screenHeader} name="Article" component={ArticleScreen} />
+    </NewsStack.Navigator>
+  );
+}
 
 function MyTabs() {
   return (
@@ -87,14 +101,18 @@ function MyTabs() {
 
             if (route.name === 'Home') {
               iconName = focused
-                ? 'ios-home'
-                : 'ios-home';
+                ? 'home'
+                : 'home';
             } else if (route.name === 'Channels') {
-              iconName = focused ? 'ios-tv' : 'ios-tv';
+              iconName = focused ? 'tv' : 'tv';
+            } else if (route.name === 'News') {
+              iconName = focused ? 'newspaper-o' : 'newspaper-o';
+            } else if (route.name === 'web') {
+              iconName = focused ? 'chrome' : 'chrome';
             }
-
+            
             // You can return any component that you like here!
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return <Icon name={iconName} size={size} color={color} />;
           },
         })}
       tabBarOptions={{
@@ -106,6 +124,8 @@ function MyTabs() {
       <StackNav.Screen name="Home" component={MatchesStackScreen} />
       <StackNav.Screen name="web" component={FSScreen} />
       <StackNav.Screen name="Channels" component={ChannelsStackScreen} />
+      <StackNav.Screen name="News" component={NewsStackScreen} />
+      
     </StackNav.Navigator>
   );
 }

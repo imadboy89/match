@@ -3,7 +3,8 @@ import { Text, View, StyleSheet, Modal, Button, Linking } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
-import {Video} from 'expo';
+import Video from 'expo';
+import { useRoute } from '@react-navigation/native';
 
 let list = [
 
@@ -19,6 +20,7 @@ class ChannelsScreen extends React.Component {
         key_key:"channel_id",
         url:'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
         category_name:"",
+        loading:true,
     };
 
     this.get_channels();
@@ -26,6 +28,7 @@ class ChannelsScreen extends React.Component {
   }
   get_channels(){
     this.category_name = this.props.route.params.category_name;
+    this.props.navigation.setOptions({title: this.category_name})
     API_.get_channels(this.props.route.params.category_id).then(resp=>{
       if(resp["data"].length>0){
         for (let i=0;i<resp["data"].length;i++){
@@ -37,7 +40,7 @@ class ChannelsScreen extends React.Component {
         }
         let list = [];
         this.chanels_data = resp["data"];
-        this.setState({list:this.chanels_data});
+        this.setState({list:this.chanels_data,loading:false});
       }
     });
   }
@@ -70,7 +73,6 @@ class ChannelsScreen extends React.Component {
               this.setState({ modalVisible_match:false,});
           } }
         >
-          <View style={{flex:.4,backgroundColor:"#2c3e5066"}}></View>
           <View style={{height:400,width:"100%",backgroundColor:"#646c78"}}>
           <Button title="Close" onPress={()=>{ this.setState({modalVisible_match:false});}} ></Button>
           <Text >   {this.state.url} </Text>
@@ -116,6 +118,7 @@ class ChannelsScreen extends React.Component {
       <View style={styles.container}>
         <Text style={styles.title}>{this.category_name}</Text>
         <ItemsList 
+          loading={this.state.loading}
           list={this.state.list} 
           onclick={this.onchannel_clicked} 
           onclick_hls={this.state.key_key=="channel_id" ? this.onchannel_clicked_hls : false} 

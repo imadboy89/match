@@ -19,6 +19,7 @@ class CategoriesScreen extends React.Component {
         player_type:1,
         key_:"category_name",
         key_key:"category_id",
+        loading:true,
     };
     this.get_cats(1);
   }
@@ -33,6 +34,8 @@ class CategoriesScreen extends React.Component {
         data = page==1 ? data : this.state.list .concat(data);
         this.setState({list:data, key_:"category_name",key_key:"category_id"});
         this.get_cats(page+1);
+      }else{
+        this.setState({loading:false});
       }
     });
 
@@ -45,12 +48,12 @@ class CategoriesScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Channels</Text>
         <Button
           title="Categories"
           onPress={()=>{ this.get_cats();}}
         ></Button>
-        <ItemsList 
+        <ItemsList  
+          loading={this.state.loading}
           list={this.state.list} 
           onclick={this.onchannel_clicked} 
           key_={this.state.key_} key_key={this.state.key_key}

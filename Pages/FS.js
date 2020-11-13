@@ -17,9 +17,16 @@ class FSScreen extends React.Component {
         show_datPicker : false,
         matches_date:new Date(),
         loading:false,
+        doRender : false,
     };
     this.injectedJS = `
       //alert("from inside");
+      (function() {
+        if (confirm('Render ...?')) {
+          document.getElementsByTagName("body")[0].outerHTML = document.getElementsByTagName("body")[0].outerText;
+        }
+      })();
+      
     `;
   }
 get_url_content(date_obj=null){

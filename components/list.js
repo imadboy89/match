@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Button, Image } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground } from 'react-native';
 import { SafeAreaView,SectionList } from 'react-native';
-
+import Loader from "./Loader";
 
 class ItemsList extends React.Component {
 
@@ -9,8 +9,12 @@ class ItemsList extends React.Component {
   get_item(item,col_key){
     if(col_key=="home_team"){
       return (
-        <View style={styles.matche_container}>
-          <View style={styles.matche_team_time}><Text style={styles.matche_team_time}>{item.time}</Text></View>
+        <View style={[styles.matche_container,item.live==1 ? styles.matche_container_live:{}]}>
+          <View style={styles.matche_team_time}>
+            <Text style={styles.matche_team_time_t}>{item.time}</Text>
+            {item.live==1 ? <Text style={styles.matche_team_time_live}>Live</Text> : null}
+            
+          </View>
           <View style={styles.matche_team_badge}>
             <Image
             style={styles.matche_team_logo}
@@ -32,22 +36,49 @@ class ItemsList extends React.Component {
           </View>
         </View>
         );
-    }else{  
+    }else if(col_key=="title_news"){ 
+      
+      return (
+        <View style={styles.news_container}>
+          <ImageBackground style={{flex:1,width:"100%"}} source={{uri: item.img}} >
+            <View style={styles.news_img_v}>
+
+            </View>
+            <View style={styles.news_title_v}><Text style={styles.news_title_t}>{item.title_news}</Text></View>
+          </ImageBackground>
+        </View>
+        );
+    }else if(col_key=="category_name"){  
+      return (
+        <View style={styles.news_container}>
+          <ImageBackground style={{flex:1,width:"100%"}} source={{uri: API_.domain_o+item.category_photo}} >
+            <View style={styles.news_img_v}>
+
+            </View>
+            <View style={styles.news_title_v}><Text style={styles.news_title_t}>{item[col_key]}</Text></View>
+          </ImageBackground>
+        </View>
+
+        );
+    }else{
+      //category_photo
       return (
         <Text style={styles.item}>- { col_key=="home_team" ? item["home_team"] +" - "+ item["away_team"] :item[col_key]}</Text>
         );
     }
   }
-  render() {
+  render_list() {
     let list = this.props.list;
     let col_key = this.props.key_ ;
     let key = this.props.key_key ;
+    //console.log(list,"-");
     let onclick_hls = this.props.onclick_hls ;
     let onclick_vid = this.props.onclick_vid ;
-    if (list[0] && list[0]["title"]==undefined){
+    if (list && list[0] && list[0]["title"]==undefined){
       list=[{"title":"",data:list}];
     }
-    
+    //console.log(list,"-");
+
     return (
       <View style={styles.container}>
       <Text>{this.props.name}</Text>
@@ -58,27 +89,30 @@ class ItemsList extends React.Component {
             keyExtractor={(item, index) => item[key]}
 
             renderItem={({item}) => 
-            <TouchableOpacity onPress={ () => {this.props.onclick(item) }}>
-              <View style={{flexDirection:'row', flexWrap:'wrap'}}>
-              {this.get_item(item,col_key)}
-            {onclick_hls && <Button
-                  title="HSL"
-                  onPress={()=>{ onclick_hls(item);}}
-                ></Button>
-            }
-            {onclick_vid && 
-              <Button
-              style={{}}
-                  title="Vid"
-                  onPress={()=>{ onclick_vid(item);}}
-                ></Button>
-            }
-                </View>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={ () => {this.props.onclick(item) }}>
+                <View style={{flexDirection:'row', flexWrap:'wrap'}}>
+                {this.get_item(item,col_key)}
+
+              {onclick_hls && <Button
+                    title="HSL"
+                    onPress={()=>{ onclick_hls(item);}}
+                  ></Button>
+              }
+              {onclick_vid && 
+                <Button
+                style={{}}
+                    title="Vid"
+                    onPress={()=>{ onclick_vid(item);}}
+                  ></Button>
+              }
+                  </View>
+              </TouchableOpacity>
             }
 
-            renderSectionHeader={({ section: { title,img } }) => (
+            renderSectionHeader={({ section: { title,img } }) => {
+              return title ? (
               <View style={[{flex:1,paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap',},styles.header]}>
+                <Text style={[styles.header,{flex:10}]}>{title}</Text>
                 <View style={{flex:1}}>
                 { img ?  
                         <Image 
@@ -87,14 +121,20 @@ class ItemsList extends React.Component {
                           />
                   : null}
                 </View>
-                <Text style={[styles.header,{flex:10}]}>{title}</Text>
               </View>
-          )}
+          ) : null}}
           
           />
         </SafeAreaView>
       </View>
     );
+  }
+  render() {
+
+    return (<View style={styles.container}>
+
+      {this.props.loading ? <Loader/> : this.render_list()}
+    </View>);
   }
 }
 export default ItemsList;
@@ -103,8 +143,11 @@ export default ItemsList;
 const styles = StyleSheet.create({
   container: {
    flex: 1,
-   paddingTop: 10,
+   paddingTop: 5,
+   width:"100%",
    backgroundColor: '#000',
+    //justifyContent: 'center',
+    //alignItems:'center',
   },
   item: {
     padding: 10,
@@ -114,24 +157,37 @@ const styles = StyleSheet.create({
     color:"#fff",
   },
   header: {
+    marginRight:5,
+    marginLeft:5,
     fontSize: 25,
-    backgroundColor: "#778ca3"
+    backgroundColor: "#bdc3c7"
   },
   title: {
     fontSize: 23
   },
   matche_container:{
+    width:"100%",
     marginTop:5,
     marginBottom:5,
     flexDirection:'row', 
     flexWrap:'wrap',
     flex: 1 ,
-    height:50
+    height:50,
+    marginRight:5,
+    marginLeft:5,
+    borderRadius:8,
+    borderWidth:1,
+  },
+  matche_container_live:{
+    borderRadius:7,
+    borderWidth: 1,
+    borderColor:"#2ecc71",
   },
   matche_team_names:{
     flex: 15 ,
     fontSize:25,
-    backgroundColor: "#4b6584"
+    backgroundColor: "#4b6584",
+    
   },
   matche_team_score:{
     flex: 2 ,
@@ -139,6 +195,8 @@ const styles = StyleSheet.create({
     alignItems:'center',
     color:"#d1d8e0",
     fontSize:25,
+    borderTopRightRadius:8,
+    borderBottomRightRadius:8,
   },
   matche_team_time:{
     flex: 4 ,
@@ -146,6 +204,21 @@ const styles = StyleSheet.create({
     alignItems:'center',
     justifyContent: 'center',
     color:"#fff",
+    borderTopLeftRadius:8,
+    borderBottomLeftRadius:8,
+    backgroundColor:"#2c3e50",
+  },
+  matche_team_time_t:{
+    fontSize:18,
+    alignItems:'center',
+    justifyContent: 'center',
+    color:"#fff",
+  },
+  matche_team_time_live:{
+    fontSize:18,
+    alignItems:'center',
+    justifyContent: 'center',
+    color:"#2ecc71",
   },
   matche_team_name:{
     color:"#d1d8e0",
@@ -178,5 +251,44 @@ const styles = StyleSheet.create({
     fontSize:18,
     fontWeight: 'bold',
   },
-  
+
+
+  news_container:{
+    marginTop:5,
+    marginBottom:5,
+    
+    height:200,
+    width:"95%",
+    margin:"auto",
+    backgroundColor:"#34495e",
+    borderRadius: 10,
+  },
+  news_img_v:{
+    flex: 12 ,
+    width:"100%",
+    color:"#fff",
+    alignItems:'center',
+  },
+  news_img_i:{
+    width: "100%",
+    height: "100%",
+    aspectRatio: 1,
+    resizeMode:"contain",
+    alignItems:'center',
+  },
+  news_title_v:{
+    width:"100%",
+    flex: 2 ,
+    fontSize:18,
+    color:"#fff",
+    backgroundColor:"#00000091"
+  },
+  news_title_t:{
+    flex: 1 ,
+    fontSize:15,
+    alignItems:'center',
+    justifyContent: 'center',
+    alignSelf : "center",
+    color:"#fff",
+  },
 });
