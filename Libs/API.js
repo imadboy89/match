@@ -109,16 +109,16 @@ class API {
   get_date(date__=null){
     const d = date__==null ? new Date() : date__;
     const ye = d.getFullYear();
-    const mo = d.getMonth()+1;
+    const mo = (d.getMonth()+1);
     const da = d.getDate();
     return `${da}-${mo}-${ye}` ;
   }
   get_date2(date__=null){
     const d = date__==null ? new Date() : date__;
     const ye = d.getFullYear();
-    const mo = d.getMonth()+1;
-    const da = d.getDate();
-    return `${ye}-${mo}-${da}` ;
+    const mo = "0"+(d.getMonth()+1);
+    const da = "0"+d.getDate();
+    return `${ye}-${mo.slice(-2)}-${da.slice(-2)}` ;
   }
   get_date_time(date__=null){
     const d = date__==null ? new Date() : date__;
@@ -130,8 +130,13 @@ class API {
     return `${ye}-${mo.slice(-2)}-${da.slice(-2)} ${ho.slice(-2)}:${mi.slice(-2)}` ;
   }
   convert_time(time, timeZone) {
-    let h = "0"+(parseInt(time.split(":")[0])-1);
-    return h.slice(-2)+":"+time.split(":")[1];
+    try{
+      let h = "0"+(parseInt(time.split(":")[0])-1);
+      return h.slice(-2)+":"+time.split(":")[1];
+    }catch(e){
+      return time;
+    }
+
     /*
     try{
       if(timeZone == undefined){
@@ -148,16 +153,19 @@ class API {
       const offset_ny = newTZ - utc;
       //notifyMessage("4"+posix_ny);
       let timeZone_ = parseInt(offset_ny/3600000);
-      notifyMessage("5 "+d+" \n  "+newTZ_d);
+      //notifyMessage("5 "+d+" \n  "+newTZ_d);
       timeZone_=timeZone_>0 ? "+"+timeZone_ : timeZone_ ;
       console.log(time,);
-      notifyMessage("6 "+time+" GMT"+timeZone_);
+      notifyMessage("6 "+((new Date()).toLocaleString("en-US", {timeZone: "Africa/Casablanca"})) );
+      notifyMessage("6 "+ (new Date()) );
+
       return  this.get_date_time((new Date(time+" GMT"+timeZone_))).split(" ")[1];
     }catch(e){
       notifyMessage(e);
       return time;
     }
     */
+    
   }
   get_matches(date_obj=null, page=1){
     if(this.headers["device-token"]==""){

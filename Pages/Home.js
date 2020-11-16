@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
+import * as Font from 'expo-font';
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -16,10 +17,16 @@ class HomeScreen extends React.Component {
         loading :true,
     };
   this.get_matches(this.state.matches_date);
-
+  this.props.navigation.setOptions({title: "Matches list",
+    "headerRight":()=>(
+            <IconButton 
+              name="refresh" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+              this.setState({list:[],loading:true});
+              this.get_matches(this.state.matches_date);
+            }}  />
+    )
+  });
   }
-
-
   get_matches(date_obj=null){
       API_.get_matches(date_obj).then(resp=>{
       if(resp["status"]=="true"){
@@ -85,10 +92,9 @@ show_DateP(){
     //this.setState({modalVisible_match:true,match:item});
   }
   render() {
-    
+
     return (
       <View style={styles.container}>
-        <Text style={styles.title}> Matches list</Text>
         <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",}} >
           <IconButton 
             disabled={this.state.loading}
@@ -98,6 +104,7 @@ show_DateP(){
             this.get_matches(this.state.matches_date);
           }}  />
             <Text style={[styles.title,]} >
+            
               {API_.get_date2(this.state.matches_date)}
             </Text>
           <IconButton title="pick date"  
@@ -140,6 +147,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     color : "#d1d8e0",
+    fontFamily : "cairoregular",
   },
   icons:{
     marginLeft:10,

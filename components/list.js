@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground } from 'react-native';
+import {  View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground } from 'react-native';
 import { SafeAreaView,SectionList } from 'react-native';
 import Loader from "./Loader";
-
 class ItemsList extends React.Component {
 
   
@@ -81,8 +80,6 @@ class ItemsList extends React.Component {
 
     return (
       <View style={styles.container}>
-      <Text>{this.props.name}</Text>
-      
         <SafeAreaView style={styles.container}>
           <SectionList
             sections={list}
@@ -143,11 +140,8 @@ export default ItemsList;
 const styles = StyleSheet.create({
   container: {
    flex: 1,
-   paddingTop: 5,
    width:"100%",
    backgroundColor: '#000',
-    //justifyContent: 'center',
-    //alignItems:'center',
   },
   item: {
     padding: 10,
@@ -159,8 +153,14 @@ const styles = StyleSheet.create({
   header: {
     marginRight:5,
     marginLeft:5,
-    fontSize: 25,
-    backgroundColor: "#bdc3c7"
+    marginTop:3,
+    fontSize: 20,
+    backgroundColor: "#bdc3c7",
+    width:"100%",
+    
+    //alignContent:"center",
+    //alignItems:"center",
+    //alignSelf:"center",
   },
   title: {
     fontSize: 23
@@ -185,7 +185,6 @@ const styles = StyleSheet.create({
   },
   matche_team_names:{
     flex: 15 ,
-    fontSize:25,
     backgroundColor: "#4b6584",
     
   },
@@ -224,7 +223,7 @@ const styles = StyleSheet.create({
     color:"#d1d8e0",
     paddingLeft:5,
     paddingRight:5,
-    fontSize:18,
+    fontSize:15,
   },
   matche_team_logo:{
     //margin :3,
@@ -248,7 +247,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   matche_team_score_text:{
-    fontSize:18,
+    fontSize:15,
     fontWeight: 'bold',
   },
 

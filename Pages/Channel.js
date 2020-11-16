@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image } from 'react-native';
+import { View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";

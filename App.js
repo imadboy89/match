@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, ToastAndroid,Platform,Alert  , I18nManager } from 'react-native';
+import {  View, StyleSheet, ToastAndroid,Platform,Alert  , I18nManager } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -14,8 +14,10 @@ import Matchcreen from './Pages/Match';
 import NewsScreen from './Pages/News';
 import ArticleScreen from './Pages/Article';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import * as Font from 'expo-font';
 
-
+import TextF from "./components/TextF";
+Text = TextF;
 /*
 if (!I18nManager.isRTL) {
   I18nManager.forceRTL(true);
@@ -24,7 +26,7 @@ if (!I18nManager.isRTL) {
 let screenHeader = {
   headerStyle: {
     backgroundColor: '#4b6584',
-    height: 80,
+    height: 70,
     },
   headerTintColor: '#fff',
   headerTitleStyle: {
@@ -32,7 +34,14 @@ let screenHeader = {
     },
   headerTitleAlign: 'center'
   }
-
+LoadedFonts = false;
+function _loadFontsAsync() {
+  Font.loadAsync({'cairoregular': require('./assets/fonts/cairoregular.ttf'),}).then(()=>{
+    LoadedFonts=true;
+  });
+  //this.setState({ fontsLoaded: true });
+}
+_loadFontsAsync();
 notifyMessage = function(msg: string,title: string) {
     if(API_.isWeb){
       alert(msg);
@@ -129,8 +138,8 @@ function MyTabs() {
     </StackNav.Navigator>
   );
 }
-
 export default function App() {
+  //[fontsLoaded] = useFonts({'cairoregular': require('./assets/fonts/cairoregular.ttf'),});
   return (
     <NavigationContainer>
       <MyTabs />

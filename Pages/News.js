@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal, Button, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Modal, Button, TouchableOpacity } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -15,6 +15,14 @@ class NewsScreen extends React.Component {
     };
   //this.get_matches(this.state.matches_date);
   this.get_news();
+  this.props.navigation.setOptions({title: "News",
+      "headerRight":()=>(
+            <IconButton 
+              name="refresh" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+              this.get_news(this.state.matches_date);
+            }}  />
+    )
+  });
   }
 
   
@@ -30,10 +38,6 @@ get_news(){
     
     return (
       <View style={styles.container}>     
-        <Button
-          title="Refresh News"
-          onPress={()=>{ this.get_news();}}
-        ></Button> 
         <ItemsList loading={this.state.loading} list={this.state.list} onclick={this.onItem_clicked} key_="title_news" key_key="link"  />
         
         <View style={styles.nav_container}>

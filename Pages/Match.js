@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity, ImageBackground} from 'react-native';
+import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity, ImageBackground} from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
@@ -51,7 +51,7 @@ class Matchcreen extends React.Component {
     if(this.state.matche_details=={}) {return null;}
     return (
       <View style={styles.view_tab}>
-        <Text style={styles.text_info}>{this.state.matche_details.date} {this.state.matche_details.time} </Text>
+        <Text style={styles.text_info}>{this.state.matche_details.date} { API_.convert_time(this.state.matche_details.time)} </Text>
         <Text style={styles.text_info}>Status : {this.state.matche_details.status ? this.state.matche_details.status : "-"}</Text>
         <Text style={styles.text_info}>League : {this.state.matche_details.league}</Text>
         <Text style={styles.text_info}>Staduim : {this.state.matche_details.stadium}</Text>

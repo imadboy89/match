@@ -6,7 +6,7 @@ import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
-
+import IconButton from "../components/IconButton";
 let list = [
 
           ];
@@ -22,6 +22,14 @@ class CategoriesScreen extends React.Component {
         loading:true,
     };
     this.get_cats(1);
+    this.props.navigation.setOptions({title: "Channels categroires",
+        "headerRight":()=>(
+              <IconButton 
+                name="refresh" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+                this.get_cats(1);
+              }}  />
+      )
+    });
   }
   show_channels = (category) => {
     this.props.navigation.navigate('channels',{category_id:category.category_id,category_name: category.category_name});
@@ -48,10 +56,6 @@ class CategoriesScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Button
-          title="Categories"
-          onPress={()=>{ this.get_cats();}}
-        ></Button>
         <ItemsList  
           loading={this.state.loading}
           list={this.state.list} 
