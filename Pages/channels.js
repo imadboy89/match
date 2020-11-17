@@ -3,8 +3,7 @@ import { Text, View, StyleSheet, Modal, Button, Linking } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
-import Video from 'expo';
-import { useRoute } from '@react-navigation/native';
+import { Video } from 'expo-av';
 
 let list = [
 

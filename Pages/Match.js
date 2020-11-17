@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity, ImageBackground} from 'react-native';
+import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity, ImageBackground, ScrollView, Dimensions} from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
@@ -21,6 +21,8 @@ class Matchcreen extends React.Component {
         matche_details:{},
         visible_tab : "general",
         loading:true,
+        show_res:false,
+        height:"100%",
     };
     this.get_Match(this.props.route.params.match_id);
 
@@ -57,6 +59,72 @@ class Matchcreen extends React.Component {
         <Text style={styles.text_info}>Staduim : {this.state.matche_details.stadium}</Text>
         <Text style={styles.text_info}>Channels :</Text>
         {channels}
+      </View> 
+    );
+  }
+  get_subs(type_){
+    const substitutions = type_=="home" ? 
+      JSON.parse(JSON.stringify(this.state.matche_details.home_substitutions)) :
+      JSON.parse(JSON.stringify(this.state.matche_details.away_substitutions));
+    let subs = [];
+    for (let k=0;k<substitutions.length;k++){
+      let el = substitutions[k];
+      let pp = el.substitution.split("|");
+      subs.push({lineup_player:pp[1].trim(), player_out:pp[0].trim(),time:el.time ,lineup_number:""});
+    }
+    return subs;
+  }
+  get_View_lineup_2(){
+    let h_lineup = this.state.matche_details.home_lineup ? this.state.matche_details.home_lineup : [];
+    let a_lineup = this.state.matche_details.away_lineup ? this.state.matche_details.away_lineup : [];
+    h_lineup.sort(function(a, b) {
+      if (a.lineup_position < b.lineup_position) return -1;
+      if (a.lineup_position > b.lineup_position) return 1;
+      return 0;
+    });
+    a_lineup.sort(function(a, b) {
+      if (a.lineup_position < b.lineup_position) return -1;
+      if (a.lineup_position > b.lineup_position) return 1;
+      return 0;
+    });
+    let players_home = {};
+    let i = -1;
+    // lineup_number lineup_player lineup_position
+    h_lineup = [{"lineup_player":this.home_team_ar,"lineup_number":""}] . concat(h_lineup);
+    a_lineup = [{"lineup_player":this.away_team_ar,"lineup_number":""}] . concat(a_lineup);
+    const subs_h = this.get_subs("home");
+    const subs_a = this.get_subs("away");
+    h_lineup = h_lineup . concat(subs_h);
+    a_lineup = a_lineup . concat(subs_a);
+
+    this.state.matche_details.home_substitutions;
+    let is_sub = false;
+    let stats = h_lineup.map(row=>{
+      i++;
+      let home_p =h_lineup[i];
+      let away_p =a_lineup[i];
+      let scored_h = this.scorers_h && this.scorers_h.includes(home_p.lineup_player) ? "⚽":"";
+      let scored_a = this.scorers_a && this.scorers_a.includes(away_p.lineup_player) ? "⚽":"";
+      let away_t = scored_h!="" ? "":"";
+      return [
+          <View style={styles.lineup2_container}>
+            
+            <Text style={styles.lineup2_number}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
+            <Text style={i==0?styles.stats_frag_l_ :styles.lineup2_h}>
+              {home_p && home_p.lineup_player? home_p.lineup_player+" "+scored_h : ""}
+            </Text>
+
+            <Text style={i==0?styles.stats_frag_m_ :styles.lineup2_m}>{" "}</Text>
+
+            <Text style={i==0?styles.stats_frag_r_ :styles.lineup2_a}>
+              {away_p && away_p.lineup_player? scored_a+" "+away_p.lineup_player : ""}
+            </Text>
+            <Text style={styles.lineup2_number}>{away_p && away_p.lineup_number? away_p.lineup_number : ""}</Text>
+          </View> ,  i==11 ? <View style={styles.hairline} /> : null ];
+    });
+    return (
+      <View style={styles.view_tab}>
+        {stats ? stats : null}
       </View> 
     );
   }
@@ -120,7 +188,7 @@ class Matchcreen extends React.Component {
     const is_home = this.state.lineup_type==undefined || this.state.lineup_type=="home" ;
     return (
       <View style={styles.view_tab}>
-        <View style={styles.view_inline}>
+        <View style={styles.view_inline_teams_lu}>
           <TouchableOpacity style={is_home==true ? styles.lineup_team_ :styles.lineup_team } onPress={ () => {this.setState({lineup_type:"home"}) }} >
             <Text style={styles.view_tab_text}>{this.home_team_ar}</Text>
           </TouchableOpacity>
@@ -133,28 +201,101 @@ class Matchcreen extends React.Component {
       </View> 
     );
   }
-  render() {
 
+  get_scores(type_="home"){
+    if(type_=="home"){this.scorers_h =[];}
+    else{this.scorers_a =[];}
+
+    let style_class = type_=="home"? styles.match_results_team_name_l : styles.match_results_team_name_r ;
+    if(this.state.matche_details.goal_scorer){
+      let res = this.state.matche_details.goal_scorer.map(elm=>{
+        if(elm[type_+"_scorer"]==undefined || elm[type_+"_scorer"]=="" || elm[type_+"_scorer"]==null) return false;
+        let text = "";
+        if(type_=="away"){
+          text = (elm.time ? elm.time+'"' : "-") +" "+ elm[type_+"_scorer"];
+          this.scorers_a.push(elm[type_+"_scorer"]);
+        }else{
+          text = elm[type_+"_scorer"] +" "+(elm.time ? elm.time+'"' : "-");
+          this.scorers_h.push(elm[type_+"_scorer"]);
+        }
+        return <Text style={[style_class,styles.match_results_scorer_text]}>{text}</Text>;
+      });
+      return(
+          <View style={[style_class]}>
+            {res ? res :null}
+          </View>
+      );
+    }
+  }
+  render() {
+    
+    let home_sc="";
+    let away_sc="";
+    let home_name="h";
+    let away_name="a";
+    let home_style={};
+    let away_style ={};
+    let scores_home = this.get_scores("home");
+    let scores_away = this.get_scores("away");
+    try{
+      home_sc = this.state.matche_details.home_team_score ? parseInt(this.state.matche_details.home_team_score) : "-";
+      away_sc = this.state.matche_details.away_team_score ? parseInt(this.state.matche_details.away_team_score) : "-";
+      home_style = home_sc>away_sc ? styles.match_results_winer 
+        : (home_sc==away_sc ? styles.match_results_drawer : styles.match_results_loser);
+      away_style = away_sc>home_sc ? styles.match_results_winer 
+      : (away_sc==home_sc ? styles.match_results_drawer : styles.match_results_loser);
+      home_name = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
+      away_name = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;
+    }catch(e){
+      alert(e);
+      return <View style={styles.container}><Text>ERR</Text></View>;
+      }
+
+    let screenHeight = Dimensions.get('window').height;
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}> {this.state.matche_details.home_team} {this.state.matche_details.home_team_score}-{this.state.matche_details.away_team_score} {this.state.matche_details.away_team}</Text>
+      <ScrollView style={styles.container} contentContainerStyle={styles.container_scrl}>
+        <TouchableOpacity style={styles.header_container} onPress={()=>this.setState({show_res : this.state.show_res?false:true})}>              
+          <View style={[styles.match_results_team_name_l,home_style]}>
+            <View styles={[styles.match_results_team_name_l,{flex:1}]}>
+              <Text style={[styles.match_results_team_name,styles.match_results_team_name_l,]}>{home_name}</Text>
+              <Text style={[styles.match_results_team_scor_t,styles.match_results_team_name_l,]}>{home_sc}</Text>
+            </View>
+            { this.state.show_res ?
+            <View style={{}}>
+              {scores_home}
+            </View>
+            :null}
+          </View>
+
+          <View style={[styles.match_results_team_name_r,away_style]}>
+            <View styles={[styles.match_results_team_name_r,{flex:1}]}>
+              <Text style={[styles.match_results_team_name,styles.match_results_team_name_r,]}>{away_name}</Text>
+              <Text style={[styles.match_results_team_scor_t,styles.match_results_team_name_r,]}>{away_sc}</Text>
+            </View>
+            { this.state.show_res ?
+            <View style={{}}>
+              {scores_away}
+            </View>
+            :null}
+          </View>
+        </TouchableOpacity>
+        
         <View style={styles.tabs_list}>
           <Button title="General" onPress={()=>this.setState({visible_tab:"general"})}/>
           <Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"})}/>
           <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/>
+          <Button title="Line-up2" onPress={()=>this.setState({visible_tab:"lineup2"})}/>
         </View>
-        <View style={{flex:1}}>
         {this.state.loading ? <Loading /> :
-            <View style={{flex:1}}>
+          <View style={{flex:1,width:"100%"}}>
             { this.state.matche_details!={} && this.state.visible_tab=="general" ? this.get_View_general() : null}
             { this.state.matche_details!={} && this.state.visible_tab=="stats"   ? this.get_View_stats()   : null}
             { this.state.matche_details!={} && this.state.visible_tab=="lineup"   ? this.get_View_lineup() : null}
+            { this.state.matche_details!={} && this.state.visible_tab=="lineup2"   ? this.get_View_lineup_2() : null}
           </View>
         }
-        </View>
-        {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
         
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -162,11 +303,24 @@ class Matchcreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
+    //minHeight:"100%",
+    //paddingTop: Constants.statusBarHeight/2,
+    paddingTop :3,
     backgroundColor: '#000',
     color : "#d1d8e0",
   },
+  container_scrl: {
+    //minHeight:"100%",
+    flexGrow: 1,
+    backgroundColor: '#000',
+    //backgroundColor: 'red',
+  },
+hairline: {
+  backgroundColor: '#A2A2A2',
+  height: 2,
+  width:"90%",
+  marginHorizontal:"auto",
+},
   paragraph: {
     margin: 24,
     fontSize: 18,
@@ -174,25 +328,54 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tabs_list:{
-    marginTop:10,
+    //marginTop:10,
     flexDirection:'row', 
     flexWrap:'wrap',
   },
   view_tab:{
-    marginTop:10,
-    flex: 12 ,
-    height:15
+    //marginTop:10,
+    flex: 13 ,
+    height:20
   },
   view_tab_text:{
-    flex: 1 ,
-    padding:8
+    //flex: 1 ,
+    textAlign:"center",
+    padding:3
   },
-  
+  lineup2_container:{
+    marginTop:3,
+    flexDirection:'row', 
+    flexWrap:'wrap',
+  },
+  lineup2_h:{
+    flex:9,
+    marginHorizontal:3,
+    textAlign: 'left',
+    color : "#d1d8e0",
+  },
+  lineup2_a:{
+    flex:9,
+    marginHorizontal:3,
+    textAlign: 'right',
+    color : "#d1d8e0",
+  },
+  lineup2_m:{
+    flex:1,
+    marginHorizontal:5,
+    textAlign: 'center',
+    color : "#d1d8e0",
+  },
+  lineup2_number:{
+    width:20,
+    marginHorizontal:3,
+    textAlign: 'center',
+    color : "#f1c40f",
+  },
   stats_container:{
     marginTop:10,
     flexDirection:'row', 
     flexWrap:'wrap',
-    flex: 1 ,
+    
   },
   stats_frag_l_:{
     margin:5,
@@ -231,24 +414,39 @@ const styles = StyleSheet.create({
   },
 
   view_inline:{
-    margin:5,
+    marginLeft:5,
+    marginRight:5,
     flexDirection:'row', 
     flexWrap:'wrap',
     flex: 1 ,
     textAlign: 'center',
     color : "#d1d8e0",
   },
+  view_inline_teams_lu:{
+    marginTop:3,
+    flexDirection:'row', 
+    flexWrap:'wrap',
+    //height:10,
+    textAlign: 'center',
+    color : "#d1d8e0",
+    marginBottom:10
+
+  },
   lineup_team:{
-    borderRadius: 20,
-    margin:5,
+    marginLeft:5,
+    marginRight:5,
+    borderRadius: 10,
+    //margin:5,
     flex: 1 ,
     textAlign: 'center',
     backgroundColor:"#dae6fd",
   },
   lineup_team_:{
-    borderWidth :1,
-    borderRadius: 20,
-    margin:5,
+    marginLeft:5,
+    marginRight:5,
+    //borderWidth :1,
+    borderRadius: 10,
+    //margin:5,
     flex: 1 ,
     textAlign: 'center',
     backgroundColor:"#97d1f9",
@@ -272,7 +470,55 @@ const styles = StyleSheet.create({
   },
    text_info:{
      color : "#d1d8e0",
-   }
+   },
+   header_container:{
+     marginHorizontal:"auto",
+     width:"98%",
+     flexDirection:"row",
+     flexWrap:'wrap',
+     marginBottom:10,
+  },
+   match_results_team_name:{
+    fontSize: 20,
+    fontWeight: 'bold',
+    color : "#fff",
+    paddingHorizontal:5,
+    width:"100%",
+    //textAlign:"right"
+   },
+   match_results_team_scor_t:{
+    fontSize: 20,
+    fontWeight: 'bold',
+    color : "#f1c40f",
+    paddingHorizontal:5,
+    //textAlign:"right"
+   },
+   
+   match_results_team_name_l:{
+     textAlign:"right",
+     borderRightWidth:1,
+     },
+   match_results_team_name_r:{
+     textAlign:"left",
+     borderLeftWidth:1,
+     
+   },
+   match_results_winer:{
+     flex:1,
+     backgroundColor:"#16a085",
+   },
+   match_results_loser:{
+     flex:1,
+     backgroundColor:"#c0392b",
+   },
+    match_results_drawer:{
+     flex:1,
+     backgroundColor:"#7f8c8d",
+   },
+   match_results_scorer_text:{
+     color:"#dbd9ff",
+     fontSize:15,
+     }
 });
 
 export default Matchcreen;
