@@ -5,7 +5,7 @@ import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
 import Loading from "../components/Loader";
-
+import {styles_channel} from "../components/Themes";
 let list = [
 
           ];
@@ -121,6 +121,7 @@ class ChannelScreen extends React.Component {
     }
   }
   render() {
+    
     let servers_list = this.state.channel ?
       this.state.channel.channel_servers.map(serv => (
         <View style={{margin:8}}>
@@ -129,16 +130,16 @@ class ChannelScreen extends React.Component {
       ))
     : null;
     return (
-      <ScrollView style={{backgroundColor: '#000',}}  contentContainerStyle={styles.container}>
-      <View style={styles.channel_logo_v}>
-        { this.channel_photo ?  <Image style={styles.channel_logo} source={{uri: API_.domain_o+this.channel_photo}} />: null}
+      <ScrollView style={{backgroundColor: '#000',}}  contentContainerStyle={styles_channel.container}>
+      <View style={styles_channel.channel_logo_v}>
+        { this.channel_photo ?  <Image style={styles_channel.channel_logo} source={{uri: API_.domain_o+this.channel_photo}} />: null}
          </View>
-         <View style={styles.info_cont}>
+         <View style={styles_channel.info_cont}>
          { this.state.loading ? <Loading /> : 
-        <View style={styles.info_cont}>
-          <Text style={styles.info_text}> Name : {this.state.channel && this.state.channel.en_name ? this.state.channel.en_name : ""}</Text>
-          <Text style={styles.info_text}> Language :{this.state.channel && this.state.channel.language? this.state.channel.language : ""}</Text>
-          <Text style={styles.info_text}> Type :{this.state.channel && this.state.channel.type? this.state.channel.type : ""}</Text>
+        <View style={styles_channel.info_cont}>
+          <Text style={styles_channel.info_text}> Name : {this.state.channel && this.state.channel.en_name ? this.state.channel.en_name : ""}</Text>
+          <Text style={styles_channel.info_text}> Language :{this.state.channel && this.state.channel.language? this.state.channel.language : ""}</Text>
+          <Text style={styles_channel.info_text}> Type :{this.state.channel && this.state.channel.type? this.state.channel.type : ""}</Text>
           
           <Picker
                 selectedValue={this.state.actionType}
@@ -158,48 +159,5 @@ class ChannelScreen extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container_scrl: {
-    flex: 1,
-    //backgroundColor: '#fff',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
-    //backgroundColor: '#bd7bc1',
-    flexDirection: 'column',
-    backgroundColor: '#000',
-    color : "#fff",
-  },
-  info_cont: {
-    flex: 4,
-    //justifyContent: 'center',
-    padding: 5,
-    fontSize: 18,
-    color : "#fff",
-    backgroundColor: '#000',
-    //backgroundColor: '#8e5858',
-  },
-  info_text:{
-    fontSize: 18,
-    color : "#fff",
-  },
-  channel_logo:{
-    aspectRatio: 1,
-    width: "100%",
-    height: "100%",
-    resizeMode: 'contain',
-  },
-  channel_logo_v:{
-    width: "100%",
-    flex :1,
-    padding:5,
-    alignContent:"center",
-    alignItems:"center",
-    alignSelf:"center",
-  }
-});
 
 export default ChannelScreen;

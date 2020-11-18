@@ -15,20 +15,24 @@ import NewsScreen from './Pages/News';
 import ArticleScreen from './Pages/Article';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Font from 'expo-font';
-
 import TextF from "./components/TextF";
+import {Themes} from "./components/Themes";
 Text = TextF;
+
+Theme = Themes["dark blue"];
 /*
 if (!I18nManager.isRTL) {
   I18nManager.forceRTL(true);
 }
 */
+
+
 let screenHeader = {
   headerStyle: {
-    backgroundColor: '#4b6584',
+    backgroundColor: Theme.headerStyle_backgroundColor,
     height: 70,
     },
-  headerTintColor: '#fff',
+  headerTintColor: Theme.headerTintColor,
   headerTitleStyle: {
     fontWeight: 'bold',
     },
@@ -36,7 +40,11 @@ let screenHeader = {
   }
 LoadedFonts = false;
 function _loadFontsAsync() {
-  Font.loadAsync({'cairoregular': require('./assets/fonts/cairoregular.ttf'),}).then(()=>{
+  Font.loadAsync({
+    'cairoregular': require('./assets/fonts/cairoregular.ttf'),
+    'DroidKufi-Regular': require('./assets/fonts/DroidKufi-Regular.ttf'),
+    'DroidKufi-Bold': require('./assets/fonts/DroidKufi-Bold.ttf'),
+    }).then(()=>{
     LoadedFonts=true;
   });
   //this.setState({ fontsLoaded: true });
@@ -57,13 +65,8 @@ notifyMessage = function(msg: string,title: string) {
 }
 
 API_ = new API();
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
+
+
 
 const StackNav = createBottomTabNavigator();
 const ChannelsStack = createStackNavigator();
@@ -82,9 +85,10 @@ function ChannelsStackScreen() {
   );
 }
 function MatchesStackScreen() {
+  console.log("st",Theme); 
   return (
     <MatchesStack.Navigator>
-      <MatchesStack.Screen options={screenHeader} name="Home" component={HomeScreen} />
+      <MatchesStack.Screen screenProps={Theme} options={screenHeader} name="Home" component={HomeScreen} />
       <MatchesStack.Screen options={screenHeader} name="Match" component={Matchcreen} />
       <MatchesStack.Screen options={screenHeader} name="Channels" component={ChannelsScreen} />
       <MatchesStack.Screen options={screenHeader} name="Channel" component={ChannelScreen} />
@@ -125,8 +129,10 @@ function MyTabs() {
           },
         })}
       tabBarOptions={{
-          activeTintColor: 'tomato',
-          inactiveTintColor: 'gray',
+          activeBackgroundColor: Theme.activeBackgroundColor,
+          inactiveBackgroundColor: Theme.inactiveBackgroundColor,
+          activeTintColor: Theme.activeTintColor,
+          inactiveTintColor: Theme.inactiveTintColor,
           size : 20
         }}
     >

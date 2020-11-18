@@ -10,7 +10,8 @@ class Scrap {
   get_article(html){
     let patttern_body = /var\s*article_content\s*=\s*".*/gi;
     let m = html.match(patttern_body);
-    let body = m && m.length>0 ? m[0].split('"')[1] : "Error";
+    let body = m && m.length>0 ? m[0].replace(/\\"/g,"'") : "";
+    body = body.split('"').length>1 ? body.split('"')[1] : "Error";
     //body = body.replace("<p");
     return this.decodeEntities(body);
   }

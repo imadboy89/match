@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import { Video } from 'expo-av';
+import { useRoute } from '@react-navigation/native';
 
 let list = [
 
@@ -113,6 +114,7 @@ class ChannelsScreen extends React.Component {
     this.props.navigation.navigate('Channel', { channel_id: item.channel_id,channel_photo:item.channel_photo });
   }
   render() {
+    if(styles.constructor === Object && Object.entries(styles).length==0){Styles();}
     return (
       <View style={styles.container}>
         <Text style={styles.title}>{this.category_name}</Text>
@@ -130,7 +132,9 @@ class ChannelsScreen extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
+styles = {};
+function Styles(){
+   styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -151,5 +155,5 @@ const styles = StyleSheet.create({
     color : "#d1d8e0",
   },
 });
-
+}
 export default ChannelsScreen;

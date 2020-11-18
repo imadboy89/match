@@ -5,6 +5,7 @@ import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
 import * as Font from 'expo-font';
+import {styles_home} from "../components/Themes";
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -15,12 +16,13 @@ class HomeScreen extends React.Component {
         show_datPicker : false,
         matches_date:new Date(),
         loading :true,
+        loading_fonts:false,
     };
   this.get_matches(this.state.matches_date);
   this.props.navigation.setOptions({title: "Matches list",
     "headerRight":()=>(
             <IconButton 
-              name="refresh" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+              name="refresh" size={styles_home.title.fontSize} style={styles_home.header_icons} onPress={()=>{
               this.setState({list:[],loading:true});
               this.get_matches(this.state.matches_date);
             }}  />
@@ -92,31 +94,30 @@ show_DateP(){
     //this.setState({modalVisible_match:true,match:item});
   }
   render() {
-
     return (
-      <View style={styles.container}>
+      <View style={styles_home.container}>
         <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",}} >
           <IconButton 
             disabled={this.state.loading}
-            title="pick date"  name="minus" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+            title="pick date"  name="minus" size={styles_home.title.fontSize} style={styles_home.icons} onPress={()=>{
             this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
             this.setState({list:[],loading:true});
             this.get_matches(this.state.matches_date);
           }}  />
-            <Text style={[styles.title,]} >
+            <Text style={[styles_home.title,]} >
             
               {API_.get_date2(this.state.matches_date)}
             </Text>
           <IconButton title="pick date"  
             disabled={this.state.loading}
-            name="plus" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+            name="plus" size={styles_home.title.fontSize} style={styles_home.icons} onPress={()=>{
             this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
             this.setState({list:[],loading:true});
             this.get_matches(this.state.matches_date);
           }}  />
           <IconButton 
             disabled={this.state.loading}
-            title="pick date"  name="edit" size={styles.title.fontSize} style={styles.icons} onPress={()=>this.setState({show_datPicker:true})}  />
+            title="pick date"  name="edit" size={styles_home.title.fontSize} style={styles_home.icons} onPress={()=>this.setState({show_datPicker:true})}  />
         </View>
 
         
@@ -129,31 +130,5 @@ show_DateP(){
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#000',
-    color : "#fff",
-  },
-
-  text:{
-    color : "#fff",
-    marginRight:10,justifyContent: 'center',alignItems: 'center'
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color : "#d1d8e0",
-    fontFamily : "cairoregular",
-  },
-  icons:{
-    marginLeft:10,
-    marginRight:10,
-
-  }
-});
 
 export default HomeScreen;

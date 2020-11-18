@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
-
+import {styles_news} from "../components/Themes";
 class NewsScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -18,7 +18,7 @@ class NewsScreen extends React.Component {
   this.props.navigation.setOptions({title: "News",
       "headerRight":()=>(
             <IconButton 
-              name="refresh" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+              name="refresh" size={styles_news.title.fontSize} style={styles_news.icons} onPress={()=>{
               this.get_news(this.state.matches_date);
             }}  />
     )
@@ -37,21 +37,21 @@ get_news(){
   render() {
     
     return (
-      <View style={styles.container}>     
+      <View style={styles_news.container}>     
         <ItemsList loading={this.state.loading} list={this.state.list} onclick={this.onItem_clicked} key_="title_news" key_key="link"  />
         
-        <View style={styles.nav_container}>
+        <View style={styles_news.nav_container}>
           <IconButton
             disabled={this.state.loading}
-           title="arrow-back-circle"  name="chevron-left" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+           title="arrow-back-circle"  name="chevron-left" size={styles_news.title.fontSize} style={styles_news.icons} onPress={()=>{
             if(this.state.page==1){return false;}
             this.state.page--;
             this.get_news();
           }}  />
-          <Text style={styles.text}>{this.state.page}</Text>
+          <Text style={styles_news.text}>{this.state.page}</Text>
           <IconButton 
             disabled={this.state.loading}
-           title="forward"  name="chevron-right" size={styles.title.fontSize} style={styles.icons} onPress={()=>{
+           title="forward"  name="chevron-right" size={styles_news.title.fontSize} style={styles_news.icons} onPress={()=>{
             this.state.page++;
             this.get_news();
           }}  />
@@ -60,40 +60,5 @@ get_news(){
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#000',
-    color : "#fff",
-  },
-  nav_container: {
-    flexDirection:'row', 
-    flexWrap:'wrap',
-    height:30,
-    justifyContent: 'center',
-    backgroundColor: '#000',
-    color : "#fff",
-  },
-
-  text:{
-    color : "#fff",
-    fontSize: 20,
-    marginRight:10,justifyContent: 'center',alignItems: 'center'
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color : "#d1d8e0",
-  },
-  icons:{
-    marginLeft:10,
-    marginRight:10,
-
-  }
-});
 
 export default NewsScreen;

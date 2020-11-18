@@ -17,7 +17,7 @@ class IconButton extends React.Component {
                 disabled={this.props.disabled ? this.props.disabled : false}
                 activeOpacity={this.props.activeOpacity ? this.props.activeOpacity : 0.5}
                 onPress={this.props.onPress}
-                style={this.props.style}
+                style={[this.props.style,{padding:10,}]}
                 >
               <View style={{}} >
                 <Icon 

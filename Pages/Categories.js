@@ -54,6 +54,7 @@ class CategoriesScreen extends React.Component {
 
   }
   render() {
+    if(styles.constructor === Object && Object.entries(styles).length==0){Styles();}
     return (
       <View style={styles.container}>
         <ItemsList  
@@ -66,8 +67,9 @@ class CategoriesScreen extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
+styles = {};
+function Styles(){
+  styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -82,5 +84,6 @@ const styles = StyleSheet.create({
     color : "#fff",
   },
 });
+}
 
 export default CategoriesScreen;
