@@ -286,24 +286,32 @@ class API {
   setConfig = async (key, value) => {
     let configs = await AsyncStorage.getItem('configs');
     if (configs) {
-      configs = JSON.parse(this.configs);
+      try{configs = JSON.parse(configs);}
+      catch(e){configs={};}
       configs[key] = value;
     }else{
       configs = {};
       configs[key] = value;
     }
     await AsyncStorage.setItem('configs', JSON.stringify(configs));
+    return value;
   };
 
-  getConfig = async (key) => {
+  getConfig = async (key,defualt_val="") => {
     let configs = await AsyncStorage.getItem('configs');
     if (configs) {
       configs = JSON.parse(configs);
       if ( configs[key] ){
         return configs[key];
+      }else{
+        if (defualt_val=="" || defualt_val==undefined){return false;}
+        await this.setConfig(key, defualt_val);
+        return defualt_val;
       }
     }else {
-      return false;
+      if (defualt_val=="" || defualt_val==undefined){return false;}
+      await this.setConfig(key, defualt_val);
+      return defualt_val;
     }
   };
 

@@ -1,712 +1,317 @@
-import {  StyleSheet } from 'react-native';
+import React from "react";
+import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity, ImageBackground, ScrollView, Dimensions} from 'react-native';
 import Constants from 'expo-constants';
+import ItemsList from '../components/list';
+import ReactHlsPlayer from "react-hls-player";
+import Video from 'expo';
+import Loading from '../components/Loader';
+import {styles_match,getTheme} from "../components/Themes";
+let list = [
+
+          ];
+class Matchcreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        list:list,
+        modalVisible_match:false,
+        player_type:1,
+        key_:"en_name",
+        channel:null,
+        matche_details:{},
+        visible_tab : "general",
+        loading:true,
+        show_res:false,
+        height:"100%",
+        dynamic_style:styles_match,
+    };
+    getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
+    this.get_Match(this.props.route.params.match_id);
+
+  }
+  get_Match(id){
+      API_.get_match(id).then(resp=>{
+        if(resp["data"] && resp["data"][0] ){
+          this.setState({matche_details:resp["data"][0],loading:false});
+          this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
+          this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
+        }
+      });
+  }
 
 
-var Themes = {
-    "dark violet":{
-        //headerStyle:
-      headerStyle_backgroundColor: '#130f40',
-      headerTintColor: '#fff',
-      activeBackgroundColor: '#30336b',
-      inactiveBackgroundColor: '#130f40',
-      activeTintColor: '#ffffff',
-      inactiveTintColor: '#57606f',
-  
-      global_backgound : "#000",
-      home_title_color : "#d1d8e0",
 
-      list_header_backgroundColor: "#bdc3c7",
-      live_borderColor:"#2ecc71",
-      match_name_backgroundColor: "#4834d4",
-      match_name_color: "#d1d8e0",
-      match_score_backgroundColor: "#a5b1c2",
-      match_score_color :"#d1d8e0",
-      match_time_backgroundColor:"#2c3e50",
-      match_time_color:"#fff",
+  onmt_clicked(item){
+    this.props.navigation.navigate('Channel', { channel_id: item.id,channel_photo:item.channel_photo });
+  }
+  get_View_general(){
+    let channels = this.state.matche_details.channels ?
+      this.state.matche_details.channels.map(ch => (
+        <View style={{margin:10}}>
+          <Button onPress={()=>this.onmt_clicked(ch)}  key={ch.id} title={ch.en_name} style={{margin:10}}></Button>
+        </View>
+      ))
+    : null;
+    if(this.state.matche_details=={}) {return null;}
+    return (
+      <View style={this.state.dynamic_style.view_tab}>
+        <Text style={this.state.dynamic_style.text_info}>{this.state.matche_details.date} { API_.convert_time(this.state.matche_details.time)} </Text>
+        <Text style={this.state.dynamic_style.text_info}>Status : {this.state.matche_details.status ? this.state.matche_details.status : "-"}</Text>
+        <Text style={this.state.dynamic_style.text_info}>League : {this.state.matche_details.league}</Text>
+        <Text style={this.state.dynamic_style.text_info}>Staduim : {this.state.matche_details.stadium}</Text>
+        <Text style={this.state.dynamic_style.text_info}>Channels :</Text>
+        {channels}
+      </View> 
+    );
+  }
+  get_subs(type_){
+    let substitutions = []
+    try{
+    substitutions = type_=="home" ? 
+      JSON.parse(JSON.stringify(this.state.matche_details.home_substitutions)) :
+      JSON.parse(JSON.stringify(this.state.matche_details.away_substitutions));
+    }catch(err){
+      console.log("get_subs err : ",err);
+      return [];
+    }
+    let subs = [];
+    for (let k=0;k<substitutions.length;k++){
+      let el = substitutions[k];
+      let pp = el.substitution.split("|");
+      subs.push({lineup_player:pp[1].trim(), player_out:pp[0].trim(),time:el.time ,lineup_number:""});
+    }
+    return subs;
+  }
+  get_View_lineup_2(){
 
+    let h_lineup = this.state.matche_details.home_lineup ? this.state.matche_details.home_lineup : [];
+    let a_lineup = this.state.matche_details.away_lineup ? this.state.matche_details.away_lineup : [];
+    h_lineup.sort(function(a, b) {
+      if (a.lineup_position < b.lineup_position) return -1;
+      if (a.lineup_position > b.lineup_position) return 1;
+      return 0;
+    });
+    a_lineup.sort(function(a, b) {
+      if (a.lineup_position < b.lineup_position) return -1;
+      if (a.lineup_position > b.lineup_position) return 1;
+      return 0;
+    });
 
-      match_badge_backgroundColor: "#4834d4",
-  
-      news_cont_backgroundColor:"#34495e",
-      news_title_backgroundColor:"#00000091",
-      news_title_color:"#fff",
-  
-      article_body_backgroundColor:"#293542d6",
-      article_body_color : "#fff",
-      article_title_backgroundColor:"#323350d6",
-      article_title_color : "#fff",
-      article_date_color : "#fff",
-      article_photo_background : "#000",
+    let players_home = {};
+    let i = -1;
+    // lineup_number lineup_player lineup_position
+    h_lineup = [{"lineup_player":this.home_team_ar,"lineup_number":""}] . concat(h_lineup);
+    a_lineup = [{"lineup_player":this.away_team_ar,"lineup_number":""}] . concat(a_lineup);
 
-      match_lineup2_color : "#d1d8e0",
-      match_lineup2_number_color : "#f1c40f",
-      match_linup_team_backgroundColor:"#dae6fd",
-      match_linup_team__backgroundColor:"#97d1f9",
-      match_stats_color : "#d1d8e0",
-      match_lineup_player_color:"#000",
-      match_text_info_color : "#d1d8e0",
-      match_results_team_scor_color : "#f1c40f",
-      match_results_winer_background  : "#16a085",
-      match_results_loser_background  : "#c0392b",
-      match_results_drawer_background : "#7f8c8d",
-      match_results_scorer_color :"#dbd9ff",
+    const subs_h = this.get_subs("home");
+    const subs_a = this.get_subs("away");
+    h_lineup = h_lineup . concat(subs_h);
+    a_lineup = a_lineup . concat(subs_a);
+    this.state.matche_details.home_substitutions;
+    let is_sub = false;
+    let stats = h_lineup.map(row=>{
+      i++;
+      let home_p = h_lineup[i]!=undefined ? h_lineup[i] : false;
+      let away_p = a_lineup[i]!=undefined ? a_lineup[i] : false;
+      let scored_h_count = this.scorers_h.filter(function(item) {return item === home_p.lineup_player}).length;
+      let scored_a_count = this.scorers_a.filter(function(item) {return item === away_p.lineup_player}).length;
+      let scored_h = this.scorers_h && home_p && this.scorers_h.includes(home_p.lineup_player) ? "⚽".repeat(scored_h_count):"";
+      let scored_a = this.scorers_a && away_p && this.scorers_a.includes(away_p.lineup_player) ? "⚽".repeat(scored_a_count):"";
       
-    },
-    "dark blue":{
-      /// most valuable
-      headerStyle_backgroundColor: '#0c2461',
-      headerTintColor: '#b7eefb',
-      activeBackgroundColor: '#0a3d62',
-      inactiveBackgroundColor: '#0c2461',
-      activeTintColor: '#ffffff',
-      inactiveTintColor: '#57606f',
+      return (
+          <View style={this.state.dynamic_style.lineup2_container}>
+            
+            <Text style={this.state.dynamic_style.lineup2_number}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
+            <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_h}>
+              {home_p && home_p.lineup_player? home_p.lineup_player+" "+scored_h : ""}
+            </Text>
 
-      global_backgound : "#000",
-      home_title_color : "#d1d8e0",
+            <Text style={i==0?this.state.dynamic_style.stats_frag_m_ :this.state.dynamic_style.lineup2_m}>{" "}</Text>
 
-      list_header_backgroundColor: "#4a69bd",
-      live_borderColor:"#78e08f",
-      match_name_backgroundColor: "#1e3799",
-      match_name_color: "#b7eefb",
-      match_score_backgroundColor: "#a5b1c2",
-      match_score_color :"#b8e994", 
-      match_time_backgroundColor:"#2c3e50",
-      match_time_color:"#fff",
-      match_badge_backgroundColor: "#1e3799",
-      ///////
-      news_cont_backgroundColor:"#34495e",
-      news_title_backgroundColor:"#00000091",
-      news_title_color:"#fff",
-  
-      article_body_backgroundColor:"#1d2c5296",
-      article_body_color : "#b7eefb",
-      article_title_backgroundColor:"#323350d6",
-      article_title_color : "#fff",
-      article_date_color : "#fff",
-      article_photo_background : "#000",
+            <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_a}>
+              {away_p && away_p.lineup_player? scored_a+" "+away_p.lineup_player : ""}
+            </Text>
+            <Text style={this.state.dynamic_style.lineup2_number}>{away_p && away_p.lineup_number? away_p.lineup_number : ""}</Text>
+            {i==11 ? <View style={this.state.dynamic_style.hairline}/> : null}
+          </View> );
+           //,  i==11 ? <View style={this.state.dynamic_style.hairline} /> : null ];
+    });
+    
+    return (
+      <View style={this.state.dynamic_style.view_tab}>
+        {stats ? stats : null}
+      </View> 
+    );
+  }
+  get_View_stats(){
+    
+    let stats_list = [{"home":this.home_team_ar,"away":this.away_team_ar,"type":"VS"}] . concat(this.state.matche_details.statistics) ;
+    let i = -1;
+    let stats = stats_list.map(row=>{
+      i++;
+      return (
+          <View style={this.state.dynamic_style.stats_container}>
+            <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.stats_frag_l}>{row ? row.home : ""}</Text>
+            <Text style={i==0?this.state.dynamic_style.stats_frag_m_ :this.state.dynamic_style.stats_frag_m}>{row ? row.type : "-"}</Text>
+            <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.stats_frag_r}>{row ? row.away : ""}</Text>
+          </View>);
+    });
+    return (
+      <View style={this.state.dynamic_style.view_tab}>
+        {stats ? stats : <View style={this.state.dynamic_style.view_tab}><Text style={this.state.dynamic_style.title}>Line-up not available</Text></View>}
+      </View> 
+    );
+  }
+  generate_lineup(data){
+    let players = {};
+    for(let i=0;i<data.length;i++){
+      let el = data[i];
+      let position = parseInt(el.lineup_position)>0 ? parseInt(el.lineup_position) : i+1;
+      players[position] = el;
+    }
+    
+    return (
+      <View style={this.state.dynamic_style.view_tab}>
+      <ImageBackground style={this.state.dynamic_style.background_pitch} source={require('../assets/ptch.jpg')} >
+        <View style={this.state.dynamic_style.view_inline}>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[1] ? players[1].lineup_player : ""}</Text>
+        </View> 
+        <View style={this.state.dynamic_style.view_inline}>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[2] ? players[2].lineup_player : ""}</Text>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[5] ? players[5].lineup_player : ""}</Text>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[4] ? players[4].lineup_player : ""}</Text>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[3] ? players[3].lineup_player : ""}</Text>
+        </View> 
+        <View style={this.state.dynamic_style.view_inline}>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[7] ? players[7].lineup_player : ""}</Text>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[8] ? players[8].lineup_player : ""}</Text>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[10] ? players[10].lineup_player : ""}</Text>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[6] ? players[6].lineup_player : ""}</Text>
+        </View> 
+        <View style={this.state.dynamic_style.view_inline}>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[11] ? players[11].lineup_player : ""}</Text>
+          <Text style={this.state.dynamic_style.lineup_player}>{players[9] ? players[9].lineup_player : ""}</Text>
+        </View> 
+      </ImageBackground>
+      </View> 
+    );
+  }
+  get_View_lineup(){
+    if( this.state.matche_details=={} || this.state.matche_details.home_lineup==undefined || this.state.matche_details.away_lineup==undefined ||
+      this.state.matche_details.home_lineup.length<11 || this.state.matche_details.away_lineup.length<11) 
+      return <View style={this.state.dynamic_style.view_tab}><Text style={this.state.dynamic_style.title}>Line-up not available</Text></View>;
+    const is_home = this.state.lineup_type==undefined || this.state.lineup_type=="home" ;
+    return (
+      <View style={this.state.dynamic_style.view_tab}>
+        <View style={this.state.dynamic_style.view_inline_teams_lu}>
+          <TouchableOpacity style={is_home==true ? this.state.dynamic_style.lineup_team_ :this.state.dynamic_style.lineup_team } onPress={ () => {this.setState({lineup_type:"home"}) }} >
+            <Text style={this.state.dynamic_style.view_tab_text}>{this.home_team_ar}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={is_home==false ? this.state.dynamic_style.lineup_team_ : this.state.dynamic_style.lineup_team} onPress={ () => {this.setState({lineup_type:"away"}) }} >
+            <Text style={this.state.dynamic_style.view_tab_text}>{this.away_team_ar}</Text>
+          </TouchableOpacity>
+        </View> 
+        {is_home==true ? this.generate_lineup(this.state.matche_details.home_lineup) : null}
+        {is_home==false ? this.generate_lineup(this.state.matche_details.away_lineup) : null}
+      </View> 
+    );
+  }
 
-      match_lineup2_color : "#d1d8e0",
-      match_lineup2_number_color : "#f1c40f",
-      match_linup_team_backgroundColor:"#dae6fd",
-      match_linup_team__backgroundColor:"#97d1f9",
-      match_stats_color : "#d1d8e0",
-      match_lineup_player_color:"#000",
-      match_text_info_color : "#d1d8e0",
-      match_results_team_scor_color : "#f1c40f",
-      match_results_winer_background  : "#16a085",
-      match_results_loser_background  : "#c0392b",
-      match_results_drawer_background : "#7f8c8d",
-      match_results_scorer_color :"#dbd9ff",
-      
-    },
-    "light":{
-      /// most valuable
+  get_scores(type_="home"){
+    if(type_=="home"){this.scorers_h =[];}
+    else{this.scorers_a =[];}
 
-      headerStyle_backgroundColor: '#eccc68',
-      headerTintColor: '#57606f',
-      activeBackgroundColor: '#eccc68',
-      inactiveBackgroundColor: '#a4b0be',
-      activeTintColor: '#2f3542',
-      inactiveTintColor: '#2f3542',
-
-      global_backgound : "#ced6e0",
-      home_title_color : "#2f3542",
-
-      list_header_backgroundColor: "#4a69bd",
-      live_borderColor:"#ffa502",
-      match_name_backgroundColor: "#dfe4ea",
-      match_name_color: "#2f3542",
-      match_score_backgroundColor: "#a5b1c2",
-      match_score_color :"#b8e994", 
-      match_time_backgroundColor:"#ced6e0",
-      match_time_color:"#2f3542",
-      match_badge_backgroundColor: "#dfe4ea",
-
-      
-      ///////
-      news_cont_backgroundColor:"#34495e",
-      news_title_backgroundColor:"#00000091",
-      news_title_color:"#fff",
-  
-      article_body_backgroundColor:"#a4b0be",
-      article_body_color : "#2f3542",
-      article_title_backgroundColor:"#acb4c1",
-      article_title_color : "#2f3542",
-      article_date_color : "#2f3542",
-      article_photo_background : "#ced6e0",
-
-      match_lineup2_color : "#2f3542",
-      match_lineup2_number_color : "#f1c40f",
-      match_linup_team_backgroundColor:"#dae6fd",
-      match_linup_team__backgroundColor:"#97d1f9",
-      match_stats_color : "#2f3542",
-      match_lineup_player_color:"#000",
-      match_text_info_color : "#2f3542",
-      match_results_team_scor_color : "#2f3542",
-      match_results_winer_background  : "#2ed573",
-      match_results_loser_background  : "#ff7f50",
-      match_results_drawer_background : "#70a1ff",
-      match_results_scorer_color :"#5352ed",
-      
+    let style_class = type_=="home"? this.state.dynamic_style.match_results_team_name_l : this.state.dynamic_style.match_results_team_name_r ;
+    if(this.state.matche_details.goal_scorer){
+      let res = this.state.matche_details.goal_scorer.map(elm=>{
+        if(elm[type_+"_scorer"]==undefined || elm[type_+"_scorer"]=="" || elm[type_+"_scorer"]==null) return false;
+        let text = "";
+        if(type_=="away"){
+          text = (elm.time ? elm.time+'"' : "-") +" "+ elm[type_+"_scorer"];
+          this.scorers_a.push(elm[type_+"_scorer"]);
+        }else{
+          text = elm[type_+"_scorer"] +" "+(elm.time ? elm.time+'"' : "-");
+          this.scorers_h.push(elm[type_+"_scorer"]);
+        }
+        return <Text style={[style_class,this.state.dynamic_style.match_results_scorer_text]}>{text}</Text>;
+      });
+      return(
+          <View style={[style_class]}>
+            {res ? res :null}
+          </View>
+      );
     }
   }
-  
-theme = Themes["dark blue"];
-var styles_list = StyleSheet.create({
-  container: {
-   flex: 1,
-   width:"100%",
-   backgroundColor: theme.global_backgound,
-   //backgroundColor: '#ff0000',
-   
-  },
-  item: {
-    padding: 10,
-    fontSize: 18,
-    height: 44,
-    flex:1,
-    color:"#fff",
-  },
-  header: {
-    marginRight:5,
-    marginLeft:5,
-    marginTop:3,
-    fontSize: 20,
-    backgroundColor: theme.list_header_backgroundColor,
-    width:"98%",
-    textAlign:"right",
-    //height:40,
-    //alignContent:"center",
-    //alignItems:"center",
-    //alignSelf:"center",
-  },
-  title: {
-    fontSize: 23
-  },
-  matche_container:{
-    width:"100%",
-    marginTop:10,
-    marginBottom:5,
-    flexDirection:'row', 
-    flexWrap:'wrap',
-    flex: 1 ,
-    height:70,
-    marginRight:5,
-    marginLeft:5,
-    borderRadius:8,
-    borderWidth:1,
-  },
-  matche_container_live:{
-    borderRadius:7,
-    borderWidth: 2,
-    borderColor: theme.live_borderColor,
-  },
-  matche_team_names:{
-    flex: 15 ,
-    backgroundColor: theme.match_name_backgroundColor,
-  },
-  matche_team_name_text:{
-    flex:1,
-    color: theme.match_name_color,
-    paddingLeft:5,
-    paddingRight:5,
-    paddingTop:8,
-    fontSize:22,
-    lineHeight:25,
-    textAlign:"right",
-  },
-  matche_team_score:{
-    flex: 2 ,
-    backgroundColor: theme.match_score_backgroundColor,
-    alignItems:'center',
-    color:theme.match_score_color,
-    borderTopRightRadius:8,
-    borderBottomRightRadius:8,
-    alignContent:"center",
-
-  },
-  matche_team_score_text:{
-    flex:1,
-    fontSize:23,
-    fontWeight: 'bold',
-    justifyContent: 'center',
-
-  },
-  matche_team_time:{
-    flex: 4 ,
-    alignItems:'center',
-    justifyContent: 'center',
-    color:"#fff",
-    borderTopLeftRadius:8,
-    borderBottomLeftRadius:8,
-    backgroundColor: theme.match_time_backgroundColor,
-    textAlignVertical: 'center',
-  },
-  matche_team_time_t:{
-    //lineHeight:20,
-   
-    //flex:4,
-    fontSize:20,
-    alignItems:'center',
-    color: theme.match_time_color,
-    //backgroundColor:"#ff3a3a9c",
-    alignContent:"center",
-  },
-  matche_team_time_live:{
-    //flex:3,
-    fontSize:20,
-    alignItems:'center',
-    justifyContent: 'center',
-    color:"#2ecc71",
-    //backgroundColor:"#ffe738cc",
-  },
-
-  matche_team_logo:{
-    //margin :3,
-    width: "100%",
-    height: "45%",
-    aspectRatio: 1,
-    resizeMode:"contain"
-  },
-  matche_league_logo:{
-    //margin :3,
-    width: "100%",
-    height: "100%",
-    aspectRatio: 1,
-    resizeMode:"contain",
-  },
-  matche_team_badge:{
-    flex: 2 ,
-    backgroundColor: theme.match_badge_backgroundColor,
-    alignItems:'center',
-    color:"#d1d8e0",
-    justifyContent: 'center',
-  },
-  news_container:{
-    marginTop:5,
-    marginBottom:5,
+  render() {
     
-    height:200,
-    width:"95%",
-    margin:"auto",
-    backgroundColor: theme.news_cont_backgroundColor,
-    borderRadius: 10,
-  },
-  news_img_v:{
-    flex: 12 ,
-    width:"100%",
-    color:"#fff",
-    alignItems:'center',
-  },
-  news_img_i:{
-    width: "100%",
-    height: "100%",
-    aspectRatio: 1,
-    resizeMode:"contain",
-    alignItems:'center',
-  },
-  news_title_v:{
-    width:"100%",
-    flex: 2 ,
-    fontSize:18,
-    color:"#fff",
-    backgroundColor: theme.news_title_backgroundColor
-  },
-  news_title_t:{
-    flex: 1 ,
-    fontSize:15,
-    alignItems:'center',
-    justifyContent: 'center',
-    alignSelf : "center",
-    color: theme.news_title_color,
-  },
-});
+    let home_sc="";
+    let away_sc="";
+    let home_name="h";
+    let away_name="a";
+    let home_style={};
+    let away_style ={};
+    let scores_home = this.get_scores("home");
+    let scores_away = this.get_scores("away");
+    try{
+      home_sc = this.state.matche_details.home_team_score ? parseInt(this.state.matche_details.home_team_score) : "-";
+      away_sc = this.state.matche_details.away_team_score ? parseInt(this.state.matche_details.away_team_score) : "-";
+      home_style = home_sc>away_sc ? this.state.dynamic_style.match_results_winer 
+        : (home_sc==away_sc ? this.state.dynamic_style.match_results_drawer : this.state.dynamic_style.match_results_loser);
+      away_style = away_sc>home_sc ? this.state.dynamic_style.match_results_winer 
+      : (away_sc==home_sc ? this.state.dynamic_style.match_results_drawer : this.state.dynamic_style.match_results_loser);
+      home_name = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
+      away_name = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;
+    }catch(e){
+      alert(e);
+      return <View style={this.state.dynamic_style.container}><Text>ERR</Text></View>;
+      }
 
-var styles_home= StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: theme.global_backgound,
-    color : "#fff",
-  },
+    return (
+      <ScrollView style={this.state.dynamic_style.container} contentContainerStyle={this.state.dynamic_style.container_scrl}>
+        <TouchableOpacity style={this.state.dynamic_style.header_container} onPress={()=>this.setState({show_res : this.state.show_res?false:true})}>              
+          <View style={[this.state.dynamic_style.match_results_team_name_l,home_style]}>
+            <View styles={[this.state.dynamic_style.match_results_team_name_l,{flex:1}]}>
+              <Text style={[this.state.dynamic_style.match_results_team_name,this.state.dynamic_style.match_results_team_name_l,]}>{home_name}</Text>
+              <Text style={[this.state.dynamic_style.match_results_team_scor_t,this.state.dynamic_style.match_results_team_name_l,]}>{home_sc}</Text>
+            </View>
+            { this.state.show_res ?
+            <View style={{}}>
+              {scores_home}
+            </View>
+            :null}
+          </View>
 
-  text:{
-    color : "#fff",
-    marginRight:10,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color : theme.home_title_color,
-    fontFamily : "cairoregular",
-  },
-  header_icons:{
-    padding:10,
-    marginHorizontal :20,
-  },
-  icons:{
-    padding:10,
-    //marginHorizontal :20,
+          <View style={[this.state.dynamic_style.match_results_team_name_r,away_style]}>
+            <View styles={[this.state.dynamic_style.match_results_team_name_r,{flex:1}]}>
+              <Text style={[this.state.dynamic_style.match_results_team_name,this.state.dynamic_style.match_results_team_name_r,]}>{away_name}</Text>
+              <Text style={[this.state.dynamic_style.match_results_team_scor_t,this.state.dynamic_style.match_results_team_name_r,]}>{away_sc}</Text>
+            </View>
+            { this.state.show_res ?
+            <View style={{}}>
+              {scores_away}
+            </View>
+            :null}
+          </View>
+        </TouchableOpacity>
+        
+        <View style={this.state.dynamic_style.tabs_list}>
+          <Button title="General" onPress={()=>this.setState({visible_tab:"general"})}/>
+          <Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"})}/>
+          <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/>
+          <Button title="Line-up2" onPress={()=>this.setState({visible_tab:"lineup2"})}/>
+        </View>
+        {this.state.loading ? <Loading /> :
+          <View  style={this.state.dynamic_style.container_scrl}>
+            { this.state.matche_details!={} && this.state.visible_tab=="general" ? this.get_View_general() : null}
+            { this.state.matche_details!={} && this.state.visible_tab=="stats"   ? this.get_View_stats()   : null}
+            { this.state.matche_details!={} && this.state.visible_tab=="lineup"   ? this.get_View_lineup() : null}
+            { this.state.matche_details!={} && this.state.visible_tab=="lineup2"   ? this.get_View_lineup_2() : null}
+          </View>
+        }
+        
+      </ScrollView>
+    );
   }
-});
+}
 
-var  styles_article = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    backgroundColor: theme.global_backgound,
-    color : "#fff",
-
-  },
-  article_v: {
-    flex: 10,
-    padding: 5,
-    fontSize: 18,
-    backgroundColor: theme.global_backgound,
-    //backgroundColor: '#8e5858',
-  },
-  article_body_t:{
-    fontSize: 15,
-    color : theme.article_body_color,
-    textAlign:"right",
-    borderRadius: 5,
-    backgroundColor: theme.article_body_backgroundColor,
-    padding:10,
-    marginBottom:5,
-  },
-  article_title_t:{
-    //fontWeight: "bold",
-    padding:10,
-    width:"100%",
-    marginTop:8,
-    marginBottom:8,
-    fontSize: 16,
-    color : theme.article_title_color,
-    textAlign:"center",
-    backgroundColor:theme.article_title_backgroundColor,
-    borderRadius: 5,
-  },
-  article_date_t:{
-    //padding:5,
-    fontSize: 12,
-    color : theme.article_date_color,
-    textAlign:"right",
-  },
-  channel_logo:{
-    aspectRatio: 1,
-    width: "100%",
-    height: "100%",
-    resizeMode: 'contain',
-  },
-  channel_logo_v:{
-    width: "100%",
-    height:200,
-    padding:5,
-    alignContent:"center",
-    alignItems:"center",
-    alignSelf:"center",
-    backgroundColor:theme.article_photo_background,
-  }
-});
-
-var styles_news = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: theme.global_backgound,
-    color : "#fff",
-  },
-  nav_container: {
-    flexDirection:'row', 
-    flexWrap:'wrap',
-    height:30,
-    justifyContent: 'center',
-    backgroundColor: theme.global_backgound,
-    color : "#fff",
-  },
-
-  text:{
-    color : "#fff",
-    fontSize: 20,
-    marginRight:10,justifyContent: 'center',alignItems: 'center'
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color : "#d1d8e0",
-  },
-  icons:{
-    padding:10,
-    marginHorizontal :20,
-  }
-});
-
-
-var styles_channel = StyleSheet.create({
-  container_scrl: {
-    flex: 1,
-    //backgroundColor: '#fff',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
-    //backgroundColor: '#bd7bc1',
-    flexDirection: 'column',
-    backgroundColor: theme.global_backgound,
-    color : "#fff",
-  },
-  info_cont: {
-    flex: 4,
-    //justifyContent: 'center',
-    padding: 5,
-    fontSize: 18,
-    color : "#fff",
-    //backgroundColor: theme.global_backgound,
-    //backgroundColor: '#8e5858',
-  },
-  info_text:{
-    fontSize: 18,
-    color : "#fff",
-  },
-  channel_logo:{
-    aspectRatio: 1,
-    width: "100%",
-    height: "100%",
-    resizeMode: 'contain',
-  },
-  channel_logo_v:{
-    width: "100%",
-    flex :1,
-    padding:5,
-    alignContent:"center",
-    alignItems:"center",
-    alignSelf:"center",
-  }
-});
-
-var styles_match = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop :3,
-    backgroundColor: theme.global_backgound,
-    color : "#d1d8e0",
-  },
-  container_scrl: {
-    flex: 1,
-    backgroundColor: theme.global_backgound,
-  },
-  hairline: {
-    backgroundColor: '#A2A2A2',
-    height: 2,
-    width:"100%",
-    marginHorizontal:"auto",
-    paddingHorizontal:10,
-  },
-  paragraph: {
-    margin: 24,
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  tabs_list:{
-    //marginTop:10,
-    flexDirection:'row', 
-    flexWrap:'wrap',
-  },
-  view_tab:{
-    //marginTop:10,
-    flex: 13 ,
-    height:20
-  },
-  view_tab_text:{
-    //flex: 1 ,
-    textAlign:"center",
-    padding:3
-  },
-  lineup2_container:{
-    marginTop:3,
-    flexDirection:'row', 
-    flexWrap:'wrap',
-  },
-  lineup2_h:{
-    flex:9,
-    marginHorizontal:3,
-    textAlign: 'left',
-    color : theme.match_lineup2_color,
-  },
-  lineup2_a:{
-    flex:9,
-    marginHorizontal:3,
-    textAlign: 'right',
-    color : theme.match_lineup2_color,
-  },
-  lineup2_m:{
-    flex:1,
-    marginHorizontal:5,
-    textAlign: 'center',
-    color : theme.match_lineup2_color,
-  },
-  lineup2_number:{
-    width:20,
-    marginHorizontal:3,
-    textAlign: 'center',
-    color : theme.match_lineup2_number_color,
-  },
-  stats_container:{
-    marginTop:10,
-    flexDirection:'row', 
-    flexWrap:'wrap',
-    
-  },
-  stats_frag_l_:{
-    marginHorizontal:5,
-    flex: 10 ,
-    textAlign: 'center',
-    color : theme.match_stats_color,
-  },
-  stats_frag_m_:{
-    marginHorizontal:5,
-    flex: 4 ,
-    textAlign: 'center',
-    color : theme.match_stats_color,
-  },
-  stats_frag_r_:{
-    marginHorizontal:5,
-    flex: 10 ,
-    textAlign: 'center',
-    color : theme.match_stats_color,
-  },
-  stats_frag_l:{
-    marginHorizontal:5,
-    flex: 2 ,
-    textAlign: 'center',
-    color : theme.match_stats_color,
-  },
-  stats_frag_m:{
-    marginHorizontal:5,
-    flex: 10 ,
-    textAlign: 'center',
-    color : theme.match_stats_color,
-  },
-  stats_frag_r:{
-    marginHorizontal:5,
-    flex: 2 ,
-    color : theme.match_stats_color,
-  },
-
-  view_inline:{
-    marginLeft:5,
-    marginRight:5,
-    flexDirection:'row', 
-    flexWrap:'wrap',
-    flex: 1 ,
-    textAlign: 'center',
-    color : "#d1d8e0",
-  },
-  view_inline_teams_lu:{
-    marginTop:3,
-    flexDirection:'row', 
-    flexWrap:'wrap',
-    //height:10,
-    textAlign: 'center',
-    color : "#d1d8e0",
-    marginBottom:10
-
-  },
-  lineup_team:{
-    marginLeft:5,
-    marginRight:5,
-    borderRadius: 10,
-    //margin:5,
-    flex: 1 ,
-    textAlign: 'center',
-    backgroundColor:theme.match_linup_team_backgroundColor,
-  },
-  lineup_team_:{
-    marginLeft:5,
-    marginRight:5,
-    borderRadius: 10,
-    flex: 1 ,
-    textAlign: 'center',
-    backgroundColor:theme.match_linup_team__backgroundColor,
-  },
-  background_pitch:{
-    flex: 12 ,
-  },
-  lineup_player:{
-    fontWeight: 'bold',
-    fontSize:15,
-    flex: 10 ,
-    textAlign: 'center',
-    color:theme.match_lineup_player_color,
-  },
-
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color : "#d1d8e0",
-  },
-   text_info:{
-     color : theme.match_text_info_color,
-   },
-   header_container:{
-     marginHorizontal:"auto",
-     width:"98%",
-     flexDirection:"row",
-     flexWrap:'wrap',
-     marginBottom:10,
-  },
-   match_results_team_name:{
-    fontSize: 20,
-    fontWeight: 'bold',
-    color : "#fff",
-    paddingHorizontal:5,
-    width:"100%",
-    //textAlign:"right"
-   },
-   match_results_team_scor_t:{
-    fontSize: 20,
-    fontWeight: 'bold',
-    color : theme.match_results_team_scor_color,
-    paddingHorizontal:5,
-    //textAlign:"right"
-   },
-   
-   match_results_team_name_l:{
-     textAlign:"right",
-     borderRightWidth:1,
-     },
-   match_results_team_name_r:{
-     textAlign:"left",
-     borderLeftWidth:1,
-     
-   },
-   match_results_winer:{
-     flex:1,
-     backgroundColor: theme.match_results_winer_background,
-   },
-   match_results_loser:{
-     flex:1,
-     backgroundColor: theme.match_results_loser_background,
-   },
-    match_results_drawer:{
-     flex:1,
-     backgroundColor: theme.match_results_drawer_background,
-   },
-   match_results_scorer_text:{
-     color: theme.match_results_scorer_color,
-     fontSize:15,
-     }
-});
-export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match};
-
-
-
+export default Matchcreen;

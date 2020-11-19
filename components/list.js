@@ -2,11 +2,17 @@ import * as React from 'react';
 import {  View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground } from 'react-native';
 import { SafeAreaView,SectionList } from 'react-native';
 import Loader from "./Loader";
-import {styles_list} from "./Themes";
+import {styles_list,getTheme} from "./Themes";
 
 
 class ItemsList extends React.Component {
-  
+  constructor(props) {
+    super(props);
+    this.state = {
+      dynamic_style:styles_list,
+    }
+    getTheme("styles_list").then(theme=>this.setState({dynamic_style:theme}));
+  }
   get_item(item,col_key){
     if(col_key=="home_team"){
       const style_small = {}
@@ -18,55 +24,55 @@ class ItemsList extends React.Component {
       if(away_team_name.length>14){ away_team_style={fontSize:15}; }
       
       return (
-        <View style={[styles_list.matche_container,item.live==1 ? styles_list.matche_container_live:{}]}>
-          <View style={styles_list.matche_team_time}>
-            <Text style={styles_list.matche_team_time_t} noFonts={true}>{item.time}</Text>
+        <View style={[this.state.dynamic_style.matche_container,item.live==1 ? this.state.dynamic_style.matche_container_live:{}]}>
+          <View style={this.state.dynamic_style.matche_team_time}>
+            <Text style={this.state.dynamic_style.matche_team_time_t} noFonts={true}>{item.time}</Text>
             {item.live==1 ? 
-              <Text style={styles_list.matche_team_time_live}  noFonts={true}>Live</Text> 
+              <Text style={this.state.dynamic_style.matche_team_time_live}  noFonts={true}>Live</Text> 
             : null}
             
           </View>
-          <View style={styles_list.matche_team_badge}>
+          <View style={this.state.dynamic_style.matche_team_badge}>
             <Image
-            style={styles_list.matche_team_logo}
+            style={this.state.dynamic_style.matche_team_logo}
             source={{uri: item.home_team_badge}}
               />
             <Image
-            style={styles_list.matche_team_logo}
+            style={this.state.dynamic_style.matche_team_logo}
             source={{uri: item.away_team_badge}}
               />
           </View>
 
-          <View style={styles_list.matche_team_names}>
-            <Text style={[styles_list.matche_team_name_text,home_team_style]}>{home_team_name}</Text>
-            <Text style={[styles_list.matche_team_name_text,away_team_style]}>{away_team_name}</Text>
+          <View style={this.state.dynamic_style.matche_team_names}>
+            <Text style={[this.state.dynamic_style.matche_team_name_text,home_team_style]}>{home_team_name}</Text>
+            <Text style={[this.state.dynamic_style.matche_team_name_text,away_team_style]}>{away_team_name}</Text>
           </View>
-          <View style={styles_list.matche_team_score}>
-            <Text style={styles_list.matche_team_score_text} noFonts={true} >{item.home_team_score ? item.home_team_score : "-"}</Text>
-            <Text style={styles_list.matche_team_score_text} noFonts={true}>{item.away_team_score ? item.away_team_score : "-"}</Text>
+          <View style={this.state.dynamic_style.matche_team_score}>
+            <Text style={this.state.dynamic_style.matche_team_score_text} noFonts={true} >{item.home_team_score ? item.home_team_score : "-"}</Text>
+            <Text style={this.state.dynamic_style.matche_team_score_text} noFonts={true}>{item.away_team_score ? item.away_team_score : "-"}</Text>
           </View>
         </View>
         );
     }else if(col_key=="title_news"){ 
       
       return (
-        <View style={styles_list.news_container}>
+        <View style={this.state.dynamic_style.news_container}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: item.img}} >
-            <View style={styles_list.news_img_v}>
+            <View style={this.state.dynamic_style.news_img_v}>
 
             </View>
-            <View style={styles_list.news_title_v}><Text style={styles_list.news_title_t}>{item.title_news}</Text></View>
+            <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t}>{item.title_news}</Text></View>
           </ImageBackground>
         </View>
         );
     }else if(col_key=="category_name"){  
       return (
-        <View style={styles_list.news_container}>
+        <View style={this.state.dynamic_style.news_container}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: API_.domain_o+item.category_photo}} >
-            <View style={styles_list.news_img_v}>
+            <View style={this.state.dynamic_style.news_img_v}>
 
             </View>
-            <View style={styles_list.news_title_v}><Text style={styles_list.news_title_t}>{item[col_key]}</Text></View>
+            <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t}>{item[col_key]}</Text></View>
           </ImageBackground>
         </View>
 
@@ -74,7 +80,7 @@ class ItemsList extends React.Component {
     }else{
       //category_photo
       return (
-        <Text style={styles_list.item}>- { col_key=="home_team" ? item["home_team"] +" - "+ item["away_team"] :item[col_key]}</Text>
+        <Text style={this.state.dynamic_style.item}>- { col_key=="home_team" ? item["home_team"] +" - "+ item["away_team"] :item[col_key]}</Text>
         );
     }
   }
@@ -91,8 +97,8 @@ class ItemsList extends React.Component {
     //console.log(list,"-");
 
     return (
-      <View style={styles_list.container}>
-        <SafeAreaView style={styles_list.container}>
+      <View style={this.state.dynamic_style.container}>
+        <SafeAreaView style={this.state.dynamic_style.container}>
           <SectionList
             sections={list}
             keyExtractor={(item, index) => item[key]}
@@ -120,12 +126,12 @@ class ItemsList extends React.Component {
 
             renderSectionHeader={({ section: { title,img } }) => {
               return title ? (
-              <View style={[{flex:1,paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap',},styles_list.header]}>
-                <Text style={[styles_list.header,{flex:7}]}>{title}</Text>
+              <View style={[{flex:1,paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap',},this.state.dynamic_style.header]}>
+                <Text style={[this.state.dynamic_style.header,{flex:7}]}>{title}</Text>
                 <View style={{flex:1}}>
                 { img ?  
                         <Image 
-                          style={styles_list.matche_league_logo}
+                          style={this.state.dynamic_style.matche_league_logo}
                           source={{uri: API_.domain_o+img}}
                           />
                   : null}
@@ -139,7 +145,7 @@ class ItemsList extends React.Component {
     );
   }
   render() {
-    return (<View style={styles_list.container}>
+    return (<View style={this.state.dynamic_style.container}>
 
       {this.props.loading ? <Loader/> : this.render_list()}
     </View>);

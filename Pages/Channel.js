@@ -5,7 +5,7 @@ import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
 import Loading from "../components/Loader";
-import {styles_channel} from "../components/Themes";
+import {styles_channel,getTheme} from "../components/Themes";
 let list = [
 
           ];
@@ -22,8 +22,11 @@ class ChannelScreen extends React.Component {
         actionType:"IPTV",
         channel:null,
         loading:true,
+        dynamic_style:styles_channel,
+        
         
     };
+    getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
     this.get_channel();
 
   }
@@ -130,16 +133,16 @@ class ChannelScreen extends React.Component {
       ))
     : null;
     return (
-      <ScrollView style={{backgroundColor: '#000',}}  contentContainerStyle={styles_channel.container}>
-      <View style={styles_channel.channel_logo_v}>
-        { this.channel_photo ?  <Image style={styles_channel.channel_logo} source={{uri: API_.domain_o+this.channel_photo}} />: null}
+      <ScrollView style={{backgroundColor: '#000',}}  contentContainerStyle={this.state.dynamic_style.container}>
+      <View style={this.state.dynamic_style.channel_logo_v}>
+        { this.channel_photo ?  <Image style={this.state.dynamic_style.channel_logo} source={{uri: API_.domain_o+this.channel_photo}} />: null}
          </View>
-         <View style={styles_channel.info_cont}>
+         <View style={this.state.dynamic_style.info_cont}>
          { this.state.loading ? <Loading /> : 
-        <View style={styles_channel.info_cont}>
-          <Text style={styles_channel.info_text}> Name : {this.state.channel && this.state.channel.en_name ? this.state.channel.en_name : ""}</Text>
-          <Text style={styles_channel.info_text}> Language :{this.state.channel && this.state.channel.language? this.state.channel.language : ""}</Text>
-          <Text style={styles_channel.info_text}> Type :{this.state.channel && this.state.channel.type? this.state.channel.type : ""}</Text>
+        <View style={this.state.dynamic_style.info_cont}>
+          <Text style={this.state.dynamic_style.info_text}> Name : {this.state.channel && this.state.channel.en_name ? this.state.channel.en_name : ""}</Text>
+          <Text style={this.state.dynamic_style.info_text}> Language :{this.state.channel && this.state.channel.language? this.state.channel.language : ""}</Text>
+          <Text style={this.state.dynamic_style.info_text}> Type :{this.state.channel && this.state.channel.type? this.state.channel.type : ""}</Text>
           
           <Picker
                 selectedValue={this.state.actionType}

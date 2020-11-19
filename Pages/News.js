@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
-import {styles_news} from "../components/Themes";
+import {styles_news,getTheme} from "../components/Themes";
 class NewsScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -12,13 +12,14 @@ class NewsScreen extends React.Component {
         list:[],
         page : 1,
         loading:true,
+        dynamic_style : styles_news,
     };
-  //this.get_matches(this.state.matches_date);
+  getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
   this.get_news();
   this.props.navigation.setOptions({title: "News",
       "headerRight":()=>(
             <IconButton 
-              name="refresh" size={styles_news.title.fontSize} style={styles_news.icons} onPress={()=>{
+              name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
               this.get_news(this.state.matches_date);
             }}  />
     )
@@ -37,21 +38,21 @@ get_news(){
   render() {
     
     return (
-      <View style={styles_news.container}>     
+      <View style={this.state.dynamic_style.container}>     
         <ItemsList loading={this.state.loading} list={this.state.list} onclick={this.onItem_clicked} key_="title_news" key_key="link"  />
         
-        <View style={styles_news.nav_container}>
+        <View style={this.state.dynamic_style.nav_container}>
           <IconButton
             disabled={this.state.loading}
-           title="arrow-back-circle"  name="chevron-left" size={styles_news.title.fontSize} style={styles_news.icons} onPress={()=>{
+           title="arrow-back-circle"  name="chevron-left" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
             if(this.state.page==1){return false;}
             this.state.page--;
             this.get_news();
           }}  />
-          <Text style={styles_news.text}>{this.state.page}</Text>
+          <Text style={this.state.dynamic_style.text}>{this.state.page}</Text>
           <IconButton 
             disabled={this.state.loading}
-           title="forward"  name="chevron-right" size={styles_news.title.fontSize} style={styles_news.icons} onPress={()=>{
+           title="forward"  name="chevron-right" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
             this.state.page++;
             this.get_news();
           }}  />

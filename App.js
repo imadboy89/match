@@ -16,28 +16,11 @@ import ArticleScreen from './Pages/Article';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Font from 'expo-font';
 import TextF from "./components/TextF";
-import {Themes} from "./components/Themes";
+import {app_styles,getTheme} from "./components/Themes";
 Text = TextF;
+Global_theme_name = "light";
+var _app_styles = app_styles;
 
-Theme = Themes["dark blue"];
-/*
-if (!I18nManager.isRTL) {
-  I18nManager.forceRTL(true);
-}
-*/
-
-
-let screenHeader = {
-  headerStyle: {
-    backgroundColor: Theme.headerStyle_backgroundColor,
-    height: 70,
-    },
-  headerTintColor: Theme.headerTintColor,
-  headerTitleStyle: {
-    fontWeight: 'bold',
-    },
-  headerTitleAlign: 'center'
-  }
 LoadedFonts = false;
 function _loadFontsAsync() {
   Font.loadAsync({
@@ -73,38 +56,37 @@ const ChannelsStack = createStackNavigator();
 const MatchesStack = createStackNavigator();
 const NewsStack = createStackNavigator();
 
-
 function ChannelsStackScreen() {
   return (
     <ChannelsStack.Navigator>
     
-      <ChannelsStack.Screen options={screenHeader} name="ChannelsCat" component={CategoriesScreen} />
-      <ChannelsStack.Screen options={screenHeader} name="Channels" component={ChannelsScreen} />
-      <ChannelsStack.Screen options={screenHeader} name="Channel" component={ChannelScreen} />
+      <ChannelsStack.Screen options={_app_styles.screenHeader} name="ChannelsCat" component={CategoriesScreen} />
+      <ChannelsStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
+      <ChannelsStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
     </ChannelsStack.Navigator>
   );
 }
 function MatchesStackScreen() {
-  console.log("st",Theme); 
   return (
     <MatchesStack.Navigator>
-      <MatchesStack.Screen screenProps={Theme} options={screenHeader} name="Home" component={HomeScreen} />
-      <MatchesStack.Screen options={screenHeader} name="Match" component={Matchcreen} />
-      <MatchesStack.Screen options={screenHeader} name="Channels" component={ChannelsScreen} />
-      <MatchesStack.Screen options={screenHeader} name="Channel" component={ChannelScreen} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Home" component={HomeScreen} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
     </MatchesStack.Navigator>
   );
 }
 function NewsStackScreen() {
   return (
     <NewsStack.Navigator>
-      <NewsStack.Screen options={screenHeader} name="News" component={NewsScreen} />
-      <NewsStack.Screen options={screenHeader} name="Article" component={ArticleScreen} />
+      <NewsStack.Screen options={_app_styles.screenHeader} name="News" component={NewsScreen} />
+      <NewsStack.Screen options={_app_styles.screenHeader} name="Article" component={ArticleScreen} />
     </NewsStack.Navigator>
   );
 }
 
-function MyTabs() {
+function MyTabs(){
+  //let tabBarOptions_ = this.state.tabBarOptions_;
   return (
     <StackNav.Navigator
       barStyle={{ backgroundColor: '#000' }}
@@ -128,13 +110,7 @@ function MyTabs() {
             return <Icon name={iconName} size={size} color={color} />;
           },
         })}
-      tabBarOptions={{
-          activeBackgroundColor: Theme.activeBackgroundColor,
-          inactiveBackgroundColor: Theme.inactiveBackgroundColor,
-          activeTintColor: Theme.activeTintColor,
-          inactiveTintColor: Theme.inactiveTintColor,
-          size : 20
-        }}
+      tabBarOptions={_app_styles.tabBarOptions}
     >
       <StackNav.Screen name="Home" component={MatchesStackScreen} />
       <StackNav.Screen name="web" component={FSScreen} />
@@ -144,11 +120,41 @@ function MyTabs() {
     </StackNav.Navigator>
   );
 }
-export default function App() {
-  //[fontsLoaded] = useFonts({'cairoregular': require('./assets/fonts/cairoregular.ttf'),});
-  return (
-    <NavigationContainer>
-      <MyTabs />
-    </NavigationContainer>
-  );
-}
+
+class APP extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        list:[],
+        modalVisible_match:false,
+        show_datPicker : false,
+        matches_date:new Date(),
+        loading :true,
+        loading_fonts:false,
+        update_available:false,
+        dynamic_style:"styles_home",
+        style_loaded:false,
+        //dynamic_style_list:styles_list,
+    };
+    getTheme("app_styles").then(theme=>{
+      if(_app_styles==theme){return true;}
+      _app_styles=theme;
+      this.setState({style_loaded:true});
+    });
+  
+  }
+
+
+
+  render(){
+    if(this.state.style_loaded==false){
+      return null;
+    }
+    return (
+      <NavigationContainer>
+        <MyTabs />
+      </NavigationContainer>
+    );
+  }
+  }
+export default APP;

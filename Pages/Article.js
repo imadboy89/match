@@ -2,21 +2,20 @@ import React from "react";
 import {  View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image , ImageBackground} from 'react-native';
 import Constants from 'expo-constants';
 import Loader from "../components/Loader";
-import {styles_article} from "../components/Themes";
+import {styles_article,getTheme} from "../components/Themes";
 
-let list = [
-
-          ];
 class ArticleScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        list:list,
+        list:[],
         modalVisible_match:false,
         loading:true,
         article:this.props.route.params.article,
+        dynamic_style:styles_article,
         
     };
+    getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme}));
     this.get_article();
 
   }
@@ -33,8 +32,8 @@ class ArticleScreen extends React.Component {
   }
   render() {
     return (
-      <ScrollView  style={styles_article.container}>
-        <View style={styles_article.channel_logo_v}>
+      <ScrollView  style={this.state.dynamic_style.container}>
+        <View style={this.state.dynamic_style.channel_logo_v}>
         
           { this.state.article.img ?  
             <ImageBackground style={{flex:1,width:"100%"}} source={{uri: this.state.article.img}} >
@@ -42,12 +41,12 @@ class ArticleScreen extends React.Component {
           : null}
         </View>
         
-          <View style={styles_article.article_v}>
-            <Text style={styles_article.article_date_t}>{this.state.article.date}</Text>
-            <Text style={styles_article.article_title_t}>{this.state.article && this.state.article.title_news ? this.state.article.title_news : ""}</Text>
+          <View style={this.state.dynamic_style.article_v}>
+            <Text style={this.state.dynamic_style.article_date_t}>{this.state.article.date}</Text>
+            <Text style={this.state.dynamic_style.article_title_t}>{this.state.article && this.state.article.title_news ? this.state.article.title_news : ""}</Text>
             
             {this.state.loading ? <Loader/> : 
-            <Text style={styles_article.article_body_t}>{this.state.article && this.state.article.body? this.state.article.body : ""}</Text>  }
+            <Text style={this.state.dynamic_style.article_body_t}>{this.state.article && this.state.article.body? this.state.article.body : ""}</Text>  }
             
           </View>
       

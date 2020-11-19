@@ -5,7 +5,11 @@ import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
 import * as Font from 'expo-font';
-import {styles_home} from "../components/Themes";
+import {styles_home,getTheme,themes_list} from "../components/Themes";
+import ExpoCustomUpdater from '../Libs/update';
+import Loader from "../components/Loader";
+import * as Updates from 'expo-updates'
+
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -17,16 +21,45 @@ class HomeScreen extends React.Component {
         matches_date:new Date(),
         loading :true,
         loading_fonts:false,
+        update_available:false,
+        dynamic_style:styles_home,
+        //dynamic_style_list:styles_list,
     };
+
+  getTheme("styles_home").then(theme=>this.setState({dynamic_style:theme}));
   this.get_matches(this.state.matches_date);
   this.props.navigation.setOptions({title: "Matches list",
     "headerRight":()=>(
+      <View style={{flexDirection:"row",marginLeft:10}}>
             <IconButton 
-              name="refresh" size={styles_home.title.fontSize} style={styles_home.header_icons} onPress={()=>{
+              name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
               this.setState({list:[],loading:true});
               this.get_matches(this.state.matches_date);
+              
             }}  />
+            <IconButton 
+              name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{   
+              const next_ind = themes_list.indexOf(Global_theme_name)+1;
+              Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
+              API_.setConfig("theme",Global_theme_name).then(o=>{
+                Updates.reloadAsync();
+              });              
+            }}  />
+            </View>
     )
+  });
+  const customUpdater = new ExpoCustomUpdater()
+  customUpdater.isAppUpdateAvailable().then(isAv=>{
+    if(isAv==false){return}
+    this.props.navigation.setOptions({title: "Matches list",
+      "headerLeft":()=>(
+              <IconButton 
+                name="cloud-download" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
+                this.setState({list:[],loading:true});
+                customUpdater.doUpdateApp();
+              }}  />
+      )
+    });
   });
   }
   get_matches(date_obj=null){
@@ -94,30 +127,31 @@ show_DateP(){
     //this.setState({modalVisible_match:true,match:item});
   }
   render() {
+    if(this.state.dynamic_style==undefined ) {return null }
     return (
-      <View style={styles_home.container}>
-        <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",}} >
+      <View style={this.state.dynamic_style.container}>
+        <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
           <IconButton 
             disabled={this.state.loading}
-            title="pick date"  name="minus" size={styles_home.title.fontSize} style={styles_home.icons} onPress={()=>{
+            title="pick date"  name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
             this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
             this.setState({list:[],loading:true});
             this.get_matches(this.state.matches_date);
           }}  />
-            <Text style={[styles_home.title,]} >
+            <Text style={[this.state.dynamic_style.title,]} >
             
               {API_.get_date2(this.state.matches_date)}
             </Text>
           <IconButton title="pick date"  
             disabled={this.state.loading}
-            name="plus" size={styles_home.title.fontSize} style={styles_home.icons} onPress={()=>{
+            name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
             this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
             this.setState({list:[],loading:true});
             this.get_matches(this.state.matches_date);
           }}  />
           <IconButton 
             disabled={this.state.loading}
-            title="pick date"  name="edit" size={styles_home.title.fontSize} style={styles_home.icons} onPress={()=>this.setState({show_datPicker:true})}  />
+            title="pick date"  name="edit" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.setState({show_datPicker:true})}  />
         </View>
 
         
