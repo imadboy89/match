@@ -35,12 +35,31 @@ class API {
 
   }
   get_news(page){
+    //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
     console.log("https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page); 
     return this.http("https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       return scrap.get_news(resp);
+    });
+  }
+  get_videos(page){
+    return this.http("https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      console.log(111);
+      return scrap.get_videos(resp);
+    });
+  }
+  get_video(link){
+    console.log(link);
+    return this.http(link,"GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_video(resp);
     });
   }
   get_article(link){

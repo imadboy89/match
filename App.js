@@ -13,10 +13,16 @@ import FSScreen from './Pages/FS';
 import Matchcreen from './Pages/Match';
 import NewsScreen from './Pages/News';
 import ArticleScreen from './Pages/Article';
+import VideosScreen from './Pages/Videos';
+import VideoScreen from './Pages/Video';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Font from 'expo-font';
 import TextF from "./components/TextF";
 import {app_styles,getTheme} from "./components/Themes";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+
+
 Text = TextF;
 Global_theme_name = "light";
 var _app_styles = app_styles;
@@ -49,12 +55,13 @@ notifyMessage = function(msg: string,title: string) {
 
 API_ = new API();
 
+var is_materialTopTab = false;
 
-
-const StackNav = createBottomTabNavigator();
+const StackNav = is_materialTopTab ? createMaterialTopTabNavigator() : createBottomTabNavigator();
 const ChannelsStack = createStackNavigator();
 const MatchesStack = createStackNavigator();
 const NewsStack = createStackNavigator();
+const VideosStack = createStackNavigator();
 
 function ChannelsStackScreen() {
   return (
@@ -84,6 +91,15 @@ function NewsStackScreen() {
     </NewsStack.Navigator>
   );
 }
+function VideosStackScreen() {
+  return (
+    <VideosStack.Navigator>
+      <VideosStack.Screen options={_app_styles.screenHeader} name="Videos" component={VideosScreen} />
+      <VideosStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
+    </VideosStack.Navigator>
+  );
+}
+
 
 function MyTabs(){
   //let tabBarOptions_ = this.state.tabBarOptions_;
@@ -104,16 +120,21 @@ function MyTabs(){
               iconName = focused ? 'newspaper-o' : 'newspaper-o';
             } else if (route.name === 'web') {
               iconName = focused ? 'chrome' : 'chrome';
+           } else if (route.name === 'Videos') {
+              iconName = focused ? 'youtube-play' : 'youtube-play';
             }
             
             // You can return any component that you like here!
             return <Icon name={iconName} size={size} color={color} />;
           },
+          swipeEnabled :true,
+          tabBarPosition:"bottom",
         })}
-      tabBarOptions={_app_styles.tabBarOptions}
+      tabBarOptions={is_materialTopTab ? _app_styles.tabBarOptions_mat : _app_styles.tabBarOptions}
+      tabBarPosition="bottom"
     >
       <StackNav.Screen name="Home" component={MatchesStackScreen} />
-      <StackNav.Screen name="web" component={FSScreen} />
+      <StackNav.Screen name="Videos" component={VideosStackScreen} />
       <StackNav.Screen name="Channels" component={ChannelsStackScreen} />
       <StackNav.Screen name="News" component={NewsStackScreen} />
       
