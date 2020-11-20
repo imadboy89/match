@@ -384,7 +384,8 @@ function generateTheme(theme_name=false){
   });
 
   var  styles_article = StyleSheet.create({
-
+    icons:styles_home.icons,
+    title:styles_home.title,
     container: {
       flex: 1,
       backgroundColor: theme.background_color_default,
