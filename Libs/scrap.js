@@ -48,7 +48,8 @@ class Scrap {
     return videoId;
   }
   get_videos(html){
-    
+    if(html==""){return []}
+    //console.log("-",html)
     let doc = new DomParser().parseFromString(html,'text/html');
     let alinks = doc.querySelect('.infinitescroll_item a')
     //console.log(d[0].getAttribute("href") )
@@ -56,6 +57,7 @@ class Scrap {
     let lastlink = "";
     for (let i=0;i<alinks.length;i++){
       let video = {"link":"","title_news":"","img":"","date":""};
+      video["date"] = alinks[i].parentNode.parentNode.querySelect("span.time")[0].childNodes+"";
       video["link"] = alinks[i].getAttribute("href");
       video["title_news"] = alinks[i].getAttribute("onclick").replace("dataLayer.push(","").replace(");","").replace(/'/g,'"');
       video["title_news"] = JSON.parse(video["title_news"])["contentHeadline"];

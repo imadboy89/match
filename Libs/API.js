@@ -44,8 +44,11 @@ class API {
       return scrap.get_news(resp);
     });
   }
-  get_videos(page){
-    return this.http("https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/","GET",null,{})
+  get_videos(page,q=""){
+    let url="https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/"+page;
+    //url="https://www.beinsports.com/ar/search?q=maroc&ft=%D8%A7%D9%84%D9%81%D9%8A%D8%AF%D9%8A%D9%88";
+    //console.log(url);
+    return this.http(url,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
@@ -130,14 +133,16 @@ class API {
     const ye = d.getFullYear();
     const mo = (d.getMonth()+1);
     const da = d.getDate();
-    return `${da}-${mo}-${ye}` ;
+    let final_d = `${da}-${mo}-${ye}`;
+    return "NaN-aN-aN"== final_d? date__ : final_d ;
   }
   get_date2(date__=null){
     const d = date__==null ? new Date() : date__;
     const ye = d.getFullYear();
     const mo = "0"+(d.getMonth()+1);
     const da = "0"+d.getDate();
-    return `${ye}-${mo.slice(-2)}-${da.slice(-2)}` ;
+    let final_d = `${ye}-${mo.slice(-2)}-${da.slice(-2)}` ;
+    return "NaN-aN-aN"== final_d? final_d : final_d ;
   }
   get_date_time(date__=null){
     const d = date__==null ? new Date() : date__;

@@ -753,7 +753,29 @@ function generateTheme(theme_name=false){
           inactiveBackgroundColor: theme.inactiveBackgroundColor,
           activeTintColor: theme.activeTintColor,
           inactiveTintColor: theme.inactiveTintColor,
-          size : 20
+          size : 20,
+          swipeEnabled :true,
+        },
+    tabBarOptions_mat:{
+      activeBackgroundColor: theme.activeBackgroundColor,
+      inactiveBackgroundColor: theme.inactiveBackgroundColor,
+      activeTintColor: theme.activeTintColor,
+      inactiveTintColor: theme.inactiveTintColor,
+      style: { 
+        backgroundColor: theme.inactiveBackgroundColor,
+        },
+      labelStyle  :{
+        height:"100%",
+        width:"100%",
+      },
+      iconStyle :{
+        height:"100%",
+        width:"100%",
+        margin:0,
+      },
+      showIcon :true, 
+      showLabel :false,
+      pressColor:theme.activeBackgroundColor,
         }
   }
 

@@ -54,10 +54,11 @@ class ItemsList extends React.Component {
         </View>
         );
     }else if(col_key=="title_news"){ 
-      
+      let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
       return (
         <View style={this.state.dynamic_style.news_container}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: item.img}} >
+          { item.date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,fon:"right",textAlign:"center",}}>{date}</Text> : null}
             <View style={this.state.dynamic_style.news_img_v}>
 
             </View>
