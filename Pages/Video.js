@@ -19,46 +19,10 @@ class VideoScreen extends React.Component {
         dynamic_style:styles_article,
         
     };
-    this.state.html = `
-<html>
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style=' background-color: #000;'>
-<div id="player-dailymotion" style='max-width: 100%;max-width: "100%";'>
-</div>
-<br/>
-<!-- <button type="button" onclick="play_fn()">Play</button>-->
-<!-- <button type="button" onclick="play_pause()">Pause</button>-->
-
-<script src="https://api.dmcdn.net/all.js"></script>
-<script>
-
-var player = DM.player(document.getElementById('player-dailymotion'), {
-      width: '100%',
-      height: '100%',
-      });
-      
-function playVid(vid){
-  player.load(vid);  
-}
-    
-document.addEventListener("vid_id", function(data) {
-  alert(data.data);
-});
-function play_fn(){
-    player.play();
-}
-
-function play_pause(){
- player.pause();
-}
-</script>
-
-</body>
-</html>
-
-    `;
+      const didBlurSubscription = this.props.navigation.addListener(
+        'didFocus',
+        payload => {}
+      );
     getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme})); 
     this.get_video();
 
@@ -74,9 +38,8 @@ function play_pause(){
     .then(videoId =>{
       console.log(videoId);
       this.state.video.videoId = videoId;
-      this.setState({loading:false});
-      this.sendVidID(videoId);
-      this.props.navigation.setOptions({title: "Matches list",
+      setTimeout(()=>{this.setState({loading:false});},500);
+      this.props.navigation.setOptions({
         "headerRight":()=>(
                 <IconButton 
                   name="chrome" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
@@ -85,39 +48,31 @@ function play_pause(){
       });
     });
   }
-sendVidID = (vid_id: string) =>{
-  /*
-  const msg= `(function() {
-    window.vid_id.onMessage(${JSON.stringify(data)});
-  })()`;
-  */
-  let msg = " playVid('"+vid_id+"');";
-  console.log(msg);
-  this.webview.injectJavaScript(msg);
-}
-
  LoadingIndicatorView() {
     return <ActivityIndicator color='#009b88' size='large' />
   }
   render_wv(){
-    const style= this.state.video && this.state.video.videoId ? {flex:1} : {width:1,height:1};
+    
     return  <WebView 
               allowsFullscreenVideo={true}
-              style={{flex:1}}
+              style={{flex:1,backgroundColor: "#000"}}
               javaScriptEnabled={true}
               domStorageEnabled={true}
-              renderLoading={this.LoadingIndicatorView}
+              
               ref={(ref) => (this.webview = ref)}
               onLoadEnd={a=>{ 
               }}
-              source={{ html: this.state.html }}
+              source={{ uri: 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality=380&info=0&logo=0&autoplay=false' }}
               userAgent='Mozilla/5.0 (Linux; Android 9.0.0;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.116 Mobile Safari/537.36'
               />;
   }
   render() {
+    const style= this.state.video && this.state.video.videoId ? {height:300,width:"100%",position:'absolute'} : {width:1,height:1};
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
-        <View style={{height:300,width:"100%"}}>      
+        <ImageBackground style={{height:300,width:"100%"}} source={{uri: this.state.video.img}} >
+        </ImageBackground>
+        <View style={style} source={{uri: this.state.video.img}} >
         {this.render_wv()}
         </View>
         

@@ -9,6 +9,7 @@ import {styles_home,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
 import Loader from "../components/Loader";
 import * as Updates from 'expo-updates'
+import { Notifications, Permissions,getAllScheduledNotificationsAsync} from 'expo';
 
 
 class HomeScreen extends React.Component {
@@ -121,6 +122,21 @@ show_DateP(){
       </Modal>
       );
 }
+  onMatch_LongPressed=(item)=>{
+    let home_team_name = item["home_team_ar"] ? item["home_team_ar"] : item["home_team"];
+    let away_team_name = item["away_team_ar"] ? item["away_team_ar"] : item["away_team"];
+    let league = item["league"] ? item["league"] : item["league"];
+    let trigger = new Date(this.state.matches_date);
+    trigger.setHours(item.time.split(":")[0]);
+    trigger.setMinutes(item.time.split(":")[1]);
+    trigger.setSeconds(0);
+    let content= {
+        title: home_team_name+" VS "+away_team_name,
+        body: league,
+      };
+    Notifications.scheduleLocalNotificationAsync(content, {time: trigger.getTime()} );
+    alert("Will remind you of this matche :\n"+content.title);
+  }
   onMatch_clicked =(item)=>{
     //API_.get_matche(item.id).then(out=>console.log(out));
     this.props.navigation.navigate('Match', { match_id: item.id });
@@ -155,7 +171,10 @@ show_DateP(){
         </View>
 
         
-        <ItemsList loading={this.state.loading} list={this.state.list} onclick={this.onMatch_clicked} key_="home_team" key_key="id"  />
+        <ItemsList loading={this.state.loading} list={this.state.list} 
+          onclick={this.onMatch_clicked}
+          onLongPress={this.onMatch_LongPressed}
+          key_="home_team" key_key="id"  />
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
 
       { this.state.show_datPicker ? this.show_DateP() : null }       
