@@ -23,9 +23,11 @@ class VideoScreen extends React.Component {
         'didFocus',
         payload => {}
       );
-    getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme})); 
     this.get_video();
 
+  }
+  componentDidMount(){
+    getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme})); 
   }
   get_video(){
     let short_title = this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : this.state.video.title_news;

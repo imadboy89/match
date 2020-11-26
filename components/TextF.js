@@ -26,12 +26,13 @@ const styles = StyleSheet.create({
   kufi_bold:{
     fontFamily : "DroidKufi-Bold",
   },
+  /*
   cairoregular_regular:{
     fontFamily : "cairoregular",
   },
   cairoregular_bold:{
     fontFamily : "cairoregular",
-  },
+  },*/
 });
 
 

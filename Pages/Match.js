@@ -25,9 +25,11 @@ class Matchcreen extends React.Component {
         height:"100%",
         dynamic_style:styles_match,
     };
-    getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
     this.get_Match(this.props.route.params.match_id);
 
+  }
+  componentDidMount(){
+    getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
   }
   get_Match(id){
       API_.get_match(id).then(resp=>{
@@ -126,7 +128,6 @@ class Matchcreen extends React.Component {
               {home_p && home_p.lineup_player? home_p.lineup_player+" "+scored_h : ""}
             </Text>
 
-            <Text style={i==0?this.state.dynamic_style.stats_frag_m_ :this.state.dynamic_style.lineup2_m}>{" "}</Text>
 
             <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_a}>
               {away_p && away_p.lineup_player? scored_a+" "+away_p.lineup_player : ""}

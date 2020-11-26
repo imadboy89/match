@@ -153,6 +153,12 @@ class API {
     const mi = "0"+d.getMinutes();
     return `${ye}-${mo.slice(-2)}-${da.slice(-2)} ${ho.slice(-2)}:${mi.slice(-2)}` ;
   }
+  convert_time_spent(datetime_start){
+    const now = new Date();
+    const time_start= new Date(datetime_start);
+    let diff = ( now.getTime()-time_start.getTime() )/60000;
+    return diff<=99 ? diff : 90;
+  }
   convert_time(time, timeZone) {
     try{
       let h = "0"+(parseInt(time.split(":")[0])-1);

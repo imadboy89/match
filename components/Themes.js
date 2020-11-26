@@ -179,8 +179,6 @@ function generateTheme(theme_name=false){
     flex: 1,
     width:"100%",
     backgroundColor: theme.background_color_default,
-    //backgroundColor: '#ff0000',
-    
     },
     item: {
       padding: 10,
@@ -347,7 +345,7 @@ function generateTheme(theme_name=false){
     container: {
       flex: 1,
       justifyContent: 'center',
-      paddingTop: Constants.statusBarHeight,
+      //paddingTop: Constants.statusBarHeight,
       backgroundColor: theme.background_color_default,
       color : "#fff",
     },
@@ -363,7 +361,7 @@ function generateTheme(theme_name=false){
       fontWeight: 'bold',
       textAlign: 'center',
       color : theme.home_title_color,
-      fontFamily : "cairoregular",
+      //fontFamily : "cairoregular",
     },
     header_icons:{
       padding:10,
@@ -447,7 +445,7 @@ function generateTheme(theme_name=false){
     container: {
       flex: 1,
       justifyContent: 'center',
-      paddingTop: Constants.statusBarHeight,
+      //paddingTop: Constants.statusBarHeight,
       backgroundColor: theme.background_color_default,
       color : "#fff",
     },
@@ -482,8 +480,8 @@ function generateTheme(theme_name=false){
     },
     container: {
       flex: 1,
-      justifyContent: 'center',
-      paddingTop: Constants.statusBarHeight,
+      //justifyContent: 'center',
+      //paddingTop: Constants.statusBarHeight,
       //backgroundColor: '#bd7bc1',
       flexDirection: 'column',
       backgroundColor: theme.background_color_default,
@@ -506,11 +504,11 @@ function generateTheme(theme_name=false){
       aspectRatio: 1,
       width: "100%",
       height: "100%",
-      resizeMode: 'contain',
+      resizeMode: 'cover',
     },
     channel_logo_v:{
       width: "100%",
-      flex :1,
+      height:300,
       padding:5,
       alignContent:"center",
       alignItems:"center",

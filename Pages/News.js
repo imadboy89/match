@@ -14,16 +14,19 @@ class NewsScreen extends React.Component {
         loading:true,
         dynamic_style : styles_news,
     };
-  getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
   this.get_news();
-  this.props.navigation.setOptions({title: "News",
-      "headerRight":()=>(
-            <IconButton 
-              name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-              this.get_news(this.state.matches_date);
-            }}  />
-    )
-  });
+
+  }
+  componentDidMount(){ 
+    getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
+    this.props.navigation.setOptions({title: "News",
+    "headerRight":()=>(
+          <IconButton 
+            name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+            this.get_news(this.state.matches_date);
+          }}  />
+  )
+});
   }
 
   

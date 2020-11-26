@@ -21,6 +21,7 @@
     },
     "android": {
       "package": "com.imados.match",
+      "useNextNotificationsApi": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000"

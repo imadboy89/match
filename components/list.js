@@ -22,13 +22,13 @@ class ItemsList extends React.Component {
       let away_team_style = {};
       if(home_team_name.length>14){ home_team_style={fontSize:15}; }
       if(away_team_name.length>14){ away_team_style={fontSize:15}; }
-      
+      let time=0;
       return (
         <View style={[this.state.dynamic_style.matche_container,item.live==1 ? this.state.dynamic_style.matche_container_live:{}]}>
           <View style={this.state.dynamic_style.matche_team_time}>
             <Text style={this.state.dynamic_style.matche_team_time_t} noFonts={true}>{item.time}</Text>
             {item.live==1 ? 
-              <Text style={this.state.dynamic_style.matche_team_time_live}  noFonts={true}>Live</Text> 
+              <Text style={this.state.dynamic_style.matche_team_time_live}  noFonts={true}>{item.time_played+"'"}</Text> 
             : null}
             
           </View>
@@ -58,7 +58,7 @@ class ItemsList extends React.Component {
       return (
         <View style={this.state.dynamic_style.news_container}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: item.img}} >
-          { item.date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,fon:"right",textAlign:"center",}}>{date}</Text> : null}
+          { item.date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,textAlign:"center",}}>{date}</Text> : null}
             <View style={this.state.dynamic_style.news_img_v}>
 
             </View>
@@ -105,7 +105,7 @@ class ItemsList extends React.Component {
             keyExtractor={(item, index) => item[key]}
 
             renderItem={({item}) => 
-              <TouchableOpacity onPress={ () => {this.props.onclick(item) }}>
+              <TouchableOpacity onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
                 <View style={{flexDirection:'row', flexWrap:'wrap'}}>
                 {this.get_item(item,col_key)}
 

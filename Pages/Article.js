@@ -15,15 +15,16 @@ class ArticleScreen extends React.Component {
         dynamic_style:styles_article,
         
     };
-    getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme}));
     this.get_article();
 
   }
-  get_article(){
+  componentDidMount(){
+    getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme}));
     let short_title = this.state.article.title_news.length > 0 ? this.state.article.title_news.slice(0,30)+"..." : this.state.article.title_news;
-    
-    this.state.article.date = API_.get_date2(new Date(this.state.article.date.replace("#","") * 1000));
     this.props.navigation.setOptions({title: short_title})
+  }
+  get_article(){
+    this.state.article.date = API_.get_date2(new Date(this.state.article.date.replace("#","") * 1000));
     API_.get_article(this.props.route.params.article.link)
     .then(body =>{
       this.state.article.body = body;

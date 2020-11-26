@@ -9,7 +9,8 @@ import {styles_home,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
 import Loader from "../components/Loader";
 import * as Updates from 'expo-updates'
-import { Notifications, Permissions,getAllScheduledNotificationsAsync} from 'expo';
+import * as Notifications from 'expo-notifications'; 
+import * as Permissions from 'expo-permissions';
 
 
 class HomeScreen extends React.Component {
@@ -27,32 +28,12 @@ class HomeScreen extends React.Component {
         //dynamic_style_list:styles_list,
     };
 
-  getTheme("styles_home").then(theme=>this.setState({dynamic_style:theme}));
   this.get_matches(this.state.matches_date);
-  this.props.navigation.setOptions({title: "Matches list",
-    "headerRight":()=>(
-      <View style={{flexDirection:"row",marginLeft:10}}>
-            <IconButton 
-              name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
-              this.setState({list:[],loading:true});
-              this.get_matches(this.state.matches_date);
-              
-            }}  />
-            <IconButton 
-              name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{   
-              const next_ind = themes_list.indexOf(Global_theme_name)+1;
-              Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
-              API_.setConfig("theme",Global_theme_name).then(o=>{
-                Updates.reloadAsync();
-              });              
-            }}  />
-            </View>
-    )
-  });
+  
   const customUpdater = new ExpoCustomUpdater()
   customUpdater.isAppUpdateAvailable().then(isAv=>{
     if(isAv==false){return}
-    this.props.navigation.setOptions({title: "Matches list",
+    this.props.navigation.setOptions({
       "headerLeft":()=>(
               <IconButton 
                 name="cloud-download" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
@@ -63,15 +44,39 @@ class HomeScreen extends React.Component {
     });
   });
   }
+  componentDidMount(){
+    getTheme("styles_home").then(theme=>this.setState({dynamic_style:theme}));
+    this.props.navigation.setOptions({
+      "headerRight":()=>(
+        <View style={{flexDirection:"row",marginLeft:10}}>
+              <IconButton 
+                name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
+                this.setState({list:[],loading:true});
+                this.get_matches(this.state.matches_date);
+                
+              }}  />
+              <IconButton 
+                name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{   
+                const next_ind = themes_list.indexOf(Global_theme_name)+1;
+                Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
+                API_.setConfig("theme",Global_theme_name).then(o=>{
+                  Updates.reloadAsync();
+                });              
+              }}  />
+              </View>
+      )
+    });
+  }
   get_matches(date_obj=null){
       API_.get_matches(date_obj).then(resp=>{
-      if(resp["status"]=="true"){
+      if(resp && resp["status"]=="true"){
         let list = [];
         let data = Object.keys(resp["data"]).map(k =>{
           let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
                     ? resp["data"][k][0]["league_badge"]["path"] : false;
           for(let i=0;i<resp["data"][k].length;i++){
             resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
+            resp["data"][k][i].time_played = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time);
           }
           return {"title":k,"img":img, data:resp["data"][k]}; 
         });
@@ -125,22 +130,31 @@ show_DateP(){
   onMatch_LongPressed=(item)=>{
     let home_team_name = item["home_team_ar"] ? item["home_team_ar"] : item["home_team"];
     let away_team_name = item["away_team_ar"] ? item["away_team_ar"] : item["away_team"];
-    let league = item["league"] ? item["league"] : item["league"];
+    let league = item["league"] ? item["league"] :"";
     let trigger = new Date(this.state.matches_date);
     trigger.setHours(item.time.split(":")[0]);
     trigger.setMinutes(item.time.split(":")[1]);
-    trigger.setSeconds(0);
+    trigger.setSeconds(10);
     let content= {
-        title: home_team_name+" VS "+away_team_name,
+        title: home_team_name+" 𝒱𝒮 "+away_team_name,
         body: league,
+        sound: true,
       };
-    Notifications.scheduleLocalNotificationAsync(content, {time: trigger.getTime()} );
-    alert("Will remind you of this matche :\n"+content.title);
+    Permissions.askAsync(Permissions.NOTIFICATIONS).then(o=>{
+      if(o.status=="granted"){
+        notifyMessage("Will remind you of this matche :\n"+content.title,"Reminder");
+        Notifications.scheduleNotificationAsync({
+          identifier: 'night-notification',
+          content:content,
+          trigger
+          });
+      }else{
+        notifyMessage("Permissions not granted","Reminder");
+      }
+    });
   }
   onMatch_clicked =(item)=>{
-    //API_.get_matche(item.id).then(out=>console.log(out));
     this.props.navigation.navigate('Match', { match_id: item.id });
-    //this.setState({modalVisible_match:true,match:item});
   }
   render() {
     if(this.state.dynamic_style==undefined ) {return null }

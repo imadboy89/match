@@ -26,9 +26,12 @@ class ChannelScreen extends React.Component {
         
         
     };
-    getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
+    
     this.get_channel();
 
+  }
+  componentDidMount(){
+    getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
   }
   get_channel(){
       this.channel_photo = this.props.route.params.channel_photo;
@@ -133,7 +136,7 @@ class ChannelScreen extends React.Component {
       ))
     : null;
     return (
-      <ScrollView style={{backgroundColor: '#000',}}  contentContainerStyle={this.state.dynamic_style.container}>
+      <ScrollView style={this.state.dynamic_style.container}>
       <View style={this.state.dynamic_style.channel_logo_v}>
         { this.channel_photo ?  <Image style={this.state.dynamic_style.channel_logo} source={{uri: API_.domain_o+this.channel_photo}} />: null}
          </View>

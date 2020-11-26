@@ -22,6 +22,8 @@ class CategoriesScreen extends React.Component {
         loading:true,
     };
     this.get_cats(1);
+  }
+  componentDidMount(){
     this.props.navigation.setOptions({title: "Channels categroires",
         "headerRight":()=>(
               <IconButton 
@@ -73,7 +75,7 @@ function Styles(){
   container: {
     flex: 1,
     justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
+    //paddingTop: Constants.statusBarHeight,
     backgroundColor: '#000',
     color : "#fff",
   },

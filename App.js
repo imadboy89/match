@@ -21,6 +21,8 @@ import * as Font from 'expo-font';
 import TextF from "./components/TextF";
 import {app_styles,getTheme} from "./components/Themes";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
 
 
 Text = TextF;
@@ -30,7 +32,7 @@ var _app_styles = app_styles;
 LoadedFonts = false;
 function _loadFontsAsync() {
   Font.loadAsync({
-    'cairoregular': require('./assets/fonts/cairoregular.ttf'),
+    //'cairoregular': require('./assets/fonts/cairoregular.ttf'),
     'DroidKufi-Regular': require('./assets/fonts/DroidKufi-Regular.ttf'),
     'DroidKufi-Bold': require('./assets/fonts/DroidKufi-Bold.ttf'),
     }).then(()=>{
@@ -39,6 +41,44 @@ function _loadFontsAsync() {
   //this.setState({ fontsLoaded: true });
 }
 _loadFontsAsync();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Constants.isDevice) {
+    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
+
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+}
+registerForPushNotificationsAsync()
 notifyMessage = function(msg: string,title: string) {
     if(API_.isWeb){
       alert(msg);
