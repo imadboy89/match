@@ -3,7 +3,7 @@ import {  View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground } f
 import { SafeAreaView,SectionList } from 'react-native';
 import Loader from "./Loader";
 import {styles_list,getTheme} from "./Themes";
-
+import IconButton from "../components/IconButton";
 
 class ItemsList extends React.Component {
   constructor(props) {
@@ -20,8 +20,9 @@ class ItemsList extends React.Component {
       let away_team_name = item["away_team_ar"] ? item["away_team_ar"] : item["away_team"];
       let home_team_style = {};
       let away_team_style = {};
-      if(home_team_name.length>14){ home_team_style={fontSize:15}; }
-      if(away_team_name.length>14){ away_team_style={fontSize:15}; }
+      const max_lenght = API_.isWeb ? 15 : 20 ;
+      if(home_team_name.length>max_lenght){ home_team_style={fontSize:15}; }
+      if(away_team_name.length>max_lenght){ away_team_style={fontSize:15}; }
       let time=0;
       return (
         <View style={[this.state.dynamic_style.matche_container,item.live==1 ? this.state.dynamic_style.matche_container_live:{}]}>
@@ -53,7 +54,7 @@ class ItemsList extends React.Component {
           </View>
         </View>
         );
-    }else if(col_key=="title_news"){ 
+    }else if(col_key=="title_news" || col_key=="league_name"){ 
       let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
       return (
         <View style={this.state.dynamic_style.news_container}>
@@ -62,7 +63,7 @@ class ItemsList extends React.Component {
             <View style={this.state.dynamic_style.news_img_v}>
 
             </View>
-            <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t}>{item.title_news}</Text></View>
+            <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t}>{item[col_key]}</Text></View>
           </ImageBackground>
         </View>
         );
@@ -73,13 +74,14 @@ class ItemsList extends React.Component {
             <View style={this.state.dynamic_style.news_img_v}>
 
             </View>
-            <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t}>{item[col_key]}</Text></View>
+            <View style={this.state.dynamic_style.news_title_v}>
+              <Text style={this.state.dynamic_style.news_title_t}>{item[col_key]}</Text>
+            </View>
           </ImageBackground>
         </View>
 
         );
     }else{
-      //category_photo
       return (
         <Text style={this.state.dynamic_style.item}>- { col_key=="home_team" ? item["home_team"] +" - "+ item["away_team"] :item[col_key]}</Text>
         );
@@ -89,7 +91,6 @@ class ItemsList extends React.Component {
     let list = this.props.list;
     let col_key = this.props.key_ ;
     let key = this.props.key_key ;
-    //console.log(list,"-");
     let onclick_hls = this.props.onclick_hls ;
     let onclick_vid = this.props.onclick_vid ;
     if (list && list[0] && list[0]["title"]==undefined){
@@ -128,6 +129,7 @@ class ItemsList extends React.Component {
             renderSectionHeader={({ section: { title,img } }) => {
               return title ? (
               <View style={[{flex:1,paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap',},this.state.dynamic_style.header]}>
+                <IconButton name="list-ol" size={this.state.dynamic_style.header.fontSize} onPress={() => {this.props.onLeaguePressed(title) }}/>
                 <Text style={[this.state.dynamic_style.header,{flex:7}]}>{title}</Text>
                 <View style={{flex:1}}>
                 { img ?  

@@ -300,6 +300,8 @@ class Matchcreen extends React.Component {
           <Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"})}/>
           <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/>
           <Button title="Line-up2" onPress={()=>this.setState({visible_tab:"lineup2"})}/>
+          <Button title="League" onPress={()=>this.props.navigation.navigate('League', { match_details: this.state.matche_details })  }/>
+          
         </View>
         {this.state.loading ? <Loading /> :
           <View  style={this.state.dynamic_style.container_scrl}>

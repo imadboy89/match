@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "koora",
-    "slug": "koora",
+    "name": "koooora",
+    "slug": "koooora",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,7 +20,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.imados.match",
+      "package": "com.imados.koooora",
       "useNextNotificationsApi": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

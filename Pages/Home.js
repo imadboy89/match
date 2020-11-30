@@ -9,9 +9,7 @@ import {styles_home,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
 import Loader from "../components/Loader";
 import * as Updates from 'expo-updates'
-import * as Notifications from 'expo-notifications'; 
-import * as Permissions from 'expo-permissions';
-
+import onMatch_LongPressed from "../Libs/localNotif";
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -27,7 +25,7 @@ class HomeScreen extends React.Component {
         dynamic_style:styles_home,
         //dynamic_style_list:styles_list,
     };
-
+  API_.load_leagues();
   this.get_matches(this.state.matches_date);
   
   const customUpdater = new ExpoCustomUpdater()
@@ -76,7 +74,9 @@ class HomeScreen extends React.Component {
                     ? resp["data"][k][0]["league_badge"]["path"] : false;
           for(let i=0;i<resp["data"][k].length;i++){
             resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
-            resp["data"][k][i].time_played = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time);
+            if(resp["data"][k][i].live){
+              resp["data"][k][i].time_played = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time);
+            }
           }
           return {"title":k,"img":img, data:resp["data"][k]}; 
         });
@@ -127,31 +127,9 @@ show_DateP(){
       </Modal>
       );
 }
-  onMatch_LongPressed=(item)=>{
-    let home_team_name = item["home_team_ar"] ? item["home_team_ar"] : item["home_team"];
-    let away_team_name = item["away_team_ar"] ? item["away_team_ar"] : item["away_team"];
-    let league = item["league"] ? item["league"] :"";
-    let trigger = new Date(this.state.matches_date);
-    trigger.setHours(item.time.split(":")[0]);
-    trigger.setMinutes(item.time.split(":")[1]);
-    trigger.setSeconds(10);
-    let content= {
-        title: home_team_name+" 𝒱𝒮 "+away_team_name,
-        body: league,
-        sound: true,
-      };
-    Permissions.askAsync(Permissions.NOTIFICATIONS).then(o=>{
-      if(o.status=="granted"){
-        notifyMessage("Will remind you of this matche :\n"+content.title,"Reminder");
-        Notifications.scheduleNotificationAsync({
-          identifier: 'night-notification',
-          content:content,
-          trigger
-          });
-      }else{
-        notifyMessage("Permissions not granted","Reminder");
-      }
-    });
+
+  onLeaguePressed = (league_name)=>{
+    this.props.navigation.navigate('League',{ match_details: {league:league_name} });
   }
   onMatch_clicked =(item)=>{
     this.props.navigation.navigate('Match', { match_id: item.id });
@@ -185,9 +163,11 @@ show_DateP(){
         </View>
 
         
-        <ItemsList loading={this.state.loading} list={this.state.list} 
+        <ItemsList 
+          loading={this.state.loading} list={this.state.list} 
+          onLeaguePressed={this.onLeaguePressed}
           onclick={this.onMatch_clicked}
-          onLongPress={this.onMatch_LongPressed}
+          onLongPress={onMatch_LongPressed}
           key_="home_team" key_key="id"  />
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
 

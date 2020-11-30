@@ -15,6 +15,8 @@ import NewsScreen from './Pages/News';
 import ArticleScreen from './Pages/Article';
 import VideosScreen from './Pages/Videos';
 import VideoScreen from './Pages/Video';
+import LeagueScreen from './Pages/League';
+import LeaguesScreen from './Pages/Leagues';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Font from 'expo-font';
@@ -102,6 +104,7 @@ const ChannelsStack = createStackNavigator();
 const MatchesStack = createStackNavigator();
 const NewsStack = createStackNavigator();
 const VideosStack = createStackNavigator();
+const LeaguesStack = createStackNavigator();
 
 function ChannelsStackScreen() {
   return (
@@ -120,7 +123,22 @@ function MatchesStackScreen() {
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
+      
     </MatchesStack.Navigator>
+  );
+}
+function LeaguesStackScreen() {
+  return (
+    <LeaguesStack.Navigator>
+    <LeaguesStack.Screen options={_app_styles.screenHeader} name="Leagues" component={LeaguesScreen} />
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Home" component={HomeScreen} />
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
+      
+    </LeaguesStack.Navigator>
   );
 }
 function NewsStackScreen() {
@@ -162,6 +180,8 @@ function MyTabs(){
               iconName = focused ? 'chrome' : 'chrome';
            } else if (route.name === 'Videos') {
               iconName = focused ? 'youtube-play' : 'youtube-play';
+            } else if (route.name === 'Leagues') {
+              iconName = focused ? 'list-ol' : 'list-ol';
             }
             
             // You can return any component that you like here!
@@ -174,6 +194,7 @@ function MyTabs(){
       tabBarPosition="bottom"
     >
       <StackNav.Screen name="Home" component={MatchesStackScreen} />
+      <StackNav.Screen name="Leagues" component={LeaguesStackScreen} />
       <StackNav.Screen name="Videos" component={VideosStackScreen} />
       <StackNav.Screen name="Channels" component={ChannelsStackScreen} />
       <StackNav.Screen name="News" component={NewsStackScreen} />

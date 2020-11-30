@@ -4,14 +4,14 @@ import API from '../Libs/API';
 
 
 function getTheme(style_name=false){
-  var API_ = new API();
+  //var API_ = new API();
   return API_.getConfig("theme","light").then(theme_name__=>{
     Global_theme_name = theme_name__;
     return generateTheme(theme_name__)[style_name];
   });
 }
 function getThemes(theme_name=false){
-  var API_ = new API();
+  //var API_ = new API();
   return API_.getConfig("theme","light").then(theme_name__=>{
     console.log(theme_name__,theme_name)
     return Themes[theme_name__];
@@ -172,6 +172,9 @@ var Themes = {
 var themes_list = Object.keys(Themes);
 
 function generateTheme(theme_name=false){
+  try{API_ = API_ ? API_ : {isWeb:false};
+  }catch(err){API_ = {isWeb:false};}
+  
   theme_name = theme_name==false ? "light" :theme_name ;
   let theme = Themes[theme_name];
   var styles_list = StyleSheet.create({
@@ -213,11 +216,11 @@ function generateTheme(theme_name=false){
       height:70,
       marginRight:5,
       marginLeft:5,
-      borderRadius:8,
+      //borderRadius:8,
       borderWidth:1,
     },
     matche_container_live:{
-      borderRadius:7,
+      borderRadius:10,
       borderWidth: 2,
       borderColor: theme.live_borderColor,
     },
@@ -230,7 +233,8 @@ function generateTheme(theme_name=false){
       color: theme.match_name_color,
       paddingLeft:5,
       paddingRight:5,
-      paddingTop:8,
+      paddingTop: API_ && API_.isWeb ? 3 : 10,
+      justifyContent: 'center',
       fontSize:22,
       lineHeight:25,
       textAlign:"right",
@@ -332,12 +336,19 @@ function generateTheme(theme_name=false){
       backgroundColor: theme.news_title_backgroundColor
     },
     news_title_t:{
-      flex: 1 ,
+      flex: 9,
       fontSize:15,
       alignItems:'center',
       justifyContent: 'center',
       alignSelf : "center",
       color: theme.news_title_color,
+    },
+    news_title_icon:{
+      //fontSize:15,
+      alignItems:'center',
+      justifyContent: 'center',
+      alignSelf : "center",
+      color: theme.news_title_backgroundColor,
     },
   });
 
@@ -734,6 +745,48 @@ function generateTheme(theme_name=false){
       fontSize:15,
       }
   });
+  var styles_league = StyleSheet.create({
+    container: {
+      flex: 1,
+      //justifyContent: 'center',
+      //paddingTop: Constants.statusBarHeight,
+      backgroundColor: theme.background_color_default,
+    },
+    tabs_list:{
+      flexDirection:'row',
+      flexWrap:'wrap',
+      width:"100%"
+    },
+    paragraph: {
+      margin: 24,
+      fontSize: 18,
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      color : "#d1d8e0",
+    },
+    team_view:{
+      flexDirection:'row',
+      flexWrap:'wrap',
+      width:"100%",
+      height:35,
+      borderColor:theme.text_color_default,
+      borderBottomWidth :1,
+      borderRadius:40,
+    },
+    group_name_t:{
+      fontSize:20,
+      color : theme.text_color_default,
+    },
+    team_name_t:{
+      fontSize:17,
+      color : theme.text_color_default,
+    },
+  });
 
   var app_styles = {
     screenHeader : {
@@ -778,7 +831,7 @@ function generateTheme(theme_name=false){
         }
   }
 
-  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles};
+  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles,styles_league};
 }
 var themes = generateTheme("dark blue");
 var styles_list    = themes["styles_list"];
@@ -788,7 +841,9 @@ var styles_news    = themes["styles_news"];
 var styles_channel = themes["styles_channel"];
 var styles_match   = themes["styles_match"];
 var app_styles     = themes["app_styles"];
-export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list};
+var styles_league  = themes["styles_league"];
+
+export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league};
 
 
 

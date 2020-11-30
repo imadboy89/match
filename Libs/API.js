@@ -36,7 +36,6 @@ class API {
   }
   get_news(page){
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
-    console.log("https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page); 
     return this.http("https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -52,12 +51,10 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      console.log(111);
       return scrap.get_videos(resp);
     });
   }
   get_video(link){
-    console.log(link);
     return this.http(link,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -153,11 +150,19 @@ class API {
     const mi = "0"+d.getMinutes();
     return `${ye}-${mo.slice(-2)}-${da.slice(-2)} ${ho.slice(-2)}:${mi.slice(-2)}` ;
   }
+
   convert_time_spent(datetime_start){
     const now = new Date();
-    const time_start= new Date(datetime_start);
+    const time_start= this.convert_time_o(datetime_start);
     let diff = ( now.getTime()-time_start.getTime() )/60000;
-    return diff<=99 ? diff : 90;
+    diff = parseInt(diff);
+    diff = diff>45 && diff <=60 ? "Half" : (diff>45+15 ? diff-15 :diff);
+    diff = diff >0 && diff<=99 ? diff : ( diff>0 ? 90 : diff);
+    return diff;
+  }
+  convert_time_o(datetime_str,seconds=false){
+    const datetime_obj= new Date(datetime_str.replace(" ","T")+":00.000+01:00");
+    return seconds==true ? datetime_obj.getTime() : datetime_obj;
   }
   convert_time(time, timeZone) {
     try{
@@ -196,6 +201,100 @@ class API {
     }
     */
     
+  }
+  get_league_matches(id){
+    const url = this.domain+"get_matches_by_league";
+    const data = "league_id="+id;
+    return fetch(url, {
+      method: 'POST',
+      headers: this.headers,
+      body:data,
+    })
+      .then(response => response.json())
+      .then(resJson => {
+        if(resJson["status"]== "true" ){
+          this.is_auth = true;
+        }
+        return resJson;
+      })
+      .catch(error => {
+        console.log('ERROR', error);
+        this.error = error;
+      });
+  }
+  get_standing(id){
+    if(this.headers["device-token"]==""){
+      return this.set_token().then(()=> { return this.get_standing(id)});
+    }
+    const url = this.domain+"standings/"+id;
+    //https://al-match.com/api/touranments_match/details?match_id=
+    return fetch(url, {
+      method: 'GET',
+      headers: this.headers,
+    })
+      .then(response => response.json())
+      .then(resJson => {
+        if(resJson["status"]== "true" ){
+          this.is_auth = true;
+        }
+        return resJson;
+      })
+      .catch(error => {
+        console.log('ERROR', error);
+        this.error = error;
+      });
+  }
+  async load_leagues(){
+    if(this.headers["device-token"]==""){
+      return this.set_token().then(()=> { return this.load_leagues()});
+    }
+    const exp_t = 3*24*60*60*1000;
+
+    let leagues = await AsyncStorage.getItem('leagues');
+    if(leagues ){
+      leagues = JSON.parse(leagues);
+    }else{
+      leagues = {"date":0,data:{}};
+    }
+    let date_stored = leagues && leagues["date"] ? parseInt(leagues["date"]) : 0;
+    const is_expired = (new Date()).getTime()- date_stored >= exp_t;
+    this.leagues_dict = {};
+    if(Object.keys( leagues["data"] ).length>0 && is_expired==false){
+      this.leagues_dict = leagues["data"];
+      return true;
+    }
+    this.get_leagues(1)
+      .then(o=>{
+        if( Object.keys( this.leagues_dict ).length >0){
+          this.leagues = {"date":(new Date()).getTime(),data:this.leagues_dict};
+          AsyncStorage.setItem('leagues', JSON.stringify(this.leagues) );
+        }
+
+        });
+
+  }
+  get_leagues(page){
+      const url = this.domain+"leagues?page="+page;
+      return fetch(url, {
+        method: 'GET',
+        headers: this.headers,
+      })
+      .then(response => response.json())
+      .then(o => {
+        if(o && o["data"] && o["data"].length>0){
+          for(let i=0;i<o["data"].length;i++){
+            let league_name = o["data"][i]["ar_league_name"] ? o["data"][i]["ar_league_name"] : o["data"][i]["league"] ;
+            this.leagues_dict[league_name] = o["data"][i];
+          }
+          return this.get_leagues(page+1);
+        }else{
+          return this.leagues_dict;
+        }
+      })
+      .catch(error => {
+        console.log('ERROR', error);
+        this.error = error;
+      });
   }
   get_matches(date_obj=null, page=1){
     if(this.headers["device-token"]==""){
@@ -296,7 +395,6 @@ class API {
       return this.set_token().then(()=> { return this.get_categories(page)});
     }
     const url = this.domain+"get_categories?page="+page;
-    let data = "match_date=05-11-2020";//{"match_date":"05-11-2020"};
     return fetch(url, {
       method: 'GET',
       headers: this.headers,
