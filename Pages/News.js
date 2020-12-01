@@ -17,7 +17,7 @@ class NewsScreen extends React.Component {
   this.get_news();
   this.interval_refresh = setInterval(()=>{
     if(this.state.page==1){this.get_news();}
-    }, 20000);
+    }, 60000);
   }
   componentDidMount(){ 
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));

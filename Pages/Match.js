@@ -257,19 +257,18 @@ class Matchcreen extends React.Component {
     let scores_home = this.get_scores("home");
     let scores_away = this.get_scores("away");
     try{
-      home_sc = this.state.matche_details.home_team_score ? parseInt(this.state.matche_details.home_team_score) : "-";
-      away_sc = this.state.matche_details.away_team_score ? parseInt(this.state.matche_details.away_team_score) : "-";
+      home_sc = this.state.match_dets.home_team_score ? parseInt(this.state.match_dets.home_team_score) : "-";
+      away_sc = this.state.match_dets.away_team_score ? parseInt(this.state.match_dets.away_team_score) : "-";
       home_style = home_sc>away_sc ? this.state.dynamic_style.match_results_winer 
         : (home_sc==away_sc ? this.state.dynamic_style.match_results_drawer : this.state.dynamic_style.match_results_loser);
       away_style = away_sc>home_sc ? this.state.dynamic_style.match_results_winer 
       : (away_sc==home_sc ? this.state.dynamic_style.match_results_drawer : this.state.dynamic_style.match_results_loser);
-      home_name = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
-      away_name = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;
+      home_name = this.state.match_dets.home_team_ar ? this.state.match_dets.home_team_ar : this.state.match_dets.home_team;
+      away_name = this.state.match_dets.away_team_ar ? this.state.match_dets.away_team_ar : this.state.match_dets.away_team;
     }catch(e){
       alert(e);
       return <View style={this.state.dynamic_style.container}><Text>ERR</Text></View>;
       }
-    console.log(this.state.match_dets.home_team_badge);
     return (
       <ScrollView style={this.state.dynamic_style.container}>
         <TouchableOpacity style={this.state.dynamic_style.header_container} onPress={()=>this.setState({show_res : this.state.show_res?false:true})}>              
@@ -305,9 +304,11 @@ class Matchcreen extends React.Component {
           <View style={{flex:1}}><Button title="General" onPress={()=>this.setState({visible_tab:"general"})} /></View>
           <View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"})}/></View>
           <View style={{flex:1}}><Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup2"})}/></View>
-          <View style={{flex:1}}><Button title="League" onPress={()=>
-          this.props.navigation.navigate('League', 
-          { league_details: {league:this.state.matche_details.league,league_img:null} })  
+          <View style={{flex:1}}><Button title="League" onPress={()=>{
+            const league_img = this.state.matche_details.league_badge ? API_.domain_o+this.state.matche_details.league_badge.path : null ;
+            this.props.navigation.navigate('League', 
+          { league_details: {league:this.state.matche_details.league,
+            league_img: league_img} })           }
           }/></View>
           {/* <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/> */}
         </View>

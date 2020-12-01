@@ -32,7 +32,7 @@ var Themes = {
 
       text_color_default : "#fff",
 
-      list_header_backgroundColor: "#bdc3c7",
+      list_header_backgroundColor: "#a29bfe",
       live_borderColor:"#2ecc71",
       match_name_backgroundColor: "#4834d4",
       match_name_color: "#d1d8e0",
@@ -705,7 +705,7 @@ function generateTheme(theme_name=false){
     },
     match_results_team_name:{
       fontSize: 20,
-      fontWeight: 'bold',
+      //fontWeight: 'bold',
       color : "#fff",
       paddingHorizontal:5,
       width:"100%",
@@ -809,7 +809,7 @@ function generateTheme(theme_name=false){
         },
       headerTintColor: theme.headerTintColor,
       headerTitleStyle: {
-        fontWeight: 'bold',
+        //fontWeight: 'bold',
         },
       headerTitleAlign: 'center'
       },
