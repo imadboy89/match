@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal, Button, TouchableOpacity, Platform } from 'react-native';
+import { Text, View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -37,10 +37,15 @@ class HomeScreen extends React.Component {
                 name="cloud-download" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
                 this.setState({list:[],loading:true});
                 customUpdater.doUpdateApp();
-              }}  />
+              }}  /> 
       )
     });
   });
+  this.interval_refresh = setInterval(()=>{
+    if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
+      this.get_matches();
+    }
+    }, 20000);
   }
   componentDidMount(){
     getTheme("styles_home").then(theme=>this.setState({dynamic_style:theme}));
@@ -65,27 +70,29 @@ class HomeScreen extends React.Component {
       )
     });
   }
-  get_matches(date_obj=null){
-      API_.get_matches(date_obj).then(resp=>{
-      if(resp && resp["status"]=="true"){
-        let list = [];
-        let data = Object.keys(resp["data"]).map(k =>{
-          let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
-                    ? resp["data"][k][0]["league_badge"]["path"] : false;
-          for(let i=0;i<resp["data"][k].length;i++){
-            resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
-            if(resp["data"][k][i].live){
-              resp["data"][k][i].time_played = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time);
-            }
+  get_matches = (date_obj=null)=>{
+    date_obj = date_obj==null ? this.state.matches_date :date_obj;
+    this.setState({loading:true});
+    API_.get_matches(date_obj).then(resp=>{
+    if(resp && resp["status"]=="true"){
+      let list = [];
+      let data = Object.keys(resp["data"]).map(k =>{
+        let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
+                  ? resp["data"][k][0]["league_badge"]["path"] : false;
+        for(let i=0;i<resp["data"][k].length;i++){
+          resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
+          if(resp["data"][k][i].live){
+            resp["data"][k][i].time_played = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time);
           }
-          return {"title":k,"img":img, data:resp["data"][k]}; 
-        });
-        this.setState({list:data,loading:false});
-        for(let i=0;i<data.length;i++){
-          
         }
+        return {"title":k,"img":img, data:resp["data"][k]}; 
+      });
+      this.setState({list:data,loading:false});
+      for(let i=0;i<data.length;i++){
+        
       }
-    });
+    }
+  });
 }
  onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -128,11 +135,11 @@ show_DateP(){
       );
 }
 
-  onLeaguePressed = (league_name)=>{
-    this.props.navigation.navigate('League',{ match_details: {league:league_name} });
+  onLeaguePressed = (league_name, league_img)=>{
+    this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:API_.domain_o+league_img} });
   }
   onMatch_clicked =(item)=>{
-    this.props.navigation.navigate('Match', { match_id: item.id });
+    this.props.navigation.navigate('Match', { match_item: item });
   }
   render() {
     if(this.state.dynamic_style==undefined ) {return null }
@@ -141,29 +148,31 @@ show_DateP(){
         <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
           <IconButton 
             disabled={this.state.loading}
-            title="pick date"  name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+            name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
             this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
             this.setState({list:[],loading:true});
             this.get_matches(this.state.matches_date);
           }}  />
-            <Text style={[this.state.dynamic_style.title,]} >
-            
-              {API_.get_date2(this.state.matches_date)}
-            </Text>
-          <IconButton title="pick date"  
+          <TouchableOpacity 
+            disabled={this.state.loading}
+            activeOpacity={0.5}
+            onPress={()=>this.setState({show_datPicker:true})}
+            >
+            <Text style={[this.state.dynamic_style.title,]} >{API_.get_date2(this.state.matches_date)}</Text>
+          </TouchableOpacity>
+          <IconButton 
             disabled={this.state.loading}
             name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
             this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
             this.setState({list:[],loading:true});
             this.get_matches(this.state.matches_date);
           }}  />
-          <IconButton 
-            disabled={this.state.loading}
-            title="pick date"  name="edit" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.setState({show_datPicker:true})}  />
+
         </View>
 
         
         <ItemsList 
+          refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={this.get_matches} />}
           loading={this.state.loading} list={this.state.list} 
           onLeaguePressed={this.onLeaguePressed}
           onclick={this.onMatch_clicked}

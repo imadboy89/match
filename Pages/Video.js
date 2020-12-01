@@ -27,7 +27,9 @@ class VideoScreen extends React.Component {
 
   }
   componentDidMount(){
+    let short_title = this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : 
     getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme})); 
+    this.props.navigation.setOptions({title: <Text >{short_title}</Text>});
   }
   get_video(){
     let short_title = this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : this.state.video.title_news;
@@ -38,7 +40,6 @@ class VideoScreen extends React.Component {
     this.setState({loading:true});
     API_.get_video(this.props.route.params.item.link)
     .then(videoId =>{
-      console.log(videoId);
       this.state.video.videoId = videoId;
       setTimeout(()=>{this.setState({loading:false});},500);
       this.props.navigation.setOptions({

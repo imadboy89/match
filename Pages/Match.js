@@ -1,11 +1,12 @@
 import React from "react";
-import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity, ImageBackground, ScrollView, Dimensions} from 'react-native';
+import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity,Image, ImageBackground, ScrollView, Dimensions} from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
 import Loading from '../components/Loader';
 import {styles_match,getTheme} from "../components/Themes";
+
 let list = [
 
           ];
@@ -19,13 +20,14 @@ class Matchcreen extends React.Component {
         key_:"en_name",
         channel:null,
         matche_details:{},
+        match_dets:this.props.route.params.match_item,
         visible_tab : "general",
         loading:true,
         show_res:false,
         height:"100%",
         dynamic_style:styles_match,
     };
-    this.get_Match(this.props.route.params.match_id);
+    this.get_Match(this.props.route.params.match_item.id);
 
   }
   componentDidMount(){
@@ -37,6 +39,8 @@ class Matchcreen extends React.Component {
           this.setState({matche_details:resp["data"][0],loading:false});
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
+
+          this.props.navigation.setOptions({title: <Text >{this.home_team_ar +" - "+this.away_team_ar }</Text>});
         }
       });
   }
@@ -73,7 +77,6 @@ class Matchcreen extends React.Component {
       JSON.parse(JSON.stringify(this.state.matche_details.home_substitutions)) :
       JSON.parse(JSON.stringify(this.state.matche_details.away_substitutions));
     }catch(err){
-      console.log("get_subs err : ",err);
       return [];
     }
     let subs = [];
@@ -266,14 +269,15 @@ class Matchcreen extends React.Component {
       alert(e);
       return <View style={this.state.dynamic_style.container}><Text>ERR</Text></View>;
       }
-
+    console.log(this.state.match_dets.home_team_badge);
     return (
-      <ScrollView style={this.state.dynamic_style.container} contentContainerStyle={this.state.dynamic_style.container_scrl}>
+      <ScrollView style={this.state.dynamic_style.container}>
         <TouchableOpacity style={this.state.dynamic_style.header_container} onPress={()=>this.setState({show_res : this.state.show_res?false:true})}>              
-          <View style={[this.state.dynamic_style.match_results_team_name_l,home_style]}>
-            <View styles={[this.state.dynamic_style.match_results_team_name_l,{flex:1}]}>
-              <Text style={[this.state.dynamic_style.match_results_team_name,this.state.dynamic_style.match_results_team_name_l,]}>{home_name}</Text>
-              <Text style={[this.state.dynamic_style.match_results_team_scor_t,this.state.dynamic_style.match_results_team_name_l,]}>{home_sc}</Text>
+          <View style={[home_style]}>
+            <Image style={{height:100,width:"95%",justifyContent: "center",resizeMode:"contain"}} source={{uri: this.state.match_dets.home_team_badge}} ></Image>
+            <View styles={{flex:1,}}>
+              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{home_name}</Text>
+              <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{home_sc}</Text>
             </View>
             { this.state.show_res ?
             <View style={{}}>
@@ -283,9 +287,11 @@ class Matchcreen extends React.Component {
           </View>
 
           <View style={[this.state.dynamic_style.match_results_team_name_r,away_style]}>
+          <Image style={{height:100,width:"95%",resizeMode:"contain"
+}} source={{uri: this.state.match_dets.away_team_badge}} ></Image>
             <View styles={[this.state.dynamic_style.match_results_team_name_r,{flex:1}]}>
-              <Text style={[this.state.dynamic_style.match_results_team_name,this.state.dynamic_style.match_results_team_name_r,]}>{away_name}</Text>
-              <Text style={[this.state.dynamic_style.match_results_team_scor_t,this.state.dynamic_style.match_results_team_name_r,]}>{away_sc}</Text>
+              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{away_name}</Text>
+              <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{away_sc}</Text>
             </View>
             { this.state.show_res ?
             <View style={{}}>
@@ -296,12 +302,14 @@ class Matchcreen extends React.Component {
         </TouchableOpacity>
         
         <View style={this.state.dynamic_style.tabs_list}>
-          <Button title="General" onPress={()=>this.setState({visible_tab:"general"})}/>
-          <Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"})}/>
-          <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/>
-          <Button title="Line-up2" onPress={()=>this.setState({visible_tab:"lineup2"})}/>
-          <Button title="League" onPress={()=>this.props.navigation.navigate('League', { match_details: this.state.matche_details })  }/>
-          
+          <View style={{flex:1}}><Button title="General" onPress={()=>this.setState({visible_tab:"general"})} /></View>
+          <View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"})}/></View>
+          <View style={{flex:1}}><Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup2"})}/></View>
+          <View style={{flex:1}}><Button title="League" onPress={()=>
+          this.props.navigation.navigate('League', 
+          { league_details: {league:this.state.matche_details.league,league_img:null} })  
+          }/></View>
+          {/* <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/> */}
         </View>
         {this.state.loading ? <Loading /> :
           <View  style={this.state.dynamic_style.container_scrl}>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Modal, Button, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Modal, Button, TouchableOpacity, RefreshControl } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -15,7 +15,9 @@ class NewsScreen extends React.Component {
         dynamic_style : styles_news,
     };
   this.get_news();
-
+  this.interval_refresh = setInterval(()=>{
+    if(this.state.page==1){this.get_news();}
+    }, 20000);
   }
   componentDidMount(){ 
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
@@ -30,8 +32,8 @@ class NewsScreen extends React.Component {
   }
 
   
-get_news(){
-  this.setState({list:[],loading:true});
+get_news =()=>{
+  this.setState({loading:true});
   API_.get_news(this.state.page).then(data=>this.setState({list:data,loading:false}));
 }
 
@@ -42,7 +44,12 @@ get_news(){
     
     return (
       <View style={this.state.dynamic_style.container}>     
-        <ItemsList loading={this.state.loading} list={this.state.list} onclick={this.onItem_clicked} key_="title_news" key_key="link"  />
+        <ItemsList 
+          refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={this.get_news} />}
+          loading={this.state.loading} 
+          list={this.state.list} 
+          onclick={this.onItem_clicked} 
+          key_="title_news" key_key="link"  />
         
         <View style={this.state.dynamic_style.nav_container}>
           <IconButton

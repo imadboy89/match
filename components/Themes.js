@@ -177,7 +177,7 @@ function generateTheme(theme_name=false){
   
   theme_name = theme_name==false ? "light" :theme_name ;
   let theme = Themes[theme_name];
-  var styles_list = StyleSheet.create({
+  var styles_list = {
     container: {
     flex: 1,
     width:"100%",
@@ -350,7 +350,7 @@ function generateTheme(theme_name=false){
       alignSelf : "center",
       color: theme.news_title_backgroundColor,
     },
-  });
+  };
 
   var styles_home= StyleSheet.create({
     container: {
@@ -709,14 +709,15 @@ function generateTheme(theme_name=false){
       color : "#fff",
       paddingHorizontal:5,
       width:"100%",
+      textAlign:"center"
       //textAlign:"right"
     },
     match_results_team_scor_t:{
-      fontSize: 20,
+      fontSize: 30,
       fontWeight: 'bold',
       color : theme.match_results_team_scor_color,
       paddingHorizontal:5,
-      //textAlign:"right"
+      textAlign:"center"
     },
     
     match_results_team_name_l:{
@@ -786,6 +787,18 @@ function generateTheme(theme_name=false){
       fontSize:17,
       color : theme.text_color_default,
     },
+    channel_logo_v : {
+      width: "100%",
+      height:250,
+      padding:5,
+      alignContent:"center",
+      alignItems:"center",
+      alignSelf:"center",
+      backgroundColor:theme.article_photo_background,
+
+    },
+    news_title_v : styles_list.news_title_v,
+    news_title_t : styles_list.news_title_t,
   });
 
   var app_styles = {

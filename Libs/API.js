@@ -165,13 +165,13 @@ class API {
     return seconds==true ? datetime_obj.getTime() : datetime_obj;
   }
   convert_time(time, timeZone) {
+    
     try{
       let h = "0"+(parseInt(time.split(":")[0])-1);
       return h.slice(-2)+":"+time.split(":")[1];
     }catch(e){
       return time;
     }
-
     /*
     try{
       if(timeZone == undefined){
@@ -191,7 +191,7 @@ class API {
       //notifyMessage("5 "+d+" \n  "+newTZ_d);
       timeZone_=timeZone_>0 ? "+"+timeZone_ : timeZone_ ;
       console.log(time,);
-      notifyMessage("6 "+((new Date()).toLocaleString("en-US", {timeZone: "Africa/Casablanca"})) );
+      notifyMessage("6 "+(new Date().toLocaleString("en-US", {timeZone: "Africa/Cairo"}) ) );
       notifyMessage("6 "+ (new Date()) );
 
       return  this.get_date_time((new Date(time+" GMT"+timeZone_))).split(" ")[1];
@@ -200,7 +200,6 @@ class API {
       return time;
     }
     */
-    
   }
   get_league_matches(id){
     const url = this.domain+"get_matches_by_league";

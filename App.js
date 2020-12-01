@@ -28,7 +28,7 @@ import * as Permissions from 'expo-permissions';
 
 
 Text = TextF;
-Global_theme_name = "light";
+Global_theme_name = "dark violet";
 var _app_styles = app_styles;
 
 LoadedFonts = false;

@@ -49,7 +49,7 @@ get_leagues(){
 }
 
   onItem_clicked =(item)=>{
-    this.props.navigation.navigate('League',{ match_details: {league:item.league_name} });
+    this.props.navigation.navigate('League',{ league_details: {league:item.league_name,league_img:item.img} });
   }
   render() {
     return (

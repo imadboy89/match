@@ -21,7 +21,7 @@ class ArticleScreen extends React.Component {
   componentDidMount(){
     getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme}));
     let short_title = this.state.article.title_news.length > 0 ? this.state.article.title_news.slice(0,30)+"..." : this.state.article.title_news;
-    this.props.navigation.setOptions({title: short_title})
+    this.props.navigation.setOptions({title: <Text>{short_title}</Text>})
   }
   get_article(){
     this.state.article.date = API_.get_date2(new Date(this.state.article.date.replace("#","") * 1000));

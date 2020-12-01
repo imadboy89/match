@@ -63,7 +63,7 @@ class ItemsList extends React.Component {
             <View style={this.state.dynamic_style.news_img_v}>
 
             </View>
-            <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t}>{item[col_key]}</Text></View>
+            <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t} numberOfLines={1}>{item[col_key]}</Text></View>
           </ImageBackground>
         </View>
         );
@@ -102,6 +102,7 @@ class ItemsList extends React.Component {
       <View style={this.state.dynamic_style.container}>
         <SafeAreaView style={this.state.dynamic_style.container}>
           <SectionList
+            refreshControl={this.props.refreshControl}
             sections={list}
             keyExtractor={(item, index) => item[key]}
 
@@ -129,7 +130,11 @@ class ItemsList extends React.Component {
             renderSectionHeader={({ section: { title,img } }) => {
               return title ? (
               <View style={[{flex:1,paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap',},this.state.dynamic_style.header]}>
-                <IconButton name="list-ol" size={this.state.dynamic_style.header.fontSize} onPress={() => {this.props.onLeaguePressed(title) }}/>
+                {this.props.onLeaguePressed ? 
+                  <IconButton name="list-ol" 
+                    size={this.state.dynamic_style.header.fontSize} 
+                    onPress={() => {this.props.onLeaguePressed(title,img) }}/>
+                : null}
                 <Text style={[this.state.dynamic_style.header,{flex:7}]}>{title}</Text>
                 <View style={{flex:1}}>
                 { img ?  
@@ -149,8 +154,7 @@ class ItemsList extends React.Component {
   }
   render() {
     return (<View style={this.state.dynamic_style.container}>
-
-      {this.props.loading ? <Loader/> : this.render_list()}
+      {this.props.loading && this.props.refreshControl==undefined  ? <Loader/> : this.render_list()}
     </View>);
   }
 }

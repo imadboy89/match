@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity, Image, ScrollView, Dimensions} from 'react-native';
+import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity, Image, ScrollView, Dimensions, ImageBackground} from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
@@ -27,16 +27,18 @@ class LeagueScreen extends React.Component {
         height:"100%",
         dynamic_style:styles_league,
     };
-    const league_name = this.props.route.params.match_details.league;
-    this.league_id = API_.leagues_dict && API_.leagues_dict[league_name] ? API_.leagues_dict[league_name].league_id : 0;
+    this.league_name = this.props.route.params.league_details.league;
+    this.league_img   = this.props.route.params.league_details.league_img;
+    this.league_id = API_.leagues_dict && API_.leagues_dict[this.league_name] ? API_.leagues_dict[this.league_name].league_id : 0;
     this.get_standing(this.league_id);
   }
   componentDidMount(){
     getTheme("styles_league").then(theme=>this.setState({dynamic_style:theme}));
+    this.props.navigation.setOptions({title: <Text>{this.league_name}</Text>});
   }
   get_standing(id){
       API_.get_standing(id).then(resp=>{
-        if(resp["data"] && resp["data"][0] ){
+        if(resp["data"] && resp["data"] ){
           this.setState({league_details:resp["data"],loading:false});
         }
       });
@@ -67,10 +69,8 @@ class LeagueScreen extends React.Component {
           }
           maches = Object.values(maches);
           maches = maches.sort((a,b)=> (a.title > b.title ? 1 : -1));
-          console.log(maches);
           return maches;
         });
-        console.log(data);
         this.setState({matches:data[0],loading:false,visible_tab:"matches"});
         for(let i=0;i<data.length;i++){
           
@@ -80,7 +80,7 @@ class LeagueScreen extends React.Component {
   }
   
   onMatch_clicked =(item)=>{
-    this.props.navigation.navigate('Match', { match_id: item.id });
+    this.props.navigation.navigate('Match', { match_item: item });
   }
   render_matches(){
     return <ItemsList 
@@ -99,6 +99,7 @@ class LeagueScreen extends React.Component {
     if(Object.keys(this.state.league_details[0]).length==1){
       standing_before = this.state.league_details;
     }
+    standing_before.sort? standing_before.sort((a,b)=> (Object.keys(a)[0] > Object.keys(b)[0]) ? 1 : -1  ) : null;
     for(let index in standing_before){
       let row = standing_before[index];
       if(index!=""){
@@ -131,9 +132,17 @@ class LeagueScreen extends React.Component {
 
   render() {
   
-
     return (
       <ScrollView style={this.state.dynamic_style.container}>
+        <View style={this.state.dynamic_style.channel_logo_v}>
+          { this.league_img ?  
+            <ImageBackground style={{flex:1,width:"100%"}} source={{uri: this.league_img}} >
+            <View style={{flex:16}}></View>
+              <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t} numberOfLines={1}>{this.league_name}</Text></View>
+            </ImageBackground>
+          : null}
+        </View> 
+
         <View style={this.state.dynamic_style.tabs_list}>
           <View style={{flex:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing"})}/></View>
           <View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"}) }/></View>

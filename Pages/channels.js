@@ -114,7 +114,6 @@ class ChannelsScreen extends React.Component {
     this.props.navigation.navigate('Channel', { channel_id: item.channel_id,channel_photo:item.channel_photo });
   }
   render() {
-    if(styles.constructor === Object && Object.entries(styles).length==0){Styles();}
     return (
       <View style={styles.container}>
         <Text style={styles.title}>{this.category_name}</Text>
@@ -132,9 +131,7 @@ class ChannelsScreen extends React.Component {
   }
 }
 
-styles = {};
-function Styles(){
-   styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -155,5 +152,4 @@ function Styles(){
     color : "#d1d8e0",
   },
 });
-}
 export default ChannelsScreen;
