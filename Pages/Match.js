@@ -122,18 +122,23 @@ class Matchcreen extends React.Component {
       let scored_a_count = this.scorers_a.filter(function(item) {return item === away_p.lineup_player}).length;
       let scored_h = this.scorers_h && home_p && this.scorers_h.includes(home_p.lineup_player) ? "⚽".repeat(scored_h_count):"";
       let scored_a = this.scorers_a && away_p && this.scorers_a.includes(away_p.lineup_player) ? "⚽".repeat(scored_a_count):"";
-      
+
+      let assist_h_count = this.assist_h.filter(function(item) {return item === home_p.lineup_player}).length;
+      let assist_a_count = this.assist_a.filter(function(item) {return item === away_p.lineup_player}).length;
+      let assist_h = this.assist_h && home_p && this.assist_h.includes(home_p.lineup_player) ? "🤾".repeat(assist_h_count):"";
+      let assist_a = this.assist_a && away_p && this.assist_a.includes(away_p.lineup_player) ? "🤾".repeat(assist_a_count):"";
+
       return (
           <View style={this.state.dynamic_style.lineup2_container}>
             
             <Text style={this.state.dynamic_style.lineup2_number}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
             <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_h}>
-              {home_p && home_p.lineup_player? home_p.lineup_player+" "+scored_h : ""}
+              {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
             </Text>
 
 
             <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_a}>
-              {away_p && away_p.lineup_player? scored_a+" "+away_p.lineup_player : ""}
+              {away_p && away_p.lineup_player? scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
             </Text>
             <Text style={this.state.dynamic_style.lineup2_number}>{away_p && away_p.lineup_number? away_p.lineup_number : ""}</Text>
             {i==11 ? <View style={this.state.dynamic_style.hairline}/> : null}
@@ -222,8 +227,8 @@ class Matchcreen extends React.Component {
   }
 
   get_scores(type_="home"){
-    if(type_=="home"){this.scorers_h =[];}
-    else{this.scorers_a =[];}
+    if(type_=="home"){this.scorers_h =[];this.assist_h =[];}
+    else{this.scorers_a =[];this.assist_a =[];}
 
     let style_class = type_=="home"? this.state.dynamic_style.match_results_team_name_l : this.state.dynamic_style.match_results_team_name_r ;
     if(this.state.matche_details.goal_scorer){
@@ -233,9 +238,12 @@ class Matchcreen extends React.Component {
         if(type_=="away"){
           text = (elm.time ? elm.time+'"' : "-") +" "+ elm[type_+"_scorer"];
           this.scorers_a.push(elm[type_+"_scorer"]);
+          this.assist_a.push(elm[type_+"_assist"]);
+          
         }else{
           text = elm[type_+"_scorer"] +" "+(elm.time ? elm.time+'"' : "-");
           this.scorers_h.push(elm[type_+"_scorer"]);
+          this.assist_h.push(elm[type_+"_assist"]);
         }
         return <Text style={[style_class,this.state.dynamic_style.match_results_scorer_text]}>{text}</Text>;
       });
