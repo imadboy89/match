@@ -9,7 +9,7 @@ import {styles_home,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
 import Loader from "../components/Loader";
 import * as Updates from 'expo-updates'
-import onMatch_LongPressed from "../Libs/localNotif";
+import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -23,9 +23,14 @@ class HomeScreen extends React.Component {
         loading_fonts:false,
         update_available:false,
         dynamic_style:styles_home,
+        notifications_matches:{},
         //dynamic_style_list:styles_list,
     };
   API_.load_leagues();
+  get_notifications_matches().then(o=>{
+    this.setState({notifications_matches:o});
+    console.log(o);
+    });
   this.get_matches(this.state.matches_date);
   
   const customUpdater = new ExpoCustomUpdater()
@@ -46,6 +51,11 @@ class HomeScreen extends React.Component {
       this.get_matches();
     }
     }, 20000);
+  }
+  _onMatch_LongPressed=(item)=>{
+    onMatch_LongPressed(item).then(o=>{
+      get_notifications_matches().then(o=>this.setState({notifications_matches:o}) );
+    });
   }
   componentDidMount(){
     getTheme("styles_home").then(theme=>this.setState({dynamic_style:theme}));
@@ -176,7 +186,8 @@ show_DateP(){
           loading={this.state.loading} list={this.state.list} 
           onLeaguePressed={this.onLeaguePressed}
           onclick={this.onMatch_clicked}
-          onLongPress={onMatch_LongPressed}
+          onLongPress={this._onMatch_LongPressed}
+          notifications_matches={this.state.notifications_matches}
           key_="home_team" key_key="id"  />
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
 

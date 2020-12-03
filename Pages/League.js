@@ -6,7 +6,7 @@ import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
 import Loading from '../components/Loader';
 import {styles_league,getTheme} from "../components/Themes";
-import onMatch_LongPressed from "../Libs/localNotif";
+import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 
 let list = [
 
@@ -26,6 +26,7 @@ class LeagueScreen extends React.Component {
         show_res:false,
         height:"100%",
         dynamic_style:styles_league,
+        notifications_matches:{},
     };
     this.league_name = this.props.route.params.league_details.league;
     this.league_img   = this.props.route.params.league_details.league_img;
@@ -43,10 +44,10 @@ class LeagueScreen extends React.Component {
         }
       });
   }
-  onMatch_LongPressed = ()=>{
-    
-  }
   get_matches(league_id){
+      get_notifications_matches().then(o=>{
+        this.setState({notifications_matches:o});
+        });
       API_.get_league_matches(this.league_id).then(resp=>{
       if(resp && resp["status"]=="true"){
         let list = [];
@@ -82,11 +83,17 @@ class LeagueScreen extends React.Component {
   onMatch_clicked =(item)=>{
     this.props.navigation.navigate('Match', { match_item: item });
   }
+  _onMatch_LongPressed=(item)=>{
+    onMatch_LongPressed(item).then(o=>{
+      get_notifications_matches().then(o=>this.setState({notifications_matches:o}) );
+    });
+  }
   render_matches(){
     return <ItemsList 
           loading={this.state.loading} list={this.state.matches} 
           onclick={this.onMatch_clicked}
-          onLongPress={onMatch_LongPressed}
+          onLongPress={this._onMatch_LongPressed}
+          notifications_matches={this.state.notifications_matches}
           key_="home_team" key_key="id"  />;
   }
 
@@ -145,7 +152,7 @@ class LeagueScreen extends React.Component {
 
         <View style={this.state.dynamic_style.tabs_list}>
           <View style={{flex:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing"})}/></View>
-          <View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"}) }/></View>
+          {/*<View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"}) }/></View> */}
           <View style={{flex:1}}><Button title="Matches" onPress={()=>{
             if(this.state.matches == undefined){
               this.setState({loading : true, matches:[]});

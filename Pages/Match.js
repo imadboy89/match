@@ -83,7 +83,7 @@ class Matchcreen extends React.Component {
     for (let k=0;k<substitutions.length;k++){
       let el = substitutions[k];
       let pp = el.substitution.split("|");
-      subs.push({lineup_player:pp[1].trim(), player_out:pp[0].trim(),time:el.time ,lineup_number:""});
+      subs.push({lineup_player:pp[1].trim(), player_out:pp[0].trim(),time:el.time ,lineup_number:el.time ? el.time.split("+")[0]+'"':""});
     }
     return subs;
   }
@@ -125,22 +125,25 @@ class Matchcreen extends React.Component {
 
       let assist_h_count = this.assist_h.filter(function(item) {return item === home_p.lineup_player}).length;
       let assist_a_count = this.assist_a.filter(function(item) {return item === away_p.lineup_player}).length;
-      let assist_h = this.assist_h && home_p && this.assist_h.includes(home_p.lineup_player) ? "🤾".repeat(assist_h_count):"";
-      let assist_a = this.assist_a && away_p && this.assist_a.includes(away_p.lineup_player) ? "🤾".repeat(assist_a_count):"";
+      let assist_h = this.assist_h && home_p && this.assist_h.includes(home_p.lineup_player) ? "★".repeat(assist_h_count):"";
+      let assist_a = this.assist_a && away_p && this.assist_a.includes(away_p.lineup_player) ? "★".repeat(assist_a_count):"";
+
+      const style_sub_h = home_p.player_out==undefined ? {} : this.state.dynamic_style.lineup2_number_subs;
+      const style_sub_a = away_p.player_out==undefined ? {} : this.state.dynamic_style.lineup2_number_subs;
 
       return (
           <View style={this.state.dynamic_style.lineup2_container}>
             
-            <Text style={this.state.dynamic_style.lineup2_number}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
-            <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_h}>
+            <Text style={[this.state.dynamic_style.lineup2_number,style_sub_h]}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
+            <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_h} numberOfLines={1}>
               {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
             </Text>
 
 
-            <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_a}>
+            <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_a} numberOfLines={1}>
               {away_p && away_p.lineup_player? scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
             </Text>
-            <Text style={this.state.dynamic_style.lineup2_number}>{away_p && away_p.lineup_number? away_p.lineup_number : ""}</Text>
+            <Text style={[this.state.dynamic_style.lineup2_number,style_sub_a]}>{away_p && away_p.lineup_number? away_p.lineup_number : ""}</Text>
             {i==11 ? <View style={this.state.dynamic_style.hairline}/> : null}
           </View> );
            //,  i==11 ? <View style={this.state.dynamic_style.hairline} /> : null ];

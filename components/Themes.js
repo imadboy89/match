@@ -216,13 +216,19 @@ function generateTheme(theme_name=false){
       height:70,
       marginRight:5,
       marginLeft:5,
-      //borderRadius:8,
+      borderRadius:10,
       borderWidth:1,
     },
     matche_container_live:{
       borderRadius:10,
       borderWidth: 2,
       borderColor: theme.live_borderColor,
+    },
+    matche_container_notif:{
+      borderRadius:10,
+      borderWidth: 2,
+      borderColor: theme.list_header_backgroundColor,
+      //backgroundColor:"yellow"
     },
     matche_team_names:{
       flex: 15 ,
@@ -573,15 +579,19 @@ function generateTheme(theme_name=false){
     },
     lineup2_h:{
       flex:9,
-      marginHorizontal:3,
+      marginLeft:3,
       textAlign: 'left',
       color : theme.match_lineup2_color,
+      borderRightWidth:1,
+      borderColor:theme.text_color_default
     },
     lineup2_a:{
       flex:9,
-      marginHorizontal:3,
+      marginRight:3,
       textAlign: 'right',
       color : theme.match_lineup2_color,
+      borderLeftWidth:1,
+      borderColor:theme.text_color_default
     },
     lineup2_m:{
       flex:1,
@@ -595,6 +605,12 @@ function generateTheme(theme_name=false){
       textAlign: 'center',
       color : theme.match_lineup2_number_color,
     },
+    lineup2_number_subs:{
+      width:20,
+      //marginHorizontal:3,
+      textAlign: 'center',
+      color : theme.live_borderColor,
+    },
     stats_container:{
       //marginTop:10,
       flexDirection:'row', 
@@ -602,6 +618,7 @@ function generateTheme(theme_name=false){
       
     },
     stats_frag_l_:{
+      fontSize:16,
       marginHorizontal:5,
       flex: 10 ,
       textAlign: 'center',
@@ -616,6 +633,7 @@ function generateTheme(theme_name=false){
       
     },
     stats_frag_r_:{
+      fontSize:16,
       marginHorizontal:5,
       flex: 10 ,
       textAlign: 'center',

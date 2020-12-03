@@ -12,18 +12,38 @@ const onMatch_LongPressed=(item)=>{
       body: league,
       sound: true,
     };
-  Permissions.askAsync(Permissions.NOTIFICATIONS).then(o=>{
+  return Permissions.askAsync(Permissions.NOTIFICATIONS).then(o=>{
     if(o.status=="granted"){
       notifyMessage("Will remind you of this matche :\n"+content.title,"Reminder");
-      Notifications.scheduleNotificationAsync({
-        identifier: 'night-notification',
-        content:content,
-        trigger
-        });
+      return Notifications.getAllScheduledNotificationsAsync().then(o=>{
+        let is_exist = false;
+        for(let i=0; i<o.length;i++){
+          if(o.identifier==item.id+""){
+            is_exist = true;
+          }
+        }
+        if(is_exist==true){return true;}
+        return Notifications.scheduleNotificationAsync({
+          identifier: item.id+"",
+          content:content,
+          trigger
+          });
+      });
+      
     }else{
       notifyMessage("Permissions not granted","Reminder");
     }
   });
 }
 
-export default onMatch_LongPressed;
+const get_notifications_matches=()=>{
+  return Notifications.getAllScheduledNotificationsAsync().then(o=>{
+    let notif_matches={};
+    for(let i=0; i<o.length;i++){
+      notif_matches[o[i].identifier] = o[i];
+    }
+    return notif_matches;
+  });
+}
+
+export {onMatch_LongPressed,get_notifications_matches};

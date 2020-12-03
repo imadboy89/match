@@ -24,8 +24,11 @@ class ItemsList extends React.Component {
       if(home_team_name.length>max_lenght){ home_team_style={fontSize:15}; }
       if(away_team_name.length>max_lenght){ away_team_style={fontSize:15}; }
       let time=0;
+      //console.log(this.props.notifications_matches[item.id]);
+      let style_extra = this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
+      style_extra = item.live==1 ? this.state.dynamic_style.matche_container_live: style_extra;
       return (
-        <View style={[this.state.dynamic_style.matche_container,item.live==1 ? this.state.dynamic_style.matche_container_live:{}]}>
+        <View style={[this.state.dynamic_style.matche_container,style_extra]}>
           <View style={this.state.dynamic_style.matche_team_time}>
             <Text style={this.state.dynamic_style.matche_team_time_t} noFonts={true}>{item.time}</Text>
             {item.live==1 ? 
