@@ -138,7 +138,7 @@ class ItemsList extends React.Component {
                     size={this.state.dynamic_style.header.fontSize} 
                     onPress={() => {this.props.onLeaguePressed(title,img) }}/>
                 : null}
-                <Text style={[this.state.dynamic_style.header,{flex:7}]}>{title}</Text>
+                <Text style={[this.state.dynamic_style.header,{flex:7}]} numberOfLines={1}>{title}</Text>
                 <View style={{flex:1}}>
                 { img ?  
                         <Image 
