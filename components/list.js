@@ -99,8 +99,8 @@ class ItemsList extends React.Component {
     if(this.props.favorite && this.props.set_fav){
       const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : 0 ;
       fav_icon = this.props.favorite.includes(league_id) ? 
-        <IconButton name="star" onPress={()=>{this.props.set_fav(league_id)}} /> : 
-        <IconButton name="star-o" onPress={()=>{this.props.set_fav(league_id)}}/> ;
+        <IconButton name="star" onPress={()=>{this.props.set_fav(league_id)}} style={{position: 'absolute'}}/> : 
+        <IconButton name="star-o" onPress={()=>{this.props.set_fav(league_id)}} style={{position: 'absolute'}}/> ;
     }
     return fav_icon;
   }
