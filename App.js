@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import API from './Libs/API';
-import HomeScreen from './Pages/Home';
+import HomeScreen from './Pages/Home.js';
 import CategoriesScreen from './Pages/Categories';
 import ChannelsScreen from './Pages/Channels';
 import ChannelScreen from './Pages/Channel';
@@ -17,6 +17,7 @@ import VideosScreen from './Pages/Videos';
 import VideoScreen from './Pages/Video';
 import LeagueScreen from './Pages/League';
 import LeaguesScreen from './Pages/Leagues';
+import Constants from 'expo-constants';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Font from 'expo-font';
@@ -28,6 +29,7 @@ import * as Permissions from 'expo-permissions';
 
 
 Text = TextF;
+API_ = new API();
 Global_theme_name = "dark violet";
 var _app_styles = app_styles;
 
@@ -53,6 +55,9 @@ Notifications.setNotificationHandler({
 });
 
 async function registerForPushNotificationsAsync() {
+  if(API_.isWeb){
+    return new Promise(function(){return []});
+  }
   let token;
   if (Constants.isDevice) {
     const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
@@ -81,21 +86,24 @@ async function registerForPushNotificationsAsync() {
   }
 }
 registerForPushNotificationsAsync()
-notifyMessage = function(msg: string,title: string) {
+notifyMessage = function(msg: string,title: string, buttons) {
     if(API_.isWeb){
+      console.log(buttons);
       alert(msg);
-      return;
+      return new Promise((resolve, reject)=>{return resolve([])});
     }
-    Alert.alert(
+    
+    return Alert.alert(
       title!=undefined ? title : "Message",
       msg,
+      buttons!=undefined ? buttons
+      :
       [
         { text: "OK", onPress: () => console.log("OK Pressed") }
+        //{ text: "OK", onPress: () => console.log("OK Pressed") }
       ],
     );
 }
-
-API_ = new API();
 
 var is_materialTopTab = false;
 

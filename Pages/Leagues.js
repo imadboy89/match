@@ -14,6 +14,7 @@ class LeaguesScreen extends React.Component {
         page : 1,
         loading:true,
         dynamic_style : styles_news,
+        favorite:[],
     };
 
     setTimeout(()=>{
@@ -21,8 +22,12 @@ class LeaguesScreen extends React.Component {
     },300);
 
   }
+  
   componentDidMount(){ 
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
+    API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{
+      this.setState({favorite:o});
+    });
     this.props.navigation.setOptions({title: "Leagues",
     "headerRight":()=>(
           <IconButton 
@@ -32,20 +37,35 @@ class LeaguesScreen extends React.Component {
   )
 });
   }
-
+  set_fav=(league_id)=>{
+    API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{
+      if( o.includes(league_id) ){
+        o = o.filter(o=>{if(o!=league_id)return o;});
+      }else{
+        o.push(league_id);
+      }
+      this.setState({favorite:o});
+      API_.setConfig("favorite_leagues",o);
+    });
+    this.setState({});
+  }
   
 get_leagues(){
-  const leagues = API_.leagues_dict;
-  if(leagues==undefined || leagues==null){
-    return null;
-  }
-  let data = Object.keys(leagues).map(k =>{
-    let row = leagues[k];
-    let img = row && row.logo ? row.logo : false;
-    let league_name = row.ar_league_name ? row.ar_league_name : row.league;
-    return {"img": API_.domain_o+img,"league_name":league_name , id:row.league_id}; 
+  API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
+    const leagues = API_.leagues_dict;
+    if(leagues==undefined || leagues==null){
+      return null;
+    }
+    let data = Object.keys(leagues).map(k =>{
+      let row = leagues[k];
+      let img = row && row.logo ? row.logo : false;
+      let league_name = row.ar_league_name ? row.ar_league_name : row.league;
+      return {"img": API_.domain_o+img,"league_name":league_name , id:row.league_id}; 
+    });
+    data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
+    this.setState({loading:false,leagues:data,favorite:favorite});
   });
-  this.setState({loading:false,leagues:data});
+
 }
 
   onItem_clicked =(item)=>{
@@ -54,7 +74,11 @@ get_leagues(){
   render() {
     return (
       <View style={this.state.dynamic_style.container}>     
-        <ItemsList loading={this.state.loading} list={this.state.leagues} onclick={this.onItem_clicked} key_={this.state.key} key_key="link"  />
+        <ItemsList 
+          favorite={this.state.favorite}
+          set_fav={this.set_fav}
+          loading={this.state.loading} list={this.state.leagues} 
+          onclick={this.onItem_clicked} key_={this.state.key} key_key="id"  />
         
         <View style={this.state.dynamic_style.nav_container}>
           <IconButton

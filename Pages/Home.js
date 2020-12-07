@@ -24,13 +24,10 @@ class HomeScreen extends React.Component {
         update_available:false,
         dynamic_style:styles_home,
         notifications_matches:{},
+        favorite:[],
         //dynamic_style_list:styles_list,
     };
   API_.load_leagues();
-  get_notifications_matches().then(o=>{
-    this.setState({notifications_matches:o});
-    console.log(o);
-    });
   this.get_matches(this.state.matches_date);
   
   const customUpdater = new ExpoCustomUpdater()
@@ -46,28 +43,41 @@ class HomeScreen extends React.Component {
       )
     });
   });
-  this.interval_refresh = setInterval(()=>{
-    if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
-      this.get_matches();
-    }
-    }, 20000);
+  }
+  set_fav=(league_id)=>{
+    API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{
+      if( o.includes(league_id) ){
+        o = o.filter(o=>{if(o!=league_id)return o;});
+      }else{
+        o.push(league_id);
+      }
+      this.setState({favorite:o});
+      API_.setConfig("favorite_leagues",o);
+    });
+    this.setState({});
   }
   _onMatch_LongPressed=(item)=>{
-    onMatch_LongPressed(item).then(o=>{
-      get_notifications_matches().then(o=>this.setState({notifications_matches:o}) );
+    onMatch_LongPressed(item).then(oo=>{
+      if(oo==false){return false;}
+      this.setState({notifications_matches:[]});
+      get_notifications_matches().then(o=>{this.setState({notifications_matches:o});} );
     });
+  }
+  componentWillUnmount(){
+    clearInterval(this.interval_refresh);
   }
   componentDidMount(){
     getTheme("styles_home").then(theme=>this.setState({dynamic_style:theme}));
     this.props.navigation.setOptions({
       "headerRight":()=>(
         <View style={{flexDirection:"row",marginLeft:10}}>
+              {API_.isWeb==false ?null : 
               <IconButton 
                 name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
-                this.setState({list:[],loading:true});
                 this.get_matches(this.state.matches_date);
                 
               }}  />
+              }
               <IconButton 
                 name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{   
                 const next_ind = themes_list.indexOf(Global_theme_name)+1;
@@ -79,29 +89,44 @@ class HomeScreen extends React.Component {
               </View>
       )
     });
+
+  this.interval_refresh = setInterval(()=>{
+    if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
+      this.get_matches();
+    }
+    }, 20000);
+
   }
   get_matches = (date_obj=null)=>{
-    date_obj = date_obj==null ? this.state.matches_date :date_obj;
+    date_obj = date_obj==null ? this.state.matches_date :date_obj; 
     this.setState({loading:true});
-    API_.get_matches(date_obj).then(resp=>{
-    if(resp && resp["status"]=="true"){
-      let list = [];
-      let data = Object.keys(resp["data"]).map(k =>{
-        let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
-                  ? resp["data"][k][0]["league_badge"]["path"] : false;
-        for(let i=0;i<resp["data"][k].length;i++){
-          resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
-          if(resp["data"][k][i].live){
-            resp["data"][k][i].time_played = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time);
-          }
+    API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
+      get_notifications_matches().then(_notifications_matches=>{
+        API_.get_matches(date_obj).then(resp=>{
+          let data = [];
+          console.log("get_matches",resp["status"]);
+        if(resp && resp["status"]=="true"){
+          let list = [];
+          data = Object.keys(resp["data"]).map(k =>{
+            let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
+                      ? resp["data"][k][0]["league_badge"]["path"] : false;
+            for(let i=0;i<resp["data"][k].length;i++){
+              resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
+              if(resp["data"][k][i].live){
+                resp["data"][k][i].time_played = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time);
+              }
+            }
+            let id=0;
+            try{id=API_ && API_.leagues_dict && API_.leagues_dict[k]? API_.leagues_dict[k].league_id :0;}catch(e){console.log(e);}
+            return {"title":k,"img":img, data:resp["data"][k],"id":id}; 
+          });
+          try{
+            data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
+          }catch(e){console.log(e);}
         }
-        return {"title":k,"img":img, data:resp["data"][k]}; 
+        this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
       });
-      this.setState({list:data,loading:false});
-      for(let i=0;i<data.length;i++){
-        
-      }
-    }
+    });
   });
 }
  onChange = (event, selectedDate) => {
@@ -182,8 +207,12 @@ show_DateP(){
 
         
         <ItemsList 
+          favorite={this.state.favorite}
+          set_fav={this.set_fav}
+          
           refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={this.get_matches} />}
-          loading={this.state.loading} list={this.state.list} 
+          loading={this.state.loading} 
+          list={this.state.list} 
           onLeaguePressed={this.onLeaguePressed}
           onclick={this.onMatch_clicked}
           onLongPress={this._onMatch_LongPressed}

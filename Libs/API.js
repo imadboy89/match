@@ -101,7 +101,7 @@ class API {
       }
     }
     this.token = (Math.random().toString(36).substring(2)+Math.random().toString(36).substring(2) ).slice(0,20) ;
-    notifyMessage("new");
+    //notifyMessage("new");
     const url = this.domain+"device_app";
     this.token_post["token"] = this.token;
     //alert(JSON.stringify(url,this.token_post) + JSON.stringify(this.headers)); 
@@ -259,6 +259,7 @@ class API {
     const is_expired = (new Date()).getTime()- date_stored >= exp_t;
     this.leagues_dict = {};
     if(Object.keys( leagues["data"] ).length>0 && is_expired==false){
+      console.log("leagues cache");
       this.leagues_dict = leagues["data"];
       return true;
     }
@@ -273,6 +274,7 @@ class API {
 
   }
   get_leagues(page){
+      console.log("leagues loading pg="+page);
       const url = this.domain+"leagues?page="+page;
       return fetch(url, {
         method: 'GET',
@@ -424,19 +426,20 @@ class API {
     return value;
   };
 
-  getConfig = async (key,defualt_val="") => {
+  getConfig = async (key,defualt_val=undefined) => {
+    //if(defualt_val==false) this.setConfig(key, []);
     let configs = await AsyncStorage.getItem('configs');
     if (configs) {
       configs = JSON.parse(configs);
       if ( configs[key] ){
         return configs[key];
       }else{
-        if (defualt_val=="" || defualt_val==undefined){return false;}
+        if (defualt_val==undefined){return false;}
         await this.setConfig(key, defualt_val);
         return defualt_val;
       }
     }else {
-      if (defualt_val=="" || defualt_val==undefined){return false;}
+      if (defualt_val==undefined){return false;}
       await this.setConfig(key, defualt_val);
       return defualt_val;
     }

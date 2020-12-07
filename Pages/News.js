@@ -19,7 +19,7 @@ class NewsScreen extends React.Component {
     if(this.state.page==1){this.get_news();}
     }, 60000);
   }
-  componentDidMount(){ 
+  componentDidMount(){
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
     this.props.navigation.setOptions({title: "News",
     "headerRight":()=>(
@@ -30,7 +30,9 @@ class NewsScreen extends React.Component {
   )
 });
   }
-
+  componentWillUnmount(){
+    clearInterval(this.interval_refresh);
+  }
   
 get_news =()=>{
   this.setState({loading:true});

@@ -5,14 +5,14 @@ import API from '../Libs/API';
 
 function getTheme(style_name=false){
   //var API_ = new API();
-  return API_.getConfig("theme","light").then(theme_name__=>{
+  return API_.getConfig("theme",Global_theme_name).then(theme_name__=>{
     Global_theme_name = theme_name__;
     return generateTheme(theme_name__)[style_name];
   });
 }
 function getThemes(theme_name=false){
   //var API_ = new API();
-  return API_.getConfig("theme","light").then(theme_name__=>{
+  return API_.getConfig("theme",Global_theme_name).then(theme_name__=>{
     console.log(theme_name__,theme_name)
     return Themes[theme_name__];
   });
@@ -322,7 +322,7 @@ function generateTheme(theme_name=false){
       borderRadius: 10,
     },
     news_img_v:{
-      flex: 12 ,
+      flex: 11 ,
       width:"100%",
       color:"#fff",
       alignItems:'center',
@@ -336,6 +336,7 @@ function generateTheme(theme_name=false){
     },
     news_title_v:{
       width:"100%",
+      paddingBottom:5,
       flex: 2 ,
       fontSize:18,
       color:"#fff",

@@ -14,7 +14,7 @@ class TextF extends React.Component {
       let style = this.props.bold ? styles.kufi_regular: styles.kufi_regular;
       style = this.props.noFonts ? this.props.style : [style,this.props.style];
       return (
-        <Text style={style}>{this.props.children}</Text>
+        <Text style={style} numberOfLines={this.props.numberOfLines}>{this.props.children}</Text>
       );
     }
 }
