@@ -52,13 +52,15 @@ class Scrap {
     if(details_dict["l"] && details_dict["l"].length>0){
       let channels = [];
       for(let i=0; i<details_dict["l"].length;i++){
-        channels.push({id:details_dict["l"][i][1] , en_name:details_dict["l"][i][2] });
+        channels.push({id:details_dict["l"][i][1] , en_name:details_dict["l"][i][2] ,"is_koora":true});
       }
       match_details["channels"] = channels
     }
     /// staduim
     if(details_dict["a"] && details_dict["a"].length>0){
       match_details["stadium"] = details_dict["a"][0] && details_dict["a"][0].length >=3 ? details_dict["a"][0][3] : "";
+      match_details["stadium"] = details_dict["a"][0] && details_dict["a"][0].length >=5 
+      ? details_dict["a"][0][5]+" | "+match_details["stadium"] : match_details["stadium"];
     }
     // league name
     match_details["league"] = league_name;
@@ -85,7 +87,71 @@ class Scrap {
       }
     }
     match_details["goal_scorer"] = scorers;
+    match_details["round"] = details_dict["o"] && details_dict["o"].length>0 ? "الجولة "+details_dict["o"][0][1] : "-" ;
+    match_details["round"] = match_details["round"]=="-" && details_dict["w"] && details_dict["w"].length>0 ? "الأسبوع "+details_dict["w"][0][1] : match_details["round"] ;
+    match_details["phase"] = details_dict["e"] && details_dict["e"].length>0 ? details_dict["e"][0][2] : "-" ;
+    match_details["group"] = details_dict["sl"] && details_dict["sl"].length>0 ? details_dict["sl"][0][1] : "-" ;
+
+    match_details["retour_score"] = details_dict["sl"] && details_dict["sl"].length>0 ? 
+      details_dict["sl"][0][1] + " - " +details_dict["sl"][0][2] : "-" ;
+
     return match_details;
+  }
+  get_lineup(html){
+    let json_={"match_squads":[]};
+    try{
+      json_ = JSON.parse(html);
+    }catch(err){console.log(err);}
+    let lineups = {"home_lineup":[],"away_lineup":[],"home_substitutions":[],"away_substitutions":[]};
+    if(json_ && json_["match_squads"] && JSON.stringify(json_["match_squads"])==JSON.stringify([-1]) ){
+      console.log("empty");
+      return lineups;
+    }
+    const lineup_header = [
+                          "team",
+                          "player_key",
+                          "lineup_position",
+                          "lineup_number",
+                          "lineup_player",
+                          "player_is_subs",
+                          "subs_in_time",
+                          "subs_out_time",
+                          "info_1",
+                          "info_2",
+                          "info_3",
+                          "info_4",
+                          "info_5",
+                          "info_6",
+                          "info_7",
+                          "info_8",
+                          "info_9",
+                          "info_10",
+                          "info_11",
+                          "info_12",
+                          "info_13",
+                          "info_14",
+                          "info_15",
+                          "info_16",
+                          "info_17",]
+    let h =0;
+    let player = {};
+    try{
+    for(let i=0;i< json_["match_squads"].length;i++){
+      player [ lineup_header[h] ] = json_["match_squads"][i];
+      h++;
+      if(h==lineup_header.length){
+        player["subs_in_time"] = player["subs_in_time"]+""
+        player["time"] = player["subs_in_time"]!="-1" ? player["subs_in_time"] : "";
+        let type = player["team"]==1 ? "home_lineup" : "away_lineup";
+        type = type.replace("lineup", player["player_is_subs"]=="s" ? "lineup" : "substitutions");
+        lineups[type].push(player);
+        h=0;
+        player={};
+      }
+      
+    }
+    }catch(err){console.log(err)}
+    return lineups;
   }
   get_matches_k(html,date,is_oneMatch=false){
     let json_={"matches_comps":[],"matches_list":[]};
@@ -245,6 +311,30 @@ class Scrap {
     }
     return videoId;
   }
+  get_lineup_old(html){
+    if(html==""){return []}
+    let lineups = {"home_lineup":[],"away_lineup":[],"home_substitutions":[],"away_substitutions":[]};
+    let doc = new DomParser().parseFromString(html,'text/html');
+    let tlineups = doc.querySelect('.tLineup');
+    for (let i=0;i<tlineups.length;i++){
+      const key = i==0?"home_lineup":"away_lineup";
+      const tr_s = tlineups[i].querySelect("tr");
+      for(let k=0;k<tr_s.length;k++){
+        const tr = tr_s[k];
+        if(tr.querySelect("th") && tr.querySelect("th").length>0){
+          const key = i==0?"home_substitutions":"away_substitutions";
+          continue;
+        }
+        let player = {lineup_number:"",lineup_player:"",lineup_position:i,player_key:""};
+        player["lineup_player"] = tr.querySelect("a").childNodes+"";
+        player["lineup_number"] = tr.querySelect("td")[0].childNodes+"";
+        player["player_key"]   = tr.querySelect("a").getAttribute("href");
+        lineups[key].push(player);
+      }
+    }
+    return lineups;
+  }
+
   get_videos(html){
     if(html==""){return []}
     //console.log("-",html)

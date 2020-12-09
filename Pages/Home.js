@@ -128,7 +128,7 @@ class HomeScreen extends React.Component {
                 if(resp["data"][k][i].live){
                   const played_time = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time) ;
                   resp["data"][k][i].time_played = played_time ? played_time : "";
-                  if(played_time==false){
+                  if(played_time==false || played_time<-10){
                     resp["data"][k][i].live = 0;
                   }
                 }

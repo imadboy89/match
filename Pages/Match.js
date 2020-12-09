@@ -5,7 +5,8 @@ import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
 import Loading from '../components/Loader';
-import {styles_match,getTheme} from "../components/Themes";
+import {styles_match,getTheme,global_theme} from "../components/Themes";
+import IconButton from "../components/IconButton";
 
 let list = [
 
@@ -26,11 +27,13 @@ class Matchcreen extends React.Component {
         show_res:false,
         height:"100%",
         dynamic_style:styles_match,
+        favorite:[],
     };
     this.get_Match(this.props.route.params.match_item.id);
 
   }
   componentDidMount(){
+    API_.getConfig("favorite_channels",this.state.favorite).then(o=>{this.setState({favorite:o});});
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
   }
   get_Match(id){
@@ -62,23 +65,88 @@ class Matchcreen extends React.Component {
   onmt_clicked(item){
     this.props.navigation.navigate('Channel', { channel_id: item.id,channel_photo:item.channel_photo });
   }
+
+
+  set_fav=(ch_name)=>{
+    API_.getConfig("favorite_channels",this.state.favorite).then(o=>{
+      if( o.includes(ch_name) ){
+        o = o.filter(o=>{if(o!=ch_name)return o;});
+      }else{
+        o.push(ch_name);
+      }
+      this.setState({favorite:o});
+      API_.setConfig("favorite_channels",o);
+    });
+    this.setState({});
+  }
+  get_fav_icon(ch_name){
+    let fav_icon = null;
+    if(this.state.favorite){
+      fav_icon = this.state.favorite.includes(ch_name) ? 
+        <IconButton name="star" style={{height:30,width:50}} color={global_theme.text_color_default} /> :
+        <IconButton name="star-o" style={{height:30,width:50}} color={global_theme.text_color_default}/> ;
+    }
+    return fav_icon;
+  }
   get_View_general(){
+    this.state.matche_details.channels = this.state.matche_details.channels ? 
+      this.state.matche_details.channels.sort((a,b)=>{return (this.state.favorite.indexOf(a.en_name)>this.state.favorite.indexOf(b.en_name))?-1:1;})
+      :this.state.matche_details.channels;
     let channels = this.state.matche_details.channels ?
       this.state.matche_details.channels.map(ch => (
-        <View style={{margin:10}}>
-          <Button onPress={()=>this.onmt_clicked(ch)}  key={ch.id} title={ch.en_name} style={{margin:10}}></Button>
+        <View style={{margin:1}}>
+          {ch.is_koora==undefined ?
+            <Button onPress={()=>this.onmt_clicked(ch)}  key={ch.id} title={ch.en_name} style={{margin:4}}></Button>
+           : 
+            <TouchableOpacity style={{flexDirection:'row', flexWrap:'wrap',width:"100%",marginLeft:10}} onPress={()=>this.set_fav(ch.en_name)}>
+              {this.get_fav_icon(ch.en_name)}
+              <Text style={{flex:1,backgroundColor:global_theme.background_color_default,color:global_theme.text_color_default}} >{ch.en_name}</Text>
+            </TouchableOpacity>
+          }
         </View>
       ))
     : null;
     if(this.state.matche_details=={}) {return null;}
+
+    this.state.matche_details.status       = this.state.matche_details.status ? this.state.matche_details.status : "-";
+    this.state.matche_details.league       = this.state.matche_details.league ? this.state.matche_details.league : "-";
+    this.state.matche_details.phase        = this.state.matche_details.phase ? this.state.matche_details.phase : "-";
+    this.state.matche_details.group        = this.state.matche_details.group ? this.state.matche_details.group : "-";
+    this.state.matche_details.round        = this.state.matche_details.round ? this.state.matche_details.round : "-";
+    this.state.matche_details.retour_score = this.state.matche_details.retour_score ? this.state.matche_details.retour_score : "-";
+    this.state.matche_details.stadium      = this.state.matche_details.stadium ? this.state.matche_details.stadium : "-";
+    
     return (
       <View style={this.state.dynamic_style.view_tab}>
         <Text style={this.state.dynamic_style.text_info}>{this.state.matche_details.date} { API_.convert_time(this.state.matche_details.time)} </Text>
-        <Text style={this.state.dynamic_style.text_info}>Status : {this.state.matche_details.status ? this.state.matche_details.status : "-"}</Text>
-        <Text style={this.state.dynamic_style.text_info}>League : {this.state.matche_details.league}</Text>
-        <Text style={this.state.dynamic_style.text_info}>Staduim : {this.state.matche_details.stadium}</Text>
-        <Text style={this.state.dynamic_style.text_info}>Channels :</Text>
-        {channels}
+        {this.state.matche_details.status!="-" ?
+          <Text style={this.state.dynamic_style.text_info}>Status : {this.state.matche_details.status}</Text>
+         : null}
+        {this.state.matche_details.league!="-" ?
+          <Text style={this.state.dynamic_style.text_info}>League : {this.state.matche_details.league}</Text>
+         : null}
+        {this.state.matche_details.phase!="-" ?
+          <Text style={this.state.dynamic_style.text_info}>Phase : {this.state.matche_details.phase}</Text>
+         : null}
+        {this.state.matche_details.group!="-" ?
+          <Text style={this.state.dynamic_style.text_info}>Group : {this.state.matche_details.group}</Text>
+         : null}
+        {this.state.matche_details.round!="-" ?
+          <Text style={this.state.dynamic_style.text_info}>Round : {this.state.matche_details.round}</Text>
+         : null}
+        {this.state.matche_details.retour_score!="-" ?
+          <Text style={this.state.dynamic_style.text_info}>First leg : {this.state.matche_details.retour_score}</Text>
+         : null}
+        {this.state.matche_details.stadium!="-" ?
+          <Text style={this.state.dynamic_style.text_info}>Staduim : {this.state.matche_details.stadium}</Text>
+         : null}
+        {channels!=null && channels.length>0 ?
+          <Text style={this.state.dynamic_style.text_info}>Channels :</Text>
+         : null}
+        {channels!=null && channels.length>0 ?
+          channels
+         : null}
+        
       </View> 
     );
   }
@@ -94,9 +162,13 @@ class Matchcreen extends React.Component {
     let subs = [];
     for (let k=0;k<substitutions.length;k++){
       let el = substitutions[k];
-      let pp = el.substitution.split("|");
+      let pp = el.substitution ? el.substitution.split("|") : ["",el.lineup_player];
+      if(el.time==""){
+        continue;
+      }
       subs.push({lineup_player:pp[1].trim(), player_out:pp[0].trim(),time:el.time ,lineup_number:el.time ? el.time.split("+")[0]+'"':""});
     }
+    subs = subs.sort((a,b)=>{return a.time<b.time?-1:1;});
     return subs;
   }
   get_View_lineup_2(){
@@ -326,7 +398,20 @@ class Matchcreen extends React.Component {
         <View style={this.state.dynamic_style.tabs_list}>
           <View style={{flex:1}}><Button title="General" onPress={()=>this.setState({visible_tab:"general"})} /></View>
           <View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"})}/></View>
-          <View style={{flex:1}}><Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup2"})}/></View>
+          <View style={{flex:1}}><Button title="Line-up" onPress={()=>{
+            this.setState({visible_tab:"lineup2",loading:true});
+            if(this.state.match_dets.details && this.state.matche_details.home_lineup==undefined){
+              API_.get_lineup_k(this.state.matche_details.id).then(o=>{
+                for(let i=0;i< Object.keys(o).length;i++){
+                  this.state.matche_details[Object.keys(o)[i]] = o[Object.keys(o)[i]];
+                }
+                this.setState({visible_tab:"lineup2",loading:false});
+              });
+              return null;
+            }else{
+              this.setState({visible_tab:"lineup2",loading:false});
+            }
+            }}/></View>
           <View style={{flex:1}}><Button title="League" onPress={()=>{
             const league_img = this.state.matche_details.league_badge ? API_.domain_o+this.state.matche_details.league_badge.path : null ;
             this.props.navigation.navigate('League', 

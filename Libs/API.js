@@ -300,9 +300,7 @@ class API {
         this.error = error;
       });
   }
-
   get_matches_k(date_obj){
-    console.log("https://www.kooora.com/?region=-1&area=0&dd="+date_obj.getDate()+"&mm="+(date_obj.getMonth()+1)+"&yy="+date_obj.getFullYear()+"&arabic&ajax=1","GET");
     return this.http("https://www.kooora.com/?region=-1&area=0&dd="+date_obj.getDate()+"&mm="+(date_obj.getMonth()+1)+"&yy="+date_obj.getFullYear()+"&arabic&ajax=1","GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -317,6 +315,15 @@ class API {
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       return scrap.get_matche_k(resp,false,true);
+    });
+  }
+  get_lineup_k(id){
+    //https://www.kooora.com/?m=2469218&ajax=true
+    return this.http("https://www.kooora.com/?squads="+id+"&arabic","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_lineup(resp);
     });
   }
   get_matches(date_obj=null, page=1){
