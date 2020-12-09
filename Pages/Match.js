@@ -34,17 +34,29 @@ class Matchcreen extends React.Component {
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
   }
   get_Match(id){
+      if(this.state.match_dets.details){
+        return this.get_Match_k(id);
+      }
       API_.get_match(id).then(resp=>{
         if(resp["data"] && resp["data"][0] ){
           this.setState({matche_details:resp["data"][0],loading:false});
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
-
           this.props.navigation.setOptions({title: <Text >{this.home_team_ar +" - "+this.away_team_ar }</Text>});
         }
       });
   }
-
+  get_Match_k(id){
+      API_.get_match_k(id).then(resp=>{
+        //console.log("get_Match_k ",Object.values(resp)[0]["data"][0]);
+        if(resp ){
+          this.setState({matche_details: resp,loading:false});
+          this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
+          this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
+          this.props.navigation.setOptions({title: <Text >{this.home_team_ar +" - "+this.away_team_ar }</Text>});
+        }
+      });
+  }
 
 
   onmt_clicked(item){
@@ -268,8 +280,8 @@ class Matchcreen extends React.Component {
     let scores_home = this.get_scores("home");
     let scores_away = this.get_scores("away");
     try{
-      home_sc = this.state.match_dets.home_team_score ? parseInt(this.state.match_dets.home_team_score) : "-";
-      away_sc = this.state.match_dets.away_team_score ? parseInt(this.state.match_dets.away_team_score) : "-";
+      home_sc = this.state.match_dets.home_team_score && this.state.match_dets.home_team_score!="-" ? parseInt(this.state.match_dets.home_team_score) : "-";
+      away_sc = this.state.match_dets.away_team_score && this.state.match_dets.away_team_score!="-" ? parseInt(this.state.match_dets.away_team_score) : "-";
       home_style = home_sc>away_sc ? this.state.dynamic_style.match_results_winer 
         : (home_sc==away_sc ? this.state.dynamic_style.match_results_drawer : this.state.dynamic_style.match_results_loser);
       away_style = away_sc>home_sc ? this.state.dynamic_style.match_results_winer 

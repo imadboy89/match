@@ -2,7 +2,7 @@ import * as React from 'react';
 import {  View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground } from 'react-native';
 import { SafeAreaView,SectionList } from 'react-native';
 import Loader from "./Loader";
-import {styles_list,getTheme} from "./Themes";
+import {styles_list,getTheme,global_theme} from "./Themes";
 import IconButton from "../components/IconButton";
 
 class ItemsList extends React.Component {
@@ -59,8 +59,8 @@ class ItemsList extends React.Component {
           </View>
         </View>
         );
-    }else if(col_key=="title_news" || col_key=="league_name"){ 
-      const fav_icon = this.get_fav_icon(item[col_key]);
+    }else if(col_key=="title_news" || col_key=="league_name"){
+      const fav_icon = this.get_fav_icon(item[col_key],col_key=="league_name"? item.id : 0,true);
       let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
       return (
         <View style={this.state.dynamic_style.news_container}>
@@ -94,30 +94,35 @@ class ItemsList extends React.Component {
         );
     }
   }
-  get_fav_icon(title){
+  get_fav_icon(title,league_id,is_leagues=false){
+    const color = is_leagues ? global_theme.text_color_default : global_theme.background_color_default;
     let fav_icon = null;
     if(this.props.favorite && this.props.set_fav){
-      const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : 0 ;
+      //const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : 0 ;
       fav_icon = this.props.favorite.includes(league_id) ? 
-        <IconButton name="star" onPress={()=>{this.props.set_fav(league_id)}} style={{position: 'absolute'}}/> : 
-        <IconButton name="star-o" onPress={()=>{this.props.set_fav(league_id)}} style={{position: 'absolute'}}/> ;
+        <IconButton name="star" onPress={()=>{this.props.set_fav(league_id)}} color={color} /> :
+        <IconButton name="star-o" onPress={()=>{this.props.set_fav(league_id)}} color={color}/> ;
     }
     return fav_icon;
   }
-  setHidden(title){
-    if(this.props.favorite==undefined && this.props.set_fav==undefined){
+  setHidden(id){
+    if(this.props.favorite==undefined || this.props.set_fav==undefined){
       return ;
     }
     this.state.header_to_hide = [];
     for(let i=0;i<this.list.length;i++){
-      const title = this.list[i]["title"] ;
-      const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : 0 ;
+      //const id = this.list[i]["id"] ;
+      const league_id =  id ? id : this.list[i]["id"] ;
+      if(league_id==undefined || league_id==0){
+        continue;
+      }
       if(this.props.favorite.includes(league_id) == false){
-        this.state.header_to_hide.push(title);
+        this.state.header_to_hide.push(league_id);
       }
     }
   }
   render_list() {
+    
     let is_new = JSON.stringify(this.list) == JSON.stringify(this.props.list) ? false : true;
     this.list = this.props.list;
     let col_key = this.props.key_ ;
@@ -139,7 +144,7 @@ class ItemsList extends React.Component {
             sections={this.list}
             keyExtractor={(item, index) => item[key]}
 
-            renderItem={({item}) => this.state.header_to_hide.includes(item.league) ? null : 
+            renderItem={({item}) => this.state.header_to_hide.includes(item.league_id) ? null : 
               <TouchableOpacity 
                 activeOpacity={0.5}
                 onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
@@ -162,13 +167,14 @@ class ItemsList extends React.Component {
               </TouchableOpacity>
             }
 
-            renderSectionHeader={({ section: { title,img } }) => {
-              const fav_icon = this.get_fav_icon(title);
+            renderSectionHeader={({ section: { title,img,id } }) => {
+              //console.log(title,img,id);
+              const fav_icon = this.get_fav_icon(title,id);
               
               return title ? (
               <View style={[{flex:1,paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap',},this.state.dynamic_style.header]}>
                 {this.props.onLeaguePressed ? 
-                  <IconButton name="list-ol" 
+                  <IconButton name="list-ol" color="#130f40"
                     size={this.state.dynamic_style.header.fontSize} 
                     onPress={() => {this.props.onLeaguePressed(title,img) }}/>
                 : null}
@@ -176,10 +182,10 @@ class ItemsList extends React.Component {
                   style={{flex:7}}
                   activeOpacity={0.9}
                   onPress={()=>{
-                    if(this.state.header_to_hide.includes(title)){
-                      this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=title)return x});
+                    if(this.state.header_to_hide.includes(id)){
+                      this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id)return x});
                     }else{
-                      this.state.header_to_hide.push(title);
+                      this.state.header_to_hide.push(id);
                     }
                     this.setState({});
                     }}
@@ -191,7 +197,7 @@ class ItemsList extends React.Component {
                 { img ?  
                         <Image 
                           style={this.state.dynamic_style.matche_league_logo}
-                          source={{uri: API_.domain_o+img}}
+                          source={{uri: img.slice(0,8)=="https://" ? img :API_.domain_o+img}}
                           />
                   : null}
                 </View>

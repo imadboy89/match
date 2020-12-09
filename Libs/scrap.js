@@ -17,6 +17,204 @@ class Scrap {
     //body = body.replace("<p");
     return this.decodeEntities(body);
   }
+  parse_details(details){
+    details = details.split("~");
+    let details_dict = {};
+    for (let i=0;i<details.length;i++){
+      let el = details[i].trim();
+      el = el.split("|");
+      if(el.length==0){continue}
+
+      if(details_dict[el[0]] ==undefined){
+        details_dict[el[0]] = [el,];
+      }else{
+        details_dict[el[0]].push(el);
+        /*
+        if(typeof details_dict[el[0]][0] == "object"){
+          details_dict[el[0]].push(el);
+        }else{
+          details_dict[el[0]] = [details_dict[el[0]],el];
+        }*/
+      }
+    }
+    return details_dict;
+  }
+  get_matche_k(resp,date){
+    
+    let matche_dets = this.get_matches_k(resp,date,true);
+    const league_name = matche_dets && matche_dets.length==1 && matche_dets[0]["title"] ? matche_dets[0]["title"] :"";
+    let match_details = matche_dets && matche_dets.length==1 && matche_dets[0]["data"] && matche_dets[0]["data"].length==1 ? matche_dets[0]["data"][0] : false;
+    if(match_details==false){return [];}
+    let details_dict = this.parse_details(match_details['details']);
+    let home_players_events_dict = this.parse_details(match_details['home_scorers']);
+    let away_players_events_dict = this.parse_details(match_details['away_scorers']);
+    /// chanels
+    if(details_dict["l"] && details_dict["l"].length>0){
+      let channels = [];
+      for(let i=0; i<details_dict["l"].length;i++){
+        channels.push({id:details_dict["l"][i][1] , en_name:details_dict["l"][i][2] });
+      }
+      match_details["channels"] = channels
+    }
+    /// staduim
+    if(details_dict["a"] && details_dict["a"].length>0){
+      match_details["stadium"] = details_dict["a"][0] && details_dict["a"][0].length >=3 ? details_dict["a"][0][3] : "";
+    }
+    // league name
+    match_details["league"] = league_name;
+    // scorers
+    let scorers = [];
+    const goal_keys = ["p","g","o"] ;
+    for(let k=0;k<goal_keys.length;k++){
+      const key_ = goal_keys[k];
+      if(home_players_events_dict[key_] && home_players_events_dict[key_].length>0){
+        for(let i=0;i< home_players_events_dict[key_].length;i++){
+          let scorer = {"home_scorer":"","home_assist":"","away_scorer":"","away_assist":"","time":""};
+          scorer["home_scorer"] = home_players_events_dict[key_][i][3];
+          scorer["time"] = home_players_events_dict[key_][i][1];
+          scorers.push(scorer);
+        }
+      }
+      if(away_players_events_dict[key_] && away_players_events_dict[key_].length>0){
+        for(let i=0;i< away_players_events_dict[key_].length;i++){
+          let scorer = {"home_scorer":"","home_assist":"","away_scorer":"","away_assist":"","time":""};
+          scorer["away_scorer"] = away_players_events_dict[key_][i][3];
+          scorer["time"] = away_players_events_dict[key_][i][1];
+          scorers.push(scorer);
+        }
+      }
+    }
+    match_details["goal_scorer"] = scorers;
+    return match_details;
+  }
+  get_matches_k(html,date,is_oneMatch=false){
+    let json_={"matches_comps":[],"matches_list":[]};
+    try{
+      json_ = JSON.parse(html);
+    }catch(err){console.log(err);}
+    const date_str = date ? API_.get_date2(date): false;
+    //parse matches_comps
+    const blacklisted_comps = is_oneMatch ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب"," الثاني","تحت ","شمال","الثالث"," A ", " B "]
+    const blacklisted_countries = is_oneMatch ? [] :  ["SA","BH","KW","IQ","PS","TR","ND","AR","BR","CO","JO","SS","VN"];
+    let compititions = {};
+    let compitition = {"country":""};
+    const comp_header = ["divider","league_id","comp_name","comp_logo","comp_id_news","options"];
+    const MIN_ALLOWED_OPTIONS = is_oneMatch ? 1 : 3;
+    let k = 0;
+    for(let i=0;i< json_["matches_comps"].length;i++){
+      compitition[ comp_header[k] ] = json_["matches_comps"][i];
+      if(comp_header[k]=="comp_logo" && compitition[ comp_header[k] ].length<=3){
+        compitition[ "country" ] = compitition[ comp_header[k] ];
+        compitition[ comp_header[k] ] = "//o.kooora.com/f/"+compitition[ comp_header[k] ]+".png";
+      }
+      //o.kooora.com/f/QA.png
+      k++;
+      if(comp_header.length==k){
+        let is_allowed = true;
+        for(let x=0;x<blacklisted_comps.length;x++){
+          if(compitition["comp_name"].toLocaleLowerCase().indexOf(blacklisted_comps[x].toLocaleLowerCase())>=0){
+            is_allowed = false;
+          }
+        }
+        if(blacklisted_countries.includes(compitition["country"])){
+          is_allowed = false;
+        }
+        is_allowed = compitition["options"].length>=MIN_ALLOWED_OPTIONS ? is_allowed : false;
+        compitition["comp_name"] = compitition["comp_name"].replace("القسم الأول","").replace("إنوي","").replace("الدرجة الاولى","").replace("الممتاز","").replace("الإحترافية","").replace("القسم الثاني","2").replace("الدرجة الأولى","1").trim();
+        compitition["comp_name"] = compitition["comp_name"].replace("-","").trim();
+        if((compitition["comp_name"].indexOf("الأوروبي")>=0 || compitition["comp_name"].indexOf("أوروبا"))>=0 && compitition["country"]==""){
+          compitition["country"]="EURO";
+        }
+        if(is_allowed || "MA"==compitition["country"]){
+          compititions[compitition["league_id"]] = compitition;
+        }
+        //console.log(compitition);
+        compitition = {"country":""};
+        k=0;
+      }
+    }
+    // parse matches_list
+    const mat_header = ["league_id",
+"com_id_page",
+"id_1",
+"id",
+"datetime",
+"inf_1",
+"time",
+"home_team_id",
+"home_team_status",
+"home_team",
+"home_scorers",
+"score",
+"away_team_id",
+"home_team_status",
+"away_team",
+"away_scorers",
+"inf_7",
+"inf_8",
+"inf_9",
+"details"]
+
+    let matches = {};
+    let matche = {};
+    let j = 0;
+    let is_ok = true;
+    let live = 0;
+    for(let f=0;f< json_["matches_list"].length;f++){
+      matche[ mat_header[j] ] = json_["matches_list"][f].trim ? json_["matches_list"][f].trim() : json_["matches_list"][f];
+      matche[ mat_header[j] ] = this.decodeEntities(matche[ mat_header[j] ]);
+      if(mat_header[j]=="time"){
+        
+        //is_ok = matche[ mat_header[j] ].indexOf("$f")>=0 ? false : true;
+        live = matche[ mat_header[j] ].indexOf("@")>=0 ? 1 : 0;
+        matche[ mat_header[j] ] = matche[ mat_header[j] ].replace(/[^0-9\:]/g,"");
+        matche[ mat_header[j] ] = matche[ mat_header[j] ].slice(0,5)//API_.convert_time(matche[ mat_header[j] ].slice(0,5),+1);
+        try{
+          matche.datetime = API_.get_date_time(new Date(matche.datetime*1000));
+          matche[ "date" ]= matche.datetime.split(" ")[0];
+          matche[ "time" ]= matche.datetime.split(" ")[1];
+          //matche[ "time" ]= API_.convert_time(matche[ "time" ],+1);
+          if(date_str && date_str != matche[ "date" ]){
+            is_ok = false;
+          }
+          const time_playerd = live ? API_.convert_time_spent(matche.date + " "+matche.time) : "";
+          if(live==1 && time_playerd>0){
+            matche["time_played"] = time_playerd;
+            matche["live"] = live;
+          }
+
+        }catch(err){console.log("Error",err)}
+      }
+      if( ["home_team","away_team"].includes(mat_header[j]) ){
+        matche[ mat_header[j] ] = matche[ mat_header[j] ].split("-")[0].trim();
+      }
+
+      //if(f==300)break;
+      j++;
+      if(mat_header.length==j){
+        const comp_match = compititions[matche["league_id"]] ;
+        if(comp_match!=undefined && (is_ok || comp_match["country"]=="MA") ){
+          let league = {"title": comp_match["comp_name"].trim(), "id":matche["league_id"],"img":comp_match["comp_logo"].replace("//","https://"), "data":[],"country":comp_match["country"]};
+          if(matches[ matche["league_id"] ]==undefined){
+            matches[ matche["league_id"] ] = league;
+          }
+          const score = matche["score"].split("|");
+          matche["home_team_score"] = score && score.length ==2 ? score[0] : "-";
+          matche["away_team_score"] = score && score.length ==2 ? score[1] : "-";
+          matches[ matche["league_id"] ]["data"].push(matche);
+        }
+        is_ok = true;
+        live = 0;
+        matche = {};
+        j=0;
+      }
+    }
+    matches = Object.values(matches) ;
+    const periority_cc= ["NL","ES","IT","EN","MA","EURO"];
+    matches = matches.sort((a,b)=>{return periority_cc.indexOf(a["country"]) > periority_cc.indexOf(b["country"])? -1 : 1;});
+    //matches = matches.sort((a,b)=>{return a["country"]=="MA"? -1 : 1;});
+    return matches;
+  }
   get_news(html){
     let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
     let m = html.match(patttern);
@@ -79,7 +277,6 @@ class Scrap {
           video["img"] = m[3].trim().split(" ")[0]; 
         }
       }
-      //console.log(alinks[i].querySelect('img').getAttribute("_nsMap-src")); 
       videos.push(video);
     }
     return videos;

@@ -155,7 +155,7 @@ var Themes = {
       article_photo_background : "#ced6e0",
 
       match_lineup2_color : "#2f3542",
-      match_lineup2_number_color : "#f1c40f",
+      match_lineup2_number_color : "#f37305",
       match_linup_team_backgroundColor:"#dae6fd",
       match_linup_team__backgroundColor:"#97d1f9",
       match_stats_color : "#2f3542",
@@ -322,7 +322,7 @@ function generateTheme(theme_name=false){
       borderRadius: 10,
     },
     news_img_v:{
-      flex: 11 ,
+      flex: 10 ,
       width:"100%",
       color:"#fff",
       alignItems:'center',
@@ -607,7 +607,7 @@ function generateTheme(theme_name=false){
       color : theme.match_lineup2_number_color,
     },
     lineup2_number_subs:{
-      width:20,
+      width:35,
       //marginHorizontal:3,
       textAlign: 'center',
       color : theme.live_borderColor,
@@ -863,7 +863,7 @@ function generateTheme(theme_name=false){
         }
   }
 
-  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles,styles_league};
+  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles,styles_league,theme};
 }
 var themes = generateTheme("dark blue");
 var styles_list    = themes["styles_list"];
@@ -874,8 +874,9 @@ var styles_channel = themes["styles_channel"];
 var styles_match   = themes["styles_match"];
 var app_styles     = themes["app_styles"];
 var styles_league  = themes["styles_league"];
+var global_theme   = themes["theme"];
 
-export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league};
+export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme};
 
 
 

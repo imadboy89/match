@@ -117,9 +117,9 @@ class LeagueScreen extends React.Component {
       standing_ = standing_.concat( row.map(row=>{
         const team_name = row && row.team_name ? row.team_name : "";
         const team_badge= row && row.team_badge ? row.team_badge : "";
-        const position  = row && row.overall_league_position ? row.overall_league_position : "";
-        const points    = row && row.overall_league_PTS ? row.overall_league_PTS : "";
-        const played    = row && row.overall_league_payed ? row.overall_league_payed : "";
+        const position  = row && row.overall_league_position ? row.overall_league_position : "0";
+        const points    = row && row.overall_league_PTS ? row.overall_league_PTS : "0";
+        const played    = row && row.overall_league_payed ? row.overall_league_payed : "0";
         return <View style={this.state.dynamic_style.team_view}>
           <View style={{flex:1,padding:2}} >
             <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} />

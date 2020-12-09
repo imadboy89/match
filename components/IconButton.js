@@ -17,15 +17,13 @@ class IconButton extends React.Component {
                 disabled={this.props.disabled ? this.props.disabled : false}
                 activeOpacity={this.props.activeOpacity ? this.props.activeOpacity : 0.5}
                 onPress={this.props.onPress}
-                style={[this.props.style,{padding:10,}]}
+                style={[this.props.style,{paddingHorizontal:5,paddingVertical:10,justifyContent:"center"}]}
                 >
-              <View style={{}} >
                 <Icon 
                     name={this.props.name!=undefined?this.props.name:"rocket"} 
                     size={this.props.size!=undefined?this.props.size:28} 
                     color={this.props.color!=undefined?this.props.color:"#5abfd8"}
                      />
-              </View>
             </TouchableOpacity>
         );
     }

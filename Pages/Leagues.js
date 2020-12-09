@@ -52,18 +52,20 @@ class LeaguesScreen extends React.Component {
   
 get_leagues(){
   API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
-    const leagues = API_.leagues_dict;
-    if(leagues==undefined || leagues==null){
-      return null;
-    }
-    let data = Object.keys(leagues).map(k =>{
-      let row = leagues[k];
-      let img = row && row.logo ? row.logo : false;
-      let league_name = row.ar_league_name ? row.ar_league_name : row.league;
-      return {"img": API_.domain_o+img,"league_name":league_name , id:row.league_id}; 
+    API_.load_leagues().then(leagues_dict=>{
+      if(leagues_dict==undefined || leagues_dict==null){
+        return null;
+      }
+      let data = Object.keys(leagues_dict).map(k =>{
+        let row = leagues_dict[k];
+        let img = row && row.logo ? row.logo : false;
+        let league_name = row.ar_league_name ? row.ar_league_name : row.league;
+        return {"img": API_.domain_o+img,"league_name":league_name , id:row.league_id}; 
+      });
+      data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
+      this.setState({loading:false,leagues:data,favorite:favorite});
+
     });
-    data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
-    this.setState({loading:false,leagues:data,favorite:favorite});
   });
 
 }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl } from 'react-native';
+import { Text, View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl, Picker } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -25,9 +25,9 @@ class HomeScreen extends React.Component {
         dynamic_style:styles_home,
         notifications_matches:{},
         favorite:[],
+        source_id:0,
         //dynamic_style_list:styles_list,
     };
-  API_.load_leagues();
   this.get_matches(this.state.matches_date);
   
   const customUpdater = new ExpoCustomUpdater()
@@ -66,6 +66,12 @@ class HomeScreen extends React.Component {
   componentWillUnmount(){
     clearInterval(this.interval_refresh);
   }
+  changesource = (itemValue, itemIndex)=>{
+    this.state.source_id = itemIndex;
+    this.setState({});
+    this.get_matches();
+
+  }
   componentDidMount(){
     getTheme("styles_home").then(theme=>this.setState({dynamic_style:theme}));
     this.props.navigation.setOptions({
@@ -94,37 +100,68 @@ class HomeScreen extends React.Component {
     if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
       this.get_matches();
     }
-    }, 20000);
+    }, 40000);
 
   }
   get_matches = (date_obj=null)=>{
+    if(this.state.source_id==1){
+      return this.get_matches_koora(date_obj);
+    }
     date_obj = date_obj==null ? this.state.matches_date :date_obj; 
     this.setState({loading:true});
     API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
       get_notifications_matches().then(_notifications_matches=>{
-        API_.get_matches(date_obj).then(resp=>{
-          let data = [];
-          console.log("get_matches",resp["status"]);
-        if(resp && resp["status"]=="true"){
-          let list = [];
-          data = Object.keys(resp["data"]).map(k =>{
-            let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
-                      ? resp["data"][k][0]["league_badge"]["path"] : false;
-            for(let i=0;i<resp["data"][k].length;i++){
-              resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
-              if(resp["data"][k][i].live){
-                resp["data"][k][i].time_played = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time);
+        API_.load_leagues().then(leagues_dict=>{
+          API_.get_matches(date_obj).then(resp=>{
+            let data = [];
+          if(resp && resp["status"]=="true"){
+            let list = [];
+            data = Object.keys(resp["data"]).map(k =>{
+
+              let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
+                        ? resp["data"][k][0]["league_badge"]["path"] : false;
+              let league_id=0; 
+              try{league_id= leagues_dict && leagues_dict[k]? leagues_dict[k].league_id :0;}catch(e){console.log(e);}
+              for(let i=0;i<resp["data"][k].length;i++){
+                resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
+                resp["data"][k][i].league_id = league_id
+                if(resp["data"][k][i].live){
+                  const played_time = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time) ;
+                  resp["data"][k][i].time_played = played_time ? played_time : "";
+                  if(played_time==false){
+                    resp["data"][k][i].live = 0;
+                  }
+                }
               }
-            }
-            let id=0;
-            try{id=API_ && API_.leagues_dict && API_.leagues_dict[k]? API_.leagues_dict[k].league_id :0;}catch(e){console.log(e);}
-            return {"title":k,"img":img, data:resp["data"][k],"id":id}; 
-          });
-          try{
-            data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
-          }catch(e){console.log(e);}
-        }
-        this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+              return {"title":k,"img":img, data:resp["data"][k],"id":league_id}; 
+            });
+            try{
+              data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
+            }catch(e){console.log(e);}
+          }
+          this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+        });
+        });
+    });
+  });
+}
+  get_matches_koora = (date_obj=null)=>{
+    date_obj = date_obj==null ? this.state.matches_date :date_obj; 
+    this.setState({loading:true});
+    API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
+      get_notifications_matches().then(_notifications_matches=>{
+        API_.load_leagues().then(leagues_dict=>{
+          API_.get_matches_k(date_obj).then(resp=>{
+            //console.log(Object.values(resp) )
+            let data = resp && resp.length>0 ? resp : [];
+            try{
+              data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
+            }catch(e){console.log(e);}
+            try{
+              //data = data.sort((a,b)=>{return (leagues_dict(a.title)>leagues_dict(b.title))?-1:1;});
+            }catch(e){console.log(e);}
+          this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+        });
       });
     });
   });
@@ -202,7 +239,14 @@ show_DateP(){
             this.setState({list:[],loading:true});
             this.get_matches(this.state.matches_date);
           }}  />
-
+          <Picker
+              selectedValue={this.state.source_id}
+              style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+              onValueChange={this.changesource}
+            >
+              <Picker.Item label="AL match" value="0" />
+              <Picker.Item label="Kooora" value="1" />
+          </Picker>
         </View>
 
         

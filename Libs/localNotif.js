@@ -37,7 +37,7 @@ const  onMatch_LongPressed=async(item)=>{
       is_exist = saved_notifs[i] ;
     }
   }
-  action = await AsyncAlert(content.title+"\nAdd/Remove Notification","Reminder",is_exist==false)
+  action = await AsyncAlert(content.title+"\nAdd/Remove Notification : "+API_.get_date_time(trigger),"Reminder",is_exist==false)
 
   if(action==1){
     return save(item);

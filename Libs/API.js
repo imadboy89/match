@@ -152,22 +152,24 @@ class API {
   }
 
   convert_time_spent(datetime_start){
+    //console.log(datetime_start);
     const now = new Date();
     const time_start= this.convert_time_o(datetime_start);
     let diff = ( now.getTime()-time_start.getTime() )/60000;
     diff = parseInt(diff);
     diff = diff>45 && diff <=60 ? "Half" : (diff>45+15 ? diff-15 :diff);
+    const isok = diff>130 ? false : true;
     diff = diff >0 && diff<=99 ? diff : ( diff>0 ? 90 : diff);
-    return diff;
+    return isok ? diff : false;
   }
   convert_time_o(datetime_str,seconds=false){
     const datetime_obj= new Date(datetime_str.replace(" ","T")+":00.000+01:00");
     return seconds==true ? datetime_obj.getTime() : datetime_obj;
   }
-  convert_time(time, timeZone) {
+  convert_time(time, time_add=-1) {
     
     try{
-      let h = "0"+(parseInt(time.split(":")[0])-1);
+      let h = "0"+(parseInt(time.split(":")[0])+time_add);
       return h.slice(-2)+":"+time.split(":")[1];
     }catch(e){
       return time;
@@ -261,13 +263,14 @@ class API {
     if(Object.keys( leagues["data"] ).length>0 && is_expired==false){
       console.log("leagues cache");
       this.leagues_dict = leagues["data"];
-      return true;
+      return this.leagues_dict;
     }
-    this.get_leagues(1)
+    return this.get_leagues(1)
       .then(o=>{
         if( Object.keys( this.leagues_dict ).length >0){
           this.leagues = {"date":(new Date()).getTime(),data:this.leagues_dict};
           AsyncStorage.setItem('leagues', JSON.stringify(this.leagues) );
+          return this.leagues_dict;
         }
 
         });
@@ -296,6 +299,25 @@ class API {
         console.log('ERROR', error);
         this.error = error;
       });
+  }
+
+  get_matches_k(date_obj){
+    console.log("https://www.kooora.com/?region=-1&area=0&dd="+date_obj.getDate()+"&mm="+(date_obj.getMonth()+1)+"&yy="+date_obj.getFullYear()+"&arabic&ajax=1","GET");
+    return this.http("https://www.kooora.com/?region=-1&area=0&dd="+date_obj.getDate()+"&mm="+(date_obj.getMonth()+1)+"&yy="+date_obj.getFullYear()+"&arabic&ajax=1","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_matches_k(resp,date_obj);
+    });
+  }
+  get_match_k(id){
+    //https://www.kooora.com/?m=2469218&ajax=true
+    return this.http("https://www.kooora.com/?ajax=1&m="+id+"&arabic","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_matche_k(resp,false,true);
+    });
   }
   get_matches(date_obj=null, page=1){
     if(this.headers["device-token"]==""){
