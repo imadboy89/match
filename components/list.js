@@ -98,9 +98,7 @@ class ItemsList extends React.Component {
     const color = is_leagues ? global_theme.text_color_default : global_theme.background_color_default;
     let fav_icon = null;
     if(this.props.favorite && this.props.set_fav){
-      const league_id_ =  API_.leagueId_byTitle(title);
-      
-      league_id = league_id_>0 ? league_id_ : league_id;
+      league_id = API_.leagueId_byTitle(title,league_id);
       
       fav_icon = this.props.favorite.includes(league_id) ?
         <IconButton name="star" onPress={()=>{this.props.set_fav(league_id)}} color={color} /> :
@@ -116,8 +114,7 @@ class ItemsList extends React.Component {
     for(let i=0;i<this.list.length;i++){
       //const id = this.list[i]["id"] ;
       let league_id =  id ? id : this.list[i]["id"] ;
-      const league_id_ = API_.leagueId_byTitle(this.list[i]["title"]);
-      league_id = league_id_>0 ? league_id_ : league_id;
+      league_id = API_.leagueId_byTitle(this.list[i]["title"],league_id);
       if(league_id==undefined || league_id==0){
         continue;
       }
@@ -188,6 +185,7 @@ class ItemsList extends React.Component {
                   activeOpacity={0.9}
                   onPress={()=>{
                     //id = API_.leagueId_byTitle(title)>0 ? API_.leagueId_byTitle(title) : id;
+                    id = API_.leagueId_byTitle(title,id);
                     if(this.state.header_to_hide.includes(id)){
                       this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id)return x});
                     }else{
