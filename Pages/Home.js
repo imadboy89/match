@@ -67,10 +67,9 @@ class HomeScreen extends React.Component {
     clearInterval(this.interval_refresh);
   }
   changesource = (itemValue, itemIndex)=>{
-    this.state.source_id = itemIndex;
+    this.state.source_id = parseInt(itemValue);
     this.setState({});
     this.get_matches();
-
   }
   componentDidMount(){
     getTheme("styles_home").then(theme=>this.setState({dynamic_style:theme}));
@@ -208,7 +207,8 @@ show_DateP(){
 }
 
   onLeaguePressed = (league_name, league_img)=>{
-    this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:API_.domain_o+league_img} });
+    league_img = ["https:/","http://"].includes(league_img.slice(0,7)) ? league_img : API_.domain_o+league_img;
+    this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:league_img} });
   }
   onMatch_clicked =(item)=>{
     this.props.navigation.navigate('Match', { match_item: item });
@@ -244,8 +244,8 @@ show_DateP(){
               style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
               onValueChange={this.changesource}
             >
-              <Picker.Item label="AL match" value="0" />
-              <Picker.Item label="Kooora" value="1" />
+              <Picker.Item label="AL match" value={0} />
+              <Picker.Item label="Kooora" value={1} />
           </Picker>
         </View>
 

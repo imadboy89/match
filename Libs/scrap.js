@@ -160,7 +160,7 @@ class Scrap {
     }catch(err){console.log(err);}
     const date_str = date ? API_.get_date2(date): false;
     //parse matches_comps
-    const blacklisted_comps = is_oneMatch ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب"," الثاني","تحت ","شمال","الثالث"," A ", " B "]
+    const blacklisted_comps = is_oneMatch ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب"," الثاني","تحت ","شمال","الثالث"," A ", " B ", " C "," D ","الدرجة D","الدرجة C","الدرجة B",]
     const blacklisted_countries = is_oneMatch ? [] :  ["SA","BH","KW","IQ","PS","TR","ND","AR","BR","CO","JO","SS","VN"];
     let compititions = {};
     let compitition = {"country":""};
@@ -186,7 +186,7 @@ class Scrap {
           is_allowed = false;
         }
         is_allowed = compitition["options"].length>=MIN_ALLOWED_OPTIONS ? is_allowed : false;
-        compitition["comp_name"] = compitition["comp_name"].replace("القسم الأول","").replace("إنوي","").replace("الدرجة الاولى","").replace("الممتاز","").replace("الإحترافية","").replace("القسم الثاني","2").replace("الدرجة الأولى","1").trim();
+        compitition["comp_name"] = compitition["comp_name"].replace("القسم الأول","").replace("إنوي","").replace("الدرجة الاولى","").replace("الممتاز","").replace("الإحترافية","").replace("القسم الثاني","2").replace("الدرجة الأولى","").replace("الدرجة A","").replace("البطولة المغربية","الدوري المغربي").trim();
         compitition["comp_name"] = compitition["comp_name"].replace("-","").trim();
         if((compitition["comp_name"].indexOf("الأوروبي")>=0 || compitition["comp_name"].indexOf("أوروبا"))>=0 && compitition["country"]==""){
           compitition["country"]="EURO";

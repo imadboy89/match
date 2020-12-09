@@ -34,6 +34,13 @@ class API {
     //this.set_token();
 
   }
+  leagueId_byTitle(title){
+    title= typeof title == "string" ? title.trim() : title;
+    title= typeof title == "string" ? title.replace(/أ/g,"ا") : title;
+    title= typeof title == "string" ? title.replace(/إ/g,"ا") : title;
+    const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : 0 ;
+    return parseInt(league_id);
+  }
   get_news(page){
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
     return this.http("https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,"GET",null,{})

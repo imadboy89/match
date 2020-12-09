@@ -98,8 +98,11 @@ class ItemsList extends React.Component {
     const color = is_leagues ? global_theme.text_color_default : global_theme.background_color_default;
     let fav_icon = null;
     if(this.props.favorite && this.props.set_fav){
-      //const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : 0 ;
-      fav_icon = this.props.favorite.includes(league_id) ? 
+      const league_id_ =  API_.leagueId_byTitle(title);
+      
+      league_id = league_id_>0 ? league_id_ : league_id;
+      
+      fav_icon = this.props.favorite.includes(league_id) ?
         <IconButton name="star" onPress={()=>{this.props.set_fav(league_id)}} color={color} /> :
         <IconButton name="star-o" onPress={()=>{this.props.set_fav(league_id)}} color={color}/> ;
     }
@@ -112,12 +115,16 @@ class ItemsList extends React.Component {
     this.state.header_to_hide = [];
     for(let i=0;i<this.list.length;i++){
       //const id = this.list[i]["id"] ;
-      const league_id =  id ? id : this.list[i]["id"] ;
+      let league_id =  id ? id : this.list[i]["id"] ;
+      const league_id_ = API_.leagueId_byTitle(this.list[i]["title"]);
+      league_id = league_id_>0 ? league_id_ : league_id;
       if(league_id==undefined || league_id==0){
         continue;
       }
       if(this.props.favorite.includes(league_id) == false){
         this.state.header_to_hide.push(league_id);
+      }else{
+        
       }
     }
   }
@@ -182,6 +189,7 @@ class ItemsList extends React.Component {
                   style={{flex:7}}
                   activeOpacity={0.9}
                   onPress={()=>{
+                    //id = API_.leagueId_byTitle(title)>0 ? API_.leagueId_byTitle(title) : id;
                     if(this.state.header_to_hide.includes(id)){
                       this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id)return x});
                     }else{
