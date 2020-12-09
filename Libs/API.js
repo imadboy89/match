@@ -34,11 +34,12 @@ class API {
     //this.set_token();
 
   }
-  leagueId_byTitle(title){
+  leagueId_byTitle(title,default_id){
+    default_id = default_id==undefined ? 0 : default_id ;
     title= typeof title == "string" ? title.trim() : title;
     title= typeof title == "string" ? title.replace(/أ/g,"ا") : title;
     title= typeof title == "string" ? title.replace(/إ/g,"ا") : title;
-    const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : 0 ;
+    const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : default_id ;
     return parseInt(league_id);
   }
   get_news(page){

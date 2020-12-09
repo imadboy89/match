@@ -123,8 +123,6 @@ class ItemsList extends React.Component {
       }
       if(this.props.favorite.includes(league_id) == false){
         this.state.header_to_hide.push(league_id);
-      }else{
-        
       }
     }
   }
@@ -151,7 +149,7 @@ class ItemsList extends React.Component {
             sections={this.list}
             keyExtractor={(item, index) => item[key]}
 
-            renderItem={({item}) => this.state.header_to_hide.includes(item.league_id) ? null : 
+            renderItem={({item}) => this.state.header_to_hide.includes(API_.leagueId_byTitle(item.league,item.league_id)) ? null : 
               <TouchableOpacity 
                 activeOpacity={0.5}
                 onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
