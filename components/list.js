@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {  View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground } from 'react-native';
-import { SafeAreaView,SectionList } from 'react-native';
+import { SafeAreaView,SectionList, FlatList } from 'react-native';
 import Loader from "./Loader";
 import {styles_list,getTheme,global_theme} from "./Themes";
 import IconButton from "../components/IconButton";
@@ -123,18 +123,68 @@ class ItemsList extends React.Component {
       }
     }
   }
+  _render_item=({item})=>{
+    if(this.state.header_to_hide.includes(API_.leagueId_byTitle(item.league,item.league_id)) ){return null}
+    return (<TouchableOpacity 
+      activeOpacity={0.5}
+      onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
+      <View style={{flexDirection:'row', flexWrap:'wrap'}}>
+        {this.get_item(item,this.props.key_)}
+      </View>
+    </TouchableOpacity>);
+  }
+
+  _render_header=({ section: { title,img,id } })=>{
+    //console.log(title,img,id);
+    const fav_icon = this.get_fav_icon(title,id);
+    if(title==undefined || title==""){
+      return null;
+    }
+    
+    return (
+      <View style={[{flex:1,paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap'},this.state.dynamic_style.header]}>
+        {this.props.onLeaguePressed ? 
+          <IconButton name="list-ol" color="#130f40"
+            size={this.state.dynamic_style.header.fontSize} 
+            onPress={() => {this.props.onLeaguePressed(title,img) }}/>
+        : null}
+        <TouchableOpacity
+          style={{flex:7}}
+          activeOpacity={0.9}
+          onPress={()=>{
+            //id = API_.leagueId_byTitle(title)>0 ? API_.leagueId_byTitle(title) : id;
+            id = API_.leagueId_byTitle(title,id);
+            if(this.state.header_to_hide.includes(id)){
+              this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id)return x});
+            }else{
+              this.state.header_to_hide.push(id);
+            }
+            this.setState({});
+            }}
+        >
+        <Text style={[this.state.dynamic_style.header,{flex:7}]} numberOfLines={1}>{title}</Text>
+        </TouchableOpacity>
+        {fav_icon}
+        <View style={{flex:1}}>
+        { img ?  
+                <Image 
+                  style={this.state.dynamic_style.matche_league_logo}
+                  source={{uri: img.slice(0,8)=="https://" ? img :API_.domain_o+img}}
+                  />
+          : null}
+        </View>
+      </View>);
+
+  }
   render_list() {
     
     let is_new = JSON.stringify(this.list) == JSON.stringify(this.props.list) ? false : true;
     this.list = this.props.list;
-    let col_key = this.props.key_ ;
-    let key = this.props.key_key ;
-    let onclick_hls = this.props.onclick_hls ;
-    let onclick_vid = this.props.onclick_vid ;
     if (this.list && this.list[0] && this.list[0]["title"]==undefined){
       this.list=[{"title":"",data:this.list}];
     }
-    
+    //this.list = this.list[0] ? this.list[0]["data"]: [];
+    console.log(this.list);
     if(is_new){
       this.setHidden();
     }
@@ -142,71 +192,14 @@ class ItemsList extends React.Component {
       <View style={this.state.dynamic_style.container}>
         <SafeAreaView style={this.state.dynamic_style.container}>
           <SectionList
+            stickySectionHeadersEnabled={false}
+            onEndReached = {this.props.onEndReached}
             refreshControl={this.props.refreshControl}
             sections={this.list}
-            keyExtractor={(item, index) => item[key]}
-
-            renderItem={({item}) => this.state.header_to_hide.includes(API_.leagueId_byTitle(item.league,item.league_id)) ? null : 
-              <TouchableOpacity 
-                activeOpacity={0.5}
-                onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
-                <View style={{flexDirection:'row', flexWrap:'wrap'}}>
-                {this.get_item(item,col_key)}
-
-              {onclick_hls && <Button
-                    title="HSL"
-                    onPress={()=>{ onclick_hls(item);}}
-                  ></Button>
-              }
-              {onclick_vid && 
-                <Button
-                style={{}}
-                    title="Vid"
-                    onPress={()=>{ onclick_vid(item);}}
-                  ></Button>
-              }
-                  </View>
-              </TouchableOpacity>
-            }
-
-            renderSectionHeader={({ section: { title,img,id } }) => {
-              //console.log(title,img,id);
-              const fav_icon = this.get_fav_icon(title,id);
-              
-              return title ? (
-              <View style={[{flex:1,paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap',},this.state.dynamic_style.header]}>
-                {this.props.onLeaguePressed ? 
-                  <IconButton name="list-ol" color="#130f40"
-                    size={this.state.dynamic_style.header.fontSize} 
-                    onPress={() => {this.props.onLeaguePressed(title,img) }}/>
-                : null}
-                <TouchableOpacity
-                  style={{flex:7}}
-                  activeOpacity={0.9}
-                  onPress={()=>{
-                    //id = API_.leagueId_byTitle(title)>0 ? API_.leagueId_byTitle(title) : id;
-                    id = API_.leagueId_byTitle(title,id);
-                    if(this.state.header_to_hide.includes(id)){
-                      this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id)return x});
-                    }else{
-                      this.state.header_to_hide.push(id);
-                    }
-                    this.setState({});
-                    }}
-                >
-                <Text style={[this.state.dynamic_style.header,{flex:7}]} numberOfLines={1}>{title}</Text>
-                </TouchableOpacity>
-                {fav_icon}
-                <View style={{flex:1}}>
-                { img ?  
-                        <Image 
-                          style={this.state.dynamic_style.matche_league_logo}
-                          source={{uri: img.slice(0,8)=="https://" ? img :API_.domain_o+img}}
-                          />
-                  : null}
-                </View>
-              </View>
-          ) : null}}
+            data={this.list}
+            keyExtractor={(item, index) => item[this.props.key_key]}
+            renderItem={this._render_item}
+            renderSectionHeader={this._render_header}
           
           />
         </SafeAreaView>

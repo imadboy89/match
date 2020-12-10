@@ -20,7 +20,9 @@ class CategoriesScreen extends React.Component {
         key_:"category_name",
         key_key:"category_id",
         loading:true,
+        page:1,
     };
+    this.end = false;
     this.get_cats(1);
   }
   componentDidMount(){
@@ -37,15 +39,16 @@ class CategoriesScreen extends React.Component {
     this.props.navigation.navigate('channels',{category_id:category.category_id,category_name: category.category_name});
   }
   get_cats(page=1){
+    if(this.end==true){return false;}
     API_.get_categories(page).then(resp=>{
       if(resp["data"].length>0){
         let list = [];
         let data = resp["data"];
         data = page==1 ? data : this.state.list .concat(data);
-        this.setState({list:data, key_:"category_name",key_key:"category_id"});
-        this.get_cats(page+1);
+        this.setState({list:data, key_:"category_name",key_key:"category_id",loading:false});
+        //this.get_cats(page+1);
       }else{
-        this.setState({loading:false});
+        this.end=true;
       }
     });
 
@@ -64,14 +67,16 @@ class CategoriesScreen extends React.Component {
           list={this.state.list} 
           onclick={this.onchannel_clicked} 
           key_={this.state.key_} key_key={this.state.key_key}
-          />
+          onEndReached={(info: {distanceFromEnd: number})=>{
+            this.state.page = this.state.page+1;
+            this.get_cats(this.state.page);
+            }}
+          /> 
       </View>
     );
   }
 }
-styles = {};
-function Styles(){
-  styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -86,6 +91,4 @@ function Styles(){
     color : "#fff",
   },
 });
-}
-
 export default CategoriesScreen;
