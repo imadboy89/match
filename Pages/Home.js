@@ -8,7 +8,9 @@ import * as Font from 'expo-font';
 import {styles_home,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
 import Loader from "../components/Loader";
-import * as Updates from 'expo-updates'
+import * as Updates from 'expo-updates';
+import { AppLoading } from 'expo';
+
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 
 class HomeScreen extends React.Component {
@@ -22,10 +24,10 @@ class HomeScreen extends React.Component {
         loading :true,
         loading_fonts:false,
         update_available:false,
-        dynamic_style:styles_home,
+        dynamic_style:false,
         notifications_matches:{},
         favorite:[],
-        source_id:0,
+        source_id:1,
         //dynamic_style_list:styles_list,
     };
   this.get_matches(this.state.matches_date);
@@ -43,6 +45,9 @@ class HomeScreen extends React.Component {
       )
     });
   });
+  }
+  refresh_list=()=>{
+    this.setState({list:JSON.parse(JSON.stringify(this.state.list))});
   }
   set_fav=(league_id)=>{
     API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{
@@ -72,28 +77,31 @@ class HomeScreen extends React.Component {
     this.get_matches();
   }
   componentDidMount(){
-    getTheme("styles_home").then(theme=>this.setState({dynamic_style:theme}));
-    this.props.navigation.setOptions({
-      "headerRight":()=>(
-        <View style={{flexDirection:"row",marginLeft:10}}>
-              {API_.isWeb==false ?null : 
-              <IconButton 
-                name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
-                this.get_matches(this.state.matches_date);
-                
-              }}  />
-              }
-              <IconButton 
-                name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{   
-                const next_ind = themes_list.indexOf(Global_theme_name)+1;
-                Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
-                API_.setConfig("theme",Global_theme_name).then(o=>{
-                  Updates.reloadAsync();
-                });              
-              }}  />
-              </View>
-      )
-    });
+    getTheme("styles_home").then(theme=>{
+      this.setState({dynamic_style:theme});
+      this.props.navigation.setOptions({
+        "headerRight":()=>(
+          <View style={{flexDirection:"row",marginLeft:10}}>
+                {API_.isWeb==false ?null : 
+                <IconButton 
+                  name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
+                  this.get_matches(this.state.matches_date);
+                  
+                }}  />
+                }
+                <IconButton 
+                  name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{   
+                  const next_ind = themes_list.indexOf(Global_theme_name)+1;
+                  Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
+                  API_.setConfig("theme",Global_theme_name).then(o=>{
+                    Updates.reloadAsync();
+                  });              
+                }}  />
+                </View>
+        )
+      });
+      });
+
 
   this.interval_refresh = setInterval(()=>{
     if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
@@ -214,7 +222,7 @@ show_DateP(){
     this.props.navigation.navigate('Match', { match_item: item });
   }
   render() {
-    if(this.state.dynamic_style==undefined ) {return null }
+    if(this.state.dynamic_style==undefined || this.state.dynamic_style===false) {return <AppLoading/>; }
     return (
       <View style={this.state.dynamic_style.container}>
         <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
@@ -253,7 +261,7 @@ show_DateP(){
         <ItemsList 
           favorite={this.state.favorite}
           set_fav={this.set_fav}
-          
+          refresh_list={this.refresh_list}
           refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={this.get_matches} />}
           loading={this.state.loading} 
           list={this.state.list} 

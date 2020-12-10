@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {  View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground } from 'react-native';
-import { SafeAreaView,SectionList, FlatList } from 'react-native';
+import {  View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground,ScrollView  } from 'react-native';
+import { SafeAreaView,SectionList, FlatList, Dimensions,TouchableHighlight } from 'react-native';
 import Loader from "./Loader";
 import {styles_list,getTheme,global_theme} from "./Themes";
 import IconButton from "../components/IconButton";
@@ -9,12 +9,27 @@ class ItemsList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      dynamic_style:styles_list,
+      dynamic_style:false,
       header_to_hide:[],
+      numColumns:1,
     }
+    this.minWidth = 300;
     this.list = [];
-    getTheme("styles_list").then(theme=>this.setState({dynamic_style:theme}));
+    this.check_width();
   }
+  componentDidMount=()=>{
+    getTheme("styles_list").then(theme=>this.setState({dynamic_style:theme}));
+    
+  }
+  check_width=()=>{
+    if(this.windowWidth == Dimensions.get('window').width){return ;}
+    this.windowWidth = Dimensions.get('window').width;
+    //this.setState({numColumns:this.windowWidth/500});
+    this.state.numColumns = parseInt(this.windowWidth/this.minWidth);
+    this.state.numColumns = this.state.numColumns>=1 ? this.state.numColumns : 1;
+    this.elem_width = parseInt(this.windowWidth/this.state.numColumns)-5;
+    return true;
+  } 
   get_item(item,col_key){
     if(col_key=="home_team"){
       const style_small = {}
@@ -126,9 +141,10 @@ class ItemsList extends React.Component {
   _render_item=({item})=>{
     if(this.state.header_to_hide.includes(API_.leagueId_byTitle(item.league,item.league_id)) ){return null}
     return (<TouchableOpacity 
+      style={{width:this.elem_width}}
       activeOpacity={0.5}
       onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
-      <View style={{flexDirection:'row', flexWrap:'wrap'}}>
+      <View style={{flexDirection:'row', flexWrap:'wrap',width:"100%",justifyContent: 'center',alignItems:"center",alignContent:"center"}}>
         {this.get_item(item,this.props.key_)}
       </View>
     </TouchableOpacity>);
@@ -142,30 +158,30 @@ class ItemsList extends React.Component {
     }
     
     return (
-      <View style={[{flex:1,paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap'},this.state.dynamic_style.header]}>
+      <View style={[{paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap'},this.state.dynamic_style.header]}>
         {this.props.onLeaguePressed ? 
           <IconButton name="list-ol" color="#130f40"
             size={this.state.dynamic_style.header.fontSize} 
             onPress={() => {this.props.onLeaguePressed(title,img) }}/>
         : null}
-        <TouchableOpacity
-          style={{flex:7}}
+        <TouchableHighlight
+          style={{flex:7}} 
           activeOpacity={0.9}
           onPress={()=>{
-            //id = API_.leagueId_byTitle(title)>0 ? API_.leagueId_byTitle(title) : id;
             id = API_.leagueId_byTitle(title,id);
             if(this.state.header_to_hide.includes(id)){
               this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id)return x});
             }else{
               this.state.header_to_hide.push(id);
             }
-            this.setState({});
+            this.props.refresh_list();
+            //this.setState({list:l});
             }}
         >
-        <Text style={[this.state.dynamic_style.header,{flex:7}]} numberOfLines={1}>{title}</Text>
-        </TouchableOpacity>
+        <Text style={[this.state.dynamic_style.header_components,{flex:1}]} numberOfLines={1}>{title}</Text>
+        </TouchableHighlight>
         {fav_icon}
-        <View style={{flex:1}}>
+        <View style={{flex:1,height:"100%"}}>
         { img ?  
                 <Image 
                   style={this.state.dynamic_style.matche_league_logo}
@@ -184,29 +200,71 @@ class ItemsList extends React.Component {
       this.list=[{"title":"",data:this.list}];
     }
     //this.list = this.list[0] ? this.list[0]["data"]: [];
-    console.log(this.list);
     if(is_new){
       this.setHidden();
     }
-    return (
-      <View style={this.state.dynamic_style.container}>
-        <SafeAreaView style={this.state.dynamic_style.container}>
-          <SectionList
-            stickySectionHeadersEnabled={false}
-            onEndReached = {this.props.onEndReached}
-            refreshControl={this.props.refreshControl}
-            sections={this.list}
-            data={this.list}
-            keyExtractor={(item, index) => item[this.props.key_key]}
-            renderItem={this._render_item}
-            renderSectionHeader={this._render_header}
-          
-          />
-        </SafeAreaView>
-      </View>
-    );
+    
+    if(this.list.length>0 && this.list[0]["title"]!=""){
+      const list_lists = this.list.map(k=>{
+      return (
+          <View style={{width:"100%"}}>
+            {this._render_header({section:k})}
+            <FlatList
+              numColumns={this.state.numColumns} 
+              stickySectionHeadersEnabled={false}
+              data={k.data}
+              keyExtractor={(item, index) => item[this.props.key_key]} 
+              renderItem={this._render_item}
+              renderSectionHeader={this._render_header}
+              columnWrapperStyle={this.state.numColumns>1  ?{justifyContent: 'flex-end'} : null}
+            
+            />
+          </View>);
+      });
+      return (
+        <ScrollView  style={this.state.dynamic_style.container}
+          refreshControl={this.props.refreshControl}
+          onEndReached = {this.props.onEndReached}
+            >
+          <SafeAreaView style={this.state.dynamic_style.item_container}>
+            {list_lists}
+          </SafeAreaView>
+        </ScrollView >);
+
+    }else {
+      let final_list = [];
+      for(let i=0;i<this.list.length;i++){
+        let header = JSON.parse(JSON.stringify(this.list[i])) ;
+        delete header["data"];
+        header["is_header"] = true;
+        //final_list = final_list.concat([header]);
+        final_list = final_list.concat(this.list[i] ? this.list[i]["data"]: []);
+      }
+      return (
+        <View style={this.state.dynamic_style.container}>
+          <SafeAreaView style={this.state.dynamic_style.container}>
+            <FlatList
+              numColumns={this.state.numColumns} 
+              stickySectionHeadersEnabled={false}
+              onEndReached = {this.props.onEndReached}
+              refreshControl={this.props.refreshControl}
+              data={final_list}
+              keyExtractor={(item, index) => item[this.props.key_key]} 
+              renderItem={this._render_item}
+              renderSectionHeader={this._render_header}
+              columnWrapperStyle={this.state.numColumns>1  ?{justifyContent: 'flex-end'} : null}
+            
+            />
+          </SafeAreaView>
+        </View>
+      );
+    }
+
   }
   render() {
+    if(this.check_width() || this.state.dynamic_style==false){
+      return null;
+    }
     return (<View style={this.state.dynamic_style.container}>
       {this.props.loading && this.props.refreshControl==undefined  ? <Loader/> : this.render_list()}
     </View>);

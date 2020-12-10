@@ -1,4 +1,4 @@
-import {  StyleSheet } from 'react-native';
+import {  StyleSheet} from 'react-native';
 import Constants from 'expo-constants';
 import API from '../Libs/API';
 
@@ -174,14 +174,17 @@ var themes_list = Object.keys(Themes);
 function generateTheme(theme_name=false){
   try{API_ = API_ ? API_ : {isWeb:false};
   }catch(err){API_ = {isWeb:false};}
-  
   theme_name = theme_name==false ? "light" :theme_name ;
   let theme = Themes[theme_name];
   var styles_list = {
     container: {
-    flex: 1,
-    width:"100%",
-    backgroundColor: theme.background_color_default,
+      flex: 1,
+      width:"100%",
+      backgroundColor: theme.background_color_default,
+    },
+    item_container: {
+      width:"100%",
+      backgroundColor: theme.background_color_default,
     },
     item: {
       padding: 10,
@@ -198,7 +201,21 @@ function generateTheme(theme_name=false){
       backgroundColor: theme.list_header_backgroundColor,
       width:"98%",
       textAlign:"right",
+      height:50,
       //height:40,
+      //alignContent:"center",
+      //alignItems:"center",
+      //alignSelf:"center",
+    },
+    header_components: {
+      marginRight:5,
+      marginLeft:5,
+      //marginTop:3,
+      fontSize: 20,
+      backgroundColor: theme.list_header_backgroundColor,
+      width:"98%",
+      textAlign:"right",
+      height:"100%",
       //alignContent:"center",
       //alignItems:"center",
       //alignSelf:"center",
@@ -313,13 +330,18 @@ function generateTheme(theme_name=false){
       justifyContent: 'center',
     },
     news_container:{
-      padding:5,
+      //padding:5,
+      
       marginTop:5,
       marginBottom:5,
       height:200,
-      width:"100%",
-      backgroundColor: "#00000005",//theme.news_cont_backgroundColor,
+      width:"99%",
+      //width:200,
+      //backgroundColor: "#00000005",//theme.news_cont_backgroundColor,
+      backgroundColor: "#fff",//theme.news_cont_backgroundColor,
       borderRadius: 10,
+      justifyContent: 'center',
+      
     },
     news_img_v:{
       flex: 10 ,

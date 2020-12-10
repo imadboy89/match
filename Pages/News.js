@@ -51,7 +51,7 @@ get_news =()=>{
           loading={this.state.loading} 
           list={this.state.list} 
           onclick={this.onItem_clicked} 
-          key_="title_news" key_key="link"  />
+          key_="title_news" key_key="title_news"  />
         
         <View style={this.state.dynamic_style.nav_container}>
           <IconButton

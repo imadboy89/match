@@ -130,7 +130,7 @@ class API {
       .catch(error => {
         console.log('ERROR', error);
         this.error = error;
-        alert(error);
+        alert("Token Error",error);
       });
   }
   get_date(date__=null){
@@ -355,6 +355,7 @@ class API {
         return resJson;
       })
       .catch(error => {
+        this.setConfig("token","");
         console.log('ERROR', error);
         this.error = error;
       });

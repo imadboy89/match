@@ -59,8 +59,13 @@ class LeagueScreen extends React.Component {
           for(let i=0;i<resp["data"][k].length;i++){
             resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
             if(resp["data"][k][i].live){
-              resp["data"][k][i].time_played = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time);
+              const played_time = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time) ;
+              resp["data"][k][i].time_played = played_time ? played_time : "";
+              if(played_time==false || played_time<-10){
+                resp["data"][k][i].live = 0;
+              }
             }
+
             date_str = resp["data"][k][i].date;
             if( maches[date_str] == undefined){
               maches[date_str] = {title: date_str, data: [ resp["data"][k][i],] };

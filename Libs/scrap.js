@@ -157,7 +157,7 @@ class Scrap {
     let json_={"matches_comps":[],"matches_list":[]};
     try{
       json_ = JSON.parse(html);
-    }catch(err){console.log(err);}
+    }catch(err){console.log(err);return [];}
     const date_str = date ? API_.get_date2(date): false;
     //parse matches_comps
     const blacklisted_comps = is_oneMatch ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب"," الثاني","تحت ","شمال","الثالث"," A ", " B ", " C "," D ","الدرجة D","الدرجة C","الدرجة B",]

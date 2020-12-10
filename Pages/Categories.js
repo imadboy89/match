@@ -7,6 +7,7 @@ import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
 import IconButton from "../components/IconButton";
+
 let list = [
 
           ];
