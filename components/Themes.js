@@ -224,15 +224,15 @@ function generateTheme(theme_name=false){
       fontSize: 23
     },
     matche_container:{
-      width:"100%",
+      width:"95%",
       marginTop:10,
       marginBottom:5,
       flexDirection:'row', 
       flexWrap:'wrap',
       flex: 1 ,
       height:70,
-      marginRight:5,
-      marginLeft:5,
+      //marginRight:5,
+      //marginLeft:5,
       borderRadius:10,
       borderWidth:1,
     },
@@ -332,13 +332,14 @@ function generateTheme(theme_name=false){
     news_container:{
       //padding:5,
       
-      marginTop:5,
-      marginBottom:5,
+      marginVertical:7,
+      margingHorizontal:3,
+      //marginBottom:5,
       height:200,
-      width:"99%",
+      width:"98%",
       //width:200,
       //backgroundColor: "#00000005",//theme.news_cont_backgroundColor,
-      backgroundColor: "#fff",//theme.news_cont_backgroundColor,
+      backgroundColor: theme.news_cont_backgroundColor,
       borderRadius: 10,
       justifyContent: 'center',
       
@@ -353,7 +354,7 @@ function generateTheme(theme_name=false){
       width: "100%",
       height: "100%",
       aspectRatio: 1,
-      resizeMode:"contain",
+      resizeMode:"stretch",
       alignItems:'center',
     },
     news_title_v:{
@@ -484,7 +485,6 @@ function generateTheme(theme_name=false){
   var styles_news = StyleSheet.create({
     container: {
       flex: 1,
-      justifyContent: 'center',
       //paddingTop: Constants.statusBarHeight,
       backgroundColor: theme.background_color_default,
       color : "#fff",

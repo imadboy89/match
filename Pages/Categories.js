@@ -68,7 +68,8 @@ class CategoriesScreen extends React.Component {
     if(styles.constructor === Object && Object.entries(styles).length==0){Styles();}
     return (
       <View style={styles.container}>
-        <ItemsList  
+        <ItemsList
+          minWidth={160}
           refresh_list={this.refresh_list}
           loading={this.state.loading}
           list={this.state.list} 

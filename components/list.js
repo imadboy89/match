@@ -14,7 +14,7 @@ class ItemsList extends React.Component {
       numColumns:1,
       list : [],
     }
-    this.minWidth = 300; 
+    this.minWidth = this.props.minWidth ? this.props.minWidth : 300; 
     this.list = [];
     this.check_width(false);
 
@@ -86,9 +86,10 @@ class ItemsList extends React.Component {
     }else if(col_key=="title_news" || col_key=="league_name"){
       const fav_icon = this.get_fav_icon(item[col_key],col_key=="league_name"? item.id : 0,true);
       let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
+      const resizemode = col_key=="title_news" ? "stretch" : "center";
       return (
         <View style={this.state.dynamic_style.news_container}>
-          <ImageBackground style={{flex:1,width:"100%"}} source={{uri: item.img}} >
+          <ImageBackground style={{flex:1,width:"100%"}} source={{uri: item.img}} imageStyle={{resizeMode:resizemode}}>
           { item.date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,textAlign:"center",}}>{date}</Text> : null}
           {fav_icon!=null ? fav_icon : null}
             <View style={this.state.dynamic_style.news_img_v}>
@@ -101,7 +102,7 @@ class ItemsList extends React.Component {
     }else if(col_key=="category_name"){  
       return (
         <View style={this.state.dynamic_style.news_container}>
-          <ImageBackground style={{flex:1,width:"100%"}} source={{uri: API_.domain_o+item.category_photo}} >
+          <ImageBackground style={{flex:1,width:"100%"}} source={{uri: API_.domain_o+item.category_photo}} imageStyle={{resizeMode:"stretch"}}>
             <View style={this.state.dynamic_style.news_img_v}>
 
             </View>
@@ -153,7 +154,7 @@ class ItemsList extends React.Component {
       style={{width:this.elem_width}}
       activeOpacity={0.5}
       onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
-      <View style={{flexDirection:'row', flexWrap:'wrap',width:"100%",justifyContent: 'center',alignItems:"center",alignContent:"center"}}>
+      <View style={{flexDirection:'row', flexWrap:'wrap',width:"100%",justifyContent: 'center',alignItems:"center",alignContent:"center",marginHorizontal:3,}}>
         {this.get_item(item,this.props.key_)}
       </View>
     </TouchableOpacity>);
@@ -174,6 +175,7 @@ class ItemsList extends React.Component {
             onPress={() => {this.props.onLeaguePressed(title,img) }}/>
         : null}
         <TouchableHighlight
+          underlayColor={"green"}
           style={{flex:7}} 
           activeOpacity={0.9}
           onPress={()=>{
@@ -225,7 +227,7 @@ class ItemsList extends React.Component {
               keyExtractor={(item, index) => item[this.props.key_key]} 
               renderItem={this._render_item}
               renderSectionHeader={this._render_header}
-              columnWrapperStyle={this.state.numColumns>1  ?{justifyContent: 'flex-end'} : null}
+              columnWrapperStyle={this.state.numColumns>1  ?{justifyContent: 'flex-end',marginRight:3} : null}
             
             />
           </View>);
@@ -251,7 +253,7 @@ class ItemsList extends React.Component {
       }
       return (
         <View style={this.state.dynamic_style.container}>
-          <SafeAreaView style={this.state.dynamic_style.container}>
+          <SafeAreaView style={[this.state.dynamic_style.container,{}]}>
             <FlatList
               numColumns={this.state.numColumns} 
               stickySectionHeadersEnabled={false}
@@ -261,7 +263,6 @@ class ItemsList extends React.Component {
               keyExtractor={(item, index) => item[this.props.key_key]} 
               renderItem={this._render_item}
               renderSectionHeader={this._render_header}
-              columnWrapperStyle={this.state.numColumns>1  ?{justifyContent: 'flex-end'} : null}
             
             />
           </SafeAreaView>

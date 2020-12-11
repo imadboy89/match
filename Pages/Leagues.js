@@ -82,6 +82,7 @@ get_leagues(){
     return (
       <View style={this.state.dynamic_style.container}>     
         <ItemsList 
+          minWidth={160}
           refresh_list={this.refresh_list}
           favorite={this.state.favorite}
           set_fav={this.set_fav}
