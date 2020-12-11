@@ -60,7 +60,7 @@ class VideoScreen extends React.Component {
   }
   render_wv(){
     const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality=380&info=0&logo=0&autoplay=false';
-    const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0';
+    const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq=380&color='+"";
     const uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
     return  <WebView 
               allowsFullscreenVideo={true}
