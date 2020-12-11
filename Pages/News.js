@@ -30,6 +30,13 @@ class NewsScreen extends React.Component {
   )
 });
   }
+
+  refresh_list=()=>{
+    const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
+    this.setState({list:[]}); 
+    this.setState({list:tmp_list});
+  }
+  
   componentWillUnmount(){
     clearInterval(this.interval_refresh);
   }
@@ -47,6 +54,7 @@ get_news =()=>{
     return (
       <View style={this.state.dynamic_style.container}>     
         <ItemsList 
+          refresh_list={this.refresh_list}
           refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={this.get_news} />}
           loading={this.state.loading} 
           list={this.state.list} 

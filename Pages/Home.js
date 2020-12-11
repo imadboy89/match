@@ -47,7 +47,9 @@ class HomeScreen extends React.Component {
   });
   }
   refresh_list=()=>{
-    this.setState({list:JSON.parse(JSON.stringify(this.state.list))});
+    const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
+    this.setState({list:[]}); 
+    this.setState({list:tmp_list});
   }
   set_fav=(league_id)=>{
     API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{

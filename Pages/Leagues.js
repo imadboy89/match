@@ -9,7 +9,7 @@ class LeaguesScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        leagues:[],
+        list:[],
         key:"league_name",
         page : 1,
         loading:true,
@@ -37,6 +37,11 @@ class LeaguesScreen extends React.Component {
   )
 });
   }
+  refresh_list=()=>{
+    const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
+    this.setState({list:[]}); 
+    this.setState({list:tmp_list});
+  }
   set_fav=(league_id)=>{
     API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{
       if( o.includes(league_id) ){
@@ -63,7 +68,7 @@ get_leagues(){
         return {"img": API_.domain_o+img,"league_name":league_name , id:row.league_id}; 
       });
       data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
-      this.setState({loading:false,leagues:data,favorite:favorite});
+      this.setState({loading:false,list:data,favorite:favorite});
 
     });
   });
@@ -77,9 +82,10 @@ get_leagues(){
     return (
       <View style={this.state.dynamic_style.container}>     
         <ItemsList 
+          refresh_list={this.refresh_list}
           favorite={this.state.favorite}
           set_fav={this.set_fav}
-          loading={this.state.loading} list={this.state.leagues} 
+          loading={this.state.loading} list={this.state.list} 
           onclick={this.onItem_clicked} key_={this.state.key} key_key="id"  />
         
         <View style={this.state.dynamic_style.nav_container}>

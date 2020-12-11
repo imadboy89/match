@@ -199,7 +199,7 @@ function generateTheme(theme_name=false){
       marginTop:3,
       fontSize: 20,
       backgroundColor: theme.list_header_backgroundColor,
-      width:"98%",
+      width:"100%",
       textAlign:"right",
       height:50,
       //height:40,
@@ -384,7 +384,7 @@ function generateTheme(theme_name=false){
   var styles_home= StyleSheet.create({
     container: {
       flex: 1,
-      justifyContent: 'center',
+      //justifyContent: 'center',
       //paddingTop: Constants.statusBarHeight,
       backgroundColor: theme.background_color_default,
       color : "#fff",

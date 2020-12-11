@@ -59,7 +59,7 @@ class Scrap {
     /// staduim
     if(details_dict["a"] && details_dict["a"].length>0){
       match_details["stadium"] = details_dict["a"][0] && details_dict["a"][0].length >=3 ? details_dict["a"][0][3] : "";
-      match_details["stadium"] = details_dict["a"][0] && details_dict["a"][0].length >=5 
+      match_details["stadium"] = details_dict["a"][0] && details_dict["a"][0][5]
       ? details_dict["a"][0][5]+" | "+match_details["stadium"] : match_details["stadium"];
     }
     // league name

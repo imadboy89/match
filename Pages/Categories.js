@@ -36,6 +36,11 @@ class CategoriesScreen extends React.Component {
       )
     });
   }
+  refresh_list=()=>{
+    const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
+    this.setState({list:[]}); 
+    this.setState({list:tmp_list});
+  }
   show_channels = (category) => {
     this.props.navigation.navigate('channels',{category_id:category.category_id,category_name: category.category_name});
   }
@@ -64,6 +69,7 @@ class CategoriesScreen extends React.Component {
     return (
       <View style={styles.container}>
         <ItemsList  
+          refresh_list={this.refresh_list}
           loading={this.state.loading}
           list={this.state.list} 
           onclick={this.onchannel_clicked} 

@@ -12,22 +12,31 @@ class ItemsList extends React.Component {
       dynamic_style:false,
       header_to_hide:[],
       numColumns:1,
+      list : [],
     }
-    this.minWidth = 300;
+    this.minWidth = 300; 
     this.list = [];
-    this.check_width();
+    this.check_width(false);
+
   }
   componentDidMount=()=>{
     getTheme("styles_list").then(theme=>this.setState({dynamic_style:theme}));
-    
+    //AppState.addEventListener("resize", this.check_width.bind(this));
+    Dimensions.addEventListener("change",this.check_width)
   }
-  check_width=()=>{
+  componentWillUnmount(){
+    Dimensions.removeEventListener("change",this.check_width)
+  }
+  check_width=(render=true)=>{
     if(this.windowWidth == Dimensions.get('window').width){return ;}
     this.windowWidth = Dimensions.get('window').width;
     //this.setState({numColumns:this.windowWidth/500});
     this.state.numColumns = parseInt(this.windowWidth/this.minWidth);
     this.state.numColumns = this.state.numColumns>=1 ? this.state.numColumns : 1;
     this.elem_width = parseInt(this.windowWidth/this.state.numColumns)-5;
+    if(render && this.props.refresh_list){
+      this.props.refresh_list(1)
+    }
     return true;
   } 
   get_item(item,col_key){
@@ -262,7 +271,7 @@ class ItemsList extends React.Component {
 
   }
   render() {
-    if(this.check_width() || this.state.dynamic_style==false){
+    if(this.check_width(false) || this.state.dynamic_style==false || this.props.list.length==0){
       return null;
     }
     return (<View style={this.state.dynamic_style.container}>

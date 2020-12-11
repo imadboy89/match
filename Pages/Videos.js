@@ -30,6 +30,11 @@ class VideosScreen extends React.Component {
     });
   }
 
+  refresh_list=()=>{
+    const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
+    this.setState({list:[]}); 
+    this.setState({list:tmp_list});
+  }
   
 get_Videos(){
   this.setState({list:[],loading:true});
@@ -43,7 +48,7 @@ get_Videos(){
     
     return (
       <View style={this.state.dynamic_style.container}>     
-        <ItemsList loading={this.state.loading} list={this.state.list} onclick={this.onItem_clicked} key_="title_news" key_key="link"  />
+        <ItemsList loading={this.state.loading} list={this.state.list} onclick={this.onItem_clicked} key_="title_news" key_key="link"  refresh_list={this.refresh_list} />
         
         <View style={this.state.dynamic_style.nav_container}>
           <IconButton
