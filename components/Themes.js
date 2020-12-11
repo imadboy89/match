@@ -382,7 +382,7 @@ function generateTheme(theme_name=false){
     },
   };
 
-  var styles_home= StyleSheet.create({
+  var styles_home= {
     container: {
       flex: 1,
       //justifyContent: 'center',
@@ -411,16 +411,14 @@ function generateTheme(theme_name=false){
     icons:{
       alignItems:"center",
       justifyContent: "center",
-
-      height:40,
+      height:40,  
       width:40,
-      marginHorizontal :10,
       borderRadius: 20 ,
       backgroundColor:theme.headerStyle_backgroundColor,
       borderColor:theme.text_color_default,
       borderWidth:1,
     }
-  });
+  };
 
   var  styles_article = StyleSheet.create({
     icons:styles_home.icons,
@@ -492,17 +490,20 @@ function generateTheme(theme_name=false){
     nav_container: {
       flexDirection:'row', 
       flexWrap:'wrap',
-      height:30,
+      //height:30,
       justifyContent: 'center',
       backgroundColor: theme.background_color_default,
       color : "#fff",
     },
-
-    text:{
+    text: {
       color : theme.text_color_default,
       fontSize: 20,
-      marginRight:10,justifyContent: 'center',alignItems: 'center'
+      marginHorizontal:10,
+      justifyContent: 'center',
+      textAlign:"center",
+      width:20,
     },
+
     title: {
       fontSize: 20,
       fontWeight: 'bold',

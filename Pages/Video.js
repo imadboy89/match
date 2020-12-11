@@ -32,6 +32,10 @@ class VideoScreen extends React.Component {
     this.props.navigation.setOptions({title: <Text >{short_title}</Text>});
   }
   get_video(){
+    if(this.state.video.is_yt && this.state.video.videoId){
+      setTimeout(()=>{this.setState({loading:false});},500);
+      return true;
+    }
     let short_title = this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : this.state.video.title_news;
     
     //this.state.video.date = API_.get_date2(new Date(this.state.video.date.replace("#","") * 1000));
@@ -55,7 +59,9 @@ class VideoScreen extends React.Component {
     return <ActivityIndicator color='#009b88' size='large' />
   }
   render_wv(){
-    
+    const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality=380&info=0&logo=0&autoplay=false';
+    const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0';
+    const uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
     return  <WebView 
               allowsFullscreenVideo={true}
               style={{flex:1,backgroundColor: "#000"}}
@@ -65,7 +71,7 @@ class VideoScreen extends React.Component {
               ref={(ref) => (this.webview = ref)}
               onLoadEnd={a=>{ 
               }}
-              source={{ uri: 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality=380&info=0&logo=0&autoplay=false' }}
+              source={{ uri: uri_ }}
               userAgent='Mozilla/5.0 (Linux; Android 9.0.0;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.116 Mobile Safari/537.36'
               />;
   }

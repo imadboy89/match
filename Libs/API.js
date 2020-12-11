@@ -7,6 +7,7 @@ import Base64 from "./Base64";
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
+    this.channel_id = "UCBaD-tLomo_JgH66CuSFWAQ";
     //alert(Base64.btoa("aW1hZA=="));
     this.error = null;
     this.data = null;
@@ -502,6 +503,61 @@ class API {
       });
   };
 
+  get_channel_info(){
+    const url = 'https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id='+this.channel_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0';
+    return fetch(url, {
+          method: 'GET',
+          headers: this.headers2,
+    }).then(response => response.json())
+    .catch(error => {
+        console.log('ERROR', error);
+        this.error = error;
+    });
+  }
+  get_channel_items(playlist_id){
+      const url = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=25&playlistId='+playlist_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0';
+      return fetch(url, {
+            method: 'GET',
+            headers: this.headers2,
+      }).then(response => response.json())
+      .then(response => {
+          return response;
+      })
+      .catch(error => {
+          console.log('ERROR', error);
+          this.error = error;
+      });
+  }
+  get_yt_vids(){
+    return this.get_channel_info().then(o=>{
+      let playlist_id = "";
+      if(Object.keys(o).length==0){
+        return [];
+      }
+      try{playlist_id=o["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"];}catch(err){console.log(o);return[];}
+      return this.get_channel_items(playlist_id).then(o=>{
+        let list = [];
+        if(o["items"] && o["items"].length>0){
+          for(let i=0;i<o["items"].length;i++){
+            try{
+              const r = o["items"][i];
+              let vid = {
+                link:r.contentDetails.videoId,
+                videoId:r.contentDetails.videoId,
+                title_news:r.snippet.title,
+                img:r.snippet.thumbnails.medium.url,
+                date:r.snippet.publishedAt.split("T")[0],
+                is_yt :true,
+              };
+              list.push(vid);
+            }catch(err){console.log(err);}
+          }
+        }
+        return list;
+        
+      });
+    })
+  }
 
   get_url_content(url){
 
@@ -511,7 +567,7 @@ class API {
 
     return fetch(q_url+url, {
       method: 'GET',
-    })
+    }).then(response => response.json())
       .then(response => {
         return fetch(sc_url+url, {
           method: 'GET',
