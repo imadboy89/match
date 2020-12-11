@@ -272,7 +272,7 @@ class ItemsList extends React.Component {
 
   }
   render() {
-    if(this.check_width(false) || this.state.dynamic_style==false || this.props.list.length==0){
+    if(this.check_width(false) || this.state.dynamic_style==false || this.props.list==undefined || this.props.list.length==0){
       return null;
     }
     return (<View style={this.state.dynamic_style.container}>

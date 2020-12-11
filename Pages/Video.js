@@ -2,7 +2,7 @@ import React from "react";
 import {  View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image , ImageBackground, ActivityIndicator, TouchableOpacity} from 'react-native';
 import Constants from 'expo-constants';
 import Loader from "../components/Loader";
-import {styles_article,getTheme} from "../components/Themes";
+import {styles_article,getTheme, global_theme} from "../components/Themes";
 import Dailymotion from 'react-dailymotion';
 import { Video } from 'expo-av';
 import { WebView } from 'react-native-webview';
@@ -59,17 +59,22 @@ class VideoScreen extends React.Component {
     return <ActivityIndicator color='#009b88' size='large' />
   }
   render_wv(){
+    if(this.state.video.videoId==false){return null}
     const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality=380&info=0&logo=0&autoplay=false';
-    const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq=380&color='+"";
+    const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq=380&color='+global_theme.text_color_default;
     const uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
     return  <WebView 
               allowsFullscreenVideo={true}
               style={{flex:1,backgroundColor: "#000"}}
               javaScriptEnabled={true}
               domStorageEnabled={true}
-              
               ref={(ref) => (this.webview = ref)}
-              onLoadEnd={a=>{ 
+              onShouldStartLoadWithRequest={(request) => {
+                if(request.url.replace("/m.","/").replace("/www.","/") != uri_.replace("/m.","/").replace("/www.","/")){
+                  console.log("stopLoading");
+                  return false;
+                }
+                return true;
               }}
               source={{ uri: uri_ }}
               userAgent='Mozilla/5.0 (Linux; Android 9.0.0;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.116 Mobile Safari/537.36'
