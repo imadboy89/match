@@ -7,7 +7,8 @@ import Base64 from "./Base64";
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
-    this.channel_id = "UCBaD-tLomo_JgH66CuSFWAQ";
+    this.channels = {1:"UCBaD-tLomo_JgH66CuSFWAQ" , 2:"UCRN5ho3UGhUi7ZCBe2G2f2w"}
+    this.pageTokens = {};
     //alert(Base64.btoa("aW1hZA=="));
     this.error = null;
     this.data = null;
@@ -37,11 +38,15 @@ class API {
   }
   leagueId_byTitle(title,default_id){
     default_id = default_id==undefined ? 0 : default_id ;
+    title = this.fix_title(title);
+    const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : default_id ;
+    return parseInt(league_id);
+  }
+  fix_title(title){
     title= typeof title == "string" ? title.trim() : title;
     title= typeof title == "string" ? title.replace(/أ/g,"ا") : title;
     title= typeof title == "string" ? title.replace(/إ/g,"ا") : title;
-    const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : default_id ;
-    return parseInt(league_id);
+    return title;
   }
   get_news(page){
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
@@ -50,6 +55,16 @@ class API {
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       return scrap.get_news(resp);
+    });
+  }
+  get_scorers(league_id){
+    //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
+    console.log("https://m.kooora.com/?c="+league_id+"&scorers=true");
+    return this.http("https://m.kooora.com/?c="+league_id+"&scorers=true&arabic","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_scorers(resp);
     });
   }
   get_videos(page,q=""){
@@ -63,12 +78,22 @@ class API {
       return scrap.get_videos(resp);
     });
   }
-  get_video(link){
+  get_videos_m(page,q=""){
+    let url="https://mountakhab.net/mnt1/category/lions-du-monde/page/"+page+"/";
+    return this.http(url,"GET",null,{})
+    .then(resp=>{
+      
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_videos_m(resp);
+    });
+  }
+  get_video(link,source_id){console.log(link,source_id);
     return this.http(link,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_video(resp);
+      return scrap.get_video(resp,source_id);
     });
   }
   get_article(link){
@@ -503,8 +528,10 @@ class API {
       });
   };
 
-  get_channel_info(){
-    const url = 'https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id='+this.channel_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0';
+  get_channel_info(channel_id){
+    channel_id = this.channels[channel_id] ;
+    
+    const url = 'https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id='+channel_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0';
     return fetch(url, {
           method: 'GET',
           headers: this.headers2,
@@ -515,21 +542,24 @@ class API {
     });
   }
   get_channel_items(playlist_id){
-      const url = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=25&playlistId='+playlist_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0';
+      //pageToken
+      const pagetoken = this.pageToken== undefined ? "" : "&pageToken="+this.pageToken;
+      const url = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=25&playlistId='+playlist_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0'+pagetoken;
       return fetch(url, {
             method: 'GET',
             headers: this.headers2,
       }).then(response => response.json())
       .then(response => {
-          return response;
+        this.nextPageToken = response["nextPageToken"] ;
+        return response;
       })
       .catch(error => {
           console.log('ERROR', error);
           this.error = error;
       });
   }
-  get_yt_vids(){
-    return this.get_channel_info().then(o=>{
+  get_yt_vids(channel_id){
+    return this.get_channel_info(channel_id).then(o=>{
       let playlist_id = "";
       if(Object.keys(o).length==0){
         return [];
@@ -540,7 +570,6 @@ class API {
         if(o["items"] && o["items"].length>0){
           for(let i=0;i<o["items"].length;i++){
             try{
-              const r = o["items"][i];
               let vid = {
                 link:r.contentDetails.videoId,
                 videoId:r.contentDetails.videoId,

@@ -172,18 +172,18 @@ class ItemsList extends React.Component {
         {this.props.onLeaguePressed ? 
           <IconButton name="list-ol" color="#130f40"
             size={this.state.dynamic_style.header.fontSize} 
-            onPress={() => {this.props.onLeaguePressed(title,img) }}/>
+            onPress={() => {this.props.onLeaguePressed(title,img,id) }}/>
         : null}
         <TouchableHighlight
           underlayColor={"green"}
           style={{flex:7}} 
           activeOpacity={0.9}
           onPress={()=>{
-            id = API_.leagueId_byTitle(title,id);
-            if(this.state.header_to_hide.includes(id)){
-              this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id)return x});
+            const id_ = API_.leagueId_byTitle(title,id);
+            if(this.state.header_to_hide.includes(id_)){
+              this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id_)return x});
             }else{
-              this.state.header_to_hide.push(id);
+              this.state.header_to_hide.push(id_);
             }
             this.props.refresh_list();
             //this.setState({list:l});

@@ -828,6 +828,7 @@ function generateTheme(theme_name=false){
     team_name_t:{
       fontSize:17,
       color : theme.text_color_default,
+      textAlign:"left"
     },
     channel_logo_v : {
       width: "100%",

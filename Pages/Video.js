@@ -42,15 +42,20 @@ class VideoScreen extends React.Component {
     this.props.navigation.setOptions({title: short_title})
     this.state.video.videoId = false;
     this.setState({loading:true});
-    API_.get_video(this.props.route.params.item.link)
+
+    API_.get_video(this.props.route.params.item.link,this.props.route.params.item.source_id)
     .then(videoId =>{
+      let url = 'https://www.dailymotion.com/embed/video/'+videoId;
+      if(videoId.slice(0,4)=="http"){
+        url = videoId;
+      }
       this.state.video.videoId = videoId;
       setTimeout(()=>{this.setState({loading:false});},500);
       this.props.navigation.setOptions({
         "headerRight":()=>(
                 <IconButton 
                   name="chrome" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
-                  onPress={()=>{ Linking.openURL('https://www.dailymotion.com/embed/video/'+this.state.video.videoId); }}  />
+                  onPress={()=>{ Linking.openURL(url); }}  />
         )
       });
     });
@@ -62,7 +67,10 @@ class VideoScreen extends React.Component {
     if(this.state.video.videoId==false){return null}
     const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality=380&info=0&logo=0&autoplay=false';
     const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq=380&color='+global_theme.text_color_default;
-    const uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
+    const uri_direct = this.state.video.videoId.slice(0,4)=="http" ? this.state.video.videoId : "";
+    let uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
+    uri_ = this.state.video.source_id==3 ? uri_direct :  uri_;
+    
     return  <WebView 
               allowsFullscreenVideo={true}
               style={{flex:1,backgroundColor: "#000"}}

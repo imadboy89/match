@@ -109,11 +109,11 @@ class HomeScreen extends React.Component {
     if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
       this.get_matches();
     }
-    }, 40000);
+    }, 50000);
 
   }
   get_matches = (date_obj=null)=>{
-    if(this.state.source_id==1){
+    if(this.state.source_id!=0){
       return this.get_matches_koora(date_obj);
     }
     date_obj = date_obj==null ? this.state.matches_date :date_obj; 
@@ -164,10 +164,10 @@ class HomeScreen extends React.Component {
             //console.log(Object.values(resp) )
             let data = resp && resp.length>0 ? resp : [];
             try{
-              data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
+              data = data.sort((a,b)=>{ return (leagues_dict[API_.fix_title(a.title) ] != undefined && leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
             }catch(e){console.log(e);}
             try{
-              //data = data.sort((a,b)=>{return (leagues_dict(a.title)>leagues_dict(b.title))?-1:1;});
+              data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
             }catch(e){console.log(e);}
           this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
         });
@@ -216,9 +216,9 @@ show_DateP(){
       );
 }
 
-  onLeaguePressed = (league_name, league_img)=>{
+  onLeaguePressed = (league_name, league_img,league_id)=>{
     league_img = ["https:/","http://"].includes(league_img.slice(0,7)) ? league_img : API_.domain_o+league_img;
-    this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:league_img} });
+    this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:league_img,id:league_id} });
   }
   onMatch_clicked =(item)=>{
     this.props.navigation.navigate('Match', { match_item: item });
@@ -256,6 +256,7 @@ show_DateP(){
             >
               <Picker.Item label="AL match" value={0} />
               <Picker.Item label="Kooora" value={1} />
+              <Picker.Item label="arriadia" value={2} />
           </Picker>
         </View>
 

@@ -14,9 +14,10 @@ class VideosScreen extends React.Component {
         page : 1,
         loading:true,
         dynamic_style : styles_news,
-        source_id:0,
+        source_id:3,
     };
   this.get_Videos();
+  this.pageTokens={};
 
   }
   componentDidMount(){
@@ -32,7 +33,7 @@ class VideosScreen extends React.Component {
   }
   changesource = (itemValue, itemIndex)=>{
     this.state.source_id = parseInt(itemValue);
-    this.setState({});
+    this.setState({page:1});
     this.get_Videos();
   }
 
@@ -43,17 +44,33 @@ class VideosScreen extends React.Component {
   }
 get_Videos_m(){
   this.setState({list:[],loading:true});
-  API_.get_yt_vids().then(o=>this.setState({list:o,loading:false}));
+  if(this.state.source_id==3){
+    return API_.get_videos_m(this.state.page).then(o=>{
+      this.setState({list:o,loading:false});
+    });
+  }
+  if(this.pageTokens[this.state.source_id] == undefined){
+    this.pageTokens[this.state.source_id] = ["",""]
+  }else{
+    API_.pageToken = this.pageTokens[this.state.source_id] && this.pageTokens[this.state.source_id][this.state.page] ? this.pageTokens[this.state.source_id][this.state.page] : "";
+  }
+  API_.get_yt_vids(this.state.source_id).then(o=>{
+    this.setState({list:o,loading:false});
+    this.pageTokens[this.state.source_id][this.state.page+1] = API_.nextPageToken;
+    API_.nextPageToken = "";
+  });
 }
 get_Videos(){
-  if(this.state.source_id==1){
+  if(this.state.source_id!=0){
     return this.get_Videos_m(this.state.page);
   }
   this.setState({list:[],loading:true});
+
   API_.get_videos(this.state.page).then(data=>this.setState({list:data,loading:false}));
 }
 
   onItem_clicked =(item)=>{
+    item.source_id = this.state.source_id;
     this.props.navigation.navigate('Video', { item: item });
   }
   render() {
@@ -83,7 +100,9 @@ get_Videos(){
             onValueChange={this.changesource}
           >
             <Picker.Item label="BeIn" value={0} />
-            <Picker.Item label="Mthkb" value={1} />
+            <Picker.Item label="AlMthkb" value={1} />
+            <Picker.Item label="arriadia" value={2} />
+            <Picker.Item label="Mtkhb" value={3} />
         </Picker>
         </View>
 

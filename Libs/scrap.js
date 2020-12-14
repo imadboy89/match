@@ -157,7 +157,7 @@ class Scrap {
     let json_={"matches_comps":[],"matches_list":[]};
     try{
       json_ = JSON.parse(html);
-    }catch(err){console.log(err);return [];}
+    }catch(err){console.log(err,html);return [];}
     const date_str = date ? API_.get_date2(date): false;
     //parse matches_comps
     const blacklisted_comps = is_oneMatch ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب"," الثاني","تحت ","شمال","الثالث"," A ", " B ", " C "," D ","الدرجة D","الدرجة C","الدرجة B",]
@@ -282,6 +282,61 @@ class Scrap {
     //matches = matches.sort((a,b)=>{return a["country"]=="MA"? -1 : 1;});
     return matches;
   }
+  get_scorers(html){
+    //let patttern = /var\s+scorers_details\s*=\s*new\s+Array\s*\((([^;]*\r\n[^;]*)*)/gmi;
+    let patttern = /var\s+scorers_details\s*=\s*new\s+Array\s*\(\r\n([^0][^;\r\n]*\r\n)*/gim;
+    let m = html.match(patttern);
+    const header = [
+      "goals",
+      "goals_pn",
+      "goals_pn_wasted",
+      "goals_fiend",
+      "ycards",
+      "rcards",
+      "player_id",
+      "info_1",
+      "player_number",
+      "player_name_ar",
+      "player_name_en",
+      "team_id",
+      "team_name",
+      "info_2",
+      "info_3",
+      "info_4",
+      "info_5",
+      "info_6",
+      "info_7",
+      "info_8",
+      "info_9",
+      "info_10",
+      "info_11",
+    ];
+    
+    if(m){
+      let out = "[["+m[0].trim().replace(/var\s+scorers_details\s*=\s*new\s+Array\s*\(/i,"")
+        .replace(/,\s*-1\s*\)$/mi,"")
+        .replace(/,\s*$/gi,"")
+        .replace(/,\r\n/gi,"],[") + "]]";
+      let out_list = []; 
+      let final_out = [];
+      try{
+        out = JSON.parse(out);
+        out = out ? out : [];
+        for (let i=0; i<out.length;i++){
+          if(out[i][0]==-1){continue;}
+          let row = {};
+          //continue;
+          for (let h=0; h<out[i].length;h++){
+            row[header[h]] = out[i][h];
+          }
+          final_out.push(row);
+        }
+      }catch (e){console.log(e);}
+
+      return final_out;
+    } 
+    return [];
+  }
   get_news(html){
     let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
     let m = html.match(patttern);
@@ -302,7 +357,10 @@ class Scrap {
     } 
     return [];
   }
-  get_video(html){
+  get_video(html,source_id=0){
+    if(source_id==3){
+      return this.get_video_m(html);
+    }
     let videoId="";
     let patttern = /video'\s*:\s*'([^']*)',/gmi;
     let m = html.match(patttern);
@@ -310,6 +368,16 @@ class Scrap {
       m=m[0].replace(/video'\s*:\s*'/gi,"").replace(/[',]/ig,"");
       videoId = m.trim();
     }
+    return videoId;
+  }
+  get_video_m(html){console.log("hh");
+    let videoId="";
+    html = html.split("<p><iframe src=\"");
+    console.log(html.length);
+    html = html.length == 2 ? html[1] : "";
+    console.log(html.length);
+    videoId=html.split("\" width")[0];
+    console.log(videoId);
     return videoId;
   }
   get_lineup_old(html){
@@ -335,7 +403,22 @@ class Scrap {
     }
     return lineups;
   }
-
+  get_videos_m(html){
+    if(html==""){return []}
+    let doc = new DomParser().parseFromString(html,'text/html');
+    let items = doc.querySelect('.content article');
+    let videos = [];
+    for(let i=0;i<items.length;i++){
+      let video = {"link":"","title_news":"","img":"","date":""};
+      const v = items[i];
+      video["date"] = (v.querySelect("span")[0].childNodes+"").split("</i>")[1]+"";
+      video["link"] = v.querySelect("a")[0].getAttribute("href")+"";
+      video["title_news"] = v.querySelect("a")[0].childNodes+"";
+      video["img"] = v.querySelect("img")[0].getAttribute("src")+"";
+      videos.push(video);
+    }
+    return videos;
+  }
   get_videos(html){
     if(html==""){return []}
     //console.log("-",html)

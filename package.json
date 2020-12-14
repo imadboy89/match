@@ -1,11 +1,13 @@
 {
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
+    "start_": "webpack-dev-server -d --config ./web/webpack.config.js --inline --hot --colors",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "publish": "expo publish"
   },
   "dependencies": {
     "@react-native-community/async-storage": "~1.12.0",
@@ -17,15 +19,18 @@
     "@react-navigation/material-top-tabs": "^5.2.16",
     "@react-navigation/native": "^5.7.3",
     "@react-navigation/stack": "^5.9.0",
+    "babel-loader": "^8.2.2",
+    "babel-plugin-react-native-web": "^0.14.9",
     "expo": "^39.0.0",
     "expo-av": "~8.6.0",
+    "expo-cli": "^4.0.13",
     "expo-constants": "~9.2.0",
     "expo-notifications": "^0.7.2",
-    "expo-status-bar": "~1.0.2", 
+    "expo-status-bar": "~1.0.2",
     "expo-updates": "^0.3.5",
     "react": "16.13.1",
     "react-dailymotion": "^0.4.1",
-    "react-dom": "16.13.1",
+    "react-dom": "^16.13.1",
     "react-hls-player": "*",
     "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.3.tar.gz",
     "react-native-gesture-handler": "~1.7.0",
@@ -37,7 +42,9 @@
     "react-native-tab-view": "^2.15.1",
     "react-native-vector-icons": "*",
     "react-native-video": "*",
-    "react-native-webview": "10.7.0"
+    "react-native-web": "^0.14.9",
+    "react-native-webview": "10.7.0",
+    "url-loader": "^4.1.1"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"
