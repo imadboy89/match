@@ -5,7 +5,7 @@ const DEFAULT_MIN_REFRESH_INTERVAL = 300
 const getUnixEpoch = () => Math.floor(Date.now() / 1000)
 
 try {
-  __DEV__ = __DEV__;
+  var __DEV__ = __DEV__;
 } catch (error) {
   var __DEV__ =true;
 }

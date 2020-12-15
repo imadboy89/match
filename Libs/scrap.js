@@ -253,10 +253,12 @@ class Scrap {
           if(date_str && date_str != matche[ "date" ]){
             is_ok = false;
           }
-          let time_playerd = live ? API_.convert_time_spent(matche.date + " "+matche.time) : "";
+          let time_playerd = API_.convert_time_spent(matche.date + " "+matche.time);
           time_playerd = matche[ "time_old" ].split("'").length==2 && matche[ "time_old" ].split("'")[0].length<=2 
             ? parseInt(matche[ "time_old" ].split("'")[0])
             : time_playerd;
+          time_playerd = live==0 && parseInt(time_playerd)>0 && parseInt(time_playerd)<90 ? 45 : time_playerd;
+          live = parseInt(time_playerd)>0 && parseInt(time_playerd)<90 ? 1 : 0;
           if(live==1 && time_playerd>0){
             matche["time_played"] = time_playerd;
             matche["live"] = live;

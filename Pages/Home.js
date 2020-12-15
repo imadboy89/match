@@ -9,7 +9,7 @@ import {styles_home,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
 import Loader from "../components/Loader";
 import * as Updates from 'expo-updates';
-import { AppLoading } from 'expo';
+import AppLoading from 'expo-app-loading';
 
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 

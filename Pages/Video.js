@@ -1,10 +1,9 @@
 import React from "react";
 import {  View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image , ImageBackground, ActivityIndicator, TouchableOpacity} from 'react-native';
 import Constants from 'expo-constants';
+import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import Loader from "../components/Loader";
 import {styles_article,getTheme, global_theme} from "../components/Themes";
-import Dailymotion from 'react-dailymotion';
-import { Video } from 'expo-av';
 import { WebView } from 'react-native-webview';
 import IconButton from "../components/IconButton";
 
@@ -27,9 +26,13 @@ class VideoScreen extends React.Component {
 
   }
   componentDidMount(){
+    activateKeepAwake();
     let short_title = this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : 
     getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme})); 
     this.props.navigation.setOptions({title: <Text >{short_title}</Text>});
+  }
+  componentWillUnmount(){
+    deactivateKeepAwake();
   }
   get_video(){
     if(this.state.video.is_yt && this.state.video.videoId){

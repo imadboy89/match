@@ -309,7 +309,6 @@ class API {
           AsyncStorage.setItem('leagues', JSON.stringify(this.leagues) );
           return this.leagues_dict;
         }
-
         });
 
   }
@@ -333,6 +332,8 @@ class API {
         }
       })
       .catch(error => {
+        this.setConfig("token","");
+        this.headers["device-token"]="";
         console.log('ERROR', error);
         this.error = error;
       });
@@ -399,12 +400,15 @@ class API {
               this.matches[matches[i]] = this.matches[matches[i]].concat(resJson["data"][matches[i]]);
             }
           }
+          return Object.keys(resJson["data"]).length>0 ? this.get_matches(date_obj, page+1) : this.matches;
         }
-        return Object.keys(resJson["data"]).length>0 ? this.get_matches(date_obj, page+1) : this.matches;
+        return resJson;
       })
       .catch(error => {
+        console.log("here11");
         this.setConfig("token","");
-        console.log('ERROR', error);
+        this.headers["device-token"]="";
+        const is_err = this.error ? true : false;
         this.error = error;
       });
   }
