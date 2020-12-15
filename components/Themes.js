@@ -317,7 +317,8 @@ function generateTheme(theme_name=false){
     },
     matche_league_logo:{
       //margin :3,
-      width: "100%",
+      marginRight:5,
+      width: "90%",
       height: "100%",
       aspectRatio: 1,
       resizeMode:"contain",

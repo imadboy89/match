@@ -153,7 +153,7 @@ class Scrap {
     }catch(err){console.log(err)}
     return lineups;
   }
-  get_matches_k(html,date,is_oneMatch=false){
+  get_matches_k(html,date,is_oneMatch=false,is_only_live=false){
     let json_={"matches_comps":[],"matches_list":[]};
     try{
       json_ = JSON.parse(html);
@@ -161,9 +161,11 @@ class Scrap {
     const date_str = date ? API_.get_date2(date): false;
     //parse matches_comps
     const blacklisted_comps = is_oneMatch ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب"," الثاني","تحت ","شمال","الثالث"," A ", " B ", " C "," D ","الدرجة D","الدرجة C","الدرجة B",]
-    const blacklisted_countries = is_oneMatch ? [] :  ["SA","BH","KW","IQ","PS","TR","ND","AR","BR","CO","JO","SS","VN"];
+    const blacklisted_countries = is_oneMatch ? [] :  ["SA","BH","KW","IQ","PS","ND","AR","BR","CO","JO","SS","VN","ZA","TR","UZ"];
+    const exceptions = ["افريقيا",];
     let compititions = {};
     let compitition = {"country":""};
+    
     const comp_header = ["divider","league_id","comp_name","comp_logo","comp_id_news","options"];
     const MIN_ALLOWED_OPTIONS = is_oneMatch ? 1 : 3;
     let k = 0;
@@ -182,18 +184,25 @@ class Scrap {
             is_allowed = false;
           }
         }
-        if(blacklisted_countries.includes(compitition["country"])){
-          is_allowed = false;
-        }
+
         is_allowed = compitition["options"].length>=MIN_ALLOWED_OPTIONS ? is_allowed : false;
         compitition["comp_name"] = compitition["comp_name"].replace("القسم الأول","").replace("إنوي","").replace("الدرجة الاولى","").replace("الممتاز","").replace("الإحترافية","").replace("القسم الثاني","2").replace("الدرجة الأولى","").replace("الدرجة A","").replace("البطولة المغربية","الدوري المغربي").trim();
         compitition["comp_name"] = compitition["comp_name"].replace("-","").trim();
         if((compitition["comp_name"].indexOf("الأوروبي")>=0 || compitition["comp_name"].indexOf("أوروبا"))>=0 && compitition["country"]==""){
           compitition["country"]="EURO";
         }
+        for(let x=0;x<exceptions.length;x++){
+          if(compitition["comp_name"].toLocaleLowerCase().indexOf(exceptions[x].toLocaleLowerCase())>=0){
+            is_allowed = true;
+          }
+        }
+        if(blacklisted_countries.includes(compitition["country"])){
+          is_allowed = false;
+        }
         if(is_allowed || "MA"==compitition["country"]){
           compititions[compitition["league_id"]] = compitition;
         }
+
         //console.log(compitition);
         compitition = {"country":""};
         k=0;
@@ -232,6 +241,7 @@ class Scrap {
       if(mat_header[j]=="time"){
         
         //is_ok = matche[ mat_header[j] ].indexOf("$f")>=0 ? false : true;
+        matche[ "time_old" ] = matche[ mat_header[j] ];
         live = matche[ mat_header[j] ].indexOf("@")>=0 ? 1 : 0;
         matche[ mat_header[j] ] = matche[ mat_header[j] ].replace(/[^0-9\:]/g,"");
         matche[ mat_header[j] ] = matche[ mat_header[j] ].slice(0,5)//API_.convert_time(matche[ mat_header[j] ].slice(0,5),+1);
@@ -243,7 +253,10 @@ class Scrap {
           if(date_str && date_str != matche[ "date" ]){
             is_ok = false;
           }
-          const time_playerd = live ? API_.convert_time_spent(matche.date + " "+matche.time) : "";
+          let time_playerd = live ? API_.convert_time_spent(matche.date + " "+matche.time) : "";
+          time_playerd = matche[ "time_old" ].split("'").length==2 && matche[ "time_old" ].split("'")[0].length<=2 
+            ? parseInt(matche[ "time_old" ].split("'")[0])
+            : time_playerd;
           if(live==1 && time_playerd>0){
             matche["time_played"] = time_playerd;
             matche["live"] = live;
@@ -258,9 +271,19 @@ class Scrap {
       //if(f==300)break;
       j++;
       if(mat_header.length==j){
+        if(matche["id"]==25879071 ){
+          console.log(matche);
+          console.log(matche["time_old"].indexOf("@"));
+        }
         const comp_match = compititions[matche["league_id"]] ;
+
         if(comp_match!=undefined && (is_ok || comp_match["country"]=="MA") ){
+          if(matche["live"]==undefined && is_only_live){
+            continue;
+          }
           let league = {"title": comp_match["comp_name"].trim(), "id":matche["league_id"],"img":comp_match["comp_logo"].replace("//","https://"), "data":[],"country":comp_match["country"]};
+
+          league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
           if(matches[ matche["league_id"] ]==undefined){
             matches[ matche["league_id"] ] = league;
           }
@@ -412,6 +435,10 @@ class Scrap {
       let video = {"link":"","title_news":"","img":"","date":""};
       const v = items[i];
       video["date"] = (v.querySelect("span")[0].childNodes+"").split("</i>")[1]+"";
+      video["date"] = video["date"].replace(/\s*ago\s*/i,"").trim();
+
+      const ds = Date.parse(video["date"]) ;
+      video["date"] = Number.isNaN(ds) ? video["date"] : API_.get_date2(new Date(ds));
       video["link"] = v.querySelect("a")[0].getAttribute("href")+"";
       video["title_news"] = v.querySelect("a")[0].childNodes+"";
       video["img"] = v.querySelect("img")[0].getAttribute("src")+"";

@@ -42,6 +42,10 @@ class API {
     const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : default_id ;
     return parseInt(league_id);
   }
+  leagueLogo_byTitle(title,logo){
+    title = this.fix_title(title);
+    return  API_ && API_.leagues_dict[title] ? API_.domain_o+API_.leagues_dict[title].logo : logo ;
+  }
   fix_title(title){
     title= typeof title == "string" ? title.trim() : title;
     title= typeof title == "string" ? title.replace(/أ/g,"ا") : title;
@@ -59,7 +63,6 @@ class API {
   }
   get_scorers(league_id){
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
-    console.log("https://m.kooora.com/?c="+league_id+"&scorers=true");
     return this.http("https://m.kooora.com/?c="+league_id+"&scorers=true&arabic","GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -88,7 +91,7 @@ class API {
       return scrap.get_videos_m(resp);
     });
   }
-  get_video(link,source_id){console.log(link,source_id);
+  get_video(link,source_id){
     return this.http(link,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -334,12 +337,24 @@ class API {
         this.error = error;
       });
   }
-  get_matches_k(date_obj){
-    return this.http("https://www.kooora.com/?region=-1&area=0&dd="+date_obj.getDate()+"&mm="+(date_obj.getMonth()+1)+"&yy="+date_obj.getFullYear()+"&arabic&ajax=1","GET",null,{})
+  get_matches_k(date_obj, is_only_live){
+    let url = "https://www.kooora.com/?region=-1&area=0&dd=";
+    url = is_only_live ? "https://www.kooora.com/?region=-1&area=6&dd=" : url;
+    url +=date_obj.getDate()+"&mm="+(date_obj.getMonth()+1)+"&yy="+date_obj.getFullYear()+"&arabic&ajax=1";
+    return this.http(url,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_matches_k(resp,date_obj);
+      return scrap.get_matches_k(resp,date_obj,false, is_only_live);
+    });
+  }
+  get_matches_league_k(league_id){
+    let url = "https://www.kooora.com/?c="+league_id+"&cm=m&ajax=1&arabic";
+    return this.http(url,"GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_matches_k(resp);
     });
   }
   get_match_k(id){
@@ -364,8 +379,8 @@ class API {
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_matches(date_obj,page)});
     }
-    const url = this.domain+"get_matches";
-
+    this.matches = page==1 ? {} : this.matches;
+    const url = this.domain+"get_matches&page="+page;
     date_obj = date_obj ? date_obj : new Date();
     let data = "match_date="+this.get_date(date_obj);
     return fetch(url, {
@@ -375,10 +390,17 @@ class API {
     })
       .then(response => response.json())
       .then(resJson => {
-        if(resJson["status"]== "true" ){
-          this.is_auth = true;
+        if(resJson["status"]== "true" ){//console.log(resJson["data"]);
+          const matches = Object.keys(resJson["data"]);
+          for(let i=0;i<matches.length;i++){
+            if(this.matches[matches[i]] == undefined){
+              this.matches[matches[i]] = resJson["data"][matches[i]];
+            }else{
+              this.matches[matches[i]] = this.matches[matches[i]].concat(resJson["data"][matches[i]]);
+            }
+          }
         }
-        return resJson;
+        return Object.keys(resJson["data"]).length>0 ? this.get_matches(date_obj, page+1) : this.matches;
       })
       .catch(error => {
         this.setConfig("token","");
@@ -569,6 +591,7 @@ class API {
         let list = [];
         if(o["items"] && o["items"].length>0){
           for(let i=0;i<o["items"].length;i++){
+            const r = o["items"][i];
             try{
               let vid = {
                 link:r.contentDetails.videoId,

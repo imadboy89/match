@@ -115,7 +115,7 @@ class ItemsList extends React.Component {
         );
     }else{
       return (
-        <Text style={this.state.dynamic_style.item}>- { col_key=="home_team" ? item["home_team"] +" - "+ item["away_team"] :item[col_key]}</Text>
+        <Text style={this.state.dynamic_style.item}>- {item[col_key]}</Text>
         );
     }
   }
@@ -192,7 +192,7 @@ class ItemsList extends React.Component {
         <Text style={[this.state.dynamic_style.header_components,{flex:1}]} numberOfLines={1}>{title}</Text>
         </TouchableHighlight>
         {fav_icon}
-        <View style={{flex:1,height:"100%"}}>
+        <View style={{flex:2,height:"100%"}}>
         { img ?  
                 <Image 
                   style={this.state.dynamic_style.matche_league_logo}
@@ -236,6 +236,17 @@ class ItemsList extends React.Component {
         <ScrollView  style={this.state.dynamic_style.container}
           refreshControl={this.props.refreshControl}
           onEndReached = {this.props.onEndReached}
+          onScroll={(e) => {
+            if(this.props.onEndReached==undefined){
+              return ;
+            }
+            let paddingToBottom = 10;
+            paddingToBottom += e.nativeEvent.layoutMeasurement.height;
+            const distance = e.nativeEvent.contentSize.height-paddingToBottom-e.nativeEvent.contentOffset.y;
+            if(e.nativeEvent.contentOffset.y >= e.nativeEvent.contentSize.height - paddingToBottom) {
+              this.props.onEndReached({info:{distanceFromEnd:distance}});
+            }
+          }}
             >
           <SafeAreaView style={this.state.dynamic_style.item_container}>
             {list_lists}
@@ -272,11 +283,11 @@ class ItemsList extends React.Component {
 
   }
   render() {
-    if(this.check_width(false) || this.state.dynamic_style==false || this.props.list==undefined || this.props.list.length==0){
+    if( this.props.loading==false && (this.check_width(false) || this.state.dynamic_style==false || this.props.list==undefined || this.props.list.length==0)){
       return null;
     }
     return (<View style={this.state.dynamic_style.container}>
-      {this.props.loading && this.props.refreshControl==undefined  ? <Loader/> : this.render_list()}
+      {this.props.loading && (this.props.refreshControl==undefined || API_.isWeb)  ? <Loader/> : this.render_list()}
     </View>);
   }
 }

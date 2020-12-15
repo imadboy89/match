@@ -33,6 +33,7 @@ class LeagueScreen extends React.Component {
     this.league_img   = this.props.route.params.league_details.league_img;
     this.real_id = this.props.route.params.league_details.id;
     this.league_id = API_.leagueId_byTitle(this.league_name)>0 ? API_.leagueId_byTitle(this.league_name) : 0;
+    //this.league_img = API_.leagueLogo_byTitle(this.league_name,this.league_img);
     this.get_standing(this.league_id);
   }
   componentDidMount(){
@@ -50,6 +51,9 @@ class LeagueScreen extends React.Component {
       get_notifications_matches().then(o=>{
         this.setState({notifications_matches:o});
         });
+      if(this.real_id!=this.league_id && this.real_id!=undefined){
+        return this.get_matches_k();
+      }
       API_.get_league_matches(this.league_id).then(resp=>{
       if(resp && resp["status"]=="true"){
         let list = [];
@@ -84,6 +88,31 @@ class LeagueScreen extends React.Component {
           
         }
       }
+    });
+  }
+  get_matches_k = ()=>{
+    this.setState({loading:true});
+    let matches = {};
+    get_notifications_matches().then(_notifications_matches=>{
+      API_.get_matches_league_k(this.real_id).then(resp=>{
+        let data = resp && resp.length>0 ? resp : [];
+        let header = JSON.parse(JSON.stringify(data[0])) ;
+        header["data"] = [];
+        data["data"];
+        try{
+          data = data[0]["data"].map(row =>{
+            const date_str = row.date;
+            if(matches[date_str] == undefined){
+              matches[date_str] = JSON.parse(JSON.stringify(header));
+              matches[date_str].title = date_str;
+            }
+            matches[date_str].data.push(row);
+
+          });
+        }catch(e){console.log(e)}
+      matches = Object.values(matches) ? Object.values(matches) : [];
+      this.setState({matches:matches,loading:false,visible_tab:"matches",notifications_matches:_notifications_matches});
+      });
     });
   }
   
@@ -140,7 +169,7 @@ class LeagueScreen extends React.Component {
         row = row[key];
         standing_ = standing_.concat(<View style={{flex:1,alignItems:"center"}}><Text style={this.state.dynamic_style.group_name_t}>{key}</Text></View>);
       }
-      row = [{"team_name":"team_name","team_badge":"","overall_league_payed":"Pld","overall_league_PTS":"Pts","goals":"Gls"}].concat(row);
+      row = [{"team_name":"Team name","team_badge":"","overall_league_payed":"Pld","overall_league_PTS":"Pts","goals":"Gls"}].concat(row);
       standing_ = standing_.concat( row.map(row=>{
         const team_name = row && row.team_name ? row.team_name : "";
         const team_badge= row && row.team_badge ? row.team_badge : "";

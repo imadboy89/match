@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl, Picker } from 'react-native';
+import { Text, View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl, Picker , Switch} from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -18,6 +18,7 @@ class HomeScreen extends React.Component {
     super(props);
     this.state = {
         list:[],
+        page:1,
         modalVisible_match:false,
         show_datPicker : false,
         matches_date:new Date(),
@@ -28,6 +29,7 @@ class HomeScreen extends React.Component {
         notifications_matches:{},
         favorite:[],
         source_id:1,
+        is_only_live : false,
         //dynamic_style_list:styles_list,
     };
   this.get_matches(this.state.matches_date);
@@ -48,7 +50,7 @@ class HomeScreen extends React.Component {
   }
   refresh_list=()=>{
     const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
-    this.setState({list:[]}); 
+    this.setState({list:[],page:1}); 
     this.setState({list:tmp_list});
   }
   set_fav=(league_id)=>{
@@ -74,43 +76,60 @@ class HomeScreen extends React.Component {
     clearInterval(this.interval_refresh);
   }
   changesource = (itemValue, itemIndex)=>{
+    this.end=false;
     this.state.source_id = parseInt(itemValue);
-    this.setState({});
+    this.setState({source_id:parseInt(itemValue),page:1});
     this.get_matches();
   }
+  update_is_only_live=(k,v)=>{
+    this.setState({is_only_live:k});
+    this.render_header();
+    this.get_matches();
+    }
   componentDidMount(){
     getTheme("styles_home").then(theme=>{
       this.setState({dynamic_style:theme});
+      this.render_header();
+      });
+
+    this.interval_refresh = setInterval(()=>{
+      if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
+        this.get_matches();
+      }
+      }, 50000);
+
+  }
+
+  render_header=()=>{
       this.props.navigation.setOptions({
         "headerRight":()=>(
           <View style={{flexDirection:"row",marginLeft:10}}>
-                {API_.isWeb==false ?null : 
-                <IconButton 
-                  name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
-                  this.get_matches(this.state.matches_date);
-                  
-                }}  />
-                }
-                <IconButton 
-                  name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{   
-                  const next_ind = themes_list.indexOf(Global_theme_name)+1;
-                  Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
-                  API_.setConfig("theme",Global_theme_name).then(o=>{
-                    Updates.reloadAsync();
-                  });              
-                }}  />
+            <Switch
+              style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:3}}
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+              thumbColor={this.state.is_only_live ? "#f5dd4b" : "#f4f3f4"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={this.update_is_only_live}
+              value={this.state.is_only_live}
+            />
+              {API_.isWeb==false ?null : 
+              <IconButton 
+                name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
+                this.get_matches(this.state.matches_date);
+                
+              }}  />
+              }
+              <IconButton 
+                name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{   
+                const next_ind = themes_list.indexOf(Global_theme_name)+1;
+                Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
+                API_.setConfig("theme",Global_theme_name).then(o=>{
+                  Updates.reloadAsync();
+                });              
+              }}  />
                 </View>
         )
       });
-      });
-
-
-  this.interval_refresh = setInterval(()=>{
-    if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
-      this.get_matches();
-    }
-    }, 50000);
-
   }
   get_matches = (date_obj=null)=>{
     if(this.state.source_id!=0){
@@ -121,33 +140,36 @@ class HomeScreen extends React.Component {
     API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
       get_notifications_matches().then(_notifications_matches=>{
         API_.load_leagues().then(leagues_dict=>{
-          API_.get_matches(date_obj).then(resp=>{
+          API_.get_matches(date_obj,this.state.page).then(resp=>{
+            const matches_list = resp ? resp : {};
             let data = [];
-          if(resp && resp["status"]=="true"){
+          if(matches_list && Object.keys(matches_list).length){
             let list = [];
-            data = Object.keys(resp["data"]).map(k =>{
-
-              let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
-                        ? resp["data"][k][0]["league_badge"]["path"] : false;
+            data = Object.keys(matches_list).map(k =>{
+              let row = matches_list[k] ;
+              let img = row && row.length>0 && row[0]["league_badge"] && row[0]["league_badge"]["path"] 
+                        ? row[0]["league_badge"]["path"] : false;
               let league_id=0; 
               try{league_id= leagues_dict && leagues_dict[k]? leagues_dict[k].league_id :0;}catch(e){console.log(e);}
-              for(let i=0;i<resp["data"][k].length;i++){
-                resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
-                resp["data"][k][i].league_id = league_id
-                if(resp["data"][k][i].live){
-                  const played_time = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time) ;
-                  resp["data"][k][i].time_played = played_time ? played_time : "";
+              for(let i=0;i<row.length;i++){
+                row[i].time = API_.convert_time(row[i].time);
+                row[i].league_id = league_id
+                if(row[i].live){
+                  const played_time = API_.convert_time_spent(row[i].date + " "+row[i].time) ;
+                  row[i].time_played = played_time ? played_time : "";
                   if(played_time==false || played_time<-10){
-                    resp["data"][k][i].live = 0;
+                    row[i].live = 0;
                   }
-                }
+                }else if(this.state.is_only_live){ return false;}
               }
-              return {"title":k,"img":img, data:resp["data"][k],"id":league_id}; 
+              return {"title":k,"img":img, data:row,"id":league_id}; 
             });
             try{
               data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
             }catch(e){console.log(e);}
           }
+          //this.end = data.length == 0 ? true : false;
+          //data = this.state.page>1 ? this.state.list.concat(data) : data;
           this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
         });
         });
@@ -160,7 +182,7 @@ class HomeScreen extends React.Component {
     API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
       get_notifications_matches().then(_notifications_matches=>{
         API_.load_leagues().then(leagues_dict=>{
-          API_.get_matches_k(date_obj).then(resp=>{
+          API_.get_matches_k(date_obj,this.state.is_only_live).then(resp=>{
             //console.log(Object.values(resp) )
             let data = resp && resp.length>0 ? resp : [];
             try{
@@ -231,9 +253,10 @@ show_DateP(){
           <IconButton 
             disabled={this.state.loading}
             name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-            this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
-            this.setState({list:[],loading:true});
-            this.get_matches(this.state.matches_date);
+              this.end=false;
+              this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
+              this.setState({list:[],loading:true,page:1});
+              this.get_matches(this.state.matches_date);
           }}  />
           <TouchableOpacity 
             disabled={this.state.loading}
@@ -245,9 +268,10 @@ show_DateP(){
           <IconButton 
             disabled={this.state.loading}
             name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-            this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
-            this.setState({list:[],loading:true});
-            this.get_matches(this.state.matches_date);
+              this.end=false;
+              this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
+              this.setState({list:[],loading:true,page:1});
+              this.get_matches(this.state.matches_date);
           }}  />
           <Picker
               selectedValue={this.state.source_id}
@@ -265,14 +289,15 @@ show_DateP(){
           favorite={this.state.favorite}
           set_fav={this.set_fav}
           refresh_list={this.refresh_list}
-          refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={this.get_matches} />}
+          refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={()=>{this.state.page=1 ;this.get_matches()}} />}
           loading={this.state.loading} 
           list={this.state.list} 
           onLeaguePressed={this.onLeaguePressed}
           onclick={this.onMatch_clicked}
           onLongPress={this._onMatch_LongPressed}
           notifications_matches={this.state.notifications_matches}
-          key_="home_team" key_key="id"  />
+          key_="home_team" key_key="id"
+            />
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
 
       { this.state.show_datPicker ? this.show_DateP() : null }       
