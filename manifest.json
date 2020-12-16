@@ -5,7 +5,7 @@
   "lang": "en",
   "name": "koooora",
   "short_name": "koooora",
-  "start_url": "/?utm_source=web_app_manifest",
+  "start_url": "/match",
   "orientation": "portrait",
   "related_applications": [
     {
