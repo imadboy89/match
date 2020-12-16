@@ -93,11 +93,10 @@ class HomeScreen extends React.Component {
       var psswd = prompt("Please enter your psswd", "");
       if(psswd!="hadil17"){
         window.location = "https://gooogle.com";
+        API_.is_auth = false;
         return;
-      }else{
-        API_.is_auth = true;
-      }
-    }
+      }else{API_.is_auth = true;}
+    }else{ API_.is_auth = true; }
     this.get_matches(this.state.matches_date);
     this._isMounted = true;
     getTheme("styles_home").then(theme=>{
