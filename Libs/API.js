@@ -150,7 +150,6 @@ class API {
       .then(response => response.json()) 
       .then(resJson => {
         if(resJson["status"]== "true" && resJson["message"]){
-          this.is_auth = true;
           this.headers["device-token"]=this.token;
           this.setConfig("token",this.token);
           //alert(resJson["message"]);
@@ -250,9 +249,6 @@ class API {
     })
       .then(response => response.json())
       .then(resJson => {
-        if(resJson["status"]== "true" ){
-          this.is_auth = true;
-        }
         return resJson;
       })
       .catch(error => {
@@ -272,9 +268,6 @@ class API {
     })
       .then(response => response.json())
       .then(resJson => {
-        if(resJson["status"]== "true" ){
-          this.is_auth = true;
-        }
         return resJson;
       })
       .catch(error => {
@@ -382,7 +375,7 @@ class API {
     }
     //notifyMessage("token : "+this.headers["device-token"]);
     this.matches = page==1 ? {} : this.matches;
-    const url = this.domain+"get_matches&page="+page;
+    const url = this.domain+"get_matches?page="+page;
     date_obj = date_obj ? date_obj : new Date();
     let data = "match_date="+this.get_date(date_obj);
     return fetch(url, {
@@ -390,7 +383,13 @@ class API {
       headers: this.headers,
       body:data
     })
-      .then(response => response.json())
+      .then(response =>{
+        if(response["ok"]){
+          return response.json()
+        }
+        notifyMessage("There is something wrong with this request\nstatus code:"+response.status+"\nurl: "+response.url+"\ntoken :"+this.headers["device-token"]);
+        return {};
+      })
       .then(resJson => {
         if(resJson["status"]== "true" ){//console.log(resJson["data"]);
           const matches = Object.keys(resJson["data"]);
@@ -406,7 +405,7 @@ class API {
         return resJson;
       })
       .catch(error => {
-        notifyMessage("error : \n"+JSON.stringify(error));
+        console.log("api_ error",error , url);
         this.setConfig("token","");
         this.headers["device-token"]="";
         const is_err = this.error ? true : false;
@@ -449,9 +448,6 @@ class API {
     })
       .then(response => response.json())
       .then(resJson => {
-        if(resJson["status"]== "true" ){
-          this.is_auth = true;
-        }
         return resJson;
       })
       .catch(error => {
@@ -472,9 +468,6 @@ class API {
     })
       .then(response => response.json())
       .then(resJson => {
-        if(resJson["status"]== "true" ){
-          this.is_auth = true;
-        }
         return resJson;
       })
       .catch(error => {

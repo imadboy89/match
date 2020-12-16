@@ -56,6 +56,7 @@
     "@babel/core": "~7.9.0",
     "@expo/webpack-config": "^0.12.51",
     "gh-pages": "^3.1.0",
+    "terser-webpack-plugin": "^5.0.3",
     "webpack-cli": "^4.2.0"
   },
   "private": true

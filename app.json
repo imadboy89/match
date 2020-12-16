@@ -28,13 +28,16 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "icon": "./assets/icon.png",
+      "backgroundColor":"#000",
+      "lang":"en",
     },
     "platforms": [
       "android",
       "ios",
       "web"
     ],
-    "description": ""
+    "description": "real time macthes events, live streaming and more..."
   }
 }

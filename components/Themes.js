@@ -538,6 +538,21 @@ function generateTheme(theme_name=false){
       flex: 1,
       //backgroundColor: '#fff',
     },
+    modalView: {
+      margin: 20,
+      backgroundColor: theme.background_color_default,
+      borderRadius: 10,
+      padding: 35,
+      alignItems: "center",
+      shadowColor: theme.text_color_default,
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5
+    },
     container: {
       flex: 1,
       //justifyContent: 'center',

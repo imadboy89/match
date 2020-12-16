@@ -32,7 +32,6 @@ class HomeScreen extends React.Component {
         is_only_live : false,
         //dynamic_style_list:styles_list,
     };
-  this.get_matches(this.state.matches_date);
   
   const customUpdater = new ExpoCustomUpdater()
   customUpdater.isAppUpdateAvailable().then(isAv=>{
@@ -90,6 +89,16 @@ class HomeScreen extends React.Component {
     this.get_matches();
     }
   componentDidMount(){
+    if(API_.isWeb){
+      var psswd = prompt("Please enter your psswd", "");
+      if(psswd!="hadil17"){
+        window.location = "https://gooogle.com";
+        return;
+      }else{
+        API_.is_auth = true;
+      }
+    }
+    this.get_matches(this.state.matches_date);
     this._isMounted = true;
     getTheme("styles_home").then(theme=>{
       this.setState({dynamic_style:theme});
@@ -141,6 +150,7 @@ class HomeScreen extends React.Component {
       });
   }
   get_matches = (date_obj=null,setloading=true)=>{
+    if(API_.is_auth==false){return false;}
     if(this.state.loading==false && setloading){this.setState({loading:true});}
     if(this.state.source_id!=0){
       return this.get_matches_koora(date_obj);
@@ -151,7 +161,6 @@ class HomeScreen extends React.Component {
       get_notifications_matches().then(_notifications_matches=>{
         API_.load_leagues().then(leagues_dict=>{
           API_.get_matches(date_obj,this.state.page).then(resp=>{
-            notifyMessage(""+JSON.stringify(resp) );
             const matches_list = resp ? resp : {};
             let data = [];
           if(matches_list && Object.keys(matches_list).length){

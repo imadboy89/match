@@ -1,21 +1,17 @@
 import React from "react";
-import { View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image } from 'react-native';
+import { View, Modal, Button, Linking, Picker,ScrollView, Image } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import {Video} from 'expo-av';
 import Loading from "../components/Loader";
 import {styles_channel,getTheme} from "../components/Themes";
-import Modal_web from "modal-enhanced-react-native-web" ;
 
-let list = [
-
-          ];
 class ChannelScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        list:list,
+        list:[],
         modalVisible_match:false,
         player_type:1,
         key_:"en_name",
@@ -63,7 +59,7 @@ class ChannelScreen extends React.Component {
     }
   }
   render_modal_credentials(){
-    const MModal = API_.isWeb ? Modal_web : Modal;
+    const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
     return (          
         <MModal 
           animationType="slide"
@@ -74,9 +70,9 @@ class ChannelScreen extends React.Component {
           } }
           
         > 
-        <View style={{flex: 1,justifyContent: "center",alignItems: "center",marginTop: 22}}>
-          <View style={modalView}>
-            <Button title="Close" onPress={()=>{ this.setState({modalVisible_match:false});}} ></Button>
+        <View style={{flex: 1,justifyContent: "center",alignItems: "center",width:"100%",paddingTop: 22,backgroundColor:"#2f333738"}}>
+          <View style={this.state.dynamic_style.modalView}>
+            <Button title="Close" onPress={()=>{ this.setState({modalVisible_match:false,p_url:""});}} ></Button>
             <Text >   {this.state.url} </Text>
             {this.state.modalVisible_match==true && this.state.p_url!="" ? this.render_ReactHlsPlayer() : null}
           </View>
@@ -170,22 +166,6 @@ class ChannelScreen extends React.Component {
         </ScrollView >
     );
   }
-}
-
-const modalView= {
-  margin: 20,
-  backgroundColor: "white",
-  borderRadius: 10,
-  padding: 35,
-  alignItems: "center",
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 2
-  },
-  shadowOpacity: 0.25,
-  shadowRadius: 3.84,
-  elevation: 5
 }
 
 export default ChannelScreen;

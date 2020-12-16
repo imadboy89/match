@@ -96,7 +96,6 @@ async function registerForPushNotificationsAsync() {
 registerForPushNotificationsAsync()
 global.notifyMessage = function(msg: string,title: string, buttons) {
     if(API_.isWeb){
-      console.log(buttons);
       alert(msg);
       return new Promise((resolve, reject)=>{return resolve([])});
     }

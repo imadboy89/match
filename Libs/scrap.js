@@ -235,6 +235,7 @@ class Scrap {
     let j = 0;
     let is_ok = true;
     let live = 0;
+    let time_playerd=0;
     for(let f=0;f< json_["matches_list"].length;f++){
       matche[ mat_header[j] ] = json_["matches_list"][f].trim ? json_["matches_list"][f].trim() : json_["matches_list"][f];
       matche[ mat_header[j] ] = this.decodeEntities(matche[ mat_header[j] ]);
@@ -253,13 +254,14 @@ class Scrap {
           if(date_str && date_str != matche[ "date" ]){
             is_ok = false;
           }
-          let time_playerd = API_.convert_time_spent(matche.date + " "+matche.time);
+          time_playerd = API_.convert_time_spent(matche.date + " "+matche.time);
           time_playerd = matche[ "time_old" ].split("'").length==2 && matche[ "time_old" ].split("'")[0].length<=2 
             ? parseInt(matche[ "time_old" ].split("'")[0])
             : time_playerd;
-          time_playerd = live==0 && parseInt(time_playerd)>0 && parseInt(time_playerd)<90 ? 45 : time_playerd;
-          live = parseInt(time_playerd)>0 && parseInt(time_playerd)<90 ? 1 : 0;
-          if(live==1 && time_playerd>0){
+          //time_playerd = live==0 && parseInt(time_playerd)>0 && parseInt(time_playerd)<90 ? 45 : time_playerd;
+          live = (time_playerd+"").toLocaleLowerCase()=="half" || (parseInt(time_playerd)>0 && parseInt(time_playerd)<95) ? 1 : live;
+
+          if(live==1 && time_playerd!=false){
             matche["time_played"] = time_playerd;
             matche["live"] = live;
           }
@@ -273,32 +275,30 @@ class Scrap {
       //if(f==300)break;
       j++;
       if(mat_header.length==j){
-        if(matche["id"]==25879071 ){
-          console.log(matche);
-          console.log(matche["time_old"].indexOf("@"));
+        if(matche["id"]==25478821111 ){
+          console.log(matche,time_playerd,live);
         }
         const comp_match = compititions[matche["league_id"]] ;
+        if(is_only_live==false || (matche["live"]==1 && is_only_live) ){
+          if(comp_match!=undefined && (is_ok || comp_match["country"]=="MA") ){
+            let league = {"title": comp_match["comp_name"].trim(), "id":matche["league_id"],"img":comp_match["comp_logo"].replace("//","https://"), "data":[],"country":comp_match["country"]};
 
-        if(comp_match!=undefined && (is_ok || comp_match["country"]=="MA") ){
-          if(matche["live"]==undefined && is_only_live){
-            continue;
+            league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
+            if(matches[ matche["league_id"] ]==undefined){
+              matches[ matche["league_id"] ] = league;
+            }
+            const score = matche["score"].split("|");
+            matche["home_team_score"] = score && score.length ==2 ? score[0] : "-";
+            matche["away_team_score"] = score && score.length ==2 ? score[1] : "-";
+            matche["league"] = league["title"];
+            matches[ matche["league_id"] ]["data"].push(matche);
           }
-          let league = {"title": comp_match["comp_name"].trim(), "id":matche["league_id"],"img":comp_match["comp_logo"].replace("//","https://"), "data":[],"country":comp_match["country"]};
-
-          league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
-          if(matches[ matche["league_id"] ]==undefined){
-            matches[ matche["league_id"] ] = league;
-          }
-          const score = matche["score"].split("|");
-          matche["home_team_score"] = score && score.length ==2 ? score[0] : "-";
-          matche["away_team_score"] = score && score.length ==2 ? score[1] : "-";
-          matche["league"] = league["title"];
-          matches[ matche["league_id"] ]["data"].push(matche);
         }
         is_ok = true;
         live = 0;
         matche = {};
         j=0;
+        time_playerd=0;
       }
     }
     matches = Object.values(matches) ;
