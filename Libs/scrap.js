@@ -444,8 +444,9 @@ class Scrap {
       video["link"] = v.querySelect("a")[0].getAttribute("href")+"";
       video["title_news"] = v.querySelect("a")[0].childNodes+"";
       video["img"] = v.querySelect("img")[0].getAttribute("src")+"";
+      video["desc"] = v.querySelect("div.entry p")[0].childNodes+"";
       videos.push(video);
-    }
+    }console.log(videos);
     return videos;
   }
   get_videos(html){

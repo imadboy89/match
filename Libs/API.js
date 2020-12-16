@@ -380,6 +380,7 @@ class API {
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_matches(date_obj,page)});
     }
+    //notifyMessage("token : "+this.headers["device-token"]);
     this.matches = page==1 ? {} : this.matches;
     const url = this.domain+"get_matches&page="+page;
     date_obj = date_obj ? date_obj : new Date();
@@ -405,7 +406,7 @@ class API {
         return resJson;
       })
       .catch(error => {
-        console.log("here11");
+        notifyMessage("error : \n"+JSON.stringify(error));
         this.setConfig("token","");
         this.headers["device-token"]="";
         const is_err = this.error ? true : false;

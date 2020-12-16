@@ -1,8 +1,15 @@
-import {  StyleSheet} from 'react-native';
+import {  StyleSheet, Dimensions} from 'react-native';
 import Constants from 'expo-constants';
 import API from '../Libs/API';
 
-
+function _isMobile(isWeb){
+  var isMobile = true;
+  if(isWeb==false){
+    return isMobile;
+  }
+  isMobile = (/iphone|ipod|android|ie|blackberry|fennec/i).test(navigator.userAgent);
+  return isMobile;
+}
 function getTheme(style_name=false){
   //var API_ = new API();
   return API_.getConfig("theme",Global_theme_name).then(theme_name__=>{
@@ -172,10 +179,16 @@ var Themes = {
 var themes_list = Object.keys(Themes);
 
 function generateTheme(theme_name=false){
-  try{API_ = API_ ? API_ : {isWeb:false};
-  }catch(err){API_ = {isWeb:false};}
+  let isWeb=false;
+  const window_width = Dimensions.get('window').width;
+  const window_height = Dimensions.get('window').height;
+  try{
+    isWeb = API_ ? API_.isWeb : {isWeb:false};
+  }catch(err){isWeb = false;}
   theme_name = theme_name==false ? "light" :theme_name ;
   let theme = Themes[theme_name];
+  const header_height = isWeb ? 30 : 70;
+  const __isMobile = _isMobile(isWeb);
   var styles_list = {
     container: {
       flex: 1,
@@ -185,6 +198,10 @@ function generateTheme(theme_name=false){
     item_container: {
       width:"100%",
       backgroundColor: theme.background_color_default,
+    },
+    columnWrapperStyle:{
+      justifyContent: 'flex-end',
+      marginRight: __isMobile ? 3 : 10
     },
     item: {
       padding: 10,
@@ -225,6 +242,7 @@ function generateTheme(theme_name=false){
     },
     matche_container:{
       width:"95%",
+      marginLeft:3,
       marginTop:10,
       marginBottom:5,
       flexDirection:'row', 
@@ -256,7 +274,7 @@ function generateTheme(theme_name=false){
       color: theme.match_name_color,
       paddingLeft:5,
       paddingRight:5,
-      paddingTop: API_ && API_.isWeb ? 3 : 10,
+      paddingTop: isWeb ? 3 : 10,
       justifyContent: 'center',
       fontSize:22,
       lineHeight:25,
@@ -472,7 +490,7 @@ function generateTheme(theme_name=false){
     },
     channel_logo_v:{
       width: "100%",
-      height:200,
+      height:window_height/3,
       padding:5,
       alignContent:"center",
       alignItems:"center",
@@ -550,7 +568,7 @@ function generateTheme(theme_name=false){
     },
     channel_logo_v:{
       width: "100%",
-      height:300,
+      height:window_height/3,
       padding:5,
       alignContent:"center",
       alignItems:"center",
@@ -833,7 +851,7 @@ function generateTheme(theme_name=false){
     },
     channel_logo_v : {
       width: "100%",
-      height:250,
+      height: window_height/3,
       padding:5,
       alignContent:"center",
       alignItems:"center",
@@ -849,7 +867,7 @@ function generateTheme(theme_name=false){
     screenHeader : {
       headerStyle: {
         backgroundColor: theme.headerStyle_backgroundColor,
-        height: 70,
+        height: header_height,
         },
       headerTintColor: theme.headerTintColor,
       headerTitleStyle: {
@@ -901,7 +919,7 @@ var app_styles     = themes["app_styles"];
 var styles_league  = themes["styles_league"];
 var global_theme   = themes["theme"];
 
-export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme};
+export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme,_isMobile};
 
 
 

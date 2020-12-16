@@ -140,7 +140,7 @@ class LeagueScreen extends React.Component {
     return scorers.map(p=>{
         const p_name = p.player_name_ar ? p.player_name_ar : p.player_name_en ;
         const p_img = false;
-        return <View style={this.state.dynamic_style.team_view}>
+        return <View style={this.state.dynamic_style.team_view} key={p_name}>
           
           <View style={{flex:1,padding:2}} >
             {p_img!=false ? <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} /> : null}
@@ -179,7 +179,7 @@ class LeagueScreen extends React.Component {
         let goals     = row && row.overall_league_GF>=0 ? row.overall_league_GF : 0 ;
         goals = row && row.overall_league_GA ? goals-row.overall_league_GA : goals;
         goals = row && row.goals=="Gls" ? row.goals : goals;
-        return <View style={this.state.dynamic_style.team_view}>
+        return <View style={this.state.dynamic_style.team_view} key={team_name}>
           <View style={{flex:1,padding:2}} >
             <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} />
           </View>

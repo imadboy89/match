@@ -3,13 +3,13 @@ import * as Updates from 'expo-updates'
 
 const DEFAULT_MIN_REFRESH_INTERVAL = 300
 const getUnixEpoch = () => Math.floor(Date.now() / 1000)
-
+/*
 try {
   var __DEV__ = __DEV__;
 } catch (error) {
   var __DEV__ =true;
 }
-
+*/
 export default class ExpoCustomUpdater {
     constructor ({
       minRefreshSeconds = DEFAULT_MIN_REFRESH_INTERVAL,

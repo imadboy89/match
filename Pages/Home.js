@@ -50,8 +50,10 @@ class HomeScreen extends React.Component {
   }
   refresh_list=()=>{
     const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
-    this.setState({list:[],page:1}); 
-    this.setState({list:tmp_list});
+    if(this._isMounted){
+      this.setState({list:[],page:1}); 
+      this.setState({list:tmp_list});
+    }
   }
   set_fav=(league_id)=>{
     API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{
@@ -73,6 +75,7 @@ class HomeScreen extends React.Component {
     });
   }
   componentWillUnmount(){
+    this._isMounted = false;
     clearInterval(this.interval_refresh);
   }
   changesource = (itemValue, itemIndex)=>{
@@ -87,6 +90,7 @@ class HomeScreen extends React.Component {
     this.get_matches();
     }
   componentDidMount(){
+    this._isMounted = true;
     getTheme("styles_home").then(theme=>{
       this.setState({dynamic_style:theme});
       this.render_header();
@@ -94,7 +98,7 @@ class HomeScreen extends React.Component {
 
     this.interval_refresh = setInterval(()=>{
       if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
-        this.get_matches();
+        this.get_matches(null,false);
       }
       }, 50000);
 
@@ -114,33 +118,40 @@ class HomeScreen extends React.Component {
             />
               {API_.isWeb==false ?null : 
               <IconButton 
-                name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
+                name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
                 this.get_matches(this.state.matches_date);
                 
               }}  />
               }
               <IconButton 
-                name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{   
+                name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{   
                 const next_ind = themes_list.indexOf(Global_theme_name)+1;
                 Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
                 API_.setConfig("theme",Global_theme_name).then(o=>{
-                  Updates.reloadAsync();
+                  if(API_.isWeb){
+                    reloading_app = true;
+                    location.reload();
+                  }else{
+                    Updates.reloadAsync();
+                  }
                 });              
               }}  />
                 </View>
         )
       });
   }
-  get_matches = (date_obj=null)=>{
+  get_matches = (date_obj=null,setloading=true)=>{
+    if(this.state.loading==false && setloading){this.setState({loading:true});}
     if(this.state.source_id!=0){
       return this.get_matches_koora(date_obj);
     }
     date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-    this.setState({loading:true});
+
     API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
       get_notifications_matches().then(_notifications_matches=>{
         API_.load_leagues().then(leagues_dict=>{
           API_.get_matches(date_obj,this.state.page).then(resp=>{
+            notifyMessage(""+JSON.stringify(resp) );
             const matches_list = resp ? resp : {};
             let data = [];
           if(matches_list && Object.keys(matches_list).length){
@@ -160,17 +171,23 @@ class HomeScreen extends React.Component {
                   if(played_time==false || played_time<-10){
                     row[i].live = 0;
                   }
-                }else if(this.state.is_only_live){ return false;}
+                }
+              }
+              if(this.state.is_only_live){
+                row = row.filter(o=>o.live);
               }
               return {"title":k,"img":img, data:row,"id":league_id}; 
             });
+            data = data.filter(o=>o.data.length>0);
             try{
               data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
             }catch(e){console.log(e);}
           }
           //this.end = data.length == 0 ? true : false;
           //data = this.state.page>1 ? this.state.list.concat(data) : data;
-          this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+          if(this._isMounted){
+            this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+          }
         });
         });
     });
@@ -178,7 +195,6 @@ class HomeScreen extends React.Component {
 }
   get_matches_koora = (date_obj=null)=>{
     date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-    this.setState({loading:true});
     API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
       get_notifications_matches().then(_notifications_matches=>{
         API_.load_leagues().then(leagues_dict=>{
@@ -191,12 +207,14 @@ class HomeScreen extends React.Component {
             try{
               data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
             }catch(e){console.log(e);}
-          this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+            if(this._isMounted){
+              this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+            }
         });
       });
     });
   });
-}
+  }
  onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     this.setState({show_datPicker: false ,list:[],matches_date:currentDate,loading:true});

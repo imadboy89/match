@@ -94,9 +94,9 @@ class Matchcreen extends React.Component {
       :this.state.matche_details.channels;
     let channels = this.state.matche_details.channels ?
       this.state.matche_details.channels.map(ch => (
-        <View style={{margin:1}}>
+        <View style={{margin:1}} key={ch.id}>
           {ch.is_koora==undefined ?
-            <Button onPress={()=>this.onmt_clicked(ch)}  key={ch.id} title={ch.en_name} style={{margin:4}}></Button>
+            <Button onPress={()=>this.onmt_clicked(ch)} title={ch.en_name} style={{margin:4}}></Button>
            : 
             <TouchableOpacity style={{flexDirection:'row', flexWrap:'wrap',width:"100%",marginLeft:10}} onPress={()=>this.set_fav(ch.en_name)}>
               {this.get_fav_icon(ch.en_name)}
@@ -214,9 +214,11 @@ class Matchcreen extends React.Component {
 
       const style_sub_h = home_p.player_out==undefined ? {} : this.state.dynamic_style.lineup2_number_subs;
       const style_sub_a = away_p.player_out==undefined ? {} : this.state.dynamic_style.lineup2_number_subs;
-
+      if(home_p==undefined || !home_p){
+        return null;
+      }
       return (
-          <View style={this.state.dynamic_style.lineup2_container}>
+          <View style={this.state.dynamic_style.lineup2_container} key={home_p.lineup_number+home_p.lineup_player+away_p.lineup_player}>
             
             <Text style={[this.state.dynamic_style.lineup2_number,style_sub_h]}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
             <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_h} numberOfLines={1}>
@@ -246,7 +248,7 @@ class Matchcreen extends React.Component {
     let stats = stats_list.map(row=>{
       i++;
       return (
-          <View style={this.state.dynamic_style.stats_container}>
+          <View style={this.state.dynamic_style.stats_container} key={row?row.type+"":"-"}>
             <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.stats_frag_l}>{row ? row.home : ""}</Text>
             <Text style={i==0?this.state.dynamic_style.stats_frag_m_ :this.state.dynamic_style.stats_frag_m}>{row ? row.type : "-"}</Text>
             <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.stats_frag_r}>{row ? row.away : ""}</Text>
@@ -319,20 +321,33 @@ class Matchcreen extends React.Component {
 
     let style_class = type_=="home"? this.state.dynamic_style.match_results_team_name_l : this.state.dynamic_style.match_results_team_name_r ;
     if(this.state.matche_details.goal_scorer){
+      this.state.matche_details.goal_scorer = this.state.matche_details.goal_scorer.sort((a,b)=>{
+        const a_time = !isNaN(a.time) ? parseInt(a.time) : a.time;
+        const b_time = !isNaN(b.time) ? parseInt(b.time) : b.time;
+        return a_time<b_time?-1:1
+      });
       let res = this.state.matche_details.goal_scorer.map(elm=>{
         if(elm[type_+"_scorer"]==undefined || elm[type_+"_scorer"]=="" || elm[type_+"_scorer"]==null) return false;
         let text = "";
         if(type_=="away"){
-          text = (elm.time ? elm.time+'"' : "-") +" "+ elm[type_+"_scorer"];
+          if(/^[\x00-\x7F]*$/.test(elm[type_+"_scorer"])){
+            text = (elm.time ? elm.time+'"' : "-") +" "+ elm[type_+"_scorer"];
+          }else{
+            text = elm[type_+"_scorer"]+" "+(elm.time ? elm.time+'"' : "-");
+          }
           this.scorers_a.push(elm[type_+"_scorer"]);
           this.assist_a.push(elm[type_+"_assist"]);
           
         }else{
-          text = elm[type_+"_scorer"] +" "+(elm.time ? elm.time+'"' : "-");
+          if(/^[\x00-\x7F]*$/.test(elm[type_+"_scorer"])){
+            text = elm[type_+"_scorer"] +" "+(elm.time ? elm.time+'"' : "-");
+          }else{
+            text = (elm.time ? elm.time+'"' : "-") +" " +elm[type_+"_scorer"];
+          }
           this.scorers_h.push(elm[type_+"_scorer"]);
           this.assist_h.push(elm[type_+"_assist"]);
         }
-        return <Text style={[style_class,this.state.dynamic_style.match_results_scorer_text]}>{text}</Text>;
+        return <Text style={[style_class,this.state.dynamic_style.match_results_scorer_text]} key={text}>{text}</Text>;
       });
       return(
           <View style={[style_class]}>

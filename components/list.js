@@ -2,7 +2,7 @@ import * as React from 'react';
 import {  View, StyleSheet, TouchableOpacity, Button, Image, ImageBackground,ScrollView  } from 'react-native';
 import { SafeAreaView,SectionList, FlatList, Dimensions,TouchableHighlight } from 'react-native';
 import Loader from "./Loader";
-import {styles_list,getTheme,global_theme} from "./Themes";
+import {_isMobile,getTheme,global_theme} from "./Themes";
 import IconButton from "../components/IconButton";
 
 class ItemsList extends React.Component {
@@ -20,22 +20,27 @@ class ItemsList extends React.Component {
 
   }
   componentDidMount=()=>{
+    this._isMounted=true;
     getTheme("styles_list").then(theme=>this.setState({dynamic_style:theme}));
     //AppState.addEventListener("resize", this.check_width.bind(this));
     Dimensions.addEventListener("change",this.check_width)
   }
   componentWillUnmount(){
+    this._isMounted=false;
     Dimensions.removeEventListener("change",this.check_width)
   }
   check_width=(render=true)=>{
     if(this.windowWidth == Dimensions.get('window').width){return ;}
+    const margin2add = _isMobile(API_.isWeb) ? 5 : 20;
     this.windowWidth = Dimensions.get('window').width;
     //this.setState({numColumns:this.windowWidth/500});
     this.state.numColumns = parseInt(this.windowWidth/this.minWidth);
     this.state.numColumns = this.state.numColumns>=1 ? this.state.numColumns : 1;
-    this.elem_width = parseInt(this.windowWidth/this.state.numColumns)-5;
+    this.elem_width = parseInt(this.windowWidth/this.state.numColumns)- margin2add;
     if(render && this.props.refresh_list){
-      this.props.refresh_list(1)
+      if(this._isMounted){
+        this.props.refresh_list(1)
+      }
     }
     return true;
   } 
@@ -126,8 +131,8 @@ class ItemsList extends React.Component {
       league_id = API_.leagueId_byTitle(title,league_id);
       
       fav_icon = this.props.favorite.includes(league_id) ?
-        <IconButton name="star" onPress={()=>{this.props.set_fav(league_id)}} color={color} /> :
-        <IconButton name="star-o" onPress={()=>{this.props.set_fav(league_id)}} color={color}/> ;
+        <IconButton name="star" onPress={()=>{this.props.set_fav(league_id)}} color={color} style={{width:50}} /> :
+        <IconButton name="star-o" onPress={()=>{this.props.set_fav(league_id)}} color={color} style={{width:50}}/> ;
     }
     return fav_icon;
   }
@@ -150,7 +155,7 @@ class ItemsList extends React.Component {
   }
   _render_item=({item})=>{
     if(this.state.header_to_hide.includes(API_.leagueId_byTitle(item.league,item.league_id)) ){return null}
-    return (<TouchableOpacity 
+    return (<TouchableOpacity
       style={{width:this.elem_width}}
       activeOpacity={0.5}
       onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
@@ -214,28 +219,29 @@ class ItemsList extends React.Component {
     if(is_new){
       this.setHidden();
     }
-    
     if(this.list.length>0 && this.list[0]["title"]!=""){
       const list_lists = this.list.map(k=>{
+        
       return (
-          <View style={{width:"100%"}}>
+          <View style={{width:"100%"}} key={k.title}>
             {this._render_header({section:k})}
             <FlatList
               numColumns={this.state.numColumns} 
               stickySectionHeadersEnabled={false}
               data={k.data}
-              keyExtractor={(item, index) => item[this.props.key_key]} 
+              keyExtractor={(item, index) => {return item[this.props.key_key]+""}} 
               renderItem={this._render_item}
               renderSectionHeader={this._render_header}
-              columnWrapperStyle={this.state.numColumns>1  ?{justifyContent: 'flex-end',marginRight:3} : null}
-            
+              columnWrapperStyle={this.state.numColumns>1  ? this.state.dynamic_style.columnWrapperStyle  : null}
+              
             />
           </View>);
       });
       return (
-        <ScrollView  style={this.state.dynamic_style.container}
+        <ScrollView  style={this.state.dynamic_style.container} key={JSON.stringify(this.list)}
           refreshControl={this.props.refreshControl}
           onEndReached = {this.props.onEndReached}
+          scrollEventThrottle={0}
           onScroll={(e) => {
             if(this.props.onEndReached==undefined){
               return ;
@@ -271,7 +277,7 @@ class ItemsList extends React.Component {
               onEndReached = {this.props.onEndReached}
               refreshControl={this.props.refreshControl}
               data={final_list}
-              keyExtractor={(item, index) => item[this.props.key_key]} 
+              keyExtractor={(item, index) => item[this.props.key_key]+""} 
               renderItem={this._render_item}
               renderSectionHeader={this._render_header}
             

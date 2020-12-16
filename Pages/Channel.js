@@ -3,9 +3,11 @@ import { View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image } fr
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
-import Video from 'expo';
+import {Video} from 'expo-av';
 import Loading from "../components/Loader";
 import {styles_channel,getTheme} from "../components/Themes";
+import Modal_web from "modal-enhanced-react-native-web" ;
+
 let list = [
 
           ];
@@ -19,10 +21,11 @@ class ChannelScreen extends React.Component {
         key_:"en_name",
         key_key:"channel_id",
         url:'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-        actionType:"IPTV",
+        actionType:"PLAYER",
         channel:null,
         loading:true,
         dynamic_style:styles_channel,
+        p_url:"",
         
         
     };
@@ -44,7 +47,7 @@ class ChannelScreen extends React.Component {
   render_ReactHlsPlayer(){
     if (this.state.player_type == 1){
       return ( <ReactHlsPlayer
-                url={this.state.url}
+                url={this.state.p_url}
                 autoplay={true}
                 controls={true}
                 width="100%" 
@@ -52,7 +55,7 @@ class ChannelScreen extends React.Component {
             />);
     }else{
       return (<Video 
-                source={{uri: "https://stream.mux.com/your-playback-id.m3u8"}}   
+                source={{uri: this.state.p_url}}   
                 ref={(ref) => {
                   this.player = ref
                 }} />
@@ -60,26 +63,25 @@ class ChannelScreen extends React.Component {
     }
   }
   render_modal_credentials(){
-    
+    const MModal = API_.isWeb ? Modal_web : Modal;
     return (          
-        <Modal 
+        <MModal 
           animationType="slide"
           transparent={true}
           visible={this.state.modalVisible_match}
           onRequestClose={() => { 
               this.setState({ modalVisible_match:false,});
           } }
-        >
-          <View style={{flex:.4,backgroundColor:"#2c3e5066"}}></View>
-          <View style={{height:400,width:"100%",backgroundColor:"#646c78"}}>
-          <Button title="Close" onPress={()=>{ this.setState({modalVisible_match:false});}} ></Button>
-          <Text >   {this.state.url} </Text>
-          {this.render_ReactHlsPlayer()}
-
+          
+        > 
+        <View style={{flex: 1,justifyContent: "center",alignItems: "center",marginTop: 22}}>
+          <View style={modalView}>
+            <Button title="Close" onPress={()=>{ this.setState({modalVisible_match:false});}} ></Button>
+            <Text >   {this.state.url} </Text>
+            {this.state.modalVisible_match==true && this.state.p_url!="" ? this.render_ReactHlsPlayer() : null}
           </View>
-          <View style={{flex:1,backgroundColor:"#2c3e5066"}}></View>
-
-        </Modal>
+        </View>
+        </MModal>
         );
 }
   onchannel_clicked_hls =(item)=>{
@@ -117,6 +119,10 @@ class ChannelScreen extends React.Component {
       API_.saveLink(serv.SecureUrl,this.state.channel["name"],API_.domain_o+this.channel_photo).then(out=>notifyMessage("Link saved"));
       
     }else if ("PLAYER"){
+      if(API_.isWeb){
+        this.setState({p_url:url,modalVisible_match:true});
+        return;
+      }
        Linking.canOpenURL(url).then(supported=>{
          if(supported){
            Linking.openURL(url).then(out=>{notifyMessage("Opening channel.");});
@@ -130,8 +136,8 @@ class ChannelScreen extends React.Component {
     
     let servers_list = this.state.channel ?
       this.state.channel.channel_servers.map(serv => (
-        <View style={{margin:8}}>
-          <Button onPress={()=>this.onch_clicked(serv)}  key={serv.id} title={serv.name} style={{margin:5}}></Button>
+        <View style={{margin:8}} key={serv.id}>
+          <Button onPress={()=>this.onch_clicked(serv)} title={serv.name} style={{margin:5}}></Button>
         </View>
       ))
     : null;
@@ -160,10 +166,26 @@ class ChannelScreen extends React.Component {
         </View>
         }
         </View>
-        {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
+        {this.render_modal_credentials()}
         </ScrollView >
     );
   }
+}
+
+const modalView= {
+  margin: 20,
+  backgroundColor: "white",
+  borderRadius: 10,
+  padding: 35,
+  alignItems: "center",
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 2
+  },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  elevation: 5
 }
 
 export default ChannelScreen;

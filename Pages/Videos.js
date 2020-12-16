@@ -43,7 +43,6 @@ class VideosScreen extends React.Component {
     this.setState({list:tmp_list});
   }
 get_Videos_m(){
-  this.setState({list:[],loading:true});
   if(this.state.source_id==3){
     return API_.get_videos_m(this.state.page).then(o=>{
       this.setState({list:o,loading:false});
@@ -61,10 +60,12 @@ get_Videos_m(){
   });
 }
 get_Videos(){
+  if(this.state.loading==false){
+    this.setState({list:[],loading:true});
+  }
   if(this.state.source_id!=0){
     return this.get_Videos_m(this.state.page);
   }
-  this.setState({list:[],loading:true});
 
   API_.get_videos(this.state.page).then(data=>this.setState({list:data,loading:false}));
 }

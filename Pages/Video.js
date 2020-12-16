@@ -35,6 +35,7 @@ class VideoScreen extends React.Component {
     deactivateKeepAwake();
   }
   get_video(){
+    if(this.state.loading==false){this.setState({loading:true});}
     if(this.state.video.is_yt && this.state.video.videoId){
       setTimeout(()=>{this.setState({loading:false});},500);
       return true;
@@ -44,7 +45,6 @@ class VideoScreen extends React.Component {
     //this.state.video.date = API_.get_date2(new Date(this.state.video.date.replace("#","") * 1000));
     this.props.navigation.setOptions({title: short_title})
     this.state.video.videoId = false;
-    this.setState({loading:true});
 
     API_.get_video(this.props.route.params.item.link,this.props.route.params.item.source_id)
     .then(videoId =>{
@@ -73,7 +73,9 @@ class VideoScreen extends React.Component {
     const uri_direct = this.state.video.videoId.slice(0,4)=="http" ? this.state.video.videoId : "";
     let uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
     uri_ = this.state.video.source_id==3 ? uri_direct :  uri_;
-    
+    if (API_.isWeb) {
+      return <iframe src={uri_} style={{flex:1,backgroundColor: "#000",borderWidth:0}} seamless/>;
+    }
     return  <WebView 
               allowsFullscreenVideo={true}
               style={{flex:1,backgroundColor: "#000"}}
@@ -107,6 +109,7 @@ class VideoScreen extends React.Component {
             
             
           </View>
+          <Text style={this.state.dynamic_style.article_body_t}>{this.state.video&&this.state.video.desc?this.state.video.desc :""}</Text>
           {this.state.video &&this.state.video.videoId ? null : <Loader/> }
       
         </ScrollView >

@@ -20,6 +20,7 @@ class NewsScreen extends React.Component {
     }, 60000);
   }
   componentDidMount(){
+    this._isMounted=true;
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
     this.props.navigation.setOptions({title: "News",
     "headerRight":()=>(
@@ -33,17 +34,26 @@ class NewsScreen extends React.Component {
 
   refresh_list=()=>{
     const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
-    this.setState({list:[]}); 
-    this.setState({list:tmp_list});
+    if(this._isMounted){
+      this.setState({list:[]}); 
+      this.setState({list:tmp_list});
+    }
   }
   
   componentWillUnmount(){
+    this._isMounted=false;
     clearInterval(this.interval_refresh);
   }
   
 get_news =()=>{
-  this.setState({loading:true});
-  API_.get_news(this.state.page).then(data=>this.setState({list:data,loading:false}));
+  if(this.state.loading==false){
+    this.setState({loading:true});
+  }
+  API_.get_news(this.state.page).then(data=>{
+    if(this._isMounted){
+      this.setState({list:data,loading:false});
+    }
+  });
 }
 
   onItem_clicked =(item)=>{

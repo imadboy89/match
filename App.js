@@ -29,11 +29,12 @@ import * as Permissions from 'expo-permissions';
 
 
 Text = TextF;
-API_ = new API();
-Global_theme_name = "dark violet";
+global. API_ = new API();
+global. Global_theme_name = "dark violet";
+global.reloading_app = false;
 var _app_styles = app_styles;
 
-LoadedFonts = false;
+global. LoadedFonts = false;
 function _loadFontsAsync() {
   Font.loadAsync({
     //'cairoregular': require('./assets/fonts/cairoregular.ttf'),
@@ -44,8 +45,15 @@ function _loadFontsAsync() {
   });
   //this.setState({ fontsLoaded: true });
 }
+if(API_.isWeb){
+  window.addEventListener('beforeunload', function (e) {
+    if(reloading_app==false){
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+}
 _loadFontsAsync();
-
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -86,7 +94,7 @@ async function registerForPushNotificationsAsync() {
   }
 }
 registerForPushNotificationsAsync()
-notifyMessage = function(msg: string,title: string, buttons) {
+global.notifyMessage = function(msg: string,title: string, buttons) {
     if(API_.isWeb){
       console.log(buttons);
       alert(msg);
