@@ -1,11 +1,11 @@
 {
   "files": {
-    "app.js": "/match/static/js/app.a747e23f.chunk.js",
-    "app.js.map": "/match/static/js/app.a747e23f.chunk.js.map",
+    "app.js": "/match/static/js/app.55e234d1.chunk.js",
+    "app.js.map": "/match/static/js/app.55e234d1.chunk.js.map",
     "runtime~app.js": "/match/static/js/runtime~app.e652ff3a.js",
     "runtime~app.js.map": "/match/static/js/runtime~app.e652ff3a.js.map",
-    "static/js/2.16948c3b.chunk.js": "/match/static/js/2.16948c3b.chunk.js",
-    "static/js/2.16948c3b.chunk.js.map": "/match/static/js/2.16948c3b.chunk.js.map",
+    "static/js/2.12d9ff8e.chunk.js": "/match/static/js/2.12d9ff8e.chunk.js",
+    "static/js/2.12d9ff8e.chunk.js.map": "/match/static/js/2.12d9ff8e.chunk.js.map",
     "fonts/DroidKufi-Bold.ttf": "/match/./fonts/DroidKufi-Bold.ttf",
     "fonts/DroidKufi-Regular.ttf": "/match/./fonts/DroidKufi-Regular.ttf",
     "fonts/FontAwesome.ttf": "/match/./fonts/FontAwesome.ttf",
@@ -20,7 +20,7 @@
   },
   "entrypoints": [
     "static/js/runtime~app.e652ff3a.js",
-    "static/js/2.16948c3b.chunk.js",
-    "static/js/app.a747e23f.chunk.js"
+    "static/js/2.12d9ff8e.chunk.js",
+    "static/js/app.55e234d1.chunk.js"
   ]
 }
