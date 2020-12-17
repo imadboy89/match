@@ -6,6 +6,7 @@
   "name": "koooora",
   "short_name": "koooora",
   "start_url": "/match",
+  "crossorigin": "no-referrer",
   "orientation": "portrait",
   "related_applications": [
     {
