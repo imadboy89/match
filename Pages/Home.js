@@ -91,21 +91,19 @@ class HomeScreen extends React.Component {
     }
 
   _handleNotification = notification => {
-    console.log("_handleNotification",notification);
-    let item = {};
+    console.log(1,notification);
     try{
-      item = JSON.parse(notification.data);
-    }catch(err){return true;}
-    this.onMatch_clicked(item);
+      let item = JSON.parse(notification.request.content.data.data);
+      this.onMatch_clicked(item);
+    }catch(err){}
   };
 
   _handleNotificationResponse = response => {
-    console.log("_handleNotificationResponse",response);
-    let item = {};
+    console.log(2,response);
     try{
-      item = JSON.parse(response.data);
-    }catch(err){return true;}
-    this.onMatch_clicked(item);
+      let item = JSON.parse(response.notification.request.content.data.data);
+      this.onMatch_clicked(item);
+    }catch(err){}
   };
   componentDidMount(){
 
@@ -140,9 +138,9 @@ class HomeScreen extends React.Component {
   render_header=()=>{
       this.props.navigation.setOptions({
         "headerRight":()=>(
-          <View style={{flexDirection:"row",marginLeft:10}}>
+          <View style={{flexDirection:"row",margin:5}}>
             <Switch
-              style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:3}}
+              style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:50}}
               trackColor={{ false: "#767577", true: "#81b0ff" }}
               thumbColor={this.state.is_only_live ? "#f5dd4b" : "#f4f3f4"}
               ios_backgroundColor="#3e3e3e"
@@ -169,7 +167,7 @@ class HomeScreen extends React.Component {
                   }
                 });              
               }}  />
-                </View>
+          </View>
         )
       });
   }

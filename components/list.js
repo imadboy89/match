@@ -173,39 +173,44 @@ class ItemsList extends React.Component {
     }
     
     return (
-      <View style={[{paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap'},this.state.dynamic_style.header]}>
-        {this.props.onLeaguePressed ? 
-          <IconButton name="list-ol" color="#130f40"
-            size={this.state.dynamic_style.header.fontSize} 
-            onPress={() => {this.props.onLeaguePressed(title,img,id) }}/>
-        : null}
-        <TouchableHighlight
-          underlayColor={"green"}
-          style={{flex:7,maxHeight:"100%"}} 
-          activeOpacity={0.9}
-          onPress={()=>{
-            const id_ = API_.leagueId_byTitle(title,id);
-            if(this.state.header_to_hide.includes(id_)){
-              this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id_)return x});
-            }else{
-              this.state.header_to_hide.push(id_);
-            }
-            this.props.refresh_list();
-            //this.setState({list:l});
-            }}
-        >
-        <Text style={[this.state.dynamic_style.header_components,{flex:1,}]} numberOfLines={1}>{title}</Text>
-        </TouchableHighlight>
-        {fav_icon}
-        <View style={{flex:2,height:"100%"}}>
-        { img ?  
-                <Image 
-                  style={this.state.dynamic_style.matche_league_logo}
-                  source={{uri: img.slice(0,8)=="https://" ? img :API_.domain_o+img}}
-                  />
+      <TouchableHighlight style={this.state.dynamic_style.header_container}
+        underlayColor={"green"}
+        activeOpacity={0.9}
+        onPress={()=>{
+          const id_ = API_.leagueId_byTitle(title,id);
+          if(this.state.header_to_hide.includes(id_)){
+            this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id_)return x});
+          }else{
+            this.state.header_to_hide.push(id_);
+          }
+          this.props.refresh_list();
+          //this.setState({list:l});
+          }}
+      >
+        <View style={[{paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap'},this.state.dynamic_style.header]}>
+          {this.props.onLeaguePressed ? 
+            <IconButton name="list-ol" color="#130f40"
+              size={this.state.dynamic_style.header.fontSize} 
+              onPress={() => {this.props.onLeaguePressed(title,img,id) }}/>
           : null}
+          <View
+            
+            style={{flex:7,maxHeight:"100%"}} 
+
+          >
+          <Text style={[this.state.dynamic_style.header_components,{flex:1,}]} numberOfLines={1}>{title}</Text>
+          </View>
+          {fav_icon}
+          <View style={{flex:2,height:"100%"}}>
+          { img ?  
+                  <Image 
+                    style={this.state.dynamic_style.matche_league_logo}
+                    source={{uri: img.slice(0,8)=="https://" ? img :API_.domain_o+img}}
+                    />
+            : null}
+          </View>
         </View>
-      </View>);
+      </TouchableHighlight>);
 
   }
   render_list() {

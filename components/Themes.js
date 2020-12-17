@@ -187,7 +187,7 @@ function generateTheme(theme_name=false){
   }catch(err){isWeb = false;}
   theme_name = theme_name==false ? "light" :theme_name ;
   let theme = Themes[theme_name];
-  const header_height = isWeb ? 30 : 70;
+  const header_height = isWeb ? 40 : 70;
   const __isMobile = _isMobile(isWeb);
   var styles_list = {
     container: {
@@ -210,22 +210,28 @@ function generateTheme(theme_name=false){
       flex:1,
       color:theme.text_color_default,
     },
-    header: {
+    header_container: {
       marginRight:__isMobile ? 3 : 10,
       marginLeft:5,
       marginTop:3,
-      fontSize: 20,
-      backgroundColor: theme.list_header_backgroundColor,
+      //backgroundColor: theme.list_header_backgroundColor,
       width:"98%",
-      textAlign:"right",
-      height:50,
+      height:48,
       borderTopLeftRadius:20,
       borderTopRightRadius:20,
-      
-      //height:40,
-      //alignContent:"center",
-      //alignItems:"center",
-      //alignSelf:"center",
+      borderBottomLeftRadius:5,
+      borderBottomRightRadius:5,
+    },
+    header: {
+      borderTopLeftRadius:20,
+      borderTopRightRadius:20,
+      borderBottomLeftRadius:5,
+      borderBottomRightRadius:5,
+      fontSize: 20,
+      backgroundColor: theme.list_header_backgroundColor,
+      width:"100%",
+      textAlign:"right",
+      height:"99%",
     },
     header_components: {
       //marginRight:5,
@@ -340,6 +346,7 @@ function generateTheme(theme_name=false){
       height: "100%",
       aspectRatio: 1,
       resizeMode:"contain",
+      borderRadius: isWeb ? 8 : 5
     },
     matche_team_badge:{
       flex: 2 ,
@@ -428,6 +435,7 @@ function generateTheme(theme_name=false){
       //marginLeft :20,
     },
     icons:{
+      marginHorizontal:3,
       alignItems:"center",
       justifyContent: "center",
       height:40,  
