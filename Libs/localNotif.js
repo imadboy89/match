@@ -59,11 +59,7 @@ const  onMatch_LongPressed=async(item)=>{
   let league = item["league"] ? item["league"] :"";
   let trigger = API_.convert_time_o(item.date+" "+item.time);
   let trigger_s = API_.convert_time_o(item.date+" "+item.time, true);
-  let time_now = new Date();
-  time_now = time_now.getTime() ;
-  if(trigger_s<time_now){
-    trigger =time_now +10000 ;
-  }
+  const trigger_2 = new Date((new Date).getTime()+10000);
   let content= {
       title: home_team_name+" 𝒱𝒮 "+away_team_name,
       body: league,
@@ -72,6 +68,15 @@ const  onMatch_LongPressed=async(item)=>{
     };
   if (API_.isWeb){
     return save_notification_web(item, content, trigger_s);
+  }
+  try{
+    let action2 = await AsyncAlert(content.title+"\nAdd/Remove TEST NOTIF : "+API_.get_date_time(trigger_2),"Reminder",is_exist==false);
+    if(action2==1){
+      return save(item, content, trigger_2);
+    }
+  }catch(e){
+    notifyMessage("ERR : "+e);
+    return [];
   }
   let action=2;
   let is_exist = false;
@@ -84,6 +89,7 @@ const  onMatch_LongPressed=async(item)=>{
   action = await AsyncAlert(content.title+"\nAdd/Remove Notification : "+API_.get_date_time(trigger),"Reminder",is_exist==false)
 
   if(action==1){
+    //save(item, content, trigger2);
     return save(item, content, trigger);
   }else if(action==2){
     return cancelNotif(item.id+"");
