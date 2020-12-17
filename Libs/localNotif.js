@@ -59,11 +59,16 @@ const  onMatch_LongPressed=async(item)=>{
   let league = item["league"] ? item["league"] :"";
   let trigger = API_.convert_time_o(item.date+" "+item.time);
   let trigger_s = API_.convert_time_o(item.date+" "+item.time, true);
-
+  let time_now = new Date();
+  time_now = time_now.getTime() ;
+  if(trigger_s<time_now){
+    trigger =time_now +10000 ;
+  }
   let content= {
       title: home_team_name+" 𝒱𝒮 "+away_team_name,
       body: league,
       sound: true,
+      data:JSON.stringify(item)
     };
   if (API_.isWeb){
     return save_notification_web(item, content, trigger_s);

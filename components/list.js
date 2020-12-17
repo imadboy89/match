@@ -181,7 +181,7 @@ class ItemsList extends React.Component {
         : null}
         <TouchableHighlight
           underlayColor={"green"}
-          style={{flex:7}} 
+          style={{flex:7,maxHeight:"100%"}} 
           activeOpacity={0.9}
           onPress={()=>{
             const id_ = API_.leagueId_byTitle(title,id);
@@ -194,7 +194,7 @@ class ItemsList extends React.Component {
             //this.setState({list:l});
             }}
         >
-        <Text style={[this.state.dynamic_style.header_components,{flex:1}]} numberOfLines={1}>{title}</Text>
+        <Text style={[this.state.dynamic_style.header_components,{flex:1,}]} numberOfLines={1}>{title}</Text>
         </TouchableHighlight>
         {fav_icon}
         <View style={{flex:2,height:"100%"}}>

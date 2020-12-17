@@ -201,7 +201,7 @@ function generateTheme(theme_name=false){
     },
     columnWrapperStyle:{
       justifyContent: 'flex-end',
-      marginRight: __isMobile ? 3 : 10
+      marginRight: __isMobile ? 3 : 100
     },
     item: {
       padding: 10,
@@ -211,31 +211,31 @@ function generateTheme(theme_name=false){
       color:theme.text_color_default,
     },
     header: {
-      marginRight:5,
+      marginRight:__isMobile ? 3 : 10,
       marginLeft:5,
       marginTop:3,
       fontSize: 20,
       backgroundColor: theme.list_header_backgroundColor,
-      width:"100%",
+      width:"98%",
       textAlign:"right",
       height:50,
+      borderTopLeftRadius:20,
+      borderTopRightRadius:20,
+      
       //height:40,
       //alignContent:"center",
       //alignItems:"center",
       //alignSelf:"center",
     },
     header_components: {
-      marginRight:5,
+      //marginRight:5,
       marginLeft:5,
       //marginTop:3,
       fontSize: 20,
       backgroundColor: theme.list_header_backgroundColor,
       width:"98%",
       textAlign:"right",
-      height:"100%",
-      //alignContent:"center",
-      //alignItems:"center",
-      //alignSelf:"center",
+      height:"98%",
     },
     title: {
       fontSize: 23

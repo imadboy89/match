@@ -5,6 +5,8 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "crossorigin":"no-referrer",
+    "privacy": "public",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -32,6 +34,8 @@
       "icon": "./assets/icon.png",
       "backgroundColor":"#000",
       "lang":"en",
+      "startUrl":"/match",
+      "crossorigin":"no-referrer"
     },
     "platforms": [
       "android",

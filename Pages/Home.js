@@ -7,7 +7,7 @@ import IconButton from "../components/IconButton";
 import * as Font from 'expo-font';
 import {styles_home,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
-import Loader from "../components/Loader";
+import * as Notifications from 'expo-notifications';
 import * as Updates from 'expo-updates';
 import AppLoading from 'expo-app-loading';
 
@@ -84,12 +84,37 @@ class HomeScreen extends React.Component {
     this.get_matches();
   }
   update_is_only_live=(k,v)=>{
+    this.state.matches_date = k==true ? new Date() : this.state.matches_date;
     this.setState({is_only_live:k});
     this.render_header();
     this.get_matches();
     }
+
+  _handleNotification = notification => {
+    console.log("_handleNotification",notification);
+    let item = {};
+    try{
+      item = JSON.parse(notification.data);
+    }catch(err){return true;}
+    this.onMatch_clicked(item);
+  };
+
+  _handleNotificationResponse = response => {
+    console.log("_handleNotificationResponse",response);
+    let item = {};
+    try{
+      item = JSON.parse(response.data);
+    }catch(err){return true;}
+    this.onMatch_clicked(item);
+  };
   componentDidMount(){
-    if(API_.isWeb){
+
+    //handle notification
+    Notifications.addNotificationReceivedListener(this._handleNotification);
+    Notifications.addNotificationResponseReceivedListener(this._handleNotificationResponse);
+    /////////////
+
+    if(API_.isWeb==10){
       var psswd = prompt("Please enter your psswd", "");
       if(psswd!="hadil17"){
         window.location = "https://gooogle.com";
@@ -225,9 +250,9 @@ class HomeScreen extends React.Component {
   }
  onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    this.setState({show_datPicker: false ,list:[],matches_date:currentDate,loading:true});
+    this.setState({show_datPicker: false ,list:[],matches_date:currentDate,loading:true,is_only_live:false});
     this.get_matches(currentDate);
-    
+    this.render_header();
   };
 show_DateP(){
   return  (<DateTimePicker
@@ -281,8 +306,9 @@ show_DateP(){
             name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
               this.end=false;
               this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
-              this.setState({list:[],loading:true,page:1});
+              this.setState({list:[],loading:true,page:1,is_only_live:false});
               this.get_matches(this.state.matches_date);
+              this.render_header();
           }}  />
           <TouchableOpacity 
             disabled={this.state.loading}
@@ -296,8 +322,9 @@ show_DateP(){
             name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
               this.end=false;
               this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
-              this.setState({list:[],loading:true,page:1});
+              this.setState({list:[],loading:true,page:1,is_only_live:false});
               this.get_matches(this.state.matches_date);
+              this.render_header();
           }}  />
           <Picker
               selectedValue={this.state.source_id}

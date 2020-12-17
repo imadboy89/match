@@ -7,6 +7,62 @@ import {Video} from 'expo-av';
 import Loading from "../components/Loader";
 import {styles_channel,getTheme} from "../components/Themes";
 
+class HLSP extends React.Component {
+  constructor(props) {
+    super(props);
+    this.playerRef = React.createRef();
+  }
+  componentDidMount(){  
+    
+  }
+  render_ReactHlsPlayer(){
+    if (this.props.player_type == 1){
+      return ( <ReactHlsPlayer
+                url={this.props.p_url}
+                autoplay={true}
+                controls={true}
+                width="100%" 
+                height="auto" 
+                onError={e => console.log("errr",e)}
+                playerRef={this.playerRef}
+                
+            />);
+    }else{
+      return (<Video 
+                source={{uri: this.props.p_url}}   
+                ref={(ref) => {
+                  this.player = ref
+                }} />
+          );
+    }
+  }
+  render(){
+    const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
+    return (          
+        <MModal 
+          animationType="slide"
+          transparent={true}
+          visible={this.props.modalVisible_match}
+          onRequestClose={() => { 
+              this.setState({ modalVisible_match:false,});
+          } }
+          
+        > 
+        <View style={{flex: 1,justifyContent: "center",alignItems: "center",width:"100%",paddingTop: 22,backgroundColor:"#2f333738"}}>
+          <View style={this.props.dynamic_style.modalView}>
+            <Button title="Close" onPress={()=>{ 
+              console.log(this.playerRef);
+              this.setState({modalVisible_match:false,p_url:""});
+              }} ></Button>
+            <Text >   {this.props.url} </Text>
+            {this.props.modalVisible_match==true && this.props.p_url!="" ? this.render_ReactHlsPlayer() : null}
+          </View>
+        </View>
+        </MModal>
+        );
+  }
+}
+
 class ChannelScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -25,7 +81,8 @@ class ChannelScreen extends React.Component {
         
         
     };
-    
+    this.playerRef = React.createRef();
+
     this.get_channel();
 
   }
@@ -41,6 +98,7 @@ class ChannelScreen extends React.Component {
       });
   }
   render_ReactHlsPlayer(){
+    setTimeout(()=>{this.playerRef.current.onerror = (e) => console.log("errr",e);},100);
     if (this.state.player_type == 1){
       return ( <ReactHlsPlayer
                 url={this.state.p_url}
@@ -48,6 +106,9 @@ class ChannelScreen extends React.Component {
                 controls={true}
                 width="100%" 
                 height="auto" 
+                onError={e => console.log("errr",e)}
+                playerRef={this.playerRef}
+                
             />);
     }else{
       return (<Video 
@@ -60,24 +121,13 @@ class ChannelScreen extends React.Component {
   }
   render_modal_credentials(){
     const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
-    return (          
-        <MModal 
-          animationType="slide"
-          transparent={true}
-          visible={this.state.modalVisible_match}
-          onRequestClose={() => { 
-              this.setState({ modalVisible_match:false,});
-          } }
-          
-        > 
-        <View style={{flex: 1,justifyContent: "center",alignItems: "center",width:"100%",paddingTop: 22,backgroundColor:"#2f333738"}}>
-          <View style={this.state.dynamic_style.modalView}>
-            <Button title="Close" onPress={()=>{ this.setState({modalVisible_match:false,p_url:""});}} ></Button>
-            <Text >   {this.state.url} </Text>
-            {this.state.modalVisible_match==true && this.state.p_url!="" ? this.render_ReactHlsPlayer() : null}
-          </View>
-        </View>
-        </MModal>
+    return (    
+      <HLSP 
+        modalVisible_match={this.state.modalVisible_match}
+        dynamic_style={this.state.dynamic_style}
+        p_url={this.state.p_url}
+        player_type={this.state.player_type}
+      />
         );
 }
   onchannel_clicked_hls =(item)=>{
