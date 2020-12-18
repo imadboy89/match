@@ -191,8 +191,11 @@ function generateTheme(theme_name=false){
   const __isMobile = _isMobile(isWeb);
   var styles_list = {
     container: {
+      marginRight:__isMobile ? 3 : 10,
+      marginLeft:"1%",
+      marginTop:"1%",
       flex: 1,
-      width:"100%",
+      width:"99%",
       backgroundColor: theme.background_color_default,
     },
     item_container: {
@@ -201,7 +204,7 @@ function generateTheme(theme_name=false){
     },
     columnWrapperStyle:{
       justifyContent: 'flex-end',
-      marginRight: __isMobile ? 3 : 100
+      paddingRight: __isMobile ? 10 : 20
     },
     item: {
       padding: 10,
@@ -211,10 +214,8 @@ function generateTheme(theme_name=false){
       color:theme.text_color_default,
     },
     header_container: {
-      marginRight:__isMobile ? 3 : 10,
-      marginLeft:5,
-      marginTop:3,
       //backgroundColor: theme.list_header_backgroundColor,
+      marginVertical:1,
       width:"98%",
       height:48,
       borderTopLeftRadius:20,
@@ -247,15 +248,14 @@ function generateTheme(theme_name=false){
       fontSize: 23
     },
     matche_container:{
-      width:"95%",
+      width:"98%",
       marginLeft:3,
-      marginTop:10,
-      marginBottom:5,
+      marginVertical:3,
       flexDirection:'row', 
       flexWrap:'wrap',
       flex: 1 ,
       height:70,
-      //marginRight:5,
+      marginRight:5,
       //marginLeft:5,
       borderRadius:10,
       borderWidth:1,

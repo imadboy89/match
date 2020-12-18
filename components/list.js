@@ -31,12 +31,12 @@ class ItemsList extends React.Component {
   }
   check_width=(render=true)=>{
     if(this.windowWidth == Dimensions.get('window').width){return ;}
-    const margin2add = _isMobile(API_.isWeb) ? 5 : 20;
+    let margin2add = _isMobile(API_.isWeb) ? 5 : 40;
     this.windowWidth = Dimensions.get('window').width;
     //this.setState({numColumns:this.windowWidth/500});
     this.state.numColumns = parseInt(this.windowWidth/this.minWidth);
     this.state.numColumns = this.state.numColumns>=1 ? this.state.numColumns : 1;
-    this.elem_width = parseInt(this.windowWidth/this.state.numColumns)- margin2add;
+    this.elem_width = parseInt((this.windowWidth-margin2add)/this.state.numColumns);
     if(render && this.props.refresh_list){
       if(this._isMounted){
         this.props.refresh_list(1)
@@ -260,7 +260,9 @@ class ItemsList extends React.Component {
           }}
             >
           <SafeAreaView style={this.state.dynamic_style.item_container}>
+            {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : null}
             {list_lists}
+            {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : null}
           </SafeAreaView>
         </ScrollView >);
 
@@ -275,8 +277,10 @@ class ItemsList extends React.Component {
       }
       return (
         <View style={this.state.dynamic_style.container}>
-          <SafeAreaView style={[this.state.dynamic_style.container,{}]}>
+          <SafeAreaView style={{flex: 1,width:"100%"}}>
             <FlatList
+              ListHeaderComponent = {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : undefined}
+              ListFooterComponent = {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : undefined}
               numColumns={this.state.numColumns} 
               stickySectionHeadersEnabled={false}
               onEndReached = {this.props.onEndReached}

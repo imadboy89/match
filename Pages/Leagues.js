@@ -89,6 +89,7 @@ get_leagues(){
           loading={this.state.loading} list={this.state.list} 
           onclick={this.onItem_clicked} key_={this.state.key} key_key="id"  />
         
+        {/*
         <View style={this.state.dynamic_style.nav_container}>
           <IconButton
             disabled={this.state.loading}
@@ -105,6 +106,7 @@ get_leagues(){
             this.get_news();
           }}  />
         </View>
+        */}
       </View>
     );
   }

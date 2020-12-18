@@ -10,6 +10,9 @@ import {styles_channel,getTheme} from "../components/Themes";
 class HLSP extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      modalVisible_match :this.props.modalVisible_match,
+    }
     this.playerRef = React.createRef();
   }
   componentDidMount(){  
@@ -50,9 +53,9 @@ class HLSP extends React.Component {
         > 
         <View style={{flex: 1,justifyContent: "center",alignItems: "center",width:"100%",paddingTop: 22,backgroundColor:"#2f333738"}}>
           <View style={this.props.dynamic_style.modalView}>
-            <Button title="Close" onPress={()=>{ 
-              console.log(this.playerRef);
-              this.setState({modalVisible_match:false,p_url:""});
+            <Button title="Close" onPress={()=>{
+              this.props.closeM();
+              this.setState({p_url:""});
               }} ></Button>
             <Text >   {this.props.url} </Text>
             {this.props.modalVisible_match==true && this.props.p_url!="" ? this.render_ReactHlsPlayer() : null}
@@ -97,28 +100,7 @@ class ChannelScreen extends React.Component {
         }
       });
   }
-  render_ReactHlsPlayer(){
-    setTimeout(()=>{this.playerRef.current.onerror = (e) => console.log("errr",e);},100);
-    if (this.state.player_type == 1){
-      return ( <ReactHlsPlayer
-                url={this.state.p_url}
-                autoplay={true}
-                controls={true}
-                width="100%" 
-                height="auto" 
-                onError={e => console.log("errr",e)}
-                playerRef={this.playerRef}
-                
-            />);
-    }else{
-      return (<Video 
-                source={{uri: this.state.p_url}}   
-                ref={(ref) => {
-                  this.player = ref
-                }} />
-          );
-    }
-  }
+
   render_modal_credentials(){
     const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
     return (    
@@ -127,6 +109,7 @@ class ChannelScreen extends React.Component {
         dynamic_style={this.state.dynamic_style}
         p_url={this.state.p_url}
         player_type={this.state.player_type}
+        closeM={()=>{this.setState({modalVisible_match:false})}}
       />
         );
 }

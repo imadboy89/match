@@ -75,39 +75,44 @@ get_Videos(){
     this.props.navigation.navigate('Video', { item: item });
   }
   render() {
-    
+    const ListFooterComponent = (        <View style={this.state.dynamic_style.nav_container}>
+      <IconButton
+        disabled={this.state.loading}
+       title="arrow-back-circle"  name="chevron-left" 
+       size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+        if(this.state.page==1){return false;}
+        this.state.page--;
+        this.get_Videos();
+      }}  />
+      <Text style={this.state.dynamic_style.text}>{this.state.page}</Text>
+      <IconButton 
+        disabled={this.state.loading}
+       title="forward"  name="chevron-right" 
+       size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+        this.state.page++;
+        this.get_Videos();
+      }}  />
+      <Picker
+          selectedValue={this.state.source_id}
+          style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:80}}
+          onValueChange={this.changesource}
+        >
+          <Picker.Item label="BeIn" value={0} />
+          <Picker.Item label="AlMthkb" value={1} />
+          <Picker.Item label="arriadia" value={2} />
+          <Picker.Item label="Mtkhb" value={3} />
+      </Picker>
+    </View>);
     return (
       <View style={this.state.dynamic_style.container}>
-        <View style={this.state.dynamic_style.nav_container}>
-          <IconButton
-            disabled={this.state.loading}
-           title="arrow-back-circle"  name="chevron-left" 
-           size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-            if(this.state.page==1){return false;}
-            this.state.page--;
-            this.get_Videos();
-          }}  />
-          <Text style={this.state.dynamic_style.text}>{this.state.page}</Text>
-          <IconButton 
-            disabled={this.state.loading}
-           title="forward"  name="chevron-right" 
-           size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-            this.state.page++;
-            this.get_Videos();
-          }}  />
-        <Picker
-            selectedValue={this.state.source_id}
-            style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:80}}
-            onValueChange={this.changesource}
-          >
-            <Picker.Item label="BeIn" value={0} />
-            <Picker.Item label="AlMthkb" value={1} />
-            <Picker.Item label="arriadia" value={2} />
-            <Picker.Item label="Mtkhb" value={3} />
-        </Picker>
-        </View>
 
-        <ItemsList loading={this.state.loading} list={this.state.list} onclick={this.onItem_clicked} key_="title_news" key_key="link"  refresh_list={this.refresh_list} />
+        <ItemsList 
+          ListFooterComponent = {ListFooterComponent}
+          loading={this.state.loading} 
+          list={this.state.list} 
+          onclick={this.onItem_clicked} 
+          key_="title_news" key_key="link"  
+          refresh_list={this.refresh_list} />
         
 
       </View>

@@ -112,7 +112,7 @@ class HomeScreen extends React.Component {
     Notifications.addNotificationResponseReceivedListener(this._handleNotificationResponse);
     /////////////
 
-    if(API_.isWeb==10){
+    if(API_.isWeb && __DEV__ !=true ){
       var psswd = prompt("Please enter your psswd", "");
       if(psswd!="hadil17"){
         window.location = "https://gooogle.com";
@@ -296,47 +296,46 @@ show_DateP(){
   }
   render() {
     if(this.state.dynamic_style==undefined || this.state.dynamic_style===false) {return <AppLoading/>; }
+    const ListHeaderComponent = (        <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
+    <IconButton 
+      disabled={this.state.loading}
+      name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+        this.end=false;
+        this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
+        this.setState({list:[],loading:true,page:1,is_only_live:false});
+        this.get_matches(this.state.matches_date);
+        this.render_header();
+    }}  />
+    <TouchableOpacity 
+      disabled={this.state.loading}
+      activeOpacity={0.5}
+      onPress={()=>this.setState({show_datPicker:true})}
+      >
+      <Text style={[this.state.dynamic_style.title,]} >{API_.get_date2(this.state.matches_date)}</Text>
+    </TouchableOpacity>
+    <IconButton 
+      disabled={this.state.loading}
+      name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+        this.end=false;
+        this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
+        this.setState({list:[],loading:true,page:1,is_only_live:false});
+        this.get_matches(this.state.matches_date);
+        this.render_header();
+    }}  />
+    <Picker
+        selectedValue={this.state.source_id}
+        style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+        onValueChange={this.changesource}
+      >
+        <Picker.Item label="AL match" value={0} />
+        <Picker.Item label="Kooora" value={1} />
+        <Picker.Item label="arriadia" value={2} />
+    </Picker>
+  </View>);
     return (
-      <View style={this.state.dynamic_style.container}>
-        <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
-          <IconButton 
-            disabled={this.state.loading}
-            name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-              this.end=false;
-              this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
-              this.setState({list:[],loading:true,page:1,is_only_live:false});
-              this.get_matches(this.state.matches_date);
-              this.render_header();
-          }}  />
-          <TouchableOpacity 
-            disabled={this.state.loading}
-            activeOpacity={0.5}
-            onPress={()=>this.setState({show_datPicker:true})}
-            >
-            <Text style={[this.state.dynamic_style.title,]} >{API_.get_date2(this.state.matches_date)}</Text>
-          </TouchableOpacity>
-          <IconButton 
-            disabled={this.state.loading}
-            name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-              this.end=false;
-              this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
-              this.setState({list:[],loading:true,page:1,is_only_live:false});
-              this.get_matches(this.state.matches_date);
-              this.render_header();
-          }}  />
-          <Picker
-              selectedValue={this.state.source_id}
-              style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-              onValueChange={this.changesource}
-            >
-              <Picker.Item label="AL match" value={0} />
-              <Picker.Item label="Kooora" value={1} />
-              <Picker.Item label="arriadia" value={2} />
-          </Picker>
-        </View>
-
-        
+      <View style={this.state.dynamic_style.container}>        
         <ItemsList 
+          ListHeaderComponent = {ListHeaderComponent}
           favorite={this.state.favorite}
           set_fav={this.set_fav}
           refresh_list={this.refresh_list}

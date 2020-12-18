@@ -45,12 +45,15 @@ class NewsScreen extends React.Component {
     clearInterval(this.interval_refresh);
   }
   
-get_news =()=>{
+get_news =(keep_list=false)=>{
   if(this.state.loading==false){
     this.setState({loading:true});
   }
   API_.get_news(this.state.page).then(data=>{
     if(this._isMounted){
+      if(keep_list){
+        data = this.state.list.concat(data);
+      }
       this.setState({list:data,loading:false});
     }
   });
@@ -60,33 +63,34 @@ get_news =()=>{
     this.props.navigation.navigate('Article', { article: item });
   }
   render() {
-    
+    const ListFooterComponent = (        <View style={this.state.dynamic_style.nav_container}>
+      <IconButton
+        disabled={this.state.loading}
+       title="arrow-back-circle"  name="chevron-left" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+        if(this.state.page==1){return false;}
+        this.state.page--;
+        this.get_news();
+      }}  />
+      <Text style={this.state.dynamic_style.text}>{this.state.page}</Text>
+      <IconButton 
+        disabled={this.state.loading}
+       title="forward"  name="chevron-right" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+        this.state.page++;
+        this.get_news();
+      }}  />
+    </View>);
     return (
       <View style={this.state.dynamic_style.container}>     
         <ItemsList 
+          ListFooterComponent = {ListFooterComponent}
           refresh_list={this.refresh_list}
           refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={this.get_news} />}
           loading={this.state.loading} 
           list={this.state.list} 
           onclick={this.onItem_clicked} 
-          key_="title_news" key_key="title_news"  />
+          key_="title_news" key_key="title_news"  
+          />
         
-        <View style={this.state.dynamic_style.nav_container}>
-          <IconButton
-            disabled={this.state.loading}
-           title="arrow-back-circle"  name="chevron-left" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-            if(this.state.page==1){return false;}
-            this.state.page--;
-            this.get_news();
-          }}  />
-          <Text style={this.state.dynamic_style.text}>{this.state.page}</Text>
-          <IconButton 
-            disabled={this.state.loading}
-           title="forward"  name="chevron-right" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-            this.state.page++;
-            this.get_news();
-          }}  />
-        </View>
       </View>
     );
   }

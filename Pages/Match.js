@@ -429,9 +429,8 @@ class Matchcreen extends React.Component {
             }}/></View>
           <View style={{flex:1}}><Button title="League" onPress={()=>{
             const league_img = this.state.matche_details.league_badge ? API_.domain_o+this.state.matche_details.league_badge.path : null ;
-            this.props.navigation.navigate('League', 
-          { league_details: {league:this.state.matche_details.league,
-            league_img: league_img} })           }
+            this.props.navigation.navigate('League', { league_details: {id:this.state.match_dets.league_id,league:this.state.matche_details.league,league_img: league_img} });
+          }
           }/></View>
           {/* <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/> */}
         </View>
