@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity, Image, ScrollView, Dimensions, ImageBackground} from 'react-native';
+import { View, Pressable, Modal, Button, Linking, Picker, TouchableOpacity, Image, ScrollView, Dimensions, ImageBackground} from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
@@ -27,7 +27,8 @@ class LeagueScreen extends React.Component {
         height:"100%",
         dynamic_style:styles_league,
         notifications_matches:{},
-        scorers:[]
+        scorers:[],
+        favorite:[]
     };
     this.league_name = this.props.route.params.league_details.league;
     this.league_img   = this.props.route.params.league_details.league_img;
@@ -40,12 +41,13 @@ class LeagueScreen extends React.Component {
     getTheme("styles_league").then(theme=>this.setState({dynamic_style:theme}));
     this.props.navigation.setOptions({title: <Text>{this.league_name}</Text>});
   }
-  get_standing(id){
-      API_.get_standing(id).then(resp=>{
-        if(resp["data"] && resp["data"] ){
-          this.setState({league_details:resp["data"],loading:false});
-        }
-      });
+  async get_standing(id){
+    const favorite = await API_.getConfig("favorite_teames",this.state.favorite) ;
+    console.log(favorite);
+    const resp = await API_.get_standing(id)
+    if(resp["data"] && resp["data"] ){
+      this.setState({league_details:resp["data"],loading:false,favorite:favorite});
+    }
   }
   get_matches(league_id){
       get_notifications_matches().then(o=>{
@@ -152,6 +154,29 @@ class LeagueScreen extends React.Component {
         </View>;
       });
   }
+  get_fav_icon(id){
+    id= parseInt(id);
+    if(id==0){return "";}
+    console.log(id,id==70993708);
+    if(id==70988155){
+      console.log(this.state.favorite );
+    }
+    return this.state.favorite.includes(id ) ? "★" : "☆" ;
+  }
+  set_fav=async(id)=>{
+    id= parseInt(id);
+    if(id==0){return "";}
+    let o = await API_.getConfig("favorite_teames",this.state.favorite)
+    if( o.includes(id) ){
+      o = o.filter(o=>{if(o!=id)return o;});
+    }else{
+      o.push(id);
+    }
+    console.log("fav",o);
+    this.setState({favorite:o});
+    await API_.setConfig("favorite_teames",o);
+    this.setState({});
+  }
   render_standing(){
     if(this.state.league_details==undefined || this.state.league_details.length==0){
       return null;
@@ -163,15 +188,17 @@ class LeagueScreen extends React.Component {
     }
     standing_before.sort? standing_before.sort((a,b)=> (Object.keys(a)[0] > Object.keys(b)[0]) ? 1 : -1  ) : null;
     for(let index in standing_before){
-      let row = standing_before[index];
+      let rows = standing_before[index];
       if(index!=""){
-        let key = Object.keys(row)[0];
-        row = row[key];
+        let key = Object.keys(rows)[0];
+        rows = rows[key];
         standing_ = standing_.concat(<View style={{flex:1,alignItems:"center"}}><Text style={this.state.dynamic_style.group_name_t}>{key}</Text></View>);
       }
-      row = [{"team_name":"Team name","team_badge":"","overall_league_payed":"Pld","overall_league_PTS":"Pts","goals":"Gls"}].concat(row);
-      standing_ = standing_.concat( row.map(row=>{
-        const team_name = row && row.team_name ? row.team_name : "";
+      rows = [{"team_name":"Team name","team_badge":"","overall_league_payed":"Pld","overall_league_PTS":"Pts","goals":"Gls","id":0}].concat(rows);
+      standing_ = standing_.concat( rows.map(row=>{
+        console.log(row);
+        const fav_icon = row.team ? this.get_fav_icon(row.team.id) : "";
+        const team_name = row && row.team_name ? fav_icon+row.team_name : "";
         const team_badge= row && row.team_badge ? row.team_badge : "";
         const position  = row && row.overall_league_position ? row.overall_league_position : "0";
         const points    = row && row.overall_league_PTS ? row.overall_league_PTS : "0";
@@ -179,7 +206,12 @@ class LeagueScreen extends React.Component {
         let goals     = row && row.overall_league_GF>=0 ? row.overall_league_GF : 0 ;
         goals = row && row.overall_league_GA ? goals-row.overall_league_GA : goals;
         goals = row && row.goals=="Gls" ? row.goals : goals;
-        return <View style={this.state.dynamic_style.team_view} key={team_name}>
+        return (
+        <Pressable 
+          style={this.state.dynamic_style.team_view} 
+          key={team_name}
+          onLongPress={()=>this.set_fav(row.team.id)}
+          >
           <View style={{flex:1,padding:2}} >
             <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} />
           </View>
@@ -187,7 +219,7 @@ class LeagueScreen extends React.Component {
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{played}</Text></View>
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{goals}</Text></View>
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{points}</Text></View>
-        </View>;
+        </Pressable>);
       }) );
     }
     return standing_;
@@ -204,8 +236,10 @@ class LeagueScreen extends React.Component {
         <View style={this.state.dynamic_style.channel_logo_v}>
           { this.league_img ?  
             <ImageBackground style={{flex:1,width:"100%"}} source={{uri: this.league_img}} >
-            <View style={{flex:16}}></View>
-              <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t} numberOfLines={1}>{this.league_name}</Text></View>
+              <View style={this.state.dynamic_style.news_img_v}></View>
+              <View style={this.state.dynamic_style.news_title_v}>
+                <Text style={this.state.dynamic_style.news_title_t} numberOfLines={1}>{this.league_name}</Text>
+              </View>
             </ImageBackground>
           : null}
         </View> 

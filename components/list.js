@@ -31,7 +31,8 @@ class ItemsList extends React.Component {
   }
   check_width=(render=true)=>{
     if(this.windowWidth == Dimensions.get('window').width){return ;}
-    let margin2add = _isMobile(API_.isWeb) ? 5 : 40;
+    let margin2add = _isMobile(API_.isWeb) ? 15 : 40;
+    margin2add = parseInt(margin2add * (this.minWidth/300)); 
     this.windowWidth = Dimensions.get('window').width;
     //this.setState({numColumns:this.windowWidth/500});
     this.state.numColumns = parseInt(this.windowWidth/this.minWidth);
@@ -156,7 +157,7 @@ class ItemsList extends React.Component {
   _render_item=({item})=>{
     if(this.state.header_to_hide.includes(API_.leagueId_byTitle(item.league,item.league_id)) ){return null}
     return (<TouchableOpacity
-      style={{width:this.elem_width}}
+      style={{width:this.elem_width,alignSelf:"center"}}
       activeOpacity={0.5}
       onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
       <View style={{flexDirection:'row', flexWrap:'wrap',width:"100%",justifyContent: 'center',alignItems:"center",alignContent:"center",marginHorizontal:3,}}>
@@ -243,7 +244,7 @@ class ItemsList extends React.Component {
           </View>);
       });
       return (
-        <ScrollView  style={this.state.dynamic_style.container} key={JSON.stringify(this.list)}
+        <ScrollView  style={this.state.dynamic_style.list_container} key={JSON.stringify(this.list)}
           refreshControl={this.props.refreshControl}
           onEndReached = {this.props.onEndReached}
           scrollEventThrottle={0}
@@ -276,7 +277,7 @@ class ItemsList extends React.Component {
         final_list = final_list.concat(this.list[i] ? this.list[i]["data"]: []);
       }
       return (
-        <View style={this.state.dynamic_style.container}>
+        <View style={this.state.dynamic_style.list_container}>
           <SafeAreaView style={{flex: 1,width:"100%"}}>
             <FlatList
               ListHeaderComponent = {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : undefined}

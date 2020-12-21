@@ -30,22 +30,17 @@ class HomeScreen extends React.Component {
         favorite:[],
         source_id:1,
         is_only_live : false,
+        is_upd_available:false,
         //dynamic_style_list:styles_list,
     };
   
-  const customUpdater = new ExpoCustomUpdater()
-  customUpdater.isAppUpdateAvailable().then(isAv=>{
-    if(isAv==false){return}
-    this.props.navigation.setOptions({
-      "headerLeft":()=>(
-              <IconButton 
-                name="cloud-download" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.header_icons} onPress={()=>{
-                this.setState({list:[],loading:true});
-                customUpdater.doUpdateApp();
-              }}  /> 
-      )
+  }
+  checkUpdAvailability(){
+    const customUpdater = new ExpoCustomUpdater()
+    customUpdater.isAppUpdateAvailable().then(isAv=>{
+      this.setState({is_upd_available:isAv});
+      this.render_header();
     });
-  });
   }
   refresh_list=()=>{
     const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
@@ -106,13 +101,16 @@ class HomeScreen extends React.Component {
     }catch(err){}
   };
   componentDidMount(){
-
+    this.checkUpdAvailability();
     //handle notification
     Notifications.addNotificationReceivedListener(this._handleNotification);
     Notifications.addNotificationResponseReceivedListener(this._handleNotificationResponse);
     /////////////
-
-    if(API_.isWeb && __DEV__ !=true ){
+    let is_dev = false;
+    try{
+      is_dev = __DEV__;
+    }catch(e){}
+    if(API_.isWeb && is_dev !=true ){
       var psswd = prompt("Please enter your psswd", "");
       if(psswd!="hadil17"){
         window.location = "https://gooogle.com";
@@ -136,11 +134,31 @@ class HomeScreen extends React.Component {
   }
 
   render_header=()=>{
-      this.props.navigation.setOptions({
+    let headerLeft = null;
+    const iconsSize = this.state.dynamic_style && this.state.dynamic_style.title ? this.state.dynamic_style.title.fontSize : 15;
+    if(this.state.is_upd_available){
+      headerLeft = ()=>(
+        <IconButton 
+          name="cloud-download" size={iconsSize} style={this.state.dynamic_style.icons}
+            onPress={()=>{
+              this.setState({list:[],loading:true});
+              customUpdater.doUpdateApp();
+        }}  /> );
+    }else{
+      headerLeft = ()=>(
+        <IconButton 
+          name="inbox" size={iconsSize} style={this.state.dynamic_style.icons} 
+            onPress={()=>{
+              this.checkUpdAvailability();
+        }}  /> );
+    }
+    
+    this.props.navigation.setOptions({
+        "headerLeft":headerLeft,
         "headerRight":()=>(
           <View style={{flexDirection:"row",margin:5}}>
             <Switch
-              style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:50}}
+              style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
               trackColor={{ false: "#767577", true: "#81b0ff" }}
               thumbColor={this.state.is_only_live ? "#f5dd4b" : "#f4f3f4"}
               ios_backgroundColor="#3e3e3e"
@@ -149,13 +167,13 @@ class HomeScreen extends React.Component {
             />
               {API_.isWeb==false ?null : 
               <IconButton 
-                name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+                name="refresh" size={iconsSize} style={this.state.dynamic_style.icons} onPress={()=>{
                 this.get_matches(this.state.matches_date);
                 
               }}  />
               }
               <IconButton 
-                name="adjust" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{   
+                name="adjust" size={iconsSize} style={this.state.dynamic_style.icons} onPress={()=>{   
                 const next_ind = themes_list.indexOf(Global_theme_name)+1;
                 Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
                 API_.setConfig("theme",Global_theme_name).then(o=>{

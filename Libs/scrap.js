@@ -153,6 +153,53 @@ class Scrap {
     }catch(err){console.log(err)}
     return lineups;
   }
+  get_standup(html){
+    let json_={"match_squads":[]};
+    try{
+      json_ = JSON.parse(html);
+    }catch(err){console.log(err);}
+    let standup =[];
+    if(json_ && json_["ranks_table"] && JSON.stringify(json_["ranks_table"])==JSON.stringify([-1]) ){
+      console.log("empty");
+      return lineups;
+    }
+    const lineup_header = [
+      "table_r",
+      "info_1",
+      "position",
+      "team",
+      "played",
+      "wins",
+      "draws",
+      "loses",
+      "rest",
+      "goals_scored",
+      "goals_received",
+      "goals_difference",
+      "points",
+      "i",
+      "last_matches_res"
+]
+    let h =0;
+    let team_st = {};
+    try{
+    for(let i=0;i< json_["match_squads"].length;i++){
+      if(h==0 && json_["match_squads"][i]!="r"){
+        continue;
+      }
+      team_st [ lineup_header[h] ] = json_["match_squads"][i];
+      h++;
+      if(h==lineup_header.length){
+        team_st["subs_in_time"] = player["subs_in_time"]+""
+        standup[type].push(team_st);
+        h=0;
+        team_st={};
+      }
+      
+    }
+    }catch(err){console.log(err)}
+    return standup;
+  }
   get_matches_k(html,date,is_oneMatch=false,is_only_live=false){
     let json_={"matches_comps":[],"matches_list":[]};
     try{

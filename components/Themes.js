@@ -190,12 +190,18 @@ function generateTheme(theme_name=false){
   const header_height = isWeb ? 40 : 70;
   const __isMobile = _isMobile(isWeb);
   var styles_list = {
-    container: {
-      marginRight:__isMobile ? 3 : 10,
-      marginLeft:"1%",
+    list_container: {
+      marginRight: "1%",
+      //marginLeft: isWeb ? "20%" : 0, 
       marginTop:"1%",
       flex: 1,
-      width:"99%",
+      width:"100%",
+      backgroundColor: theme.background_color_default,
+    },
+    container: {
+      //marginRight:__isMobile ? "1%" : 10,
+      flex: 1,
+      //width:"99%",
       backgroundColor: theme.background_color_default,
     },
     item_container: {
@@ -205,6 +211,10 @@ function generateTheme(theme_name=false){
     columnWrapperStyle:{
       justifyContent: 'flex-end',
       paddingRight: __isMobile ? 10 : 20
+    },
+    columnWrapperStyle2:{
+      justifyContent: 'flex-end',
+      //paddingRight: __isMobile ? 10 : 20
     },
     item: {
       padding: 10,
@@ -216,6 +226,7 @@ function generateTheme(theme_name=false){
     header_container: {
       //backgroundColor: theme.list_header_backgroundColor,
       marginVertical:1,
+      marginLeft:"1%", 
       width:"98%",
       height:48,
       borderTopLeftRadius:20,
@@ -385,6 +396,7 @@ function generateTheme(theme_name=false){
     },
     news_title_v:{
       width:"100%",
+      height : 50,
       paddingBottom:5,
       flex: 2 ,
       fontSize:18,
@@ -392,12 +404,14 @@ function generateTheme(theme_name=false){
       backgroundColor: theme.news_title_backgroundColor
     },
     news_title_t:{
+      height : "100%",
       flex: 9,
       fontSize:15,
       alignItems:'center',
       justifyContent: 'center',
       alignSelf : "center",
       color: theme.news_title_color,
+      paddingHorizontal:3,//backgroundColor:"red"
     },
     news_title_icon:{
       //fontSize:15,
@@ -833,6 +847,8 @@ function generateTheme(theme_name=false){
   var styles_league = StyleSheet.create({
     container: {
       flex: 1,
+      width:"100%",
+      alignContent:"center",
       //justifyContent: 'center',
       //paddingTop: Constants.statusBarHeight,
       backgroundColor: theme.background_color_default,
@@ -874,8 +890,8 @@ function generateTheme(theme_name=false){
     },
     channel_logo_v : {
       width: "100%",
-      height: window_height/3,
-      padding:5,
+      height: window_height/3>250 ? window_height/3 : 250,
+      paddingHorizontal:5,
       alignContent:"center",
       alignItems:"center",
       alignSelf:"center",
@@ -884,6 +900,10 @@ function generateTheme(theme_name=false){
     },
     news_title_v : styles_list.news_title_v,
     news_title_t : styles_list.news_title_t,
+    news_img_v   : styles_list.news_img_v,
+    news_container: styles_list.news_container,
+    
+    
   });
 
   var app_styles = {
