@@ -242,27 +242,39 @@ class HomeScreen extends React.Component {
     });
   });
 }
-  get_matches_koora = (date_obj=null)=>{
+  get_matches_koora = async(date_obj=null)=>{
     date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-    API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
-      get_notifications_matches().then(_notifications_matches=>{
-        API_.load_leagues().then(leagues_dict=>{
-          API_.get_matches_k(date_obj,this.state.is_only_live).then(resp=>{
-            //console.log(Object.values(resp) )
-            let data = resp && resp.length>0 ? resp : [];
-            try{
-              data = data.sort((a,b)=>{ return (leagues_dict[API_.fix_title(a.title) ] != undefined && leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
-            }catch(e){console.log(e);}
-            try{
-              data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
-            }catch(e){console.log(e);}
-            if(this._isMounted){
-              this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
-            }
-        });
-      });
-    });
-  });
+    const favorite_teams = await API_.getConfig("favorite_teams",[]) ;
+    const favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
+    const _notifications_matches = await get_notifications_matches();
+    const leagues_dict = await API_.load_leagues();
+    const resp = await API_.get_matches_k(date_obj,this.state.is_only_live)
+    //console.log(Object.values(resp) )
+    let data = resp && resp.length>0 ? resp : [];
+    let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
+    try{
+      data = data.sort((a,b)=>{ return (leagues_dict[API_.fix_title(a.title) ] != undefined && leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
+    }catch(e){console.log(e);}
+    try{
+      data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
+    }catch(e){console.log(e);}
+    for(let j=0;j<Object.keys(data).length;j++){
+      for(let m=0;m<data[j]["data"].length;m++){
+        const matche_f = JSON.parse(JSON.stringify(data[j]["data"][m]));
+        const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
+        const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
+        if(favorite_teams.includes(home_team_id) || favorite_teams.includes(away_team_id)){
+          matche_f["id"] = "fav_"+matche_f["id"];
+          matche_f["league_id"] = 1;
+          matche_f["league"] = "fav_list";
+          fav_list.data.push(matche_f);
+        }
+      }
+    }
+    data = [fav_list,].concat(data);
+    if(this._isMounted){
+      this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+    }
   }
  onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;

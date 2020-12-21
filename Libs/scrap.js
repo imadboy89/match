@@ -153,12 +153,12 @@ class Scrap {
     }catch(err){console.log(err)}
     return lineups;
   }
-  get_standup(html){
+  get_standing(html){
     let json_={"match_squads":[]};
     try{
       json_ = JSON.parse(html);
     }catch(err){console.log(err);}
-    let standup =[];
+    let standing =[];
     if(json_ && json_["ranks_table"] && JSON.stringify(json_["ranks_table"])==JSON.stringify([-1]) ){
       console.log("empty");
       return lineups;
@@ -183,22 +183,33 @@ class Scrap {
     let h =0;
     let team_st = {};
     try{
-    for(let i=0;i< json_["match_squads"].length;i++){
-      if(h==0 && json_["match_squads"][i]!="r"){
+    for(let i=0;i< json_["ranks_table"].length;i++){
+      if(h==0 && json_["ranks_table"][i]!="r"){
         continue;
       }
-      team_st [ lineup_header[h] ] = json_["match_squads"][i];
+      team_st [ lineup_header[h] ] = json_["ranks_table"][i];
       h++;
       if(h==lineup_header.length){
-        team_st["subs_in_time"] = player["subs_in_time"]+""
-        standup[type].push(team_st);
+        //team_st["subs_in_time"] = team_st["subs_in_time"]+""
+        const team = team_st["team"].split("~");
+        team_st["team"] = {"id":team[2],"team_name":team[3],"team_badge":""};
+        team_st["team_name"] = team_st["team"]["team_name"];
+        team_st["team_badge"] = team_st["team"]["team_badge"];
+        team_st["overall_league_position"] = parseInt(team_st["position"])         >0 ? parseInt(team_st["position"])         : 0 ;
+        team_st["overall_league_PTS"]      = parseInt(team_st["points"])           >0 ? parseInt(team_st["points"])           : 0 ;
+        team_st["overall_league_payed"]    = parseInt(team_st["played"])           >0 ? parseInt(team_st["played"])           : 0 ;
+        team_st["overall_league_GF"]       = parseInt(team_st["goals_scored"])     >0 ? parseInt(team_st["goals_scored"])     : 0 ;
+        team_st["overall_league_GA"]       = parseInt(team_st["goals_received"])   >0 ? parseInt(team_st["goals_received"])   : 0 ;
+        team_st["overall_league_GD"]       = parseInt(team_st["goals_difference"]) >0 ? parseInt(team_st["goals_difference"]) : 0 ;
+        standing.push(team_st);
         h=0;
         team_st={};
       }
       
     }
     }catch(err){console.log(err)}
-    return standup;
+    console.log(standing);
+    return standing;
   }
   get_matches_k(html,date,is_oneMatch=false,is_only_live=false){
     let json_={"matches_comps":[],"matches_list":[]};

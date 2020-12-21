@@ -42,12 +42,19 @@ class LeagueScreen extends React.Component {
     this.props.navigation.setOptions({title: <Text>{this.league_name}</Text>});
   }
   async get_standing(id){
-    const favorite = await API_.getConfig("favorite_teames",this.state.favorite) ;
+    const favorite = await API_.getConfig("favorite_teams",this.state.favorite) ;
+    if(this.real_id!=this.league_id && this.real_id!=undefined){
+      return this.get_standing_k(favorite);
+    }
     console.log(favorite);
     const resp = await API_.get_standing(id)
     if(resp["data"] && resp["data"] ){
       this.setState({league_details:resp["data"],loading:false,favorite:favorite});
     }
+  }
+  async get_standing_k(favorite){
+    const resp = await API_.get_standing_k(this.real_id);
+    this.setState({league_details:resp,loading:false,favorite:favorite});
   }
   get_matches(league_id){
       get_notifications_matches().then(o=>{
@@ -154,27 +161,26 @@ class LeagueScreen extends React.Component {
         </View>;
       });
   }
-  get_fav_icon(id){
+  get_fav_icon(id,bool=false){
     id= parseInt(id);
     if(id==0){return "";}
-    console.log(id,id==70993708);
-    if(id==70988155){
-      console.log(this.state.favorite );
+    if(bool==false){
+      return this.state.favorite.includes(id ) ? "★" : "☆" ;
+    }else{
+      return this.state.favorite.includes(id ) ? true : false ;
     }
-    return this.state.favorite.includes(id ) ? "★" : "☆" ;
   }
   set_fav=async(id)=>{
     id= parseInt(id);
     if(id==0){return "";}
-    let o = await API_.getConfig("favorite_teames",this.state.favorite)
+    let o = await API_.getConfig("favorite_teams",this.state.favorite)
     if( o.includes(id) ){
       o = o.filter(o=>{if(o!=id)return o;});
     }else{
       o.push(id);
     }
-    console.log("fav",o);
     this.setState({favorite:o});
-    await API_.setConfig("favorite_teames",o);
+    await API_.setConfig("favorite_teams",o);
     this.setState({});
   }
   render_standing(){
@@ -198,7 +204,10 @@ class LeagueScreen extends React.Component {
       standing_ = standing_.concat( rows.map(row=>{
         console.log(row);
         const fav_icon = row.team ? this.get_fav_icon(row.team.id) : "";
-        const team_name = row && row.team_name ? fav_icon+row.team_name : "";
+        let team_name ="";
+        if(row && row.team_name){
+          team_name = API_.is_ascii(row.team_name) ? fav_icon+row.team_name : row.team_name+fav_icon ;
+        }
         const team_badge= row && row.team_badge ? row.team_badge : "";
         const position  = row && row.overall_league_position ? row.overall_league_position : "0";
         const points    = row && row.overall_league_PTS ? row.overall_league_PTS : "0";
@@ -206,9 +215,10 @@ class LeagueScreen extends React.Component {
         let goals     = row && row.overall_league_GF>=0 ? row.overall_league_GF : 0 ;
         goals = row && row.overall_league_GA ? goals-row.overall_league_GA : goals;
         goals = row && row.goals=="Gls" ? row.goals : goals;
+        const fav_style = row.team && this.get_fav_icon(row.team.id, true) ? {backgroundColor:"#0093fb4a"} : {};
         return (
         <Pressable 
-          style={this.state.dynamic_style.team_view} 
+          style={[this.state.dynamic_style.team_view,fav_style]} 
           key={team_name}
           onLongPress={()=>this.set_fav(row.team.id)}
           >

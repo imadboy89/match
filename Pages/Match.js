@@ -330,7 +330,7 @@ class Matchcreen extends React.Component {
         if(elm[type_+"_scorer"]==undefined || elm[type_+"_scorer"]=="" || elm[type_+"_scorer"]==null) return false;
         let text = "";
         if(type_=="away"){
-          if(/^[\x00-\x7F]*$/.test(elm[type_+"_scorer"])){
+          if(API_.is_ascii(elm[type_+"_scorer"])){
             text = (elm.time ? elm.time+'"' : "-") +" "+ elm[type_+"_scorer"];
           }else{
             text = elm[type_+"_scorer"]+" "+(elm.time ? elm.time+'"' : "-");
@@ -339,7 +339,7 @@ class Matchcreen extends React.Component {
           this.assist_a.push(elm[type_+"_assist"]);
           
         }else{
-          if(/^[\x00-\x7F]*$/.test(elm[type_+"_scorer"])){
+          if(API_.is_ascii(elm[type_+"_scorer"])){
             text = elm[type_+"_scorer"] +" "+(elm.time ? elm.time+'"' : "-");
           }else{
             text = (elm.time ? elm.time+'"' : "-") +" " +elm[type_+"_scorer"];

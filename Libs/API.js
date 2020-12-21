@@ -275,6 +275,9 @@ class API {
         this.error = error;
       });
   }
+  is_ascii(text){
+    return /^[\x00-\x7F]*$/.test(text) ? true : false ;
+  }
   async load_leagues(){
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.load_leagues()});
@@ -353,7 +356,7 @@ class API {
   }
   get_match_k(id){
     //https://www.kooora.com/?m=2469218&ajax=true
-    return this.http("https://www.kooora.com/?ajax=1&m="+id+"&arabic","GET",null,{})
+    return this.http("https://www.kooora.com/?ajax=1&m="+(""+id).replace("fav_","")+"&arabic","GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
@@ -367,6 +370,14 @@ class API {
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       return scrap.get_lineup(resp);
+    });
+  }
+  get_standing_k(id){
+    return this.http("https://www.kooora.com/?c="+id+"&cm=i&ajax=1&","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_standing(resp);
     });
   }
   get_matches(date_obj=null, page=1){
