@@ -17,6 +17,7 @@ class ItemsList extends React.Component {
     this.minWidth = this.props.minWidth ? this.props.minWidth : 300; 
     this.list = [];
     this.check_width(false);
+    this.flatListRef = false;
 
   }
   componentDidMount=()=>{
@@ -214,12 +215,21 @@ class ItemsList extends React.Component {
       </TouchableHighlight>);
 
   }
+  toTop = () => {
+    if(this.flatListRef && this.flatListRef && this.flatListRef.scrollToOffset){
+      this.flatListRef.scrollToOffset({ animated: true, offset: 0 });
+    }
+  }
   render_list() {
     
     let is_new = JSON.stringify(this.list) == JSON.stringify(this.props.list) ? false : true;
+
     this.list = this.props.list;
     if (this.list && this.list[0] && this.list[0]["title"]==undefined){
       this.list=[{"title":"",data:this.list}];
+      if(is_new && this.flatListRef){
+        this.toTop();
+      }
     }
     //this.list = this.list[0] ? this.list[0]["data"]: [];
     if(is_new){
@@ -280,6 +290,7 @@ class ItemsList extends React.Component {
         <View style={this.state.dynamic_style.list_container}>
           <SafeAreaView style={{flex: 1,width:"100%"}}>
             <FlatList
+              ref={(ref) => { this.flatListRef = ref; }}
               ListHeaderComponent = {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : undefined}
               ListFooterComponent = {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : undefined}
               numColumns={this.state.numColumns} 
@@ -290,6 +301,7 @@ class ItemsList extends React.Component {
               keyExtractor={(item, index) => item[this.props.key_key]+""} 
               renderItem={this._render_item}
               renderSectionHeader={this._render_header}
+
             
             />
           </SafeAreaView>

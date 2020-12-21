@@ -42,17 +42,19 @@ class LeagueScreen extends React.Component {
     this.props.navigation.setOptions({title: <Text>{this.league_name}</Text>});
   }
   async get_standing(id){
-    const favorite = await API_.getConfig("favorite_teams",this.state.favorite) ;
+    this.is_k = false;
     if(this.real_id!=this.league_id && this.real_id!=undefined){
-      return this.get_standing_k(favorite);
+      this.is_k = true;
+      return this.get_standing_k();
     }
-    console.log(favorite);
+    const favorite = await API_.getConfig("favorite_teams",this.state.favorite) ;
     const resp = await API_.get_standing(id)
     if(resp["data"] && resp["data"] ){
       this.setState({league_details:resp["data"],loading:false,favorite:favorite});
     }
   }
-  async get_standing_k(favorite){
+  async get_standing_k(){
+    const favorite = await API_.getConfig("favorite_teams_k",this.state.favorite) ;
     const resp = await API_.get_standing_k(this.real_id);
     this.setState({league_details:resp,loading:false,favorite:favorite});
   }
@@ -173,14 +175,15 @@ class LeagueScreen extends React.Component {
   set_fav=async(id)=>{
     id= parseInt(id);
     if(id==0){return "";}
-    let o = await API_.getConfig("favorite_teams",this.state.favorite)
+    const localS_fav_key = this.is_k ? "favorite_teams_k" : "favorite_teams";
+    let o = await API_.getConfig(localS_fav_key,this.state.favorite)
     if( o.includes(id) ){
       o = o.filter(o=>{if(o!=id)return o;});
     }else{
       o.push(id);
     }
     this.setState({favorite:o});
-    await API_.setConfig("favorite_teams",o);
+    await API_.setConfig(localS_fav_key,o);
     this.setState({});
   }
   render_standing(){

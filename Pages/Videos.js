@@ -107,6 +107,7 @@ get_Videos(){
       <View style={this.state.dynamic_style.container}>
 
         <ItemsList 
+          ListHeaderComponent = {ListFooterComponent}
           ListFooterComponent = {ListFooterComponent}
           loading={this.state.loading} 
           list={this.state.list} 

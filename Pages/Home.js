@@ -244,7 +244,7 @@ class HomeScreen extends React.Component {
 }
   get_matches_koora = async(date_obj=null)=>{
     date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-    const favorite_teams = await API_.getConfig("favorite_teams",[]) ;
+    const favorite_teams = await API_.getConfig("favorite_teams_k",[]) ;
     const favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
     const _notifications_matches = await get_notifications_matches();
     const leagues_dict = await API_.load_leagues();
@@ -271,7 +271,7 @@ class HomeScreen extends React.Component {
         }
       }
     }
-    data = [fav_list,].concat(data);
+    data = fav_list.data.length>0 ? [fav_list,].concat(data) : data;
     if(this._isMounted){
       this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
     }
