@@ -27,7 +27,7 @@ import {app_styles,getTheme} from "./components/Themes";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
-import backUp from "./Libs/backUp";
+import backUp from "./Libs/BackUp";
 
 Text = TextF;
 global. API_ = new API();
@@ -98,7 +98,7 @@ async function registerForPushNotificationsAsync() {
   }
 }
 registerForPushNotificationsAsync()
-global.notifyMessage = function(msg: string,title: string, buttons) {
+global.notifyMessage = function(msg,title, buttons) {
     if(API_.isWeb){
       alert(msg);
       return new Promise((resolve, reject)=>{return resolve([])});
