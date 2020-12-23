@@ -17,6 +17,7 @@ import VideosScreen from './Pages/Videos';
 import VideoScreen from './Pages/Video';
 import LeagueScreen from './Pages/League';
 import LeaguesScreen from './Pages/Leagues';
+import SettingsScreen from './Pages/Settings';
 import Constants from 'expo-constants';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -26,13 +27,16 @@ import {app_styles,getTheme} from "./components/Themes";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
-
+import backUp from "./Libs/backUp";
 
 Text = TextF;
 global. API_ = new API();
 global. Global_theme_name = "dark violet";
 global.reloading_app = false;
 var _app_styles = app_styles;
+global.backup = new backUp();
+global.backup.executingQueued();
+
 
 global. LoadedFonts = false;
 function _loadFontsAsync() {
@@ -135,6 +139,7 @@ function MatchesStackScreen() {
   return (
     <MatchesStack.Navigator>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Home" component={HomeScreen} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Settings" component={SettingsScreen} />
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />

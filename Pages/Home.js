@@ -31,9 +31,67 @@ class HomeScreen extends React.Component {
         source_id:1,
         is_only_live : false,
         is_upd_available:false,
+        is_auth:false
         //dynamic_style_list:styles_list,
     };
-  
+    this.is_authenting = false;
+    this.didBlurSubscription = this.props.navigation.addListener(
+      'focus',
+      payload => {
+        this.setState({is_auth:(backup.email!="" && backup.email!=undefined) });
+        this.render_header();
+      }
+    );
+  }
+  componentWillUnmount(){
+    this._isMounted = false;
+    clearInterval(this.interval_refresh);
+    if(this.backup.timer){
+      clearInterval(this.backup.timer);
+    }
+    this.didBlurSubscription.remove();
+  }
+  componentDidMount(){
+    if(this.is_authenting==false){
+      this.is_authenting = true;
+      backup._loadClient().then(output=>{
+        this.setState({is_auth:(backup.email!="" &&backup.email!=undefined) });
+        this.render_header();
+        if(output==false){return false;}
+        backup.load_settings().then(o=>{
+          this.get_matches(this.state.matches_date);
+        }).catch(err=>{console.log(err)});
+      }).catch(err=>{console.log(err)});
+    }
+    this.checkUpdAvailability();
+    //handle notification
+    Notifications.addNotificationReceivedListener(this._handleNotification);
+    Notifications.addNotificationResponseReceivedListener(this._handleNotificationResponse);
+    /////////////
+    let is_dev = false;
+    try{
+      is_dev = __DEV__;
+    }catch(e){}
+    if(API_.isWeb && is_dev !=true ){
+      var psswd = prompt("Please enter your psswd", "");
+      if(psswd!="hadil17"){
+        window.location = "https://gooogle.com";
+        API_.is_auth = false;
+        return;
+      }else{API_.is_auth = true;}
+    }else{ API_.is_auth = true; }
+    this._isMounted = true;
+    getTheme("styles_home").then(theme=>{
+      this.setState({dynamic_style:theme});
+      this.render_header();
+      });
+
+    this.interval_refresh = setInterval(()=>{
+      if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
+        this.get_matches(null,false);
+      }
+      }, 50000);
+
   }
   checkUpdAvailability(){
     const customUpdater = new ExpoCustomUpdater()
@@ -68,10 +126,7 @@ class HomeScreen extends React.Component {
       get_notifications_matches().then(o=>{this.setState({notifications_matches:o});} );
     });
   }
-  componentWillUnmount(){
-    this._isMounted = false;
-    clearInterval(this.interval_refresh);
-  }
+
   changesource = (itemValue, itemIndex)=>{
     this.end=false;
     this.state.source_id = parseInt(itemValue);
@@ -100,38 +155,7 @@ class HomeScreen extends React.Component {
       this.onMatch_clicked(item);
     }catch(err){}
   };
-  componentDidMount(){
-    this.checkUpdAvailability();
-    //handle notification
-    Notifications.addNotificationReceivedListener(this._handleNotification);
-    Notifications.addNotificationResponseReceivedListener(this._handleNotificationResponse);
-    /////////////
-    let is_dev = false;
-    try{
-      is_dev = __DEV__;
-    }catch(e){}
-    if(API_.isWeb && is_dev !=true ){
-      var psswd = prompt("Please enter your psswd", "");
-      if(psswd!="hadil17"){
-        window.location = "https://gooogle.com";
-        API_.is_auth = false;
-        return;
-      }else{API_.is_auth = true;}
-    }else{ API_.is_auth = true; }
-    this.get_matches(this.state.matches_date);
-    this._isMounted = true;
-    getTheme("styles_home").then(theme=>{
-      this.setState({dynamic_style:theme});
-      this.render_header();
-      });
 
-    this.interval_refresh = setInterval(()=>{
-      if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
-        this.get_matches(null,false);
-      }
-      }, 50000);
-
-  }
 
   render_header=()=>{
     let headerLeft = null;
@@ -173,17 +197,9 @@ class HomeScreen extends React.Component {
               }}  />
               }
               <IconButton 
-                name="adjust" size={iconsSize} style={this.state.dynamic_style.icons} onPress={()=>{   
-                const next_ind = themes_list.indexOf(Global_theme_name)+1;
-                Global_theme_name = next_ind>=themes_list.length ?themes_list[0] :themes_list[next_ind]   ;
-                API_.setConfig("theme",Global_theme_name).then(o=>{
-                  if(API_.isWeb){
-                    reloading_app = true;
-                    location.reload();
-                  }else{
-                    Updates.reloadAsync();
-                  }
-                });              
+                name={ this.state.is_auth ? "user" : "gears"}
+                size={iconsSize} style={this.state.dynamic_style.icons} onPress={()=>{
+                this.props.navigation.navigate('Settings');            
               }}  />
           </View>
         )
@@ -242,40 +258,52 @@ class HomeScreen extends React.Component {
     });
   });
 }
-  get_matches_koora = async(date_obj=null)=>{
-    date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-    const favorite_teams = await API_.getConfig("favorite_teams_k",[]) ;
-    const favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
-    const _notifications_matches = await get_notifications_matches();
-    const leagues_dict = await API_.load_leagues();
-    const resp = await API_.get_matches_k(date_obj,this.state.is_only_live)
-    //console.log(Object.values(resp) )
-    let data = resp && resp.length>0 ? resp : [];
-    let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
-    try{
-      data = data.sort((a,b)=>{ return (leagues_dict[API_.fix_title(a.title) ] != undefined && leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
-    }catch(e){console.log(e);}
-    try{
-      data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
-    }catch(e){console.log(e);}
-    for(let j=0;j<Object.keys(data).length;j++){
-      for(let m=0;m<data[j]["data"].length;m++){
-        const matche_f = JSON.parse(JSON.stringify(data[j]["data"][m]));
-        const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
-        const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
-        if(favorite_teams.includes(home_team_id) || favorite_teams.includes(away_team_id)){
-          matche_f["id"] = "fav_"+matche_f["id"];
-          matche_f["league_id"] = 1;
-          matche_f["league"] = "fav_list";
-          fav_list.data.push(matche_f);
-        }
+refresh_leagues = ()=>{
+  try{
+    let fav_list = [];
+    if(this.state.list[0].id==1){
+      fav_list = this.state.list[0];
+      this.state.list = this.state.list.filter(o=>o.id!=1);
+    }
+    this.state.list = this.state.list.sort((a,b)=>{ return (API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
+    this.state.list = [fav_list,].concat(this.state.list);
+    this.state.list.push(fav_list);
+  }catch(e){console.log(e);}
+  this.setState({list:this.state.list});
+}
+get_matches_koora = async(date_obj=null)=>{
+  date_obj = date_obj==null ? this.state.matches_date :date_obj; 
+  const favorite_teams = await API_.getConfig("favorite_teams_k",[]) ;
+  const favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
+  const _notifications_matches = await get_notifications_matches();
+  await API_.load_leagues(this.refresh_leagues);
+  const resp = await API_.get_matches_k(date_obj,this.state.is_only_live)
+  //console.log(Object.values(resp) )
+  let data = resp && resp.length>0 ? resp : [];
+  let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
+  try{
+    data = data.sort((a,b)=>{ return (API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
+  }catch(e){console.log(e);}
+  try{
+    data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
+  }catch(e){console.log(e);}
+  for(let j=0;j<Object.keys(data).length;j++){
+    for(let m=0;m<data[j]["data"].length;m++){
+      const matche_f = JSON.parse(JSON.stringify(data[j]["data"][m]));
+      const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
+      const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
+      if(favorite_teams.includes(home_team_id) || favorite_teams.includes(away_team_id)){
+        matche_f["league_id"] = 1;
+        matche_f["league"] = "fav_list";
+        fav_list.data.push(matche_f);
       }
     }
-    data = fav_list.data.length>0 ? [fav_list,].concat(data) : data;
-    if(this._isMounted){
-      this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
-    }
   }
+  data = fav_list.data.length>0 ? [fav_list,].concat(data) : data;
+  if(this._isMounted){
+    this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+  }
+}
  onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     this.setState({show_datPicker: false ,list:[],matches_date:currentDate,loading:true,is_only_live:false});

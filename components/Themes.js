@@ -13,7 +13,11 @@ function _isMobile(isWeb){
 function getTheme(style_name=false){
   //var API_ = new API();
   return API_.getConfig("theme",Global_theme_name).then(theme_name__=>{
+    if(Themes[theme_name__] == undefined){
+      theme_name__ = Global_theme_name;
+    }
     Global_theme_name = theme_name__;
+    
     return generateTheme(theme_name__)[style_name];
   });
 }
@@ -353,10 +357,22 @@ function generateTheme(theme_name=false){
     matche_league_logo:{
       //margin :3,
       marginRight:5,
+      marginVertical:1,
       width: "90%",
-      height: "100%",
+      height: "95%",
       aspectRatio: 1,
       resizeMode:"contain",
+      borderRadius: isWeb ? 8 : 5
+    },
+    matche_league_logo_k:{
+      //margin :3,
+      marginRight:5,
+      marginVertical:1,
+      width: "90%",
+      borderWidth:1,
+      height: "95%",
+      aspectRatio: 1,
+      //resizeMode:"contain",
       borderRadius: isWeb ? 8 : 5
     },
     matche_team_badge:{
@@ -949,7 +965,85 @@ function generateTheme(theme_name=false){
         }
   }
 
-  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles,styles_league,theme};
+  var styles_settings = StyleSheet.create({
+    container: {
+      flex: 1,
+      //paddingTop: Constants.statusBarHeight,
+      backgroundColor: theme.background_color_default,
+      color : "#fff",
+    },
+    settings_row:{
+      flexDirection:'row', 
+      flexWrap:'wrap',
+      width:"95%",
+      //height:50,
+      margingHorizontal:5,
+      marginVertical:5,
+      backgroundColor: theme.background_color_default,
+      color : "#fff",
+    },
+    settings_row_label:{
+      flex:1,
+      backgroundColor: theme.background_color_default,
+      color : "#fff",
+    },
+    settings_row_input:{
+      flex:2,
+      backgroundColor: theme.background_color_default,
+      color : "#fff",
+    },
+    nav_container: {
+      flexDirection:'row', 
+      flexWrap:'wrap',
+      //height:30,
+      justifyContent: 'center',
+      backgroundColor: theme.background_color_default,
+      color : "#fff",
+    },
+    modal_view_container:{
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      width:"100%",
+      paddingTop: 22,
+      backgroundColor:"#2f333738"
+    },
+    modal_view: {
+      margin: 20,
+      width: __isMobile ? "90%" : "80%",
+      height: parseInt(window_height/2),
+      backgroundColor: theme.background_color_default,
+      borderRadius: 10,
+      padding: 35,
+      alignItems: "center",
+      shadowColor: theme.text_color_default,
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5
+    },
+    text: {
+      color : theme.text_color_default,
+      fontSize: 20,
+      marginHorizontal:10,
+      justifyContent: 'center',
+      textAlign:"center",
+      width:20,
+    },
+
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      color : "#d1d8e0",
+    },
+    icons:styles_home.icons,
+  });
+
+  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles,styles_league,styles_settings,theme};
 }
 var themes = generateTheme("dark blue");
 var styles_list    = themes["styles_list"];
@@ -960,9 +1054,10 @@ var styles_channel = themes["styles_channel"];
 var styles_match   = themes["styles_match"];
 var app_styles     = themes["app_styles"];
 var styles_league  = themes["styles_league"];
+var styles_settings  = themes["styles_settings"];
 var global_theme   = themes["theme"];
 
-export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme,_isMobile};
+export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme,_isMobile,styles_settings};
 
 
 

@@ -218,7 +218,10 @@ class Scrap {
     }catch(err){console.log(err,html);return [];}
     const date_str = date ? API_.get_date2(date): false;
     //parse matches_comps
-    const blacklisted_comps = is_oneMatch ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب"," الثاني","تحت ","شمال","الثالث"," A ", " B ", " C "," D ","الدرجة D","الدرجة C","الدرجة B",]
+    const blacklisted_comps = is_oneMatch ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب",
+    " الثاني","تحت ","شمال","الثالث"," A ", " B ", " C "," D ","الدرجة D","الدرجة C","الدرجة B",
+    "الدوري النرويجي الدرجة"
+  ]
     const blacklisted_countries = is_oneMatch ? [] :  ["SA","BH","KW","IQ","PS","ND","AR","BR","CO","JO","SS","VN","ZA","TR","UZ"];
     const exceptions = ["افريقيا",];
     let compititions = {};
@@ -339,9 +342,9 @@ class Scrap {
         const comp_match = compititions[matche["league_id"]] ;
         if(is_only_live==false || (matche["live"]==1 && is_only_live) ){
           if(comp_match!=undefined && (is_ok || comp_match["country"]=="MA") ){
-            let league = {"title": comp_match["comp_name"].trim(), "id":matche["league_id"],"img":comp_match["comp_logo"].replace("//","https://"), "data":[],"country":comp_match["country"]};
+            let league = {"title": comp_match["comp_name"].trim(), "id":matche["league_id"],"img":comp_match["comp_logo"].replace("//","https://"), "data":[],"country":comp_match["country"],"is_koora":true};
 
-            league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
+            //league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
             if(matches[ matche["league_id"] ]==undefined){
               matches[ matche["league_id"] ] = league;
             }
@@ -349,6 +352,7 @@ class Scrap {
             matche["home_team_score"] = score && score.length ==2 ? score[0] : "-";
             matche["away_team_score"] = score && score.length ==2 ? score[1] : "-";
             matche["league"] = league["title"];
+            matche["is_koora"] = true;
             matches[ matche["league_id"] ]["data"].push(matche);
           }
         }

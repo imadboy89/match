@@ -167,7 +167,7 @@ class ItemsList extends React.Component {
     </TouchableOpacity>);
   }
 
-  _render_header=({ section: { title,img,id } })=>{
+  _render_header=({ section: { title,img,id,is_koora } })=>{
     //console.log(title,img,id);
     const fav_icon = this.get_fav_icon(title,id);
     if(title==undefined || title==""){
@@ -206,7 +206,7 @@ class ItemsList extends React.Component {
           <View style={{flex:2,height:"100%"}}>
           { img ?  
                   <Image 
-                    style={this.state.dynamic_style.matche_league_logo}
+                    style={is_koora ? this.state.dynamic_style.matche_league_logo_k : this.state.dynamic_style.matche_league_logo}
                     source={{uri: img.slice(0,8)=="https://" ? img :API_.domain_o+img}}
                     />
             : null}

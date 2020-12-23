@@ -33,6 +33,7 @@ class API {
     this.token_post = {"token":"","app_id":2} ;
     this.token = "";
     this.is_auth = false;
+    this.leagues_dict = {};
     //this.set_token();
 
   }
@@ -278,9 +279,9 @@ class API {
   is_ascii(text){
     return /^[\x00-\x7F]*$/.test(text) ? true : false ;
   }
-  async load_leagues(){
+  async load_leagues(refresh_leagues=false){
     if(this.headers["device-token"]==""){
-      return this.set_token().then(()=> { return this.load_leagues()});
+      return this.set_token().then(()=> { return this.load_leagues(refresh_leagues)});
     }
     const exp_t = 3*24*60*60*1000;
 
@@ -292,21 +293,23 @@ class API {
     }
     let date_stored = leagues && leagues["date"] ? parseInt(leagues["date"]) : 0;
     const is_expired = (new Date()).getTime()- date_stored >= exp_t;
-    this.leagues_dict = {};
     if(Object.keys( leagues["data"] ).length>0 && is_expired==false){
       console.log("leagues cache");
       this.leagues_dict = leagues["data"];
       return this.leagues_dict;
     }
-    return this.get_leagues(1)
+    this.get_leagues(1)
       .then(o=>{
         if( Object.keys( this.leagues_dict ).length >0){
           this.leagues = {"date":(new Date()).getTime(),data:this.leagues_dict};
           AsyncStorage.setItem('leagues', JSON.stringify(this.leagues) );
+          if(refresh_leagues!=false){
+            refresh_leagues();
+          }
           return this.leagues_dict;
         }
         });
-
+    return false;
   }
   get_leagues(page){
       console.log("leagues loading pg="+page);
@@ -509,23 +512,29 @@ class API {
 
   setConfig = async (key, value) => {
     let configs = await AsyncStorage.getItem('configs');
+    try{configs = JSON.parse(configs);}
+    catch(e){configs=false;}
     if (configs) {
-      try{configs = JSON.parse(configs);}
-      catch(e){configs={};}
       configs[key] = value;
     }else{
       configs = {};
       configs[key] = value;
     }
     await AsyncStorage.setItem('configs', JSON.stringify(configs));
+    if(backup && backup.db_settings){
+      backup.save_settings(configs);
+    }else{
+      console.log("------- backup.db_settings not defined yet");
+    }
     return value;
   };
 
   getConfig = async (key,defualt_val=undefined) => {
     //if(defualt_val==false) this.setConfig(key, []);
     let configs = await AsyncStorage.getItem('configs');
-    if (configs) {
+    if (configs && configs!="null" && configs!=null && JSON.parse(configs) != null) {
       configs = JSON.parse(configs);
+
       if ( configs[key] ){
         return configs[key];
       }else{
@@ -640,6 +649,33 @@ class API {
         this.error = error;
       });
   }
+
+  get_settings = async()=>{
+    let configs = await AsyncStorage.getItem('configs');
+    if(configs){
+      return JSON.parse(configs);
+    }else{
+      return {};
+    }
+  }
+  set_settings = async(settings)=>{
+    return await AsyncStorage.setItem('configs',JSON.stringify(settings) );
+  }
+
+  setCredentials = async (email, password) => {
+    let crendentials = {"email":email.toLowerCase(),"password":password.toLowerCase()} ;
+    await AsyncStorage.setItem('crendentials', JSON.stringify(crendentials));
+  };
+  getCredentials = async () => {
+      let crendentials = await AsyncStorage.getItem('crendentials');
+      if(crendentials){
+          return JSON.parse(crendentials);
+      }else{
+          crendentials = {"email":"","password":""} ;
+          await this.setCredentials("","");
+          return crendentials;
+      }
+  };
 }
 
 export default API;
