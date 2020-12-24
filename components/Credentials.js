@@ -9,6 +9,7 @@ class Credentials extends React.Component{
         email:"",
         password:"",
         dynamic_style:this.props.dynamic_style,
+        savingCredents:false,
       };
       API_.getCredentials().then(output=>{
         this.setState({email:output.email, password:output.password});
@@ -16,10 +17,18 @@ class Credentials extends React.Component{
       }
       async saveCredentials(){
         await API_.setCredentials(this.state.email,this.state.password);
-        const status = await backup.changeClient()
+        const status = await backup.changeClient();
         if(status!=false){
           this.props.closeModal();
+          backup.load_settings();
         }
+      }
+      signUp = async(email,password)=>{
+        this.setState({savingCredents:true});
+        await API_.setCredentials(this.state.email,this.state.password);
+        await backup.newUser(email,password);
+        //await this.saveCredentials();
+        this.setState({savingCredents:false});
       }
       render(){
         const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
@@ -28,15 +37,12 @@ class Credentials extends React.Component{
           animationType="slide"
           transparent={true}
           visible={this.props.modal_visible}
-          onRequestClose={() => { 
-              this.setState({ modalVisible_match:false,});
-          } }
+          onRequestClose={() => this.props.closeModal() }
           
         > 
           <View style={this.state.dynamic_style.modal_view_container}>
-          <View style={this.state.dynamic_style.modal_view}>
-
-
+          <View style={[this.state.dynamic_style.modal_view,this.state.dynamic_style.modal_view_small]}>
+          <View style={this.state.dynamic_style.modal_body}>
 
             <View style={this.state.dynamic_style.settings_row}>
             <TextInput
@@ -69,11 +75,13 @@ class Credentials extends React.Component{
                 autoCapitalize="none"
             />
             </View>
-            <View style={this.state.dynamic_style.settings_row}>
+  
+          </View>
+          <View style={this.state.dynamic_style.footer}>
               <View style={this.state.dynamic_style.settings_row_input}>
                 <Button
                     title={"Sign in"}
-                    disabled={this.props.savingCredents}
+                    disabled={this.state.savingCredents}
                     color="#2ecc71"
                     onPress={()=>{
                       this.saveCredentials();
@@ -84,7 +92,7 @@ class Credentials extends React.Component{
               <View style={this.state.dynamic_style.settings_row_input}>
                 <Button
                     title={"Cancel"}
-                    
+                    disabled={this.state.savingCredents}
                     color="#f39c12"
                     onPress={()=>{
                         this.props.closeModal();
@@ -95,16 +103,16 @@ class Credentials extends React.Component{
               <View style={this.state.dynamic_style.settings_row_input}>
                 <Button
                     title={"SignUp"}
-                    disabled={this.props.savingCredents}
+                    disabled={this.state.savingCredents}
                     color="#3498db"
                     onPress={()=>{
-                        this.props.signUp(this.state.email,this.state.password);
+                        this.signUp();
                     }
                     }
                 ></Button>
                 </View>
-              </View>
-  
+          </View>
+
           </View>
           </View>
           </MModal>

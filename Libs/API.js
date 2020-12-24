@@ -37,6 +37,20 @@ class API {
     //this.set_token();
 
   }
+  common_league_id(league){
+    const title = this.fix_title(league.title) ;
+    let id = league.id;
+    if(league.is_koora==undefined && league.id){
+      id = this.leagues_dict[title] && this.leagues_dict[title].koora_id ? this.leagues_dict[title].koora_id : id;
+    }
+    return id;
+  }
+  set_common_league_id(league){
+    const title = this.fix_title(league.title) ;
+    if (this.leagues_dict[title] && this.leagues_dict[title].koora_id==undefined){
+      this.leagues_dict[title].koora_id = league.id;
+    }
+  }  
   leagueId_byTitle(title,default_id){
     default_id = default_id==undefined ? 0 : default_id ;
     title = this.fix_title(title);
@@ -510,7 +524,7 @@ class API {
       });
   }
 
-  setConfig = async (key, value) => {
+  setConfig = async (key, value, isDefault=false) => {
     let configs = await AsyncStorage.getItem('configs');
     try{configs = JSON.parse(configs);}
     catch(e){configs=false;}
@@ -521,7 +535,7 @@ class API {
       configs[key] = value;
     }
     await AsyncStorage.setItem('configs', JSON.stringify(configs));
-    if(backup && backup.db_settings){
+    if(backup && backup.db_settings && isDefault==false){
       backup.save_settings(configs);
     }else{
       console.log("------- backup.db_settings not defined yet");
@@ -539,12 +553,12 @@ class API {
         return configs[key];
       }else{
         if (defualt_val==undefined){return false;}
-        await this.setConfig(key, defualt_val);
+        await this.setConfig(key, defualt_val, true);
         return defualt_val;
       }
     }else {
       if (defualt_val==undefined){return false;}
-      await this.setConfig(key, defualt_val);
+      await this.setConfig(key, defualt_val, true);
       return defualt_val;
     }
   };
@@ -663,7 +677,11 @@ class API {
   }
 
   setCredentials = async (email, password) => {
-    let crendentials = {"email":email.toLowerCase(),"password":password.toLowerCase()} ;
+    let crendentials = {"email":"","password":""} ;
+    try{
+      crendentials["email"]    = email.toLowerCase().trim()
+      crendentials["password"] = password.trim()
+    }catch(err){}
     await AsyncStorage.setItem('crendentials', JSON.stringify(crendentials));
   };
   getCredentials = async () => {

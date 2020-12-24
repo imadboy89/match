@@ -38,7 +38,12 @@ class HomeScreen extends React.Component {
     this.didBlurSubscription = this.props.navigation.addListener(
       'focus',
       payload => {
-        this.setState({is_auth:(backup.email!="" && backup.email!=undefined) });
+        if(this.state.is_auth!=backup.is_auth){
+          if(backup.is_auth){
+            this.setState({is_auth:backup.is_auth });
+            this.refresh_leagues();
+          }
+        }
         this.render_header();
       }
     );
@@ -46,20 +51,23 @@ class HomeScreen extends React.Component {
   componentWillUnmount(){
     this._isMounted = false;
     clearInterval(this.interval_refresh);
-    if(this.backup.timer){
-      clearInterval(this.backup.timer);
+    if(backup.timer){
+      clearInterval(backup.timer);
     }
-    this.didBlurSubscription.remove();
+    if(this.didBlurSubscription && this.didBlurSubscription.remove){
+      this.didBlurSubscription.remove();
+    }
   }
   componentDidMount(){
+    this.get_matches(this.state.matches_date);
     if(this.is_authenting==false){
       this.is_authenting = true;
       backup._loadClient().then(output=>{
-        this.setState({is_auth:(backup.email!="" &&backup.email!=undefined) });
+        this.setState({is_auth:backup.is_auth });
         this.render_header();
         if(output==false){return false;}
         backup.load_settings().then(o=>{
-          this.get_matches(this.state.matches_date);
+          this.refresh_leagues();
         }).catch(err=>{console.log(err)});
       }).catch(err=>{console.log(err)});
     }
@@ -72,14 +80,6 @@ class HomeScreen extends React.Component {
     try{
       is_dev = __DEV__;
     }catch(e){}
-    if(API_.isWeb && is_dev !=true ){
-      var psswd = prompt("Please enter your psswd", "");
-      if(psswd!="hadil17"){
-        window.location = "https://gooogle.com";
-        API_.is_auth = false;
-        return;
-      }else{API_.is_auth = true;}
-    }else{ API_.is_auth = true; }
     this._isMounted = true;
     getTheme("styles_home").then(theme=>{
       this.setState({dynamic_style:theme});
@@ -87,6 +87,11 @@ class HomeScreen extends React.Component {
       });
 
     this.interval_refresh = setInterval(()=>{
+      if(backup.is_auth){
+        backup.load_settings().then(o=>{
+          this.refresh_leagues(this.state.list);
+        })
+      }
       if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
         this.get_matches(null,false);
       }
@@ -206,7 +211,7 @@ class HomeScreen extends React.Component {
       });
   }
   get_matches = (date_obj=null,setloading=true)=>{
-    if(API_.is_auth==false){return false;}
+    //if(API_.is_auth==false){return false;}
     if(this.state.loading==false && setloading){this.setState({loading:true});}
     if(this.state.source_id!=0){
       return this.get_matches_koora(date_obj);
@@ -258,50 +263,48 @@ class HomeScreen extends React.Component {
     });
   });
 }
-refresh_leagues = ()=>{
-  try{
-    let fav_list = [];
-    if(this.state.list[0].id==1){
-      fav_list = this.state.list[0];
-      this.state.list = this.state.list.filter(o=>o.id!=1);
-    }
-    this.state.list = this.state.list.sort((a,b)=>{ return (API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
-    this.state.list = [fav_list,].concat(this.state.list);
-    this.state.list.push(fav_list);
-  }catch(e){console.log(e);}
+refresh_leagues = async()=>{
+  this.state.list = await this.get_favs(this.state.list);
   this.setState({list:this.state.list});
 }
-get_matches_koora = async(date_obj=null)=>{
-  date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-  const favorite_teams = await API_.getConfig("favorite_teams_k",[]) ;
-  const favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
-  const _notifications_matches = await get_notifications_matches();
-  await API_.load_leagues(this.refresh_leagues);
-  const resp = await API_.get_matches_k(date_obj,this.state.is_only_live)
-  //console.log(Object.values(resp) )
-  let data = resp && resp.length>0 ? resp : [];
-  let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
+async get_favs(data){
+  console.log(data);
+  if(data && data.length > 0 && data[0].id==1){
+    data = data.filter(o=>o.id && o.id!=1);
+  }
+  this.favorite_teams = await API_.getConfig("favorite_teams_k",[]) ;
+  this.state.favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
   try{
     data = data.sort((a,b)=>{ return (API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
   }catch(e){console.log(e);}
-  try{
-    data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
-  }catch(e){console.log(e);}
-  for(let j=0;j<Object.keys(data).length;j++){
+  data = data.sort((a,b)=>{return (this.state.favorite.indexOf(a.id)>this.state.favorite.indexOf(b.id))?-1:1;});
+  console.log(data);
+  let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
+  for(let j=0;j<data.length;j++){
     for(let m=0;m<data[j]["data"].length;m++){
       const matche_f = JSON.parse(JSON.stringify(data[j]["data"][m]));
       const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
-      if(favorite_teams.includes(home_team_id) || favorite_teams.includes(away_team_id)){
+      if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
         matche_f["league_id"] = 1;
         matche_f["league"] = "fav_list";
         fav_list.data.push(matche_f);
       }
     }
   }
-  data = fav_list.data.length>0 ? [fav_list,].concat(data) : data;
+  data = fav_list.data.length>0 ? [fav_list,].concat(data) : data ;
+  return data;
+}
+get_matches_koora = async(date_obj=null)=>{
+  date_obj = date_obj==null ? this.state.matches_date :date_obj; 
+  const _notifications_matches = await get_notifications_matches();
+  await API_.load_leagues(this.refresh_leagues);
+  const resp = await API_.get_matches_k(date_obj,this.state.is_only_live)
+  //console.log(Object.values(resp) )
+  let data = resp && resp.length>0 ? resp : [];
+  data = await this.get_favs(data);
   if(this._isMounted){
-    this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+    this.setState({list:data,loading:false,notifications_matches:_notifications_matches});
   }
 }
  onChange = (event, selectedDate) => {

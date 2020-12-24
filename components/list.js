@@ -18,7 +18,9 @@ class ItemsList extends React.Component {
     this.list = [];
     this.check_width(false);
     this.flatListRef = false;
+    this.windowHeight = Dimensions.get('window').height ;
 
+    this.refs_list = {};
   }
   componentDidMount=()=>{
     this._isMounted=true;
@@ -48,9 +50,13 @@ class ItemsList extends React.Component {
   } 
   get_item(item,col_key){
     if(col_key=="home_team"){
+
       const style_small = {}
       let home_team_name = item["home_team_ar"] ? item["home_team_ar"] : item["home_team"];
       let away_team_name = item["away_team_ar"] ? item["away_team_ar"] : item["away_team"];
+      if(home_team_name==undefined || away_team_name==undefined ){
+        return null;
+      }
       let home_team_style = {};
       let away_team_style = {};
       const max_lenght = API_.isWeb ? 15 : 20 ;
@@ -126,15 +132,16 @@ class ItemsList extends React.Component {
         );
     }
   }
-  get_fav_icon(title,league_id,is_leagues=false){
+  get_fav_icon(title,id,is_leagues=false){
     const color = is_leagues ? global_theme.text_color_default : global_theme.background_color_default;
     let fav_icon = null;
     if(this.props.favorite && this.props.set_fav){
-      league_id = API_.leagueId_byTitle(title,league_id);
-      
-      fav_icon = this.props.favorite.includes(league_id) ?
-        <IconButton name="star" onPress={()=>{this.props.set_fav(league_id)}} color={color} style={{width:50}} /> :
-        <IconButton name="star-o" onPress={()=>{this.props.set_fav(league_id)}} color={color} style={{width:50}}/> ;
+      //league_id = API_.leagueId_byTitle(title,league_id);
+      id = is_leagues ? API_.common_league_id({title,id}) : id;
+
+      fav_icon = this.props.favorite.includes(id) ?
+        <IconButton name="star" onPress={()=>{this.props.set_fav(id)}} color={color} style={{width:50}} /> :
+        <IconButton name="star-o" onPress={()=>{this.props.set_fav(id)}} color={color} style={{width:50}}/> ;
     }
     return fav_icon;
   }
@@ -142,22 +149,31 @@ class ItemsList extends React.Component {
     if(this.props.favorite==undefined || this.props.set_fav==undefined){
       return ;
     }
+    if(this.windowHeight>=1000 || this.windowWidth>=1000){
+      return ;
+    }
     this.state.header_to_hide = [];
     for(let i=0;i<this.list.length;i++){
-      //const id = this.list[i]["id"] ;
       let league_id =  id ? id : this.list[i]["id"] ;
-      league_id = API_.leagueId_byTitle(this.list[i]["title"],league_id);
+      //league_id = API_.leagueId_byTitle(this.list[i]["title"],league_id);
+      league_id = API_.common_league_id(this.list[i]);
       if(league_id==undefined || league_id==0){
         continue;
       }
+      console.log(league_id,this.props.favorite.includes(league_id));
       if(this.props.favorite.includes(league_id) == false){
         this.state.header_to_hide.push(league_id);
       }
-    }
+    }console.log(this.state.header_to_hide);
   }
   _render_item=({item})=>{
-    if(this.state.header_to_hide.includes(API_.leagueId_byTitle(item.league,item.league_id)) ){return null}
+    //if(this.state.header_to_hide.includes(API_.leagueId_byTitle(item.league,item.league_id)) ){return null}
+    /*
+    if(this.refs_list[item[this.props.key_key]]){
+      this.refs_list[item[this.props.key_key]];
+    }*/
     return (<TouchableOpacity
+      
       style={{width:this.elem_width,alignSelf:"center"}}
       activeOpacity={0.5}
       onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
@@ -179,7 +195,7 @@ class ItemsList extends React.Component {
         underlayColor={"green"}
         activeOpacity={0.9}
         onPress={()=>{
-          const id_ = API_.leagueId_byTitle(title,id);
+          const id_ = API_.common_league_id({title,id,is_koora});
           if(this.state.header_to_hide.includes(id_)){
             this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id_)return x});
           }else{
@@ -234,23 +250,24 @@ class ItemsList extends React.Component {
     //this.list = this.list[0] ? this.list[0]["data"]: [];
     if(is_new){
       this.setHidden();
-    }
+    }console.log("this.state.header_to_hide",this.state.header_to_hide);
     if(this.list.length>0 && this.list[0]["title"]!=""){
       const list_lists = this.list.map(k=>{
-        
       return (
           <View style={{width:"100%"}} key={k.title}>
             {this._render_header({section:k})}
-            <FlatList
-              numColumns={this.state.numColumns} 
-              stickySectionHeadersEnabled={false}
-              data={k.data}
-              keyExtractor={(item, index) => {return item[this.props.key_key]+""}} 
-              renderItem={this._render_item}
-              renderSectionHeader={this._render_header}
-              columnWrapperStyle={this.state.numColumns>1  ? this.state.dynamic_style.columnWrapperStyle  : null}
-              
-            />
+            { this.state.header_to_hide.includes(API_.common_league_id(k))==false ? 
+              <FlatList
+                numColumns={this.state.numColumns} 
+                stickySectionHeadersEnabled={false}
+                data={k.data}
+                keyExtractor={(item, index) => {return item[this.props.key_key]+""}} 
+                renderItem={this._render_item}
+                renderSectionHeader={this._render_header}
+                columnWrapperStyle={this.state.numColumns>1  ? this.state.dynamic_style.columnWrapperStyle  : null}
+                
+              />
+            : null }
           </View>);
       });
       return (

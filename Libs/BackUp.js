@@ -15,17 +15,21 @@ class BackUp{
         this.executingQueued_running = false;
         this.queue = [];
         this.last_notification_time = false;
-        
+        this.is_auth = false;
+        this.is_settings_loaded = false;
     }
-    checkCnx = async(check_client=true)=>{
+    checkCnx = async(check_client=true,is_silent=false)=>{
       const state = await NetInfo.fetch();
       this.isConnected = state.isConnected;
-      //console.log("isConnected", isConnected);
+      console.log(".............isConnected", this.isConnected);
       if(check_client && (!this.client || !this.client.callFunction )){
         await this.setClientInfo();
       }
       if(this.isConnected && check_client){
         await this.checkConnectedUserChange();
+      }
+      if(this.isConnected==false && is_silent==false){
+        alert("You need internet connection to sign in");
       }
       return this.isConnected;
     }
@@ -38,6 +42,8 @@ class BackUp{
         this.email = this.client.auth.activeUserAuthInfo.userProfile.data.email;
         this.db = mongoClient.db("ba9al");
         this.db_settings = this.db.collection("settings");
+        this.is_auth = this.email!="" && this.email !=undefined;
+        API_.set_settings({});
         return this.isAdmin();
 
       } catch (error) {
@@ -49,7 +55,7 @@ class BackUp{
       if(this.executingQueued_running){
         return ;
       }
-      if( ! await this.checkCnx()){
+      if( ! await this.checkCnx(true, true)){
         return false;
       }
       this.executingQueued_running = true ;
@@ -99,8 +105,7 @@ class BackUp{
       return credents;
     }
     changeClient = async ()=>{
-      if( ! await this.checkCnx()){
-        alert("You need internet connection to sign in");
+      if( ! await this.checkCnx(true, true)){
         return false;
       }
       this.email = "";
@@ -141,16 +146,15 @@ class BackUp{
       }
        
     }
-    newUser = async(username,password)=>{
+    newUser = async()=>{
       if( ! await this.checkCnx()){
-        alert(TXT.You_need_internet_connection_to+(TXT.language=="en"?" ":"")+TXT.Sign_up);
         return false;
       }
-      
+      const credents = await this.LS.getCredentials();
       const emailPasswordClient = Stitch.defaultAppClient.auth
         .getProviderClient(UserPasswordAuthProviderClient.factory);
 
-      return emailPasswordClient.registerWithEmail(username.toLowerCase(),password.toLowerCase())
+      return emailPasswordClient.registerWithEmail(credents["email"],credents["password"])
         .then((output) => {
           //this.registerForPushNotificationsAsync();
           console.log("Successfully sent account confirmation email!", JSON.stringify(output) );
@@ -173,9 +177,8 @@ class BackUp{
         const credents = await this.LS.getCredentials();
         let credential= new  AnonymousCredential();
         let usingAnon = true;
-        console.log(credents);
         if(credents && credents.email && credents.password){
-          credential = new UserPasswordCredential(credents["email"].toLowerCase(),credents["password"].toLowerCase());
+          credential = new UserPasswordCredential(credents["email"],credents["password"]);
           usingAnon = false;
         } 
 
@@ -183,11 +186,10 @@ class BackUp{
         const client = await Stitch.initializeDefaultAppClient("ba9al-xpsly");
         this.client = client ;
         try{
-          const user = await this.client.auth.loginWithCredential(credential);
+          this.user = await this.client.auth.loginWithCredential(credential);
           if(credents && credents.email && credents.password){
             //this.registerForPushNotificationsAsync();
           }
-          this.currentUserId = user.id;
           this.admin = !usingAnon ;
           this.loadingClient = false;
           await this.setClientInfo();
@@ -212,29 +214,37 @@ class BackUp{
       return false;
     }
     load_settings = async()=>{
-      if(this.db_settings==undefined || this.db_settings.findOne==undefined ){
+
+      if(this.db_settings==undefined || this.db_settings.findOne==undefined || this.user == undefined || this.user.id == undefined){
         return false;
       }
-      console.log("start loads");
       let settings_cloud = await this.db_settings.findOne({},{"_id":false});
-      console.log(settings_cloud)
+      console.log("load s",settings_cloud);
       if(settings_cloud==null){
         settings_cloud = await this.save_settings();
       }else{
         await API_.set_settings(settings_cloud);
       }
-      console.log("end of loads");
+      this.is_settings_loaded = true; 
       return settings_cloud;
     }
     save_settings = async()=>{
+      if(this.db_settings==undefined || this.db_settings.findOne==undefined || this.is_settings_loaded == false || this.user == undefined || this.user.id == undefined){
+        return false;
+      }
       const settings = await API_.get_settings();
-      let docs;
-      settings["user_id"] = this.currentUserId;
+      if(settings.favorite_leagues.length == 0 && settings.favorite_teams_k.length == 0 ){
+        alert("saving empty configs");
+        return false;
+      }
+      settings["user_id"] = this.user.id;
+      delete settings["_id"]
       if(settings){
         try{
           console.log("inserting in mdb");
-          this.db_settings.updateOne({"user_id":this.currentUserId},settings,{upsert:true});
-          console.log("inserting in mdb DONE");
+          const res = await this.db_settings.updateOne({"user_id":this.user.id},settings,{upsert:true});
+
+          console.log("inserting in mdb DONE", res);
         }catch(err){
           notifyMessage(err.message,"Save settings on cloud!");
           console.log(err)
@@ -242,6 +252,69 @@ class BackUp{
         return settings ;
       }
       
+    }
+
+    partnersManager = async(action,partner_username)=>{
+      if( ! await this.checkCnx()){
+        return false;
+      }
+      const datetime = API_.get_date_time();
+      let results = {};
+      try {
+        results = await this.client.callFunction("partnersManager",[action,datetime,partner_username]);
+      } catch (error) {
+        alert(error.message ? error.message : error);
+        return false;
+      }
+      return results;
+    }
+    usersManager = async(user_email,new_status) => {
+      if( ! await this.checkCnx()){
+        return false;
+      }
+      let results = {};
+      try {
+        results = await this.client.callFunction("Users_managements",[user_email,new_status]);
+      } catch (error) {
+        alert(error.message ? error.message : error);
+        return false;
+      }
+      return results;
+    }
+
+    pushNotification = async(title="", body="",data={},partner=false,chanelId=false)=>{
+      if( ! await this.checkCnx()){
+        return new Promise(resolve=>{resolve(false);});
+      }
+      if(title=="" || body==""){
+        return false;
+      }
+      const time = new Date() .getTime();
+      if(this.last_notification_time && time -this.last_notification_time  < 5*1000){
+        return "Can't send 2 Notif in 5s";
+      }
+      const datetime = API_.get_date_time();
+      let results = {};
+      let args = [partner,title,body , data,datetime] ;
+      if(chanelId){
+        args.push(chanelId);
+      }
+      try {
+        results = await this.client.callFunction("pushNotification",args);
+        this.last_notification_time = new Date() .getTime();
+        let pushednotifto=0;
+        if(results && results["data"] && results["data"].length>0){
+          for (let i = 0; i < results["data"].length; i++) {
+            pushednotifto += results["data"][i]["status"] && results["data"][i]["status"]=="ok" ? 1 : 0 ;
+          }
+        }
+        return pushednotifto;
+      } catch (error) {
+        console.log("pushNotification",error);
+        this.queue.push([this.pushNotification,[title, body,data,partner,chanelId]]);
+        return false;
+      }
+      return results;
     }
     insertMany= async (db, data) => {
       //await db.deleteMany({});

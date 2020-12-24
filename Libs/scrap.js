@@ -315,12 +315,12 @@ class Scrap {
           if(date_str && date_str != matche[ "date" ]){
             is_ok = false;
           }
-          time_playerd = API_.convert_time_spent(matche.date + " "+matche.time);
+          const _time_playerd = API_.convert_time_spent(matche.date + " "+matche.time);
           time_playerd = matche[ "time_old" ].split("'").length==2 && matche[ "time_old" ].split("'")[0].length<=2 
             ? parseInt(matche[ "time_old" ].split("'")[0])
-            : time_playerd;
+            : (_time_playerd =="half" ? "half" : false);
           //time_playerd = live==0 && parseInt(time_playerd)>0 && parseInt(time_playerd)<90 ? 45 : time_playerd;
-          live = (time_playerd+"").toLocaleLowerCase()=="half" || (parseInt(time_playerd)>0 && parseInt(time_playerd)<95) ? 1 : live;
+          live = (time_playerd+"").toLocaleLowerCase()=="half" || (parseInt(time_playerd)>=-30 && parseInt(time_playerd)<95) ? 1 : live;
 
           if(live==1 && time_playerd!=false){
             matche["time_played"] = time_playerd;
@@ -343,7 +343,7 @@ class Scrap {
         if(is_only_live==false || (matche["live"]==1 && is_only_live) ){
           if(comp_match!=undefined && (is_ok || comp_match["country"]=="MA") ){
             let league = {"title": comp_match["comp_name"].trim(), "id":matche["league_id"],"img":comp_match["comp_logo"].replace("//","https://"), "data":[],"country":comp_match["country"],"is_koora":true};
-
+            API_.set_common_league_id(league);
             //league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
             if(matches[ matche["league_id"] ]==undefined){
               matches[ matche["league_id"] ] = league;

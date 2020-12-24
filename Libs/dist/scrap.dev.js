@@ -368,10 +368,11 @@ function () {
               is_ok = false;
             }
 
-            time_playerd = API_.convert_time_spent(matche.date + " " + matche.time);
-            time_playerd = matche["time_old"].split("'").length == 2 && matche["time_old"].split("'")[0].length <= 2 ? parseInt(matche["time_old"].split("'")[0]) : time_playerd; //time_playerd = live==0 && parseInt(time_playerd)>0 && parseInt(time_playerd)<90 ? 45 : time_playerd;
+            var _time_playerd = API_.convert_time_spent(matche.date + " " + matche.time);
 
-            live = (time_playerd + "").toLocaleLowerCase() == "half" || parseInt(time_playerd) > 0 && parseInt(time_playerd) < 95 ? 1 : live;
+            time_playerd = matche["time_old"].split("'").length == 2 && matche["time_old"].split("'")[0].length <= 2 ? parseInt(matche["time_old"].split("'")[0]) : _time_playerd == "half" ? "half" : false; //time_playerd = live==0 && parseInt(time_playerd)>0 && parseInt(time_playerd)<90 ? 45 : time_playerd;
+
+            live = (time_playerd + "").toLocaleLowerCase() == "half" || parseInt(time_playerd) >= -30 && parseInt(time_playerd) < 95 ? 1 : live;
 
             if (live == 1 && time_playerd != false) {
               matche["time_played"] = time_playerd;
@@ -405,7 +406,8 @@ function () {
                 "data": [],
                 "country": comp_match["country"],
                 "is_koora": true
-              }; //league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
+              };
+              API_.set_common_league_id(league); //league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
 
               if (matches[matche["league_id"]] == undefined) {
                 matches[matche["league_id"]] = league;

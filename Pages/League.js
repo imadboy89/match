@@ -220,9 +220,12 @@ class LeagueScreen extends React.Component {
         goals = row && row.goals=="Gls" ? row.goals : goals;
         const fav_style = row.team && this.get_fav_icon(row.team.id, true) ? {backgroundColor:"#0093fb4a"} : {};
         return (
-        <Pressable 
+        <TouchableOpacity 
+          activeOpacity={0.7}
           style={[this.state.dynamic_style.team_view,fav_style]} 
           key={team_name}
+          onPress={() => {}}
+          delayLongPress={300}
           onLongPress={()=>this.set_fav(row.team.id)}
           >
           <View style={{flex:1,padding:2}} >
@@ -232,7 +235,7 @@ class LeagueScreen extends React.Component {
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{played}</Text></View>
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{goals}</Text></View>
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{points}</Text></View>
-        </Pressable>);
+        </TouchableOpacity>);
       }) );
     }
     return standing_;

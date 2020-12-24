@@ -932,15 +932,18 @@ function generateTheme(theme_name=false){
       headerTitleStyle: {
         //fontWeight: 'bold',
         },
-      headerTitleAlign: 'center'
+      headerTitleAlign: 'center',
       },
     tabBarOptions:{
           activeBackgroundColor: theme.activeBackgroundColor,
           inactiveBackgroundColor: theme.inactiveBackgroundColor,
           activeTintColor: theme.activeTintColor,
           inactiveTintColor: theme.inactiveTintColor,
-          size : 20,
+          size : 30,
           swipeEnabled :true,
+          showLabel:true,
+          //labelPosition:"below-icon",
+          //tabStyle:{color:"red"}
         },
     tabBarOptions_mat:{
       activeBackgroundColor: theme.activeBackgroundColor,
@@ -960,7 +963,7 @@ function generateTheme(theme_name=false){
         margin:0,
       },
       showIcon :true, 
-      showLabel :false,
+      showLabel :true,
       pressColor:theme.activeBackgroundColor,
         }
   }
@@ -979,18 +982,21 @@ function generateTheme(theme_name=false){
       //height:50,
       margingHorizontal:5,
       marginVertical:5,
-      backgroundColor: theme.background_color_default,
-      color : "#fff",
+      backgroundColor: "#0000",
+      color : theme.text_color_default,
     },
     settings_row_label:{
       flex:1,
       backgroundColor: theme.background_color_default,
-      color : "#fff",
+      color : theme.text_color_default,
     },
     settings_row_input:{
       flex:2,
       backgroundColor: theme.background_color_default,
-      color : "#fff",
+      color : theme.text_color_default,
+      height:30,
+      borderRadius: isWeb ? 10 : 8,
+      paddingHorizontal : 10,
     },
     nav_container: {
       flexDirection:'row', 
@@ -998,32 +1004,59 @@ function generateTheme(theme_name=false){
       //height:30,
       justifyContent: 'center',
       backgroundColor: theme.background_color_default,
-      color : "#fff",
+      color : theme.text_color_default,
     },
     modal_view_container:{
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
       width:"100%",
+      height:"100%",
       paddingTop: 22,
-      backgroundColor:"#2f333738"
+      //backgroundColor:"red"
     },
     modal_view: {
-      margin: 20,
+      margin: 10,
       width: __isMobile ? "90%" : "80%",
-      height: parseInt(window_height/2),
       backgroundColor: theme.background_color_default,
       borderRadius: 10,
-      padding: 35,
+      padding: 10,
       alignItems: "center",
       shadowColor: theme.text_color_default,
       shadowOffset: {
-        width: 0,
-        height: 2
+        width: 5,
+        height: 10
       },
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
-      elevation: 5
+      elevation: 5,
+      borderWidth:1,
+      borderColor:theme.text_color_default,
+    },
+    modal_view_small: {
+      height : 200,
+    },
+    modal_view_large: {
+      height : 500,
+    },
+    modal_body: {
+      backgroundColor:"#646c78",
+      width:"98%",
+      flex:1,
+      justifyContent:"center",
+      alignItems:"center",
+    },
+    footer: {
+      height:50,
+      width:"90%",
+      justifyContent:"center",
+      alignItems: "center",
+      flexDirection:'row',
+      flexWrap:'wrap',
+    },
+    footer_button: {
+      margin: 5,
+      width:100,
     },
     text: {
       color : theme.text_color_default,

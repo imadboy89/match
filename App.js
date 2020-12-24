@@ -209,6 +209,7 @@ function MyTabs(){
           },
           swipeEnabled :true,
           tabBarPosition:"bottom",
+          //tabBarLabel :  ({ focused, color }) => focused ? <Text style={{ color,fontSize:10 }}>{route.name}</Text> : null,
         })}
       tabBarOptions={is_materialTopTab ? _app_styles.tabBarOptions_mat : _app_styles.tabBarOptions}
       tabBarPosition="bottom"
