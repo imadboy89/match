@@ -182,8 +182,13 @@ class Scrap {
 ]
     let h =0;
     let team_st = {};
+    let group_name=false;
     try{
     for(let i=0;i< json_["ranks_table"].length;i++){
+      if(h==0 && json_["ranks_table"][i-1]=="g"){
+        group_name = json_["ranks_table"][i];
+        continue;
+      }
       if(h==0 && json_["ranks_table"][i]!="r"){
         continue;
       }
@@ -201,14 +206,23 @@ class Scrap {
         team_st["overall_league_GF"]       = parseInt(team_st["goals_scored"])     >0 ? parseInt(team_st["goals_scored"])     : 0 ;
         team_st["overall_league_GA"]       = parseInt(team_st["goals_received"])   >0 ? parseInt(team_st["goals_received"])   : 0 ;
         team_st["overall_league_GD"]       = parseInt(team_st["goals_difference"]) >0 ? parseInt(team_st["goals_difference"]) : 0 ;
-        standing.push(team_st);
+        if(group_name){
+          if(standing.length>0 && Object.keys(standing[standing.length-1])[0] == group_name){
+            standing[standing.length-1][group_name].push(team_st);
+          }else{
+            const st = {};
+            st[group_name] = [team_st,];
+            standing.push(st);
+          }
+        }else{
+          standing.push(team_st);
+        }
         h=0;
         team_st={};
       }
       
     }
     }catch(err){console.log(err)}
-    console.log(standing);
     return standing;
   }
   get_matches_k(html,date,is_oneMatch=false,is_only_live=false){
@@ -257,11 +271,13 @@ class Scrap {
             is_allowed = true;
           }
         }
-        if(blacklisted_countries.includes(compitition["country"])){
+        if(blacklisted_countries.includes(compitition["country"]) || compitition["options"].includes("h")){
           is_allowed = false;
         }
         if(is_allowed || "MA"==compitition["country"]){
           compititions[compitition["league_id"]] = compitition;
+
+          API_.set_common_league_id({id:compitition["league_id"],title:compitition["comp_name"]});
         }
 
         //console.log(compitition);
@@ -269,6 +285,7 @@ class Scrap {
         k=0;
       }
     }
+    API_.save_leagues();
     // parse matches_list
     const mat_header = ["league_id",
 "com_id_page",
@@ -283,7 +300,7 @@ class Scrap {
 "home_scorers",
 "score",
 "away_team_id",
-"home_team_status",
+"away_team_status",
 "away_team",
 "away_scorers",
 "inf_7",
@@ -342,11 +359,26 @@ class Scrap {
         const comp_match = compititions[matche["league_id"]] ;
         if(is_only_live==false || (matche["live"]==1 && is_only_live) ){
           if(comp_match!=undefined && (is_ok || comp_match["country"]=="MA") ){
-            let league = {"title": comp_match["comp_name"].trim(), "id":matche["league_id"],"img":comp_match["comp_logo"].replace("//","https://"), "data":[],"country":comp_match["country"],"is_koora":true};
-            API_.set_common_league_id(league);
+            let league = {
+              "title": comp_match["comp_name"].trim(), 
+              "id":matche["league_id"],
+              "img":comp_match["comp_logo"].replace("//","https://"), 
+              "data":[],
+              "country":comp_match["country"],
+              "is_koora":true,
+              "options" : comp_match["options"],
+            };
             //league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
             if(matches[ matche["league_id"] ]==undefined){
               matches[ matche["league_id"] ] = league;
+            }
+            const score_p = matche["score"].split("~")
+            matche["score"] = score_p[0].trim();
+            matche["score_penalties"] = score_p.length>1 && score_p[1] ?  score_p[1].trim().replace("&nbsp;","") :false;
+            if(matche["score_penalties"]){
+              const score_penalties = matche["score_penalties"].split(":");
+              matche["home_team_score_penalties"] = score_penalties && score_penalties.length ==2 ? score_penalties[0] : "-";
+              matche["away_team_score_penalties"] = score_penalties && score_penalties.length ==2 ? score_penalties[1] : "-";
             }
             const score = matche["score"].split("|");
             matche["home_team_score"] = score && score.length ==2 ? score[0] : "-";
@@ -460,11 +492,8 @@ class Scrap {
   get_video_m(html){console.log("hh");
     let videoId="";
     html = html.split("<p><iframe src=\"");
-    console.log(html.length);
     html = html.length == 2 ? html[1] : "";
-    console.log(html.length);
     videoId=html.split("\" width")[0];
-    console.log(videoId);
     return videoId;
   }
   get_lineup_old(html){
@@ -508,7 +537,7 @@ class Scrap {
       video["img"] = v.querySelect("img")[0].getAttribute("src")+"";
       video["desc"] = v.querySelect("div.entry p")[0].childNodes+"";
       videos.push(video);
-    }console.log(videos);
+    }
     return videos;
   }
   get_videos(html){

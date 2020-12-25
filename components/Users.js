@@ -1,7 +1,7 @@
 import React from 'react';
 import {  Text, View, Button,TextInput, Modal, ActivityIndicator,ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import IconButton from "../components/IconButton";
+import IconButton from "./IconButton";
 
 
 

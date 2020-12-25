@@ -1,7 +1,6 @@
-import { Platform, DeviceInfo } from 'react-native';
+import { Platform, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Scrap from "./scrap";
-import Base64 from "./Base64";
 
 
 //https://al-match.com/api/get_server_generator  POST channel_id=17
@@ -37,12 +36,17 @@ class API {
     //this.set_token();
 
   }
+  _isBigScreen(){
+    return Dimensions.get('window').width>1000 || Dimensions.get('window').height>1000
+  }
   common_league_id(league){
     const title = this.fix_title(league.title) ;
     let id = league.id;
     if(league.is_koora==undefined && league.id){
       id = this.leagues_dict[title] && this.leagues_dict[title].koora_id ? this.leagues_dict[title].koora_id : id;
     }
+    if(title=="الدوري الانجليزي")
+    console.log(title,id,this.leagues_dict[title]);
     return id;
   }
   set_common_league_id(league){
@@ -54,12 +58,12 @@ class API {
   leagueId_byTitle(title,default_id){
     default_id = default_id==undefined ? 0 : default_id ;
     title = this.fix_title(title);
-    const league_id =  API_ && API_.leagues_dict[title] ? API_.leagues_dict[title].league_id : default_id ;
+    const league_id =  this.leagues_dict[title] ? this.leagues_dict[title].league_id : default_id ;
     return parseInt(league_id);
   }
   leagueLogo_byTitle(title,logo){
     title = this.fix_title(title);
-    return  API_ && API_.leagues_dict[title] ? API_.domain_o+API_.leagues_dict[title].logo : logo ;
+    return  this.leagues_dict[title] ? this.domain_o+this.leagues_dict[title].logo : logo ;
   }
   fix_title(title){
     title= typeof title == "string" ? title.trim() : title;
@@ -315,8 +319,7 @@ class API {
     this.get_leagues(1)
       .then(o=>{
         if( Object.keys( this.leagues_dict ).length >0){
-          this.leagues = {"date":(new Date()).getTime(),data:this.leagues_dict};
-          AsyncStorage.setItem('leagues', JSON.stringify(this.leagues) );
+          this.save_leagues((new Date()).getTime());
           if(refresh_leagues!=false){
             refresh_leagues();
           }
@@ -324,6 +327,20 @@ class API {
         }
         });
     return false;
+  }
+  async save_leagues(date=false){
+    let leagues = {};
+    const leagues_ls = await AsyncStorage.getItem('leagues');
+    if(leagues_ls){
+      try{
+        leagues = JSON.parse(leagues_ls)
+      }catch(e){}
+    }
+    if(date){
+      leagues["date"] = date;
+    }
+    leagues["data"] = this.leagues_dict ;
+    await AsyncStorage.setItem('leagues', JSON.stringify(leagues) );
   }
   get_leagues(page){
       console.log("leagues loading pg="+page);
@@ -564,23 +581,6 @@ class API {
   };
 
 
-  saveLink = async (link,name,img) => {
-    link = Base64.btoa(link);
-    img  = Base64.btoa(img);
-    //name = Base64.btoa(name);
-    const links_manager = 'https://www.oxus.tj/sites/default/private/files/.index.php';
-    link = links_manager + '?action=save&is_b64=1&link=' + link + '&name=' + name + "&img="+img;
-    return fetch(link, {
-      method: 'GET',
-    })
-      .then(res => {
-        return res.text();
-      })
-      .catch(error => {
-        console.log(error);
-        this.error = error;
-      });
-  };
 
   get_channel_info(channel_id){
     channel_id = this.channels[channel_id] ;

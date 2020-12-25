@@ -201,11 +201,12 @@ class LeagueScreen extends React.Component {
       if(index!=""){
         let key = Object.keys(rows)[0];
         rows = rows[key];
-        standing_ = standing_.concat(<View style={{flex:1,alignItems:"center"}}><Text style={this.state.dynamic_style.group_name_t}>{key}</Text></View>);
+        standing_ = standing_.concat(<View style={{flex:1,alignItems:"center"}} key={key}><Text style={this.state.dynamic_style.group_name_t}>{key}</Text></View>);
       }
-      rows = [{"team_name":"Team name","team_badge":"","overall_league_payed":"Pld","overall_league_PTS":"Pts","goals":"Gls","id":0}].concat(rows);
+      rows = [{"team_name":"Team name","team_badge":"","overall_league_payed":"Pld","overall_league_PTS":"Pts","goals":"Gls","id":"h_"+index}].concat(rows);
+      
       standing_ = standing_.concat( rows.map(row=>{
-        console.log(row);
+        
         const fav_icon = row.team ? this.get_fav_icon(row.team.id) : "";
         let team_name ="";
         if(row && row.team_name){
@@ -223,7 +224,7 @@ class LeagueScreen extends React.Component {
         <TouchableOpacity 
           activeOpacity={0.7}
           style={[this.state.dynamic_style.team_view,fav_style]} 
-          key={team_name}
+          key={team_name+row.id}
           onPress={() => {}}
           delayLongPress={300}
           onLongPress={()=>this.set_fav(row.team.id)}
@@ -238,6 +239,7 @@ class LeagueScreen extends React.Component {
         </TouchableOpacity>);
       }) );
     }
+    
     return standing_;
   }
   onmt_clicked(item){

@@ -59,9 +59,23 @@ class ItemsList extends React.Component {
       }
       let home_team_style = {};
       let away_team_style = {};
-      const max_lenght = API_.isWeb ? 15 : 20 ;
-      if(home_team_name.length>max_lenght){ home_team_style={fontSize:15}; }
-      if(away_team_name.length>max_lenght){ away_team_style={fontSize:15}; }
+      const max_lenght = API_.isWeb ? 20 : 25 ;
+      if(home_team_name.length>max_lenght){ home_team_style={fontSize:17}; }
+      if(away_team_name.length>max_lenght){ away_team_style={fontSize:17}; }
+      
+      if(item.home_team_status && item.home_team_status.toLowerCase()=="w"){ 
+        home_team_style["color"]=this.state.dynamic_style.team_name_winner; 
+      }
+      if(item.away_team_status && item.away_team_status.toLowerCase()=="w"){ 
+        away_team_style["color"]=this.state.dynamic_style.team_name_winner; 
+      }
+      if(item.home_team_status && item.home_team_status.toLowerCase()=="l"){ 
+        home_team_style["color"]=this.state.dynamic_style.team_name_drawer; 
+      }
+      if(item.away_team_status && item.away_team_status.toLowerCase()=="l"){ 
+        away_team_style["color"]=this.state.dynamic_style.team_name_drawer; 
+      }
+      //"#ffffff87"
       let time=0;
       //console.log(this.props.notifications_matches[item.id]);
       let style_extra = this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
@@ -75,23 +89,31 @@ class ItemsList extends React.Component {
             : null}
             
           </View>
-          <View style={this.state.dynamic_style.matche_team_badge}>
-            <Image
-            style={this.state.dynamic_style.matche_team_logo}
-            source={{uri: item.home_team_badge}}
-              />
-            <Image
-            style={this.state.dynamic_style.matche_team_logo}
-            source={{uri: item.away_team_badge}}
-              />
-          </View>
+          {item.home_team_badge && item.away_team_badge ? 
+            <View style={this.state.dynamic_style.matche_team_badge}>
+              <Image
+              style={this.state.dynamic_style.matche_team_logo}
+              source={{uri: item.home_team_badge}}
+                />
+              <Image
+              style={this.state.dynamic_style.matche_team_logo}
+              source={{uri: item.away_team_badge}}
+                />
+            </View>
+          : null }
 
           <View style={this.state.dynamic_style.matche_team_names}>
-            <Text style={[this.state.dynamic_style.matche_team_name_text,home_team_style]}>{home_team_name}</Text>
-            <Text style={[this.state.dynamic_style.matche_team_name_text,away_team_style]}>{away_team_name}</Text>
+            <Text style={[this.state.dynamic_style.matche_team_name_text,home_team_style]} numberOfLines={1}>{home_team_name}</Text>
+            <Text style={[this.state.dynamic_style.matche_team_name_text,away_team_style]} numberOfLines={1}>{away_team_name}</Text>
           </View>
+          { item.home_team_score_penalties==undefined ? null : 
+            <View style={this.state.dynamic_style.matche_team_score_penalties}>
+              <Text style={this.state.dynamic_style.matche_team_score_text_penalties} noFonts={true}>{item.home_team_score_penalties ? item.home_team_score_penalties : "-"}</Text>
+              <Text style={this.state.dynamic_style.matche_team_score_text_penalties} noFonts={true}>{item.away_team_score_penalties ? item.away_team_score_penalties : "-"}</Text>
+            </View>
+          }
           <View style={this.state.dynamic_style.matche_team_score}>
-            <Text style={this.state.dynamic_style.matche_team_score_text} noFonts={true} >{item.home_team_score ? item.home_team_score : "-"}</Text>
+            <Text style={this.state.dynamic_style.matche_team_score_text} noFonts={true}>{item.home_team_score ? item.home_team_score : "-"}</Text>
             <Text style={this.state.dynamic_style.matche_team_score_text} noFonts={true}>{item.away_team_score ? item.away_team_score : "-"}</Text>
           </View>
         </View>
@@ -137,11 +159,10 @@ class ItemsList extends React.Component {
     let fav_icon = null;
     if(this.props.favorite && this.props.set_fav){
       //league_id = API_.leagueId_byTitle(title,league_id);
-      id = is_leagues ? API_.common_league_id({title,id}) : id;
-
+      id = API_.common_league_id({title,id});
       fav_icon = this.props.favorite.includes(id) ?
-        <IconButton name="star" onPress={()=>{this.props.set_fav(id)}} color={color} style={{width:50}} /> :
-        <IconButton name="star-o" onPress={()=>{this.props.set_fav(id)}} color={color} style={{width:50}}/> ;
+        <IconButton name="star" onPress={()=>{this.props.set_fav(id)}} color={color} /> :
+        <IconButton name="star-o" onPress={()=>{this.props.set_fav(id)}} color={color}/> ;
     }
     return fav_icon;
   }
@@ -160,11 +181,10 @@ class ItemsList extends React.Component {
       if(league_id==undefined || league_id==0){
         continue;
       }
-      console.log(league_id,this.props.favorite.includes(league_id));
       if(this.props.favorite.includes(league_id) == false){
         this.state.header_to_hide.push(league_id);
       }
-    }console.log(this.state.header_to_hide);
+    }
   }
   _render_item=({item})=>{
     //if(this.state.header_to_hide.includes(API_.leagueId_byTitle(item.league,item.league_id)) ){return null}
@@ -183,7 +203,7 @@ class ItemsList extends React.Component {
     </TouchableOpacity>);
   }
 
-  _render_header=({ section: { title,img,id,is_koora } })=>{
+  _render_header=({ section: { title,img,id,is_koora,options } })=>{
     //console.log(title,img,id);
     const fav_icon = this.get_fav_icon(title,id);
     if(title==undefined || title==""){
@@ -205,24 +225,21 @@ class ItemsList extends React.Component {
           //this.setState({list:l});
           }}
       >
-        <View style={[{paddingLeft:5,paddingRight:5,flexDirection:'row', flexWrap:'wrap'},this.state.dynamic_style.header]}>
-          {this.props.onLeaguePressed ? 
+        <View style={[{paddingLeft:3,paddingRight:1,flexDirection:'row', flexWrap:'wrap'},this.state.dynamic_style.header]}>
+          {this.props.onLeaguePressed && (options==undefined || options.includes("r"))? 
             <IconButton name="list-ol" color="#130f40"
               size={this.state.dynamic_style.header.fontSize} 
               onPress={() => {this.props.onLeaguePressed(title,img,id) }}/>
           : null}
-          <View
-            
-            style={{flex:7,maxHeight:"100%"}} 
-
-          >
-          <Text style={[this.state.dynamic_style.header_components,{flex:1,}]} numberOfLines={1}>{title}</Text>
+          <View style={{flex:7,maxHeight:"100%",}} >
+            <Text style={[this.state.dynamic_style.header_components,{flex:1,}]} numberOfLines={1}>{title}</Text>
           </View>
           {fav_icon}
-          <View style={{flex:2,height:"100%"}}>
+          <View style={{width: API_._isBigScreen() ? 100 : 70,height:"99%"}}>
           { img ?  
-                  <Image 
-                    style={is_koora ? this.state.dynamic_style.matche_league_logo_k : this.state.dynamic_style.matche_league_logo}
+                  <ImageBackground 
+                    style={this.state.dynamic_style.matche_league_logo_c}
+                    imageStyle={is_koora ? this.state.dynamic_style.matche_league_logo_k : this.state.dynamic_style.matche_league_logo}
                     source={{uri: img.slice(0,8)=="https://" ? img :API_.domain_o+img}}
                     />
             : null}
@@ -250,7 +267,7 @@ class ItemsList extends React.Component {
     //this.list = this.list[0] ? this.list[0]["data"]: [];
     if(is_new){
       this.setHidden();
-    }console.log("this.state.header_to_hide",this.state.header_to_hide);
+    }
     if(this.list.length>0 && this.list[0]["title"]!=""){
       const list_lists = this.list.map(k=>{
       return (

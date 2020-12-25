@@ -176,7 +176,7 @@ var Themes = {
     match_results_team_scor_color: "#2f3542",
     match_results_winer_background: "#2ed573",
     match_results_loser_background: "#ff7f50",
-    match_results_drawer_background: "#70a1ff",
+    match_results_drawer_background: "#95afc0",
     match_results_scorer_color: "#5352ed"
   }
 };
@@ -264,11 +264,11 @@ function generateTheme() {
     },
     header_components: {
       //marginRight:5,
+      borderTopLeftRadius: 20,
       marginLeft: 5,
       //marginTop:3,
       fontSize: 20,
       backgroundColor: theme.list_header_backgroundColor,
-      width: "98%",
       textAlign: "right",
       height: "98%"
     },
@@ -299,12 +299,16 @@ function generateTheme() {
       borderColor: theme.list_header_backgroundColor //backgroundColor:"yellow"
 
     },
+    team_name_winner: theme.live_borderColor,
+    team_name_loser: theme.match_results_winer_background,
+    team_name_drawer: theme.match_results_drawer_background,
     matche_team_names: {
       flex: 15,
       backgroundColor: theme.match_name_backgroundColor
     },
     matche_team_name_text: {
       flex: 1,
+      width: "98%",
       color: theme.match_name_color,
       paddingLeft: 5,
       paddingRight: 5,
@@ -323,10 +327,23 @@ function generateTheme() {
       borderBottomRightRadius: 8,
       alignContent: "center"
     },
+    matche_team_score_penalties: {
+      flex: 1,
+      backgroundColor: theme.match_score_backgroundColor,
+      alignItems: 'center',
+      color: theme.match_score_color,
+      alignContent: "center"
+    },
+    matche_team_score_text_penalties: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: theme.text_color_default,
+      fontSize: 23,
+      justifyContent: 'center'
+    },
     matche_team_score_text: {
       flex: 1,
       fontSize: 23,
-      fontWeight: 'bold',
       justifyContent: 'center'
     },
     matche_team_time: {
@@ -353,7 +370,7 @@ function generateTheme() {
       fontSize: 20,
       alignItems: 'center',
       justifyContent: 'center',
-      color: "#2ecc71" //backgroundColor:"#ffe738cc",
+      color: theme.live_borderColor //backgroundColor:"#ffe738cc",
 
     },
     matche_team_logo: {
@@ -363,26 +380,31 @@ function generateTheme() {
       aspectRatio: 1,
       resizeMode: "contain"
     },
+    matche_league_logo_c: {
+      width: "100%",
+      height: "100%" //borderRadius: isWeb ? 8 : 5
+
+    },
     matche_league_logo: {
       //margin :3,
-      marginRight: 5,
       marginVertical: 1,
-      width: "90%",
+      width: "100%",
       height: "95%",
       aspectRatio: 1,
       resizeMode: "contain",
-      borderRadius: isWeb ? 8 : 5
+      borderRadius: 5,
+      borderTopRightRadius: 20
     },
     matche_league_logo_k: {
       //margin :3,
-      marginRight: 5,
       marginVertical: 1,
-      width: "90%",
+      width: "100%",
       borderWidth: 1,
       height: "95%",
       aspectRatio: 1,
       //resizeMode:"contain",
-      borderRadius: isWeb ? 8 : 5
+      borderRadius: 5,
+      borderTopRightRadius: 20
     },
     matche_team_badge: {
       flex: 2,
@@ -1032,6 +1054,9 @@ function generateTheme() {
     modal_view_large: {
       height: 500
     },
+    modal_view_meduim: {
+      height: 350
+    },
     modal_body: {
       backgroundColor: "#646c78",
       width: "98%",
@@ -1040,15 +1065,16 @@ function generateTheme() {
       alignItems: "center"
     },
     footer: {
+      padding: 2,
       height: 50,
-      width: "90%",
+      width: "98%",
       justifyContent: "center",
       alignItems: "center",
       flexDirection: 'row',
       flexWrap: 'wrap'
     },
     footer_button: {
-      margin: 5,
+      margin: 2,
       width: 100
     },
     text: {

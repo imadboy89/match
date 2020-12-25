@@ -146,7 +146,6 @@ class HomeScreen extends React.Component {
     }
 
   _handleNotification = notification => {
-    console.log(1,notification);
     try{
       let item = JSON.parse(notification.request.content.data.data);
       this.onMatch_clicked(item);
@@ -154,7 +153,6 @@ class HomeScreen extends React.Component {
   };
 
   _handleNotificationResponse = response => {
-    console.log(2,response);
     try{
       let item = JSON.parse(response.notification.request.content.data.data);
       this.onMatch_clicked(item);
@@ -268,7 +266,6 @@ refresh_leagues = async()=>{
   this.setState({list:this.state.list});
 }
 async get_favs(data){
-  console.log(data);
   if(data && data.length > 0 && data[0].id==1){
     data = data.filter(o=>o.id && o.id!=1);
   }
@@ -278,7 +275,6 @@ async get_favs(data){
     data = data.sort((a,b)=>{ return (API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
   }catch(e){console.log(e);}
   data = data.sort((a,b)=>{return (this.state.favorite.indexOf(a.id)>this.state.favorite.indexOf(b.id))?-1:1;});
-  console.log(data);
   let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
   for(let j=0;j<data.length;j++){
     for(let m=0;m<data[j]["data"].length;m++){

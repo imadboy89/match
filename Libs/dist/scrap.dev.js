@@ -221,9 +221,15 @@ function () {
       var lineup_header = ["table_r", "info_1", "position", "team", "played", "wins", "draws", "loses", "rest", "goals_scored", "goals_received", "goals_difference", "points", "i", "last_matches_res"];
       var h = 0;
       var team_st = {};
+      var group_name = false;
 
       try {
         for (var i = 0; i < json_["ranks_table"].length; i++) {
+          if (h == 0 && json_["ranks_table"][i - 1] == "g") {
+            group_name = json_["ranks_table"][i];
+            continue;
+          }
+
           if (h == 0 && json_["ranks_table"][i] != "r") {
             continue;
           }
@@ -247,7 +253,19 @@ function () {
             team_st["overall_league_GF"] = parseInt(team_st["goals_scored"]) > 0 ? parseInt(team_st["goals_scored"]) : 0;
             team_st["overall_league_GA"] = parseInt(team_st["goals_received"]) > 0 ? parseInt(team_st["goals_received"]) : 0;
             team_st["overall_league_GD"] = parseInt(team_st["goals_difference"]) > 0 ? parseInt(team_st["goals_difference"]) : 0;
-            standing.push(team_st);
+
+            if (group_name) {
+              if (standing.length > 0 && Object.keys(standing[standing.length - 1])[0] == group_name) {
+                standing[standing.length - 1][group_name].push(team_st);
+              } else {
+                var st = {};
+                st[group_name] = [team_st];
+                standing.push(st);
+              }
+            } else {
+              standing.push(team_st);
+            }
+
             h = 0;
             team_st = {};
           }
@@ -256,7 +274,6 @@ function () {
         console.log(err);
       }
 
-      console.log(standing);
       return standing;
     }
   }, {
@@ -323,12 +340,16 @@ function () {
             }
           }
 
-          if (blacklisted_countries.includes(compitition["country"])) {
+          if (blacklisted_countries.includes(compitition["country"]) || compitition["options"].includes("h")) {
             is_allowed = false;
           }
 
           if (is_allowed || "MA" == compitition["country"]) {
             compititions[compitition["league_id"]] = compitition;
+            API_.set_common_league_id({
+              id: compitition["league_id"],
+              title: compitition["comp_name"]
+            });
           } //console.log(compitition);
 
 
@@ -337,10 +358,11 @@ function () {
           };
           k = 0;
         }
-      } // parse matches_list
+      }
 
+      API_.save_leagues(); // parse matches_list
 
-      var mat_header = ["league_id", "com_id_page", "id_1", "id", "datetime", "inf_1", "time", "home_team_id", "home_team_status", "home_team", "home_scorers", "score", "away_team_id", "home_team_status", "away_team", "away_scorers", "inf_7", "inf_8", "inf_9", "details"];
+      var mat_header = ["league_id", "com_id_page", "id_1", "id", "datetime", "inf_1", "time", "home_team_id", "home_team_status", "home_team", "home_scorers", "score", "away_team_id", "away_team_status", "away_team", "away_scorers", "inf_7", "inf_8", "inf_9", "details"];
       var matches = {};
       var matche = {};
       var j = 0;
@@ -405,12 +427,22 @@ function () {
                 "img": comp_match["comp_logo"].replace("//", "https://"),
                 "data": [],
                 "country": comp_match["country"],
-                "is_koora": true
-              };
-              API_.set_common_league_id(league); //league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
+                "is_koora": true,
+                "options": comp_match["options"]
+              }; //league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
 
               if (matches[matche["league_id"]] == undefined) {
                 matches[matche["league_id"]] = league;
+              }
+
+              var score_p = matche["score"].split("~");
+              matche["score"] = score_p[0].trim();
+              matche["score_penalties"] = score_p.length > 1 && score_p[1] ? score_p[1].trim().replace("&nbsp;", "") : false;
+
+              if (matche["score_penalties"]) {
+                var score_penalties = matche["score_penalties"].split(":");
+                matche["home_team_score_penalties"] = score_penalties && score_penalties.length == 2 ? score_penalties[0] : "-";
+                matche["away_team_score_penalties"] = score_penalties && score_penalties.length == 2 ? score_penalties[1] : "-";
               }
 
               var score = matche["score"].split("|");
@@ -537,11 +569,8 @@ function () {
       console.log("hh");
       var videoId = "";
       html = html.split("<p><iframe src=\"");
-      console.log(html.length);
       html = html.length == 2 ? html[1] : "";
-      console.log(html.length);
       videoId = html.split("\" width")[0];
-      console.log(videoId);
       return videoId;
     }
   }, {
@@ -618,7 +647,6 @@ function () {
         videos.push(video);
       }
 
-      console.log(videos);
       return videos;
     }
   }, {
