@@ -21,8 +21,8 @@ class SettingsScreen extends React.Component {
         fav_teams_k_nbr:0,
         fav_leagues_nbr:0,
         fav_channels_nbr:0,
-        window_height : Dimensions.get('window').height,
-        window_width : Dimensions.get('window').width,
+        window_height : parseInt(Dimensions.get('window').height),
+        window_width : parseInt(Dimensions.get('window').width),
         modalVisible_users:false,
         
     };
@@ -122,10 +122,12 @@ class SettingsScreen extends React.Component {
             <Text style={this.state.dynamic_style.settings_row_label}>Clean cache </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>clean</Text>
           </View>
-          <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>Users </Text> 
-            <View style={this.state.dynamic_style.settings_row_input}><Button title="Manage" onPress={()=>this.setState({modalVisible_users:true})}></Button></View>
-          </View>
+          { backup.admin!=true ? null : 
+            <View style={this.state.dynamic_style.settings_row}>
+              <Text style={this.state.dynamic_style.settings_row_label}>Users </Text> 
+              <View style={this.state.dynamic_style.settings_row_input}><Button title="Manage" onPress={()=>this.setState({modalVisible_users:true})}></Button></View>
+            </View>
+          }
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Favorite Leagues </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>{this.state.fav_leagues_nbr}</Text>
@@ -144,7 +146,7 @@ class SettingsScreen extends React.Component {
           </View>
 
           {this.render_modal_login()}
-          {this.render_modal_users()}
+          { backup.admin!=true ? null : this.render_modal_users()}
         </ScrollView >
     );
   }

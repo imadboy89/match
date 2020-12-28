@@ -20,7 +20,9 @@ class ItemsList extends React.Component {
     this.flatListRef = false;
     this.windowHeight = Dimensions.get('window').height ;
 
-    this.refs_list = {};
+    this.refs_list = [];
+    this.refs_map = {};
+    
   }
   componentDidMount=()=>{
     this._isMounted=true;
@@ -32,11 +34,20 @@ class ItemsList extends React.Component {
     this._isMounted=false;
     Dimensions.removeEventListener("change",this.check_width)
   }
+  componentDidUpdate(){
+    /*
+    if(this.refs_list && this.refs_list[0] && this.refs_list[0].current && this.refs_list[0].current.focus){
+      console.log(this.refs_list[0],this.refs_list[0].current , this.refs_list[0].current.focus);
+      this.refs_list[0].current.focus();
+    }
+    */
+  }
   check_width=(render=true)=>{
-    if(this.windowWidth == Dimensions.get('window').width){return ;}
+    const current_windowWidth= Dimensions.get('window').width<=1000 ? Dimensions.get('window').width : 1000;
+    if(this.windowWidth == current_windowWidth){return ;}
     let margin2add = _isMobile(API_.isWeb) ? 15 : 40;
     margin2add = parseInt(margin2add * (this.minWidth/300)); 
-    this.windowWidth = Dimensions.get('window').width;
+    this.windowWidth = current_windowWidth;
     //this.setState({numColumns:this.windowWidth/500});
     this.state.numColumns = parseInt(this.windowWidth/this.minWidth);
     this.state.numColumns = this.state.numColumns>=1 ? this.state.numColumns : 1;
@@ -81,7 +92,7 @@ class ItemsList extends React.Component {
       let style_extra = this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
       style_extra = item.live==1 ? this.state.dynamic_style.matche_container_live: style_extra;
       return (
-        <View style={[this.state.dynamic_style.matche_container,style_extra]}>
+        <View style={[this.state.dynamic_style.matche_container,style_extra,this.state.dynamic_style.shadow_1]}>
           <View style={this.state.dynamic_style.matche_team_time}>
             <Text style={this.state.dynamic_style.matche_team_time_t} noFonts={true}>{item.time}</Text>
             {item.live==1 ? 
@@ -120,15 +131,20 @@ class ItemsList extends React.Component {
         );
     }else if(col_key=="title_news" || col_key=="league_name"){
       const fav_icon = this.get_fav_icon(item[col_key],col_key=="league_name"? item.id : 0,true);
+      const koora_icon = this.get_common_icon(item["title"],item["koora_id"],true,"flag");
       let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
       const resizemode = col_key=="title_news" ? "stretch" : "center";
       return (
-        <View style={this.state.dynamic_style.news_container}>
+        <View style={[this.state.dynamic_style.news_container,this.state.dynamic_style.shadow_1]}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: item.img}} imageStyle={{resizeMode:resizemode}}>
           { item.date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,textAlign:"center",}}>{date}</Text> : null}
-          {fav_icon!=null ? fav_icon : null}
-            <View style={this.state.dynamic_style.news_img_v}>
 
+            <View style={this.state.dynamic_style.news_img_v}>
+              <View style={this.state.dynamic_style.league_header}>
+                {fav_icon!=null ? fav_icon : null}
+                <View style={{flex:1}}></View>
+                {koora_icon!=null ? koora_icon : null}
+              </View>
             </View>
             <View style={this.state.dynamic_style.news_title_v}><Text style={this.state.dynamic_style.news_title_t} numberOfLines={1}>{item[col_key]}</Text></View>
           </ImageBackground>
@@ -136,7 +152,7 @@ class ItemsList extends React.Component {
         );
     }else if(col_key=="category_name"){  
       return (
-        <View style={this.state.dynamic_style.news_container}>
+        <View style={[this.state.dynamic_style.news_container,this.state.dynamic_style.shadow_1]}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: API_.domain_o+item.category_photo}} imageStyle={{resizeMode:"stretch"}}>
             <View style={this.state.dynamic_style.news_img_v}>
 
@@ -154,16 +170,22 @@ class ItemsList extends React.Component {
         );
     }
   }
-  get_fav_icon(title,id,is_leagues=false){
+  get_fav_icon(title,id,is_leagues=false,icon="star"){
     const color = is_leagues ? global_theme.text_color_default : global_theme.background_color_default;
     let fav_icon = null;
     if(this.props.favorite && this.props.set_fav){
       //league_id = API_.leagueId_byTitle(title,league_id);
       id = API_.common_league_id({title,id});
       fav_icon = this.props.favorite.includes(id) ?
-        <IconButton name="star" onPress={()=>{this.props.set_fav(id)}} color={color} /> :
-        <IconButton name="star-o" onPress={()=>{this.props.set_fav(id)}} color={color}/> ;
+        <IconButton name={icon} onPress={()=>{this.props.set_fav(id)}} color={color} /> :
+        <IconButton name={icon+"-o"} onPress={()=>{this.props.set_fav(id)}} color={color}/> ;
     }
+    return fav_icon;
+  }
+  get_common_icon(title,id,is_leagues=false,icon="star"){
+    const color = is_leagues ? global_theme.text_color_default : global_theme.background_color_default;
+    let fav_icon = null;
+    fav_icon = id && id>1 ? <IconButton name={icon}  color={color} /> : null ;
     return fav_icon;
   }
   setHidden(id){
@@ -209,7 +231,13 @@ class ItemsList extends React.Component {
     if(title==undefined || title==""){
       return null;
     }
-    
+    //console.log(this.refs_map[title] , this.refs_map[title].ind);
+    /*
+            nextFocusUp={this.refs_map[title] && this.refs_map[title].ind>=0 && this.refs_list[this.refs_map[title].ind-1]? this.refs_list[this.refs_map[title].ind-1] : null}
+        nextFocusDown={this.refs_map[title] && this.refs_map[title].ind>=0 && this.refs_list[this.refs_map[title].ind+1]? this.refs_list[this.refs_map[title].ind+1] : null}
+        ref={this.refs_map[title] && this.refs_map[title].ind>=0 ? this.refs_list[this.refs_map[title].ind] : null}
+
+    */
     return (
       <TouchableHighlight style={this.state.dynamic_style.header_container}
         underlayColor={"green"}
@@ -253,9 +281,21 @@ class ItemsList extends React.Component {
       this.flatListRef.scrollToOffset({ animated: true, offset: 0 });
     }
   }
+  create_refs(){
+    return false;
+    this.refs_list = [];
+    for(let i=0;i<this.list.length;i++){
+      this.refs_list[i] = React.createRef();
+      this.refs_map[this.list[i].title] = {ind:i};
+    }
+  }
   render_list() {
     
     let is_new = JSON.stringify(this.list) == JSON.stringify(this.props.list) ? false : true;
+    is_new = is_new && (this.props.ListHeaderComponent!= this.ListHeaderComponent || this.props.ListFooterComponent!=this.ListFooterComponent);
+
+    this.ListFooterComponent = this.props.ListFooterComponent;
+    this.ListHeaderComponent = this.props.ListHeaderComponent;
 
     this.list = this.props.list;
     if (this.list && this.list[0] && this.list[0]["title"]==undefined){
@@ -269,6 +309,7 @@ class ItemsList extends React.Component {
       this.setHidden();
     }
     if(this.list.length>0 && this.list[0]["title"]!=""){
+      this.create_refs();
       const list_lists = this.list.map(k=>{
       return (
           <View style={{width:"100%"}} key={k.title}>
@@ -287,6 +328,8 @@ class ItemsList extends React.Component {
             : null }
           </View>);
       });
+
+      //this.refs_list[0].focus();
       return (
         <ScrollView  style={this.state.dynamic_style.list_container} key={JSON.stringify(this.list)}
           refreshControl={this.props.refreshControl}
@@ -322,7 +365,7 @@ class ItemsList extends React.Component {
       }
       return (
         <View style={this.state.dynamic_style.list_container}>
-          <SafeAreaView style={{flex: 1,width:"100%"}}>
+          <SafeAreaView style={this.state.dynamic_style.item_container}>
             <FlatList
               ref={(ref) => { this.flatListRef = ref; }}
               ListHeaderComponent = {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : undefined}

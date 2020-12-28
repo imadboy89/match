@@ -37,7 +37,7 @@ class API {
 
   }
   _isBigScreen(){
-    return Dimensions.get('window').width>1000 || Dimensions.get('window').height>1000
+    return Dimensions.get('window').width>900 || Dimensions.get('window').height>900
   }
   common_league_id(league){
     const title = this.fix_title(league.title) ;
@@ -45,8 +45,6 @@ class API {
     if(league.is_koora==undefined && league.id){
       id = this.leagues_dict[title] && this.leagues_dict[title].koora_id ? this.leagues_dict[title].koora_id : id;
     }
-    if(title=="الدوري الانجليزي")
-    console.log(title,id,this.leagues_dict[title]);
     return id;
   }
   set_common_league_id(league){
@@ -553,7 +551,7 @@ class API {
     }
     await AsyncStorage.setItem('configs', JSON.stringify(configs));
     if(backup && backup.db_settings && isDefault==false){
-      backup.save_settings(configs);
+      await backup.save_settings(configs);
     }else{
       console.log("------- backup.db_settings not defined yet");
     }

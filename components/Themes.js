@@ -194,14 +194,17 @@ function generateTheme(theme_name=false){
   let theme = Themes[theme_name];
   const header_height = isWeb ? 40 : 70;
   const __isMobile = _isMobile(isWeb);
+  const maxWidth = window_width<1000 ? "100%" : 1000;
+  
   var styles_list = {
     list_container: {
       marginRight: "1%",
       //marginLeft: isWeb ? "20%" : 0, 
       marginTop:"1%",
       flex: 1,
-      width:"100%",
+      width: "100%" ,
       backgroundColor: theme.background_color_default,
+      
     },
     container: {
       //marginRight:__isMobile ? "1%" : 10,
@@ -209,8 +212,13 @@ function generateTheme(theme_name=false){
       //width:"99%",
       backgroundColor: theme.background_color_default,
     },
+    onFocus:{
+      backgroundColor:"red"
+    },
     item_container: {
-      width:"100%",
+      flex:1,
+      marginHorizontal:"auto",
+      width: maxWidth ,
       backgroundColor: theme.background_color_default,
     },
     columnWrapperStyle:{
@@ -262,6 +270,16 @@ function generateTheme(theme_name=false){
     },
     title: {
       fontSize: 23
+    },
+    shadow_1:{
+      shadowColor: theme.text_color_default,
+      shadowOffset: {
+        width: 2,
+        height: 3
+      },
+      shadowOpacity: 0.20,
+      //shadowRadius: 3,
+      elevation: 5
     },
     matche_container:{
       width:"98%",
@@ -428,6 +446,13 @@ function generateTheme(theme_name=false){
       width:"100%",
       color:"#fff",
       alignItems:'center',
+    },
+    league_header:{
+      height:20,
+      width:"100%",
+      color:"#fff",
+      flexDirection:'row', 
+      flexWrap:'wrap',
     },
     news_img_i:{
       width: "100%",

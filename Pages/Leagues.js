@@ -65,7 +65,7 @@ get_leagues(){
         let row = leagues_dict[k];
         let img = row && row.logo ? row.logo : false;
         let league_name = row.ar_league_name ? row.ar_league_name : row.league;
-        return {"img": API_.domain_o+img,"league_name":league_name , id:row.league_id}; 
+        return {"img": API_.domain_o+img,"league_name":league_name , id:row.league_id,koora_id:row.koora_id}; 
       });
       data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
       this.setState({loading:false,list:data,favorite:favorite});

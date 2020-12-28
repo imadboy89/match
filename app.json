@@ -31,10 +31,10 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "icon": "./assets/icon.png",
-      "backgroundColor":"#000",
-      "lang":"en",
-      "startUrl":"/match",
-      "crossorigin":"no-referrer"
+      "backgroundColor": "#000",
+      "lang": "en",
+      "startUrl": "/match",
+      "crossorigin": "no-referrer"
     },
     "platforms": [
       "android",

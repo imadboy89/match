@@ -579,6 +579,9 @@ class Scrap {
   decodeEntities(str) {
     if(str && typeof str === 'string') {
       // strip script/html tags
+      
+      str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&quot;/gi," ' ");
+      str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&nbsp;/gi," ");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&[^;]+;/gi,"");
       str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
       str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');

@@ -283,7 +283,7 @@ async get_favs(data){
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
       if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
         matche_f["league_id"] = 1;
-        matche_f["league"] = "fav_list";
+        //matche_f["league"] = "fav_list";
         fav_list.data.push(matche_f);
       }
     }
