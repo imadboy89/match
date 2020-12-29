@@ -10,6 +10,10 @@
   "orientation": "portrait",
   "related_applications": [
     {
+      "platform": "itunes",
+      "id": "com.imados.koooora"
+    },
+    {
       "platform": "play",
       "url": "http://play.google.com/store/apps/details?id=com.imados.koooora",
       "id": "com.imados.koooora"
