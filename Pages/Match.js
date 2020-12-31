@@ -228,7 +228,7 @@ class Matchcreen extends React.Component {
             </Text>
 
 
-            <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_a} numberOfLines={1}>
+            <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_r} numberOfLines={1}>
               {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
             </Text>
             <Text style={[this.state.dynamic_style.lineup2_number,style_sub_a]}>{away_p && away_p.lineup_number? away_p.lineup_number : ""}</Text>

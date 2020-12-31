@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Modal,Text, View, Button,TextInput } from 'react-native';
+import {  Modal,Text, View, Button,ScrollView } from 'react-native';
 import {getTheme} from "../components/Themes";
 
 

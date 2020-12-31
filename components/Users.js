@@ -68,7 +68,7 @@ class Users extends React.Component{
       return this.state.users.map( (value,i) =>{
         const user = value.email ;
         const is_tmp_admin = value.is_tmp_adm ? value.is_tmp_adm : false ;
-        const lastLogin  = value.lastLogin ? API_.get_date_time(lastLogin) : "-";
+        const lastLogin  = value.lastLogin ? API_.get_date_time(value.lastLogin) : "-";
         //return (<View></View>);
         return (
           <View style={{flexDirection:"row",width:"95%",height:40,borderStyle:"solid",borderWidth:1,margin:3,alignItems: 'center'}} key={user+i}>
