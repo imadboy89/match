@@ -35,6 +35,10 @@ class Matchcreen extends React.Component {
   componentDidMount(){
     API_.getConfig("favorite_channels",this.state.favorite).then(o=>{this.setState({favorite:o});});
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
+
+    const home_name = this.state.match_dets && this.state.match_dets.home_team_ar ? this.state.match_dets.home_team_ar : this.state.match_dets.home_team;
+    const away_name = this.state.match_dets && this.state.match_dets.away_team_ar ? this.state.match_dets.away_team_ar : this.state.match_dets.away_team;
+    this.props.navigation.setOptions({title: <Text >{home_name +" - "+ away_name}</Text>});
   }
   get_Match(id){
       if(this.state.match_dets.details){
@@ -45,7 +49,6 @@ class Matchcreen extends React.Component {
           this.setState({matche_details:resp["data"][0],loading:false});
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
-          this.props.navigation.setOptions({title: <Text >{this.home_team_ar +" - "+this.away_team_ar }</Text>});
         }
       });
   }
@@ -56,7 +59,6 @@ class Matchcreen extends React.Component {
           this.setState({matche_details: resp,loading:false});
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
-          this.props.navigation.setOptions({title: <Text >{this.home_team_ar +" - "+this.away_team_ar }</Text>});
         }
       });
   }
@@ -221,13 +223,13 @@ class Matchcreen extends React.Component {
           <View style={this.state.dynamic_style.lineup2_container} key={home_p.lineup_number+home_p.lineup_player+away_p.lineup_player}>
             
             <Text style={[this.state.dynamic_style.lineup2_number,style_sub_h]}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
-            <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_h} numberOfLines={1}>
-              {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
+            <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_l} numberOfLines={1}>
+              {away_p && away_p.lineup_player? scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
             </Text>
 
 
             <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_a} numberOfLines={1}>
-              {away_p && away_p.lineup_player? scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
+              {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
             </Text>
             <Text style={[this.state.dynamic_style.lineup2_number,style_sub_a]}>{away_p && away_p.lineup_number? away_p.lineup_number : ""}</Text>
             {i==11 ? <View style={this.state.dynamic_style.hairline}/> : null}
@@ -249,9 +251,9 @@ class Matchcreen extends React.Component {
       i++;
       return (
           <View style={this.state.dynamic_style.stats_container} key={row?row.type+"":"-"}>
-            <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.stats_frag_l}>{row ? row.home : ""}</Text>
+            <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.stats_frag_l}>{row ? row.away : ""}</Text>
             <Text style={i==0?this.state.dynamic_style.stats_frag_m_ :this.state.dynamic_style.stats_frag_m}>{row ? row.type : "-"}</Text>
-            <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.stats_frag_r}>{row ? row.away : ""}</Text>
+            <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.stats_frag_r}>{row ? row.home : ""}</Text>
           </View>);
     });
     return (
@@ -319,7 +321,7 @@ class Matchcreen extends React.Component {
     if(type_=="home"){this.scorers_h =[];this.assist_h =[];}
     else{this.scorers_a =[];this.assist_a =[];}
 
-    let style_class = type_=="home"? this.state.dynamic_style.match_results_team_name_l : this.state.dynamic_style.match_results_team_name_r ;
+    let style_class = type_=="home"? this.state.dynamic_style.match_results_team_name_r : this.state.dynamic_style.match_results_team_name_l ;
     if(this.state.matche_details.goal_scorer){
       this.state.matche_details.goal_scorer = this.state.matche_details.goal_scorer.sort((a,b)=>{
         const a_time = !isNaN(a.time) ? parseInt(a.time) : a.time;
@@ -330,7 +332,7 @@ class Matchcreen extends React.Component {
         if(elm[type_+"_scorer"]==undefined || elm[type_+"_scorer"]=="" || elm[type_+"_scorer"]==null) return false;
         let text = "";
         if(type_=="away"){
-          if(API_.is_ascii(elm[type_+"_scorer"])){
+          if(API_.is_ascii(elm[type_+"_scorer"]) == false){
             text = (elm.time ? elm.time+'"' : "-") +" "+ elm[type_+"_scorer"];
           }else{
             text = elm[type_+"_scorer"]+" "+(elm.time ? elm.time+'"' : "-");
@@ -339,7 +341,7 @@ class Matchcreen extends React.Component {
           this.assist_a.push(elm[type_+"_assist"]);
           
         }else{
-          if(API_.is_ascii(elm[type_+"_scorer"])){
+          if(API_.is_ascii(elm[type_+"_scorer"]) == false){
             text = elm[type_+"_scorer"] +" "+(elm.time ? elm.time+'"' : "-");
           }else{
             text = (elm.time ? elm.time+'"' : "-") +" " +elm[type_+"_scorer"];
@@ -379,32 +381,45 @@ class Matchcreen extends React.Component {
       alert(e);
       return <View style={this.state.dynamic_style.container}><Text>ERR</Text></View>;
       }
+
+      { this.state.match_dets.home_team_score_penalties==undefined ? null : 
+        <View style={this.state.dynamic_style.matche_team_score_penalties}>
+          <Text style={this.state.dynamic_style.matche_team_score_text_penalties} noFonts={true}>{this.state.match_dets.home_team_score_penalties ? this.state.match_dets.home_team_score_penalties : "-"}</Text>
+          <Text style={this.state.dynamic_style.matche_team_score_text_penalties} noFonts={true}>{this.state.match_dets.away_team_score_penalties ? this.state.match_dets.away_team_score_penalties : "-"}</Text>
+        </View>
+      }
+      console.log(this.state.match_dets);
     return (
       <ScrollView style={this.state.dynamic_style.container}>
         <TouchableOpacity style={this.state.dynamic_style.header_container} onPress={()=>this.setState({show_res : this.state.show_res?false:true})}>              
-          <View style={[home_style]}>
-            <Image style={{height:100,width:"95%",justifyContent: "center",resizeMode:"contain"}} source={{uri: this.state.match_dets.home_team_badge}} ></Image>
+          <View style={[away_style]}>
+            <Image style={{height:100,width:"95%",justifyContent: "center",resizeMode:"contain"}} source={{uri: this.state.match_dets.away_team_badge}} ></Image>
             <View styles={{flex:1,}}>
-              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{home_name}</Text>
-              <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{home_sc}</Text>
-            </View>
-            { this.state.show_res ?
-            <View style={{}}>
-              {scores_home}
-            </View>
-            :null}
-          </View>
-
-          <View style={[this.state.dynamic_style.match_results_team_name_r,away_style]}>
-          <Image style={{height:100,width:"95%",resizeMode:"contain"
-}} source={{uri: this.state.match_dets.away_team_badge}} ></Image>
-            <View styles={[this.state.dynamic_style.match_results_team_name_r,{flex:1}]}>
               <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{away_name}</Text>
               <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{away_sc}</Text>
+              { this.state.match_dets.home_team_score_penalties==undefined ? null :
+                <Text style={this.state.dynamic_style.match_results_team_scor_penalties_t} noFonts={true}>{this.state.match_dets.away_team_score_penalties ? this.state.match_dets.away_team_score_penalties : "-"}</Text>
+                 }
             </View>
             { this.state.show_res ?
             <View style={{}}>
               {scores_away}
+            </View>
+            :null}
+          </View>
+
+          <View style={[this.state.dynamic_style.match_results_team_name_r,home_style]}>
+          <Image style={{height:100,width:"95%",resizeMode:"contain"}} source={{uri: this.state.match_dets.home_team_badge}} ></Image>
+            <View styles={[this.state.dynamic_style.match_results_team_name_r,{flex:1}]}>
+              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{home_name}</Text>
+              <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{home_sc}</Text>
+              { this.state.match_dets.home_team_score_penalties==undefined ? null : 
+                <Text style={this.state.dynamic_style.match_results_team_scor_penalties_t} noFonts={true}>{this.state.match_dets.home_team_score_penalties ? this.state.match_dets.home_team_score_penalties : "-"}</Text>
+                 }
+            </View>
+            { this.state.show_res ?
+            <View style={{}}>
+              {scores_home}
             </View>
             :null}
           </View>

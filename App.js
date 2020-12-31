@@ -28,6 +28,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
 import backUp from "./Libs/BackUp";
+import ToastMsg from "./components/ToastMsg";
 
 Text = TextF;
 global. API_ = new API();
@@ -70,7 +71,6 @@ async function registerForPushNotificationsAsync() {
   if(API_.isWeb){
     return new Promise(function(){return []});
   }
-  let token;
   if (Constants.isDevice) {
     const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
     let finalStatus = existingStatus;
@@ -82,8 +82,8 @@ async function registerForPushNotificationsAsync() {
       alert('Failed to get push token for push notification!');
       return;
     }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log(token);
+    backup.PushToken = (await Notifications.getExpoPushTokenAsync()).data;
+    
   } else {
     alert('Must use physical device for Push Notifications');
   }
@@ -98,7 +98,9 @@ async function registerForPushNotificationsAsync() {
   }
 }
 registerForPushNotificationsAsync()
-global.notifyMessage = function(msg,title, buttons) {
+global.notifyMessage = function(msg,title, buttons,speed=1000,delay=1000) {
+    API_.showTMsg(msg,speed,delay);
+    return;
     if(API_.isWeb){
       alert(msg);
       return new Promise((resolve, reject)=>{return resolve([])});
@@ -238,24 +240,35 @@ class APP extends React.Component {
         dynamic_style:"styles_home",
         style_loaded:false,
         //dynamic_style_list:styles_list,
+        msg:"", 
+        speed:0, 
+        delay:0
     };
     getTheme("app_styles").then(theme=>{
       if(_app_styles==theme){return true;}
       _app_styles=theme;
       this.setState({style_loaded:true});
     });
-  
+    API_.showTMsg = this.showTMsg;
   }
-
-
-
+  componentDidMount(){
+    API_.showMsg = this.showTMsg;
+    API_.debugMsg= this.debugMsg;
+  }
+  showTMsg = (body,type, speed, delay)=>{
+    this.setState({body:body,type:type, speed:speed, delay:delay,debug:false});
+  }
+  debugMsg = (body,type, speed, delay)=>{
+    this.setState({body:body,type:type, speed:speed, delay:delay,debug:true});
+  }
   render(){
     if(this.state.style_loaded==false){
       return null;
     }
     return (
       <NavigationContainer>
-        <MyTabs />
+        <MyTabs showTMsg={this.showTMsg}/>
+        <ToastMsg body={this.state.body} speed={this.state.speed} delay={this.state.delay} type={this.state.type} debug={this.state.debug}/>
       </NavigationContainer>
     );
   }

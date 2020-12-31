@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Text, View, Button,TextInput, Modal, ActivityIndicator,ScrollView } from 'react-native';
+import {  Text, View, Button,TextInput, Modal, ActivityIndicator,ScrollView ,TouchableHighlight,Keyboard} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IconButton from "./IconButton";
 
@@ -16,10 +16,14 @@ class Users extends React.Component{
         msg_text : "",
         modalVisible_msg : false,
         dynamic_style:this.props.dynamic_style,
+        focused_user:"",
 
       };
-      this.loadUsers();
+      
     } 
+    componentDidMount(){
+      this.loadUsers();
+    }
     setUser_admin_tmp(user_username,action="tmp_admin"){
       this.setState({actionRunning:true});
       backup.partnersManager(action,user_username).then(res=>{
@@ -58,52 +62,61 @@ class Users extends React.Component{
       if (this.state.usersLoading){
         return <ActivityIndicator size="large" color="#00ff00" /> ;
       }
-      if(!this.state.users.map){
+      if(!this.state.users || !this.state.users.map){
         return null;
       }
       return this.state.users.map( (value,i) =>{
         const user = value.email ;
         const is_tmp_admin = value.is_tmp_adm ? value.is_tmp_adm : false ;
+        const lastLogin  = value.lastLogin ? API_.get_date_time(lastLogin) : "-";
         //return (<View></View>);
         return (
           <View style={{flexDirection:"row",width:"95%",height:40,borderStyle:"solid",borderWidth:1,margin:3,alignItems: 'center'}} key={user+i}>
-            <Text style={{color: value.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',flex:1}}> {user} </Text>
-        
-              <View style={{flexDirection:"row",alignSelf: 'center',}}>
-                <IconButton
-                    name={ is_tmp_admin ? "minus" : "plus"}
-                    disabled={this.state.actionRunning}
-                    size ={28}
-                    color={ this.state.actionRunning ? "#bdc3c7" : (is_tmp_admin ? "#e74c3c" : "#2ecc71")}
-                    onPress={()=>{
-                      if(is_tmp_admin){
-                          this.setUser_admin_tmp(user,"remove_tmp_admin");
-                      }else{
-                          this.setUser_admin_tmp(user,"tmp_admin");
-                      }
-                    }
-                    }
-                />
-                <IconButton
-                    name="paper-plane"
-                    disabled={this.state.actionRunning}
-                    size ={28}
-                    color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
-                    onPress={()=>{
-                      this.msg_user = user;
-                      this.setState({modalVisible_msg:true});
-                    }
-                    }
-                />
-
-                <IconButton 
-                  name={ value.disabled  ? "unlock" : "lock"}
-                  onPress={()=>this.updateUserStatus(value)}
-                  size={28} 
-                  color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
+            <TouchableHighlight style={{flex:1,height:"100%",justifyContent:"center"}} 
+              onPress={()=>this.setState({focused_user:user})}
+              >
+            <View style={{flex:1,justifyContent:"center",width:"100%",height:"100%"}}>
+              <Text style={{color: value.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',justifyContent:"center",width:"100%"}}> {user} </Text>
+              {this.state.focused_user == user ? 
+                <Text style={{color: value.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',flex:50,fontSize:8,marginHorizontal:1,width:"100%"}} >{lastLogin}</Text>
+              : null}
+            </View>
+            </TouchableHighlight>
+            <View style={{flexDirection:"row",alignSelf: 'center',}}>
+              <IconButton
+                  name={ is_tmp_admin ? "minus" : "plus"}
                   disabled={this.state.actionRunning}
-                  />
-              </View>
+                  size ={28}
+                  color={ this.state.actionRunning ? "#bdc3c7" : (is_tmp_admin ? "#e74c3c" : "#2ecc71")}
+                  onPress={()=>{
+                    if(is_tmp_admin){
+                        this.setUser_admin_tmp(user,"remove_tmp_admin");
+                    }else{
+                        this.setUser_admin_tmp(user,"tmp_admin");
+                    }
+                  }
+                  }
+              />
+              <IconButton
+                  name="paper-plane"
+                  disabled={this.state.actionRunning}
+                  size ={28}
+                  color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
+                  onPress={()=>{
+                    this.msg_user = user;
+                    this.setState({modalVisible_msg:true});
+                  }
+                  }
+              />
+
+              <IconButton 
+                name={ value.disabled  ? "unlock" : "lock"}
+                onPress={()=>this.updateUserStatus(value)}
+                size={28} 
+                color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
+                disabled={this.state.actionRunning}
+                />
+            </View>
                 
           </View>
         );
@@ -154,8 +167,7 @@ class Users extends React.Component{
           animationType="slide"
           transparent={true}
           visible={this.props.modal_visible}
-          onRequestClose={() => this.props.closeModal() }
-          
+          onRequestClose={() => {Keyboard.dismiss();this.props.closeModal();} }
         > 
         <View style={this.state.dynamic_style.modal_view_container}>
         <View style={[this.state.dynamic_style.modal_view,this.state.dynamic_style.modal_view_large]}>

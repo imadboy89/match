@@ -70,7 +70,7 @@ class ItemsList extends React.Component {
       }
       let home_team_style = {};
       let away_team_style = {};
-      const max_lenght = API_.isWeb ? 20 : 25 ;
+      const max_lenght = parseInt(this.windowWidth/19) ;
       if(home_team_name.length>max_lenght){ home_team_style={fontSize:17}; }
       if(away_team_name.length>max_lenght){ away_team_style={fontSize:17}; }
       
@@ -87,7 +87,11 @@ class ItemsList extends React.Component {
         away_team_style["color"]=this.state.dynamic_style.team_name_drawer; 
       }
       //"#ffffff87"
-      let time=0;
+      let time_style = JSON.parse(JSON.stringify(this.state.dynamic_style.matche_team_time_live));
+      if(item.time_played=="Pen"){
+        time_style["color"]="#ff5252";
+      }
+      let time_played= item.time_played>0?item.time_played+"'": item.time_played;
       //console.log(this.props.notifications_matches[item.id]);
       let style_extra = this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
       style_extra = item.live==1 ? this.state.dynamic_style.matche_container_live: style_extra;
@@ -96,7 +100,7 @@ class ItemsList extends React.Component {
           <View style={this.state.dynamic_style.matche_team_time}>
             <Text style={this.state.dynamic_style.matche_team_time_t} noFonts={true}>{item.time}</Text>
             {item.live==1 ? 
-              <Text style={this.state.dynamic_style.matche_team_time_live}  noFonts={true}>{item.time_played+"'"}</Text> 
+              <Text style={time_style}  noFonts={true}>{time_played}</Text> 
             : null}
             
           </View>
@@ -188,14 +192,14 @@ class ItemsList extends React.Component {
     fav_icon = id && id>1 ? <IconButton name={icon}  color={color} /> : null ;
     return fav_icon;
   }
-  setHidden(id){
+  setHidden(id,is_new=true){
     if(this.props.favorite==undefined || this.props.set_fav==undefined){
       return ;
     }
     if(this.windowHeight>=1000 || this.windowWidth>=1000){
       return ;
     }
-    this.state.header_to_hide = [];
+    this.state.header_to_hide = is_new ? [] : this.state.header_to_hide;
     for(let i=0;i<this.list.length;i++){
       let league_id =  id ? id : this.list[i]["id"] ;
       //league_id = API_.leagueId_byTitle(this.list[i]["title"],league_id);
@@ -231,6 +235,10 @@ class ItemsList extends React.Component {
     if(title==undefined || title==""){
       return null;
     }
+    let header_style = {flex:1};
+    const max_lenght = parseInt(this.windowWidth/14) ;
+    if(title.length>max_lenght){ header_style={fontSize:17}; }
+
     //console.log(this.refs_map[title] , this.refs_map[title].ind);
     /*
             nextFocusUp={this.refs_map[title] && this.refs_map[title].ind>=0 && this.refs_list[this.refs_map[title].ind-1]? this.refs_list[this.refs_map[title].ind-1] : null}
@@ -260,7 +268,7 @@ class ItemsList extends React.Component {
               onPress={() => {this.props.onLeaguePressed(title,img,id) }}/>
           : null}
           <View style={{flex:7,maxHeight:"100%",}} >
-            <Text style={[this.state.dynamic_style.header_components,{flex:1,}]} numberOfLines={1}>{title}</Text>
+            <Text style={[this.state.dynamic_style.header_components,header_style]} numberOfLines={1}>{title}</Text>
           </View>
           {fav_icon}
           <View style={{width: API_._isBigScreen() ? 100 : 70,height:"99%"}}>
@@ -291,9 +299,11 @@ class ItemsList extends React.Component {
   }
   render_list() {
     
-    let is_new = JSON.stringify(this.list) == JSON.stringify(this.props.list) ? false : true;
+    let is_new = JSON.stringify(this.list_origin) != JSON.stringify(this.props.list);
     is_new = is_new && (this.props.ListHeaderComponent!= this.ListHeaderComponent || this.props.ListFooterComponent!=this.ListFooterComponent);
+    const is_paginated = this.props.ListHeaderComponent!= this.ListHeaderComponent || this.props.ListFooterComponent!=this.ListFooterComponent ;
 
+    this.list_origin = this.props.list;
     this.ListFooterComponent = this.props.ListFooterComponent;
     this.ListHeaderComponent = this.props.ListHeaderComponent;
 
@@ -301,12 +311,12 @@ class ItemsList extends React.Component {
     if (this.list && this.list[0] && this.list[0]["title"]==undefined){
       this.list=[{"title":"",data:this.list}];
       if(is_new && this.flatListRef){
-        this.toTop();
+        //this.toTop();
       }
     }
     //this.list = this.list[0] ? this.list[0]["data"]: [];
     if(is_new){
-      this.setHidden();
+      this.setHidden(false,is_paginated);
     }
     if(this.list.length>0 && this.list[0]["title"]!=""){
       this.create_refs();
@@ -389,7 +399,11 @@ class ItemsList extends React.Component {
   }
   render() {
     if( this.props.loading==false && (this.check_width(false) || this.state.dynamic_style==false || this.props.list==undefined || this.props.list.length==0)){
-      return null;
+      return (<View style={this.state.dynamic_style.container}>
+        {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : null}
+        <Loader/>
+        {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : null}
+        </View>);
     }
     return (<View style={this.state.dynamic_style.container}>
       {this.props.loading && (this.props.refreshControl==undefined || API_.isWeb)  ? <Loader/> : this.render_list()}

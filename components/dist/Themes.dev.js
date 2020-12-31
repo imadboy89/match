@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.getTheme = getTheme;
 exports.getThemes = getThemes;
 exports._isMobile = _isMobile;
-exports.styles_settings = exports.global_theme = exports.styles_league = exports.themes_list = exports.app_styles = exports.styles_match = exports.styles_channel = exports.styles_news = exports.styles_home = exports.styles_article = exports.styles_list = exports.Themes = void 0;
+exports.styles_notif = exports.styles_settings = exports.global_theme = exports.styles_league = exports.themes_list = exports.app_styles = exports.styles_match = exports.styles_channel = exports.styles_news = exports.styles_home = exports.styles_article = exports.styles_list = exports.Themes = void 0;
 
 var _reactNative = require("react-native");
 
@@ -60,6 +60,8 @@ var Themes = {
     inactiveTintColor: '#57606f',
     background_color_default: "#000",
     home_title_color: "#d1d8e0",
+    alert_body_backgroundColor: "#686de0",
+    alert_body_color: "#dff9fb",
     text_color_default: "#fff",
     list_header_backgroundColor: "#a29bfe",
     live_borderColor: "#2ecc71",
@@ -103,6 +105,8 @@ var Themes = {
     background_color_default: "#000",
     home_title_color: "#d1d8e0",
     text_color_default: "#fff",
+    alert_body_backgroundColor: "#3c6382",
+    alert_body_color: "#dff9fb",
     list_header_backgroundColor: "#4a69bd",
     live_borderColor: "#78e08f",
     match_name_backgroundColor: "#1e3799",
@@ -432,7 +436,7 @@ function generateTheme() {
     news_container: {
       //padding:5,
       marginVertical: 7,
-      margingHorizontal: 3,
+      marginHorizontal: 3,
       //marginBottom:5,
       height: 200,
       width: "98%",
@@ -721,7 +725,7 @@ function generateTheme() {
       flexDirection: 'row',
       flexWrap: 'wrap'
     },
-    lineup2_h: {
+    lineup2_l: {
       flex: 9,
       marginLeft: 3,
       textAlign: 'left',
@@ -729,7 +733,7 @@ function generateTheme() {
       borderRightWidth: 1,
       borderColor: theme.text_color_default
     },
-    lineup2_a: {
+    lineup2_r: {
       flex: 9,
       marginRight: 3,
       textAlign: 'right',
@@ -870,11 +874,26 @@ function generateTheme() {
 
     },
     match_results_team_scor_t: {
-      fontSize: 30,
-      fontWeight: 'bold',
+      fontSize: 35,
+      //fontWeight: 'bold',
       color: theme.match_results_team_scor_color,
       paddingHorizontal: 5,
-      textAlign: "center"
+      textAlign: "center",
+      height: 50
+    },
+    match_results_team_scor_penalties_t: {
+      fontSize: 25,
+      lineHeight: 23,
+      paddingVertical: 2,
+      borderWidth: 1,
+      //fontWeight: 'bold',
+      color: theme.match_results_team_scor_color,
+      paddingHorizontal: 5,
+      textAlign: "center",
+      height: 30,
+      width: 30,
+      marginHorizontal: "auto",
+      alignSelf: "center"
     },
     match_results_team_name_l: {
       textAlign: "right",
@@ -1006,6 +1025,90 @@ function generateTheme() {
     }
   };
 
+  var styles_notif = _reactNative.StyleSheet.create({
+    container: {
+      height: 0,
+      width: "100%",
+      position: "absolute",
+      top: isWeb ? -30 : -1,
+      left: 0,
+      backgroundColor: "#0000",
+      padding: 5,
+      justifyContent: "center",
+      alignItems: "center"
+    },
+    box: {
+      //top:-50,
+      width: "80%",
+      backgroundColor: theme.activeBackgroundColor,
+      marginHorizontal: "auto",
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      borderWidth: 1,
+      borderRadius: 5,
+      borderColor: theme.activeTintColor,
+      justifyContent: "center"
+    },
+    body: {
+      fontSize: 18,
+      color: theme.activeTintColor,
+      flex: 1,
+      justifyContent: "center",
+      //textAlign:"center",
+      textAlignVertical: "center",
+      height: "100%",
+      padding: 5
+    },
+    txt_danger: {
+      color: "#fd7f72"
+    },
+    txt_success: {
+      color: "#42dc84"
+    },
+    txt_info: {
+      color: "#5fb2ea"
+    },
+    txt_warning: {
+      color: "#f9cd87"
+    },
+    bg_danger: {
+      backgroundColor: "#e74c3c"
+    },
+    bg_success: {
+      backgroundColor: "#2ecc71"
+    },
+    bg_info: {
+      backgroundColor: "#3498db"
+    },
+    bg_warning: {
+      backgroundColor: "#f39c12"
+    },
+    indecator: {
+      backgroundColor: "red",
+      width: 8,
+      height: "100%",
+      borderTopLeftRadius: 5,
+      borderBottomLeftRadius: 5,
+      paddingRight: 2
+    },
+    indecator_thin: {
+      backgroundColor: "red",
+      width: 4,
+      height: "100%",
+      borderTopLeftRadius: 5,
+      borderBottomLeftRadius: 5,
+      paddingRight: 2
+    }
+    /*
+    cairoregular_regular:{
+      fontFamily : "cairoregular",
+    },
+    cairoregular_bold:{
+      fontFamily : "cairoregular",
+    },*/
+
+  });
+
   var styles_settings = _reactNative.StyleSheet.create({
     container: {
       flex: 1,
@@ -1018,23 +1121,39 @@ function generateTheme() {
       flexWrap: 'wrap',
       width: "95%",
       //height:50,
-      margingHorizontal: 5,
+      marginHorizontal: 5,
       marginVertical: 5,
       backgroundColor: "#0000",
       color: theme.text_color_default
     },
     settings_row_label: {
-      flex: 1,
+      flex: 3,
       backgroundColor: theme.background_color_default,
       color: theme.text_color_default
     },
     settings_row_input: {
-      flex: 2,
+      flex: 3,
       backgroundColor: theme.background_color_default,
       color: theme.text_color_default,
       height: 30,
       borderRadius: isWeb ? 10 : 8,
       paddingHorizontal: 10
+    },
+    log_time_text: {
+      width: 70,
+      backgroundColor: theme.background_color_default,
+      color: theme.text_color_default
+    },
+    log_type_text: {
+      width: 70,
+      marginHorizontal: 3,
+      backgroundColor: theme.background_color_default,
+      color: theme.text_color_default
+    },
+    log_msg_text: {
+      flex: 1,
+      backgroundColor: theme.background_color_default,
+      color: theme.text_color_default
     },
     nav_container: {
       flexDirection: 'row',
@@ -1128,7 +1247,8 @@ function generateTheme() {
     app_styles: app_styles,
     styles_league: styles_league,
     styles_settings: styles_settings,
-    theme: theme
+    theme: theme,
+    styles_notif: styles_notif
   };
 }
 
@@ -1153,3 +1273,5 @@ var styles_settings = themes["styles_settings"];
 exports.styles_settings = styles_settings;
 var global_theme = themes["theme"];
 exports.global_theme = global_theme;
+var styles_notif = themes["styles_notif"];
+exports.styles_notif = styles_notif;

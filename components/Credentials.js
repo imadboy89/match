@@ -16,18 +16,24 @@ class Credentials extends React.Component{
       });
       }
       async saveCredentials(){
+        this.setState({savingCredents:true});
         await API_.setCredentials(this.state.email,this.state.password);
         const status = await backup.changeClient();
         if(status!=false){
+          await backup.load_settings();
           this.props.closeModal();
-          backup.load_settings();
+          await backup.load_teams();
         }
+        this.setState({savingCredents:false});
       }
       signUp = async(email,password)=>{
         this.setState({savingCredents:true});
         await API_.setCredentials(this.state.email,this.state.password);
-        await backup.newUser(email,password);
+        const status = await backup.newUser(email,password);
         //await this.saveCredentials();
+        if(status){
+          await this.saveCredentials();
+        }
         this.setState({savingCredents:false});
       }
       render(){
@@ -82,7 +88,7 @@ class Credentials extends React.Component{
                 <Button
                     title={"Sign in"}
                     disabled={this.state.savingCredents}
-                    color="#2ecc71"
+                    color= "#2ecc71"
                     onPress={()=>{
                       this.saveCredentials();
                     }

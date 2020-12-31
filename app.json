@@ -2,7 +2,7 @@
   "expo": {
     "name": "koooora",
     "slug": "koooora",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "privacy": "public",
@@ -12,16 +12,19 @@
       "backgroundColor": "#000"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 5
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.imados.koooora",
+      "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist"      
     },
     "android": {
       "package": "com.imados.koooora",
+      "googleServicesFile": "./google-services.json",
       "useNextNotificationsApi": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -34,7 +37,25 @@
       "backgroundColor": "#000",
       "lang": "en",
       "startUrl": "/match",
-      "crossorigin": "no-referrer"
+      "crossorigin": "no-referrer",
+      "config":{
+        "firebase":{
+          "apiKey": "AIzaSyDorDacYslEUtZW03Uwhwd0iPT4a7PqIB8",
+          "authDomain": "koora-f8b51.firebaseapp.com",
+          "projectId": "koora-f8b51",
+          "storageBucket": "koora-f8b51.appspot.com",
+          "messagingSenderId": "886245579369",
+          "appId": "1:886245579369:web:886803aa935af9c3e160f8",
+          "measurementId": "G-9LCB0N0CH8"
+      
+        }
+      }
+    },
+    "notification": {
+      "icon": "./assets/icon.png",
+      "color": "#000000",
+      "iosDisplayInForeground": true,
+      "androidMode": "default"
     },
     "platforms": [
       "android",

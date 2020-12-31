@@ -34,12 +34,19 @@ class API {
     this.is_auth = false;
     this.leagues_dict = {};
     //this.set_token();
+    this.is_debug=false;
+    this.messages_history = [];
+    this.getConfig("is_debug",false).then(o=>this.is_debug=o);
 
   }
   _isBigScreen(){
     return Dimensions.get('window').width>900 || Dimensions.get('window').height>900
   }
   common_league_id(league){
+    if(typeof league == "string"){
+      const league_id = this.leagueId_byTitle(league);
+      league = {id:league_id, title:league};
+    }
     const title = this.fix_title(league.title) ;
     let id = league.id;
     if(league.is_koora==undefined && league.id){
@@ -67,6 +74,7 @@ class API {
     title= typeof title == "string" ? title.trim() : title;
     title= typeof title == "string" ? title.replace(/أ/g,"ا") : title;
     title= typeof title == "string" ? title.replace(/إ/g,"ا") : title;
+    title= typeof title == "string" ? title.replace(/آ/g,"ا") : title;
     return title;
   }
   get_news(page){
@@ -140,7 +148,7 @@ class API {
     return fetch(url, configs)
       .then(response => {return is_json ? response.json() : response.text() }) 
       .catch(error => {
-        alert(error);
+        API_.showMsg((error.message ? error.message : error)+"","warning");
         console.log('ERROR', error);
         this.error = error;
       });
@@ -175,7 +183,7 @@ class API {
       .catch(error => {
         console.log('ERROR', error);
         this.error = error;
-        alert("Token Error",error);
+        API_.showMsg((error.message ? error.message : error)+"","warning");
       });
   }
   get_date(date__=null){
@@ -202,6 +210,16 @@ class API {
     const ho = "0"+d.getHours();
     const mi = "0"+d.getMinutes();
     return `${ye}-${mo.slice(-2)}-${da.slice(-2)} ${ho.slice(-2)}:${mi.slice(-2)}` ;
+  }
+  get_date_timeS(date__=null){
+    const d = date__==null ? new Date() : date__;
+    const ye = d.getFullYear();
+    const mo = "0"+(d.getMonth()+1);
+    const da = "0"+d.getDate();
+    const ho = "0"+d.getHours();
+    const mi = "0"+d.getMinutes();
+    const se = "0"+d.getSeconds();
+    return `${ye}-${mo.slice(-2)}-${da.slice(-2)} ${ho.slice(-2)}:${mi.slice(-2)}:${se.slice(-2)}` ;
   }
 
   convert_time_spent(datetime_start){
@@ -374,7 +392,8 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_matches_k(resp,date_obj,false, is_only_live);
+      let matches = scrap.get_matches_k(resp,date_obj,false, is_only_live);
+      return matches;//this.set_logos(matches);
     });
   }
   get_matches_league_k(league_id){
@@ -412,11 +431,38 @@ class API {
       return scrap.get_standing(resp);
     });
   }
+  async set_logos(matches){
+    const teams = await API_.getTeam_logo();
+
+    for(let i=0;i<matches.length;i++){
+      for(let j=0;j<matches[i]["data"].length;j++){
+        if(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]){
+          matches[i]["data"][j]["home_team_badge"] = teams[this.fix_title(matches[i]["data"][j]["home_team"])];
+          matches[i]["data"][j]["away_team_badge"] = teams[this.fix_title(matches[i]["data"][j]["away_team"])];
+          matches[i]["data"][j]["home_team_badge"] = matches[i]["data"][j]["home_team_badge"] && matches[i]["data"][j]["home_team_badge"]["logo_url"] ? matches[i]["data"][j]["home_team_badge"]["logo_url"] : "";
+          matches[i]["data"][j]["away_team_badge"] = matches[i]["data"][j]["away_team_badge"] && matches[i]["data"][j]["away_team_badge"]["logo_url"] ? matches[i]["data"][j]["away_team_badge"]["logo_url"] : "";
+        }
+      }
+    }
+    return matches;
+  }
+  async get_logos(){
+    const leagues = Object.keys(this.matches);
+    for(let i=0;i< leagues.length;i++){
+      for(let j=0;j<this.matches[leagues[i]].length;j++){
+        const item = this.matches[leagues[i]][j] ;
+        const h_name = item.home_team_ar ? item.home_team_ar :item.home_team ;
+        const a_name = item.away_team_ar ? item.away_team_ar :item.away_team ;
+        await API_.setTeam_logo(h_name,item.home_team_badge,item.league);
+        await API_.setTeam_logo(a_name,item.away_team_badge,item.league);
+      }
+    }
+    backup.save_teams();
+  }
   get_matches(date_obj=null, page=1){
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_matches(date_obj,page)});
     }
-    //notifyMessage("token : "+this.headers["device-token"]);
     this.matches = page==1 ? {} : this.matches;
     const url = this.domain+"get_matches?page="+page;
     date_obj = date_obj ? date_obj : new Date();
@@ -436,12 +482,15 @@ class API {
       .then(resJson => {
         if(resJson["status"]== "true" ){//console.log(resJson["data"]);
           const matches = Object.keys(resJson["data"]);
-          for(let i=0;i<matches.length;i++){
+          for(let i=0;i<matches.length;i++){      
             if(this.matches[matches[i]] == undefined){
               this.matches[matches[i]] = resJson["data"][matches[i]];
             }else{
               this.matches[matches[i]] = this.matches[matches[i]].concat(resJson["data"][matches[i]]);
             }
+          }
+          if(Object.keys(resJson["data"]).length>0){
+            this.get_logos();
           }
           return Object.keys(resJson["data"]).length>0 ? this.get_matches(date_obj, page+1) : this.matches;
         }
@@ -552,8 +601,6 @@ class API {
     await AsyncStorage.setItem('configs', JSON.stringify(configs));
     if(backup && backup.db_settings && isDefault==false){
       await backup.save_settings(configs);
-    }else{
-      console.log("------- backup.db_settings not defined yet");
     }
     return value;
   };
@@ -671,6 +718,9 @@ class API {
     }
   }
   set_settings = async(settings)=>{
+    if(settings["is_debug"]!=undefined){
+      this.is_debug = settings.is_debug;
+    }
     return await AsyncStorage.setItem('configs',JSON.stringify(settings) );
   }
 
@@ -692,6 +742,37 @@ class API {
           return crendentials;
       }
   };
+  setTeams_logo = async(teams)=>{
+
+  }
+  setTeam_logo = async (team_name, logo_url, league_name, _league_id = undefined) => {
+    if(logo_url==undefined || this.is_ascii(team_name)==true){ return true;}
+    team_name = team_name!=undefined ? this.fix_title(team_name.trim()) : team_name;
+    const league_id = _league_id==undefined ? this.common_league_id(league_name) : _league_id;
+    let teams_info = await this.getTeam_logo();
+    if(teams_info[team_name] == undefined){
+      teams_info[team_name] = {team_name:team_name, logo_url:logo_url.trim(),league_id:league_id, league_name:league_name};
+      await AsyncStorage.setItem('teams_info', JSON.stringify(teams_info));
+    }
+  };
+  getTeam_logo = async (team_name=undefined) => {
+    if(team_name!=undefined && this.is_ascii(team_name)==true){ return true;}
+    team_name = team_name!=undefined ? this.fix_title(team_name) : team_name;
+    
+    let teams_info = await AsyncStorage.getItem('teams_info');
+    if(teams_info){
+      teams_info = JSON.parse(teams_info);
+    }else{
+        teams_info = {} ;
+    }
+    if(team_name!=undefined){
+      return teams_info[team_name.trim()]==undefined ? false: teams_info[team_name.trim()];
+    }
+    return teams_info;
+  };
+  setTeams =async (teams)=>{
+    await AsyncStorage.setItem('teams_info', JSON.stringify(teams));
+  }
 }
 
 export default API;

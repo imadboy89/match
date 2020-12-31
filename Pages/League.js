@@ -48,10 +48,13 @@ class LeagueScreen extends React.Component {
       return this.get_standing_k();
     }
     const favorite = await API_.getConfig("favorite_teams",this.state.favorite) ;
-    const resp = await API_.get_standing(id)
+    const resp = await API_.get_standing(id);
+
     if(resp["data"] && resp["data"] ){
       this.setState({league_details:resp["data"],loading:false,favorite:favorite});
     }
+
+    
   }
   async get_standing_k(){
     const favorite = await API_.getConfig("favorite_teams_k",this.state.favorite) ;

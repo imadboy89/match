@@ -10,7 +10,7 @@ import ExpoCustomUpdater from '../Libs/update';
 import * as Notifications from 'expo-notifications';
 import * as Updates from 'expo-updates';
 import AppLoading from 'expo-app-loading';
-
+import ToastMsg from "../components/ToastMsg";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 
 class HomeScreen extends React.Component {
@@ -48,7 +48,7 @@ class HomeScreen extends React.Component {
       }
     );
   }
-  componentWillUnmount(){
+  async componentWillUnmount(){
     this._isMounted = false;
     clearInterval(this.interval_refresh);
     if(backup.timer){
@@ -59,6 +59,7 @@ class HomeScreen extends React.Component {
     }
   }
   componentDidMount(){
+    
     this.get_matches(this.state.matches_date);
     if(this.is_authenting==false){
       this.is_authenting = true;
@@ -66,10 +67,15 @@ class HomeScreen extends React.Component {
         this.setState({is_auth:backup.is_auth });
         this.render_header();
         if(output==false){return false;}
+        backup.load_teams();
         backup.load_settings().then(o=>{
+          console.log(o);
+          backup.savePushToken();
           this.refresh_leagues();
         }).catch(err=>{console.log(err)});
-      }).catch(err=>{console.log(err)});
+      }).catch(err=>{
+        API_.debugMsg(error,"danger");
+      });
     }
     this.checkUpdAvailability();
     //handle notification
@@ -89,7 +95,9 @@ class HomeScreen extends React.Component {
     this.interval_refresh = setInterval(()=>{
       if(backup.is_auth){
         backup.load_settings().then(o=>{
-          this.refresh_leagues(this.state.list);
+          if(o){
+            this.refresh_leagues(this.state.list);
+          }
         })
       }
       if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
@@ -295,8 +303,8 @@ get_matches_koora = async(date_obj=null)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
   const _notifications_matches = await get_notifications_matches();
   await API_.load_leagues(this.refresh_leagues);
-  const resp = await API_.get_matches_k(date_obj,this.state.is_only_live)
-  //console.log(Object.values(resp) )
+  let resp = await API_.get_matches_k(date_obj,this.state.is_only_live);
+  resp = await API_.set_logos(resp);
   let data = resp && resp.length>0 ? resp : [];
   data = await this.get_favs(data);
   if(this._isMounted){

@@ -21,7 +21,7 @@ class BackUp{
     checkCnx = async(check_client=true,is_silent=false)=>{
       const state = await NetInfo.fetch();
       this.isConnected = state.isConnected;
-      console.log(".............isConnected", this.isConnected);
+      //console.log(".............isConnected", this.isConnected);
       if(check_client && (!this.client || !this.client.callFunction )){
         await this.setClientInfo();
       }
@@ -29,22 +29,22 @@ class BackUp{
         await this.checkConnectedUserChange();
       }
       if(this.isConnected==false && is_silent==false){
-        alert("You need internet connection to sign in");
+        API_.debugMsg("You need internet connection to sign in");
       }
       return this.isConnected;
     }
     setClientInfo = async()=>{
       try {
-        const stitchAppClient = Stitch.defaultAppClient;
-        const mongoClient = stitchAppClient.getServiceClient(RemoteMongoClient.factory,"mongodb-atlas");
         this.client = Stitch.defaultAppClient;
+        const mongoClient = this.client.getServiceClient(RemoteMongoClient.factory,"mongodb-atlas");
         this.lastActivity = this.client.auth.activeUserAuthInfo.lastAuthActivity;
         this.email = this.client.auth.activeUserAuthInfo.userProfile.data.email;
         this.db = mongoClient.db("ba9al");
         this.db_settings = this.db.collection("settings");
+        this.db_teams_info = this.db.collection("teams_info");
         this.is_auth = this.email!="" && this.email !=undefined;
-        API_.set_settings({});
-        return this.isAdmin();
+        await this.isAdmin();
+        return this.is_auth;
 
       } catch (error) {
         return new Promise(resolve=>{resolve(false);});
@@ -78,18 +78,19 @@ class BackUp{
     isAdmin(){
       return this.client.callFunction("isAdmin").then(result => {
         this.admin = result;
-      }).catch(err=>{
-        alert(err);
+      }).catch(error=>{
+        API_.debugMsg((error.message?error.message:error)+"","warning");
+        
       });
     }
 
     savePushToken = async()=>{
-      if( ! await this.checkCnx()){
+      if( ! await this.checkCnx() || this.PushToken==undefined || this.PushToken ==""){
         return new Promise(resolve=>{resolve(false);});
       }
+      let  results ={};
       try {
-
-        results = await this.client.callFunction("savePushToken",[this.PushToken,Translation_.language]);
+        results = await this.client.callFunction("savePushToken",[this.PushToken,"ar"]);
       } catch (error) {
         console.log(error);
         return false;
@@ -111,40 +112,32 @@ class BackUp{
       this.email = "";
       this.lastActivity = "";
       let app = null;
-      try {
-        app = Stitch.defaultAppClient;
-      } catch (error) {
-        console.log(error);
-        try {
-          this._loadClient();
-        } catch (error) {
-          if(this.isAdmin){
-            alert("Error in backup service.");
-          }else{
-            alert("Error in backup service.");
-          }
-        }
-
-        
-        return false;
-      }
-      
+      await this.login();
+       
+    }
+    login = async ()=>{
       const credents = await this.LS.getCredentials();
       this.admin = true ;
+      let client=null;
+      try{
+        client = Stitch.defaultAppClient;
+       }catch(err){
+        client = await Stitch.initializeDefaultAppClient("ba9al-xpsly");
+       }
       try {
-        const credential = new UserPasswordCredential(credents["email"].toLowerCase(),credents["password"].toLowerCase());
-        this.client = await app.auth.loginWithCredential(credential);
+        const credential = new UserPasswordCredential(credents["email"],credents["password"]);
+        this.client = await client.auth.loginWithCredential(credential);
         //this.registerForPushNotificationsAsync();
-        return this.setClientInfo(); 
+        this.loadingClient = false;
+        API_.set_settings({});
+        await this.setClientInfo(); 
+        if(this.is_auth) {API_.showMsg(`Welcom back  ${this.email} !`,"success");}
+        return this.is_auth;
       } catch (error) {
-        alert(error);
+        API_.showMsg((error.message ? error.message : error)+"","danger");
         this.LS.setCredentials("","");
-        let credential= new  AnonymousCredential();
-        this.client = await app.auth.loginWithCredential(credential);
-        this.admin = false ;
-        return false;
       }
-       
+
     }
     newUser = async()=>{
       if( ! await this.checkCnx()){
@@ -157,12 +150,12 @@ class BackUp{
       return emailPasswordClient.registerWithEmail(credents["email"],credents["password"])
         .then((output) => {
           //this.registerForPushNotificationsAsync();
-          console.log("Successfully sent account confirmation email!", JSON.stringify(output) );
-          return output;
+          //console.log("Successfully sent account confirmation email!", JSON.stringify(output) );
+          API_.showMsg(`Signed up successfullly ${credents.email} !`,"success");
+          return true;
         })
-        .catch(err => {
-          alert(err.message);
-          console.log(JSON.stringify(err) );
+        .catch(error => {
+          API_.showMsg((error.message ? error.message : error)+"","warning");
         });
     }
     _loadClient = async () => {
@@ -181,8 +174,8 @@ class BackUp{
           credential = new UserPasswordCredential(credents["email"],credents["password"]);
           usingAnon = false;
         } 
-
-        
+        await this.login();
+        /*
         const client = await Stitch.initializeDefaultAppClient("ba9al-xpsly");
         this.client = client ;
         try{
@@ -194,13 +187,15 @@ class BackUp{
           this.loadingClient = false;
           await this.setClientInfo();
           console.log(`Successfully logged in as user ${this.email}` , this.lastActivity );
+          API_.showMsg(`Welcom back  ${this.email} !`,"success");
           return true;
-        }catch(err){
-          notifyMessage(err,"Login in"); 
-          console.log(`Failed to log in anonymously: ${err}`);
+        }catch(error){
+          API_.debugMsg(error.message?error.message:error+"","warning"); 
+          console.log(`Failed to log in anonymously: ${error}`);
           this.currentUserId = undefined;
 
         }
+        */
       }
 
     clean = async(db)=>{
@@ -214,46 +209,80 @@ class BackUp{
       return false;
     }
     load_settings = async()=>{
-
-      if(this.db_settings==undefined || this.db_settings.findOne==undefined || this.user == undefined || this.user.id == undefined){
+      this.is_settings_loaded = false;
+      if(!this.is_mdb_ok()){
         return false;
       }
       let settings_cloud = await this.db_settings.findOne({},{"_id":false});
-      console.log("load s",settings_cloud);
       if(settings_cloud==null){
         settings_cloud = await this.save_settings();
       }else{
         await API_.set_settings(settings_cloud);
       }
       this.is_settings_loaded = true; 
-      return settings_cloud;
+      let settings = await API_.get_settings();
+      //API_.debugMsg("Settings loaded ["+Object.keys(settings).length+"]!","info");
+      return JSON.stringify(settings_cloud) != JSON.stringify(settings);
+    }
+    is_mdb_ok(){
+      if(this.db_settings==undefined || this.db_settings.findOne==undefined || this.client == undefined || this.is_auth==false){
+        //console.log(this.db_settings.findOne,this.client.id, this.is_auth);
+        return false;
+      }
+      return true;
     }
     save_settings = async()=>{
-      if(this.db_settings==undefined || this.db_settings.findOne==undefined || this.is_settings_loaded == false || this.user == undefined || this.user.id == undefined){
+      if(!this.is_mdb_ok() || this.is_settings_loaded == false){
         return false;
       }
-      const settings = await API_.get_settings();
+      let settings = await API_.get_settings();
       if(settings.favorite_leagues.length == 0 && settings.favorite_teams_k.length == 0 ){
-        alert("saving empty configs");
+        API_.debugMsg("saving empty configs","info");
         return false;
       }
-      settings["user_id"] = this.user.id;
+      //settings["user_id"] = this.client.id;
+      settings["email"] = this.email;
+      settings["updated_at"] = new Date();
       delete settings["_id"]
       if(settings){
         try{
-          console.log("inserting in mdb");
-          const res = await this.db_settings.updateOne({"user_id":this.user.id},settings,{upsert:true});
-
-          console.log("inserting in mdb DONE", res);
+          const res = await this.db_settings.updateOne({"email":this.email},settings,{upsert:true});
         }catch(err){
           notifyMessage(err.message,"Save settings on cloud!");
-          console.log(err)
         }
         return settings ;
       }
       
     }
+    save_teams= async()=>{
+      if(!this.is_mdb_ok()){return false;}
 
+      let teams_inf = await API_.getTeam_logo();
+      const teams_name = Object.keys(teams_inf);
+      let teams2backup = [];
+      for(let i=0;i<teams_name.length;i++){
+        if(teams_inf[teams_name[i]].is_backedup == undefined){
+          teams_inf[teams_name[i]].is_backedup = true;
+          teams2backup.push(teams_inf[teams_name[i]]);
+        }
+      }
+      if(teams2backup.length==0){return true;}
+      const results = await this.client.callFunction("save_teams",[teams2backup]);
+      if (results.inserted>0 || results.updated>0){
+        await API_.setTeams(teams_inf);
+        API_.debugMsg("["+teams2backup.length+"] Teams saved successfully!","info");
+      }
+    }
+    load_teams= async()=>{
+      if(!this.is_mdb_ok() || undefined == this.db_teams_info){return false;}
+      const teams = await this.db_teams_info.find({},{"projection": { "_id": 0 },}).asArray();
+      let teams_inf = {};
+      for(let i=0;i<teams.length;i++){
+        teams_inf[teams[i].team_name] = teams[i];
+      }
+      await API_.setTeams(teams_inf);
+      return true;
+    }
     partnersManager = async(action,partner_username)=>{
       if( ! await this.checkCnx()){
         return false;
@@ -263,7 +292,7 @@ class BackUp{
       try {
         results = await this.client.callFunction("partnersManager",[action,datetime,partner_username]);
       } catch (error) {
-        alert(error.message ? error.message : error);
+        API_.debugMsg((error.message ? error.message : error)+"","danger");
         return false;
       }
       return results;
@@ -275,8 +304,9 @@ class BackUp{
       let results = {};
       try {
         results = await this.client.callFunction("Users_managements",[user_email,new_status]);
+        API_.showMsg("User updated successfully!","success");
       } catch (error) {
-        alert(error.message ? error.message : error);
+        API_.debugMsg((error.message ? error.message : error)+"","danger");
         return false;
       }
       return results;
@@ -308,14 +338,18 @@ class BackUp{
             pushednotifto += results["data"][i]["status"] && results["data"][i]["status"]=="ok" ? 1 : 0 ;
           }
         }
+        if(pushednotifto>0){
+          API_.showMsg("Notification Pushed successfully to "+pushednotifto+" users.","success");
+        }
         return pushednotifto;
       } catch (error) {
-        console.log("pushNotification",error);
+        API_.debugMsg((error.message ? error.message : error)+"","danger");
         this.queue.push([this.pushNotification,[title, body,data,partner,chanelId]]);
         return false;
       }
       return results;
     }
+
     insertMany= async (db, data) => {
       //await db.deleteMany({});
       return db.insertMany(data).catch(err=>{

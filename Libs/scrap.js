@@ -160,7 +160,7 @@ class Scrap {
     }catch(err){console.log(err);}
     let standing =[];
     if(json_ && json_["ranks_table"] && JSON.stringify(json_["ranks_table"])==JSON.stringify([-1]) ){
-      console.log("empty");
+      notifyMessage("empty");
       return lineups;
     }
     const lineup_header = [
@@ -274,7 +274,7 @@ class Scrap {
         if(blacklisted_countries.includes(compitition["country"]) || compitition["options"].includes("h")){
           is_allowed = false;
         }
-        if(is_allowed || "MA"==compitition["country"]){
+        if(is_allowed || "MA"==compitition["country"] || 214241111 == compitition["league_id"]){
           compititions[compitition["league_id"]] = compitition;
 
           API_.set_common_league_id({id:compitition["league_id"],title:compitition["comp_name"]});
@@ -318,7 +318,6 @@ class Scrap {
       matche[ mat_header[j] ] = json_["matches_list"][f].trim ? json_["matches_list"][f].trim() : json_["matches_list"][f];
       matche[ mat_header[j] ] = this.decodeEntities(matche[ mat_header[j] ]);
       if(mat_header[j]=="time"){
-        
         //is_ok = matche[ mat_header[j] ].indexOf("$f")>=0 ? false : true;
         matche[ "time_old" ] = matche[ mat_header[j] ];
         live = matche[ mat_header[j] ].indexOf("@")>=0 ? 1 : 0;
@@ -335,12 +334,14 @@ class Scrap {
           const _time_playerd = API_.convert_time_spent(matche.date + " "+matche.time);
           time_playerd = matche[ "time_old" ].split("'").length==2 && matche[ "time_old" ].split("'")[0].length<=2 
             ? parseInt(matche[ "time_old" ].split("'")[0])
-            : (_time_playerd =="half" ? "half" : false);
+            : _time_playerd;
           //time_playerd = live==0 && parseInt(time_playerd)>0 && parseInt(time_playerd)<90 ? 45 : time_playerd;
-          live = (time_playerd+"").toLocaleLowerCase()=="half" || (parseInt(time_playerd)>=-30 && parseInt(time_playerd)<95) ? 1 : live;
-
+          //live = (time_playerd+"").toLocaleLowerCase()=="half" || (parseInt(time_playerd)>=-30 && parseInt(time_playerd)<95) ? 1 : live;
+          if(matche["id"]==2924810){
+            console.log(live, time_playerd,_time_playerd,matche[ "time_old" ] );
+          }
           if(live==1 && time_playerd!=false){
-            matche["time_played"] = time_playerd;
+            matche["time_played"] = matche[ "time_old" ].includes("$p") ? "Pen" :time_playerd;
             matche["live"] = live;
           }
 
@@ -353,9 +354,6 @@ class Scrap {
       //if(f==300)break;
       j++;
       if(mat_header.length==j){
-        if(matche["id"]==25478821111 ){
-          console.log(matche,time_playerd,live);
-        }
         const comp_match = compititions[matche["league_id"]] ;
         if(is_only_live==false || (matche["live"]==1 && is_only_live) ){
           if(comp_match!=undefined && (is_ok || comp_match["country"]=="MA") ){
@@ -377,14 +375,13 @@ class Scrap {
             matche["score_penalties"] = score_p.length>1 && score_p[1] ?  score_p[1].trim().replace("&nbsp;","") :false;
             if(matche["score_penalties"]){
               const score_penalties = matche["score_penalties"].split(":");
-              matche["home_team_score_penalties"] = score_penalties && score_penalties.length ==2 ? score_penalties[0] : "-";
-              matche["away_team_score_penalties"] = score_penalties && score_penalties.length ==2 ? score_penalties[1] : "-";
+              matche["home_team_score_penalties"] = score_penalties && score_penalties.length ==2 ? score_penalties[0].trim() : "-";
+              matche["away_team_score_penalties"] = score_penalties && score_penalties.length ==2 ? score_penalties[1].trim() : "-";
             }
             const score = matche["score"].split("|");
             matche["home_team_score"] = score && score.length ==2 ? score[0] : "-";
             matche["away_team_score"] = score && score.length ==2 ? score[1] : "-";
             matche["league"] = league["title"];
-            matche["is_koora"] = true;
             matches[ matche["league_id"] ]["data"].push(matche);
           }
         }
@@ -489,7 +486,7 @@ class Scrap {
     }
     return videoId;
   }
-  get_video_m(html){console.log("hh");
+  get_video_m(html){
     let videoId="";
     html = html.split("<p><iframe src=\"");
     html = html.length == 2 ? html[1] : "";

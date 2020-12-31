@@ -16,8 +16,8 @@ class NewsScreen extends React.Component {
     };
   this.get_news();
   this.interval_refresh = setInterval(()=>{
-    if(this.state.page==1){this.get_news();}
-    }, 60000);
+    if(this.state.page==1){this.get_news(false);}
+    }, 80000);
   }
   componentDidMount(){
     this._isMounted=true;
@@ -26,7 +26,7 @@ class NewsScreen extends React.Component {
     "headerRight":()=>(
           <IconButton 
             name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-            this.get_news(this.state.matches_date);
+            this.get_news();
           }}  />
   )
 });
@@ -45,8 +45,8 @@ class NewsScreen extends React.Component {
     clearInterval(this.interval_refresh);
   }
   
-get_news =(keep_list=false)=>{
-  if(this.state.loading==false){
+get_news =(loading=true,keep_list=false)=>{
+  if(this.state.loading==false && loading){
     this.setState({loading:true});
   }
   API_.get_news(this.state.page).then(data=>{
@@ -54,7 +54,10 @@ get_news =(keep_list=false)=>{
       if(keep_list){
         data = this.state.list.concat(data);
       }
-      this.setState({list:data,loading:false});
+      if(loading){
+        this.state.loading = false;
+      }
+      this.setState({list:data});
     }
   });
 }
