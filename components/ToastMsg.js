@@ -1,7 +1,8 @@
 import Animated, { Easing } from 'react-native-reanimated';
 import React from 'react';
-import {  View,StyleSheet,TouchableOpacity } from 'react-native';
+import {  View,Pressable,TouchableOpacity } from 'react-native';
 import {styles_home,getTheme,themes_list} from "../components/Themes";
+
 const {
   Clock,
   Value,
@@ -135,6 +136,7 @@ export class ToastMsg extends React.Component {
     }else{
       this.state.body   = this.props.body ? this.props.body : "";
     }
+    this.state.body = this.state.body.charAt(0).toUpperCase() + this.state.body.slice(1);
     this.state.delay  = this.props.delay ? this.props.delay : this.delay;
     this.state.height = this.props.height ? this.props.height : this.height;
     this.state.speed  = this.props.speed ? this.props.speed : this.speed;
@@ -159,7 +161,8 @@ export class ToastMsg extends React.Component {
         <Animated.View
           style={[this.state.dynamic_style.box, {height:this.state.height,transform: [{ translateY: this.state.transY }] }]}
         >
-          <TouchableOpacity
+          <Pressable
+            hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}
             style={this.state.dynamic_style.box_inside}
             activeOpacity={0.7}
             onPress={()=>{
@@ -168,7 +171,7 @@ export class ToastMsg extends React.Component {
           >
             <View style={[this.state.dynamic_style.indecator,indecator_style]}></View>
             <Text style={[this.state.dynamic_style.body, text_style ]}>{this.state.body}</Text>
-          </TouchableOpacity>
+          </Pressable>
           </Animated.View>
       </View>
     );

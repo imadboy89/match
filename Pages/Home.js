@@ -339,7 +339,7 @@ get_matches_koora = async(date_obj=null)=>{
 }
  onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    this.setState({show_datPicker: false ,list:[],matches_date:currentDate,loading:true,is_only_live:false});
+    this.setState({show_datPicker: Platform.OS === 'ios' ,list:[],matches_date:currentDate,loading:true,is_only_live:false});
     this.get_matches(currentDate);
     this.render_header();
   };
@@ -458,7 +458,7 @@ show_DateP(){
             />
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
 
-      { this.state.show_datPicker ? this.show_DateP() : null }       
+      { this.state.show_datPicker===true ? this.show_DateP() : null }       
       </GestureRecognizer>
     );
   }

@@ -891,18 +891,19 @@ function generateTheme(theme_name=false){
       height:50,
     },
     match_results_team_scor_penalties_t:{
-      fontSize: 25,
-      lineHeight:23,
-      paddingVertical:2,
+      fontSize: 23,
+      lineHeight:20,
+      paddingVertical:1,
       borderWidth:1,
       //fontWeight: 'bold',
       color : theme.match_results_team_scor_color,
-      paddingHorizontal:5,
+      //paddingHorizontal:5,
       textAlign:"center",
-      height:30,
-      width:30,
+      height:25,
+      width:25,
       marginHorizontal:"auto",
-      alignSelf:"center"
+      alignSelf:"center",
+      marginBottom:2,
 
     },
     
@@ -1049,7 +1050,8 @@ function generateTheme(theme_name=false){
       backgroundColor:"#0000",
       padding:5,
       justifyContent:"center",
-      alignItems:"center"
+      alignItems:"center",
+      zIndex: 1,
     },
     box:{
       //top:-50,
@@ -1064,6 +1066,8 @@ function generateTheme(theme_name=false){
     },
     box_inside:{
       //top:-50,
+      zIndex: 3, // works on ios
+      elevation: 3, // works on android    
       width:"100%",
       flex:1,
       backgroundColor:  theme.activeBackgroundColor,
