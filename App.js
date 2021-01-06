@@ -37,7 +37,7 @@ global.reloading_app = false;
 var _app_styles = app_styles;
 global.backup = new backUp();
 global.backup.executingQueued();
-
+global.api_type=0;
 
 global. LoadedFonts = false;
 function _loadFontsAsync() {

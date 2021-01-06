@@ -28,12 +28,14 @@ class Matchcreen extends React.Component {
         height:"100%",
         dynamic_style:styles_match,
         favorite:[],
+        favorite_p:[],
     };
     this.get_Match(this.props.route.params.match_item.id);
 
   }
   componentDidMount(){
     API_.getConfig("favorite_channels",this.state.favorite).then(o=>{this.setState({favorite:o});});
+    API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{this.setState({favorite_p:o});});
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
 
     const home_name = this.state.match_dets && this.state.match_dets.home_team_ar ? this.state.match_dets.home_team_ar : this.state.match_dets.home_team;
@@ -70,14 +72,34 @@ class Matchcreen extends React.Component {
 
 
   set_fav=(ch_name)=>{
+    let msg_action = '';
     API_.getConfig("favorite_channels",this.state.favorite).then(o=>{
       if( o.includes(ch_name) ){
         o = o.filter(o=>{if(o!=ch_name)return o;});
+        msg_action = "تمت إزالتها من";
       }else{
         o.push(ch_name);
+        msg_action = "تمت إضافتها إلى";
       }
       this.setState({favorite:o});
       API_.setConfig("favorite_channels",o);
+      API_.showMsg(`القناة ${ch_name} ${msg_action} المفضلة!`);
+    });
+    this.setState({});
+  }
+  set_fav_p=(player_name)=>{
+    API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{
+      let msg_action = "";
+      if( o.includes(player_name) ){
+        o = o.filter(o=>{if(o!=player_name)return o;});
+        msg_action = "تمت إزالته من";
+      }else{
+        o.push(player_name);
+        msg_action = "تمت إضافته إلى";
+      }
+      this.setState({favorite_p:o});
+      API_.setConfig("favorite_players",o);
+      API_.showMsg(`اللاعب ${player_name} ${msg_action} المفضلة!`);
     });
     this.setState({});
   }
@@ -173,6 +195,7 @@ class Matchcreen extends React.Component {
     subs = subs.sort((a,b)=>{return a.time<b.time?-1:1;});
     return subs;
   }
+
   get_View_lineup_2(){
 
     let h_lineup = this.state.matche_details.home_lineup ? this.state.matche_details.home_lineup : [];
@@ -214,24 +237,36 @@ class Matchcreen extends React.Component {
       let assist_h = this.assist_h && home_p && this.assist_h.includes(home_p.lineup_player) ? "★".repeat(assist_h_count):"";
       let assist_a = this.assist_a && away_p && this.assist_a.includes(away_p.lineup_player) ? "★".repeat(assist_a_count):"";
 
-      const style_sub_h = home_p.player_out==undefined ? {} : this.state.dynamic_style.lineup2_number_subs;
-      const style_sub_a = away_p.player_out==undefined ? {} : this.state.dynamic_style.lineup2_number_subs;
+      const style_sub_h = home_p.lineup_number && home_p.lineup_number.indexOf && home_p.lineup_number.indexOf('"')>=0 ? this.state.dynamic_style.lineup2_number_subs : {};
+      const style_sub_a = away_p.lineup_number && away_p.lineup_number.indexOf && away_p.lineup_number.indexOf('"')>=0 ? this.state.dynamic_style.lineup2_number_subs : {};
       if(home_p==undefined || !home_p){
         return null;
       }
+      console.log(home_p.lineup_number, style_sub_h);
+      const home_pl_tyle = home_p.lineup_player && this.state.favorite_p.includes(home_p.lineup_player) ? {backgroundColor:"#0093fb4a"} : {};
+      const away_pl_tyle = away_p.lineup_player && this.state.favorite_p.includes(away_p.lineup_player) ? {backgroundColor:"#0093fb4a"} : {};
       return (
           <View style={this.state.dynamic_style.lineup2_container} key={home_p.lineup_number+home_p.lineup_player+away_p.lineup_player}>
             
-            <Text style={[this.state.dynamic_style.lineup2_number,style_sub_h]}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
-            <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_l} numberOfLines={1}>
-              {away_p && away_p.lineup_player? scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
-            </Text>
+            <Text style={[this.state.dynamic_style.lineup2_number,style_sub_a,away_pl_tyle]}>{away_p && away_p.lineup_number? away_p.lineup_number : ""}</Text>
+            <TouchableOpacity 
+              delayLongPress={300}
+              onLongPress={()=>this.set_fav_p(away_p.lineup_player)}
+              style={[i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_l , away_pl_tyle]}>
+              <Text style={i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_l} numberOfLines={1}>
+                {away_p && away_p.lineup_player? scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
+              </Text>
+            </TouchableOpacity>
 
-
-            <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_r} numberOfLines={1}>
-              {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
-            </Text>
-            <Text style={[this.state.dynamic_style.lineup2_number,style_sub_a]}>{away_p && away_p.lineup_number? away_p.lineup_number : ""}</Text>
+            <TouchableOpacity 
+              delayLongPress={300}
+              onLongPress={()=>this.set_fav_p(home_p.lineup_player)}
+              style={[i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_r, home_pl_tyle]}>
+              <Text style={i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_r} numberOfLines={1}>
+                {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
+              </Text>
+            </TouchableOpacity>
+            <Text style={[this.state.dynamic_style.lineup2_number,style_sub_h,home_pl_tyle]}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
             {i==11 ? <View style={this.state.dynamic_style.hairline}/> : null}
           </View> );
            //,  i==11 ? <View style={this.state.dynamic_style.hairline} /> : null ];
@@ -378,7 +413,6 @@ class Matchcreen extends React.Component {
       home_name = this.state.match_dets.home_team_ar ? this.state.match_dets.home_team_ar : this.state.match_dets.home_team;
       away_name = this.state.match_dets.away_team_ar ? this.state.match_dets.away_team_ar : this.state.match_dets.away_team;
     }catch(e){
-      alert(e);
       return <View style={this.state.dynamic_style.container}><Text>ERR</Text></View>;
       }
 
@@ -388,7 +422,6 @@ class Matchcreen extends React.Component {
           <Text style={this.state.dynamic_style.matche_team_score_text_penalties} noFonts={true}>{this.state.match_dets.away_team_score_penalties ? this.state.match_dets.away_team_score_penalties : "-"}</Text>
         </View>
       }
-      console.log(this.state.match_dets);
     return (
       <ScrollView style={this.state.dynamic_style.container}>
         <TouchableOpacity style={this.state.dynamic_style.header_container} onPress={()=>this.setState({show_res : this.state.show_res?false:true})}>              

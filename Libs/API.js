@@ -75,7 +75,7 @@ class API {
     title= typeof title == "string" ? title.replace(/أ/g,"ا") : title;
     title= typeof title == "string" ? title.replace(/إ/g,"ا") : title;
     title= typeof title == "string" ? title.replace(/آ/g,"ا") : title;
-    return title;
+    return title.split("-")[0].trim();
   }
   get_news(page){
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
@@ -151,6 +151,7 @@ class API {
         API_.showMsg((error.message ? error.message : error)+"","warning");
         console.log('ERROR', error);
         this.error = error;
+        return "";
       });
   }
   async set_token(){
@@ -229,7 +230,7 @@ class API {
     let diff = ( now.getTime()-time_start.getTime() )/60000;
     diff = parseInt(diff);
     diff = diff>45 && diff <=60 ? "Half" : (diff>45+15 ? diff-15 :diff);
-    const isok = diff>130 ? false : true;
+    const isok = diff>110 ? false : true;
     diff = diff >0 && diff<=99 ? diff : ( diff>0 ? 90 : diff);
     return isok ? diff : false;
   }
@@ -445,6 +446,16 @@ class API {
       }
     }
     return matches;
+  }
+  async set_logos_standing(standing_steams){
+    const teams = await API_.getTeam_logo();
+
+    for(let i=0;i<standing_steams.length;i++){
+      if(standing_steams[i]["team_name"] == undefined){ continue; }
+      standing_steams[i]["team_badge"] = teams[this.fix_title(standing_steams[i]["team_name"])];
+      standing_steams[i]["team_badge"] = standing_steams[i]["team_badge"] && standing_steams[i]["team_badge"]["logo_url"] ? standing_steams[i]["team_badge"]["logo_url"] : undefined;
+    }
+    return standing_steams;
   }
   async get_logos(){
     const leagues = Object.keys(this.matches);

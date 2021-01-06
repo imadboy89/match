@@ -5,8 +5,7 @@ var createExpoWebpackConfigAsync = require('@expo/webpack-config');
 var TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = function _callee(env, argv) {
-  var config, _config;
-
+  var config, config2;
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -28,10 +27,10 @@ module.exports = function _callee(env, argv) {
           return regeneratorRuntime.awrap(createExpoWebpackConfigAsync(env, argv));
 
         case 8:
-          _config = _context.sent;
-          _config.optimization.minimize = true; //config.optimization.minimizer = [new TerserPlugin()];
+          config2 = _context.sent;
+          config2.optimization.minimize = true; //config.optimization.minimizer = [new TerserPlugin()];
 
-          return _context.abrupt("return", _config);
+          return _context.abrupt("return", config2);
 
         case 11:
           return _context.abrupt("return", config);

@@ -4,14 +4,13 @@ import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
-import * as Font from 'expo-font';
 import {styles_home,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
 import * as Notifications from 'expo-notifications';
-import * as Updates from 'expo-updates';
 import AppLoading from 'expo-app-loading';
-import ToastMsg from "../components/ToastMsg";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
+import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
+
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -34,6 +33,8 @@ class HomeScreen extends React.Component {
         is_auth:false
         //dynamic_style_list:styles_list,
     };
+
+    api_type = this.state.source_id;
     this.is_authenting = false;
     this.didBlurSubscription = this.props.navigation.addListener(
       'focus',
@@ -47,6 +48,7 @@ class HomeScreen extends React.Component {
         this.render_header();
       }
     );
+    
   }
   async componentWillUnmount(){
     this._isMounted = false;
@@ -58,8 +60,24 @@ class HomeScreen extends React.Component {
       this.didBlurSubscription.remove();
     }
   }
+  goFullscreen = ()=>{
+    if(API_.isWeb){
+      console.log(document.fullscreenElement);
+      if(document.fullscreenElement){
+        document.exitFullscreen();
+        API_.showMsg("Going Back to normal mode!","info");
+      }else{
+        document.body.requestFullscreen().then(o=>{
+          API_.showMsg("Going full screen mode!","info");
+        }).catch(error=>{
+          API_.debugMsg(error,"warning");
+        });
+      }
+
+    }
+  }
   componentDidMount(){
-    
+
     this.get_matches(this.state.matches_date);
     if(this.is_authenting==false){
       this.is_authenting = true;
@@ -120,15 +138,19 @@ class HomeScreen extends React.Component {
       this.setState({list:tmp_list});
     }
   }
-  set_fav=(league_id)=>{
+  set_fav=(league_id,league_name)=>{
+    let msg_action = "";
     API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{
       if( o.includes(league_id) ){
         o = o.filter(o=>{if(o!=league_id)return o;});
+        msg_action = "تمت إزالته من";
       }else{
         o.push(league_id);
+        msg_action = "تمت إضافته إلى";
       }
       this.setState({favorite:o});
       API_.setConfig("favorite_leagues",o);
+      API_.showMsg(`الدوري ${league_name} ${msg_action} المفضلة!`);
     });
     this.setState({});
   }
@@ -145,6 +167,7 @@ class HomeScreen extends React.Component {
     this.state.source_id = parseInt(itemValue);
     this.setState({source_id:parseInt(itemValue),page:1});
     this.get_matches();
+    api_type = parseInt( itemValue );
   }
   update_is_only_live=(k,v)=>{
     this.state.matches_date = k==true ? new Date() : this.state.matches_date;
@@ -169,6 +192,7 @@ class HomeScreen extends React.Component {
 
 
   render_header=()=>{
+
     let headerLeft = null;
     const iconsSize = this.state.dynamic_style && this.state.dynamic_style.title ? this.state.dynamic_style.title.fontSize : 15;
     if(this.state.is_upd_available){
@@ -182,9 +206,11 @@ class HomeScreen extends React.Component {
     }else{
       headerLeft = ()=>(
         <IconButton 
-          name="inbox" size={iconsSize} style={this.state.dynamic_style.icons} 
+          name={API_.isWeb==true ? "search-plus" : "inbox" }
+          size={iconsSize} style={this.state.dynamic_style.icons} 
             onPress={()=>{
               this.checkUpdAvailability();
+              this.goFullscreen();
         }}  /> );
     }
     
@@ -318,6 +344,9 @@ get_matches_koora = async(date_obj=null)=>{
     this.render_header();
   };
 show_DateP(){
+  if(this.state.show_datPicker==false){
+    return null;
+  }
   return  (<DateTimePicker
             style={{
               color: '#fff',
@@ -359,18 +388,34 @@ show_DateP(){
   onMatch_clicked =(item)=>{
     this.props.navigation.navigate('Match', { match_item: item });
   }
+  onSwipeRight = (stat)=>{
+    console.log(stat);
+    this.previousPage();
+  }
+  onSwipeLeft = (stat)=>{
+    console.log(stat);
+    this.nextPage();
+  }
+  nextPage = ()=>{
+    this.end=false;
+    this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
+    this.setState({list:[],loading:true,page:1,is_only_live:false});
+    this.get_matches(this.state.matches_date);
+    this.render_header();
+  }
+  previousPage = ()=>{
+    this.end=false;
+    this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
+    this.setState({list:[],loading:true,page:1,is_only_live:false});
+    this.get_matches(this.state.matches_date);
+    this.render_header();
+  }
   render() {
     if(this.state.dynamic_style==undefined || this.state.dynamic_style===false) {return <AppLoading/>; }
     const ListHeaderComponent = (        <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
     <IconButton 
       disabled={this.state.loading}
-      name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-        this.end=false;
-        this.state.matches_date .setDate(this.state.matches_date .getDate() - 1);
-        this.setState({list:[],loading:true,page:1,is_only_live:false});
-        this.get_matches(this.state.matches_date);
-        this.render_header();
-    }}  />
+      name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.previousPage()}  />
     <TouchableOpacity 
       disabled={this.state.loading}
       activeOpacity={0.5}
@@ -380,13 +425,7 @@ show_DateP(){
     </TouchableOpacity>
     <IconButton 
       disabled={this.state.loading}
-      name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-        this.end=false;
-        this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
-        this.setState({list:[],loading:true,page:1,is_only_live:false});
-        this.get_matches(this.state.matches_date);
-        this.render_header();
-    }}  />
+      name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.nextPage()}  />
     <Picker
         selectedValue={this.state.source_id}
         style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
@@ -398,7 +437,11 @@ show_DateP(){
     </Picker>
   </View>);
     return (
-      <View style={this.state.dynamic_style.container}>        
+      <GestureRecognizer style={this.state.dynamic_style.container}
+      onSwipeRight={(state) => this.onSwipeRight(state)}
+      onSwipeLeft={(state) => this.onSwipeLeft(state)}
+
+      >        
         <ItemsList 
           ListHeaderComponent = {ListHeaderComponent}
           favorite={this.state.favorite}
@@ -416,7 +459,7 @@ show_DateP(){
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
 
       { this.state.show_datPicker ? this.show_DateP() : null }       
-      </View>
+      </GestureRecognizer>
     );
   }
 }

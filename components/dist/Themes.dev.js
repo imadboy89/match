@@ -1042,6 +1042,17 @@ function generateTheme() {
       width: "80%",
       backgroundColor: theme.activeBackgroundColor,
       marginHorizontal: "auto",
+      borderWidth: 1,
+      borderRadius: 5,
+      borderColor: theme.activeTintColor,
+      justifyContent: "center"
+    },
+    box_inside: {
+      //top:-50,
+      width: "100%",
+      flex: 1,
+      backgroundColor: theme.activeBackgroundColor,
+      marginHorizontal: "auto",
       flexDirection: 'row',
       flexWrap: 'wrap',
       borderWidth: 1,
@@ -1050,7 +1061,7 @@ function generateTheme() {
       justifyContent: "center"
     },
     body: {
-      fontSize: 18,
+      fontSize: 16,
       color: theme.activeTintColor,
       flex: 1,
       justifyContent: "center",
@@ -1140,20 +1151,23 @@ function generateTheme() {
       paddingHorizontal: 10
     },
     log_time_text: {
-      width: 70,
+      width: 40,
       backgroundColor: theme.background_color_default,
-      color: theme.text_color_default
+      color: theme.text_color_default,
+      fontSize: 10
     },
     log_type_text: {
-      width: 70,
-      marginHorizontal: 3,
+      width: 40,
+      marginHorizontal: 1,
       backgroundColor: theme.background_color_default,
-      color: theme.text_color_default
+      color: theme.text_color_default,
+      fontSize: 10
     },
     log_msg_text: {
       flex: 1,
       backgroundColor: theme.background_color_default,
-      color: theme.text_color_default
+      color: theme.text_color_default,
+      fontSize: 10
     },
     nav_container: {
       flexDirection: 'row',

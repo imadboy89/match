@@ -23,7 +23,7 @@ class AppLogHistory extends React.Component{
           const indecator_style= style_k!="" ? this.state.dynamic_style_colors["bg_"+style_k] : {};
           const text_style= style_k!="" ?  this.state.dynamic_style_colors["txt_"+style_k] : {};
           i+=1;
-          return (<View style={{flexDirection:'row', flexWrap:'wrap',width:"100%",paddingVertical:4}} key={line.time+i}>
+          return (<View style={{flexDirection:'row', flexWrap:'wrap',width:"100%",paddingVertical:2}} key={line.time+i}>
           <Text style={this.state.dynamic_style.log_time_text}>{line.time.split(" ").length==2 ? line.time.split(" ")[1]:""}</Text>
           <Text style={[this.state.dynamic_style.log_type_text,text_style]}>{line.type}</Text>
           <View style={[this.state.dynamic_style_colors.indecator_thin,indecator_style]}></View>

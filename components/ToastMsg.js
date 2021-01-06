@@ -1,6 +1,6 @@
 import Animated, { Easing } from 'react-native-reanimated';
 import React from 'react';
-import {  View,Text,StyleSheet,TouchableOpacity } from 'react-native';
+import {  View,StyleSheet,TouchableOpacity } from 'react-native';
 import {styles_home,getTheme,themes_list} from "../components/Themes";
 const {
   Clock,
@@ -13,9 +13,10 @@ const {
   debug,
   stopClock,
   block,
+  call,
 } = Animated;
 
-function runTiming(clock, value, dest,speed, delay_toback) {
+function runTiming(clock, value, dest,speed, func_end=()=>{}) {
   const state = {
     finished: new Value(0),
     position: new Value(0),
@@ -28,31 +29,35 @@ function runTiming(clock, value, dest,speed, delay_toback) {
     toValue: new Value(0),
     easing: Easing.inOut(Easing.ease),
   };
-
-  return block([
-    cond(
-      clockRunning(clock),
-      [
-        // if the clock is already running we update the toValue, in case a new dest has been passed in
-        set(config.toValue, dest),
-      ],
-      [
-        // if the clock isn't running we reset all the animation params and start the clock
-        set(state.finished, 0),
-        set(state.time, 0),
-        set(state.position, value),
-        set(state.frameTime, 0),
-        set(config.toValue, dest),
-        startClock(clock),
-      ]
-    ),
-    // we run the step here that is going to update position
-    timing(clock, state, config),
-    // if the animation is over we stop the clock
-    cond(state.finished, debug('stop clock', stopClock(clock))),
-    // we made the block return the updated position
-    state.position,
-  ]);
+    try {
+      
+    return block([
+      cond(
+        clockRunning(clock),
+        [
+          // if the clock is already running we update the toValue, in case a new dest has been passed in
+          set(config.toValue, dest),
+        ],
+        [
+          // if the clock isn't running we reset all the animation params and start the clock
+          set(state.finished, 0),
+          set(state.time, 0),
+          set(state.position, value),
+          set(state.frameTime, 0),
+          set(config.toValue, dest),
+          startClock(clock),
+        ]
+      ),
+      // we run the step here that is going to update position
+      timing(clock, state, config),
+      // if the animation is over we stop the clock
+      cond(state.finished,debug('stop clock', stopClock(clock))),
+      // we made the block return the updated position
+      state.position,
+    ]);
+  } catch (error) {
+      console.log(error);
+  }
 }
 
 export class ToastMsg extends React.Component {
@@ -61,7 +66,7 @@ export class ToastMsg extends React.Component {
   // and use runTiming method defined above to create a node that is going to be mapped
   // to the translateX transform.
   height = 70;
-  delay = 2000;
+  delay = 3000;
   speed = 500;
   type  = "info";
   constructor(props) {
@@ -77,25 +82,30 @@ export class ToastMsg extends React.Component {
       type   : this.props.type ? this.props.type : this.type,
     }
     this.state.transY = new Value(this.state.height*-1)
-    this.inteval_closing = 0;
+    this.timeout_closing = 0;
     this.previous_body = "";
     console.log("TM constructor",this.state.body);
+    this.notif_end=true;
   }
   closing=()=>{
-    
-    this.setState({transY : runTiming(new Clock(), this.state.height, -1*this.state.height,this.state.speed)});
-    this.empty_stats();
+    this.setState({transY : runTiming(new Clock(), this.state.height, -1*this.state.height,this.state.speed, this.setend)});
+    setTimeout(this.setend,this.state.speed+100);
+  }
+  closing_im=()=>{
+    this.setState({transY : runTiming(new Clock(), this.state.height, -1*this.state.height,this.state.speed/2, this.setend)});
+    clearTimeout(this.timeout_closing);
+    setTimeout(this.setend,this.state.speed+100);
   }
   start=()=>{
     API_.messages_history.push({body:this.state.body,type:this.state.type,time:API_.get_date_timeS(new Date()),is_debug:this.state.is_debug});
-    console.log(this.state.debug , API_.is_debug==false);
+    
     if(this.state.debug && API_.is_debug==false){
       return this.empty_stats();
     }
+    console.log(this.notif_end , API_.is_debug==false);
     //this.setState({transY : runTiming(new Clock(), -1*this.state.height, 0)});
-    this.state.transY = runTiming(new Clock(), -1*this.state.height, this.state.height,this.state.speed);
-    clearInterval(this.inteval_closing);
-    this.inteval_closing = setTimeout(this.closing, this.state.delay);
+    this.state.transY = runTiming(new Clock(), -1*this.state.height, this.state.height,this.state.speed,()=>{});
+    this.timeout_closing = setTimeout(this.closing, this.state.delay+this.state.speed);
   }
   componentDidMount(){
     getTheme("styles_notif").then(theme=>this.setState({dynamic_style:theme}) );
@@ -108,9 +118,17 @@ export class ToastMsg extends React.Component {
     this.state.type   = this.type ;
     this.state.debug  = this.debug ;
     this.previous_body = "";
-    this.inteval_closing = 0;
+    this.timeout_closing = 0;
+    //this.notif_end = true;
+  }
+  setend = ()=>{
+    this.empty_stats();
+    console.log("....setend")
+    this.notif_end = true;
+    return true;
   }
   fill_stats(){
+    //if(this.notif_end==false)return false;
     if(this.state.debug){
       this.state.body = this.props.body && this.props.body.message ? this.props.body.message : this.props.body;
       console.log(this.state.body);
@@ -125,7 +143,9 @@ export class ToastMsg extends React.Component {
   }
   render() {
     this.fill_stats();
-    if(this.inteval_closing==0 && this.state.body!="" && this.state.body != this.previous_body){
+    if( this.timeout_closing==0 && this.state.body!="" && this.state.body != this.previous_body){
+      this.notif_end = false;
+      
       this.start();
       this.previous_body = this.state.body;
     }else{
@@ -135,19 +155,22 @@ export class ToastMsg extends React.Component {
     const indecator_style= this.state.dynamic_style["bg_"+style_k];
     const text_style= this.state.dynamic_style["txt_"+style_k];
     return (
-      <TouchableOpacity style={this.state.dynamic_style.container}
-        onPress={()=>{
-          clearInterval(this.inteval_closing);
-          this.closing();
-        }}
-      >
+      <View style={this.state.dynamic_style.container}>
         <Animated.View
           style={[this.state.dynamic_style.box, {height:this.state.height,transform: [{ translateY: this.state.transY }] }]}
         >
-          <View style={[this.state.dynamic_style.indecator,indecator_style]}></View>
-          <Text style={[this.state.dynamic_style.body, text_style ]}>{this.state.body}</Text>
+          <TouchableOpacity
+            style={this.state.dynamic_style.box_inside}
+            activeOpacity={0.7}
+            onPress={()=>{
+              this.closing_im();
+            }}
+          >
+            <View style={[this.state.dynamic_style.indecator,indecator_style]}></View>
+            <Text style={[this.state.dynamic_style.body, text_style ]}>{this.state.body}</Text>
+          </TouchableOpacity>
           </Animated.View>
-      </TouchableOpacity>
+      </View>
     );
   }
 }

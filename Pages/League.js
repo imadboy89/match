@@ -35,6 +35,9 @@ class LeagueScreen extends React.Component {
     this.real_id = this.props.route.params.league_details.id;
     this.league_id = API_.leagueId_byTitle(this.league_name)>0 ? API_.leagueId_byTitle(this.league_name) : 0;
     //this.league_img = API_.leagueLogo_byTitle(this.league_name,this.league_img);
+    if(API_.leagues_dict[this.league_name] && API_.leagues_dict[this.league_name].koora_id && api_type == 1){
+      this.real_id = API_.leagues_dict[this.league_name].koora_id;
+    }
     this.get_standing(this.league_id);
   }
   componentDidMount(){
@@ -58,7 +61,8 @@ class LeagueScreen extends React.Component {
   }
   async get_standing_k(){
     const favorite = await API_.getConfig("favorite_teams_k",this.state.favorite) ;
-    const resp = await API_.get_standing_k(this.real_id);
+    let resp = await API_.get_standing_k(this.real_id);
+    resp = await API_.set_logos_standing(resp);
     this.setState({league_details:resp,loading:false,favorite:favorite});
   }
   get_matches(league_id){
@@ -150,11 +154,11 @@ class LeagueScreen extends React.Component {
     if(this.state.league_details==undefined || this.state.league_details.length==0 || this.state.scorers.length==0){
       return null;
     }
-    const scorers = [{"player_name_ar":"Player name","team_badge":"","overall_league_payed":"","goals":"Gls"}].concat(this.state.scorers);
+    const scorers = [{"player_name_ar":"Player name","player_id":1,"team_badge":"","overall_league_payed":"","goals":"Gls"}].concat(this.state.scorers);
     return scorers.map(p=>{
         const p_name = p.player_name_ar ? p.player_name_ar : p.player_name_en ;
         const p_img = false;
-        return <View style={this.state.dynamic_style.team_view} key={p_name}>
+        return <View style={this.state.dynamic_style.team_view} key={p.player_id+""}>
           
           <View style={{flex:1,padding:2}} >
             {p_img!=false ? <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} /> : null}
@@ -175,19 +179,23 @@ class LeagueScreen extends React.Component {
       return this.state.favorite.includes(id ) ? true : false ;
     }
   }
-  set_fav=async(id)=>{
+  set_fav=async(id,team_name)=>{
     id= parseInt(id);
+    let msg_action = "";
     if(id==0){return "";}
     const localS_fav_key = this.is_k ? "favorite_teams_k" : "favorite_teams";
     let o = await API_.getConfig(localS_fav_key,this.state.favorite)
     if( o.includes(id) ){
       o = o.filter(o=>{if(o!=id)return o;});
+      msg_action = "تمت إزالته من";
     }else{
       o.push(id);
+      msg_action = "تمت إضافته إلى";
     }
     this.setState({favorite:o});
     await API_.setConfig(localS_fav_key,o);
     this.setState({});
+    API_.showMsg(`الفريق ${team_name} ${msg_action} المفضلة!`);
   }
   render_standing(){
     if(this.state.league_details==undefined || this.state.league_details.length==0){
@@ -230,7 +238,7 @@ class LeagueScreen extends React.Component {
           key={team_name+row.id}
           onPress={() => {}}
           delayLongPress={300}
-          onLongPress={()=>this.set_fav(row.team.id)}
+          onLongPress={()=>this.set_fav(row.team ? row.team.id : -1, team_name)}
           >
           <View style={{flex:1,padding:2}} >
             <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} />

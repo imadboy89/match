@@ -2,7 +2,13 @@ import API from "./API";
 import NetInfo from '@react-native-community/netinfo';
 import { Stitch,RemoteMongoClient , AnonymousCredential,UserPasswordCredential,UserPasswordAuthProviderClient } from "mongodb-stitch-react-native-sdk";
 
-
+NetInfo.configure({
+  reachabilityUrl: 'https://imadboy89.github.io/match/',
+  reachabilityTest: async (response) => response.status === 204,
+  reachabilityLongTimeout: 60 * 1000, // 60s
+  reachabilityShortTimeout: 20 * 1000, // 5s
+  reachabilityRequestTimeout: 15 * 1000, // 15s
+});
 class BackUp{
     constructor() {
         this.LS = API_;
@@ -29,7 +35,7 @@ class BackUp{
         await this.checkConnectedUserChange();
       }
       if(this.isConnected==false && is_silent==false){
-        API_.debugMsg("You need internet connection to sign in");
+        API_.showMsg("You need internet connection!","warning");
       }
       return this.isConnected;
     }
@@ -106,7 +112,7 @@ class BackUp{
       return credents;
     }
     changeClient = async ()=>{
-      if( ! await this.checkCnx(true, true)){
+      if( ! await this.checkCnx(true)){
         return false;
       }
       this.email = "";

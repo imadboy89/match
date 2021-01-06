@@ -4,7 +4,7 @@ import {styles_settings,getTheme, themes_list} from "../components/Themes";
 import Credentials from "../components/Credentials";
 import AppLogHistory from "../components/AppLogHistory";
 import Users from "../components/Users";
-
+import * as Updates from 'expo-updates';
 class SettingsScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -19,6 +19,7 @@ class SettingsScreen extends React.Component {
         fav_teams_k_nbr:0,
         fav_leagues_nbr:0,
         fav_channels_nbr:0,
+        fav_players_nbr:0,
         window_height : parseInt(Dimensions.get('window').height),
         window_width : parseInt(Dimensions.get('window').width),
         modalVisible_users:false,
@@ -32,11 +33,13 @@ class SettingsScreen extends React.Component {
     const fav_tk = await API_.getConfig("favorite_teams_k",[]);
     const fav_t = await API_.getConfig("favorite_teams",[]);
     const fav_c = await API_.getConfig("favorite_channels",[]);
+    const fav_p = await API_.getConfig("favorite_players",[]);
     this.setState({
         fav_leagues_nbr  : fav_l.length ? fav_l.length : 0,
         fav_teams_nbr    : fav_t.length ? fav_t.length : 0,
         fav_teams_k_nbr  : fav_tk.length ? fav_tk.length : 0,
         fav_channels_nbr : fav_c.length ? fav_c.length : 0,
+        fav_players_nbr  : fav_p.length ? fav_p.length : 0,
         is_debug         : API_.is_debug,
       });
   }
@@ -148,6 +151,10 @@ class SettingsScreen extends React.Component {
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Favorite channels </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>{this.state.fav_channels_nbr}</Text>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Favorite Players </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>{this.state.fav_players_nbr}</Text>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Screen size </Text> 

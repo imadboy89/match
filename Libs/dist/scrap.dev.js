@@ -159,6 +159,7 @@ function () {
         json_ = JSON.parse(html);
       } catch (err) {
         console.log(err);
+        return [];
       }
 
       var lineups = {
@@ -209,6 +210,7 @@ function () {
         json_ = JSON.parse(html);
       } catch (err) {
         console.log(err);
+        return [];
       }
 
       var standing = [];
@@ -218,7 +220,8 @@ function () {
         return lineups;
       }
 
-      var lineup_header = ["table_r", "info_1", "position", "team", "played", "wins", "draws", "loses", "rest", "goals_scored", "goals_received", "goals_difference", "points", "i", "last_matches_res"];
+      var lineup_header = ["table_r", "info_1", "position", "team", "played", "info_2", //"wins",
+      "draws", "loses", "rest", "goals_scored", "goals_received", "goals_difference", "points", "i", "last_matches_res"];
       var h = 0;
       var team_st = {};
       var group_name = false;
@@ -240,6 +243,7 @@ function () {
           if (h == lineup_header.length) {
             //team_st["subs_in_time"] = team_st["subs_in_time"]+""
             var team = team_st["team"].split("~");
+            team_st["played"] = team_st["played"].includes("~") ? team_st["info_2"] : team_st["played"];
             team_st["team"] = {
               "id": team[2],
               "team_name": team[3],
@@ -334,6 +338,10 @@ function () {
             compitition["country"] = "EURO";
           }
 
+          if ((compitition["comp_name"].indexOf("الأفريقية") >= 0 || compitition["comp_name"].indexOf("أفريقيا")) >= 0 && compitition["country"] == "") {
+            compitition["country"] = "AFRICA";
+          }
+
           for (var _x = 0; _x < exceptions.length; _x++) {
             if (compitition["comp_name"].toLocaleLowerCase().indexOf(exceptions[_x].toLocaleLowerCase()) >= 0) {
               is_allowed = true;
@@ -367,7 +375,8 @@ function () {
       var matche = {};
       var j = 0;
       var is_ok = true;
-      var live = 0;
+      var live = 0,
+          is_done = 0;
       var time_playerd = 0;
 
       for (var f = 0; f < json_["matches_list"].length; f++) {
@@ -378,6 +387,7 @@ function () {
           //is_ok = matche[ mat_header[j] ].indexOf("$f")>=0 ? false : true;
           matche["time_old"] = matche[mat_header[j]];
           live = matche[mat_header[j]].indexOf("@") >= 0 ? 1 : 0;
+          is_done = matche[mat_header[j]].indexOf("$f") >= 0 ? 1 : 0;
           matche[mat_header[j]] = matche[mat_header[j]].replace(/[^0-9\:]/g, "");
           matche[mat_header[j]] = matche[mat_header[j]].slice(0, 5); //API_.convert_time(matche[ mat_header[j] ].slice(0,5),+1);
 
@@ -399,9 +409,11 @@ function () {
               console.log(live, time_playerd, _time_playerd, matche["time_old"]);
             }
 
-            if (live == 1 && time_playerd != false) {
+            if (live == 1 && time_playerd != false && is_done == 0) {
               matche["time_played"] = matche["time_old"].includes("$p") ? "Pen" : time_playerd;
               matche["live"] = live;
+            } else if (is_done && live == 0) {
+              matche["is_done"] = true;
             }
           } catch (err) {
             console.log("Error", err);
@@ -454,6 +466,7 @@ function () {
 
           is_ok = true;
           live = 0;
+          is_done = 0;
           matche = {};
           j = 0;
           time_playerd = 0;
@@ -461,7 +474,7 @@ function () {
       }
 
       matches = Object.values(matches);
-      var periority_cc = ["NL", "ES", "IT", "EN", "MA", "EURO"];
+      var periority_cc = ["NL", "ES", "IT", "EN", "AFRICA", "EURO", "MA"];
       matches = matches.sort(function (a, b) {
         return periority_cc.indexOf(a["country"]) > periority_cc.indexOf(b["country"]) ? -1 : 1;
       }); //matches = matches.sort((a,b)=>{return a["country"]=="MA"? -1 : 1;});

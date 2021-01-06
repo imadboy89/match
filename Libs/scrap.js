@@ -101,7 +101,10 @@ class Scrap {
     let json_={"match_squads":[]};
     try{
       json_ = JSON.parse(html);
-    }catch(err){console.log(err);}
+    }catch(err){
+      console.log(err);
+      return [];
+    }
     let lineups = {"home_lineup":[],"away_lineup":[],"home_substitutions":[],"away_substitutions":[]};
     if(json_ && json_["match_squads"] && JSON.stringify(json_["match_squads"])==JSON.stringify([-1]) ){
       console.log("empty");
@@ -157,7 +160,7 @@ class Scrap {
     let json_={"match_squads":[]};
     try{
       json_ = JSON.parse(html);
-    }catch(err){console.log(err);}
+    }catch(err){console.log(err);return [];}
     let standing =[];
     if(json_ && json_["ranks_table"] && JSON.stringify(json_["ranks_table"])==JSON.stringify([-1]) ){
       notifyMessage("empty");
@@ -169,7 +172,7 @@ class Scrap {
       "position",
       "team",
       "played",
-      "wins",
+      "info_2",//"wins",
       "draws",
       "loses",
       "rest",
@@ -197,6 +200,8 @@ class Scrap {
       if(h==lineup_header.length){
         //team_st["subs_in_time"] = team_st["subs_in_time"]+""
         const team = team_st["team"].split("~");
+        team_st["played"] = team_st["played"].includes("~") ? team_st["info_2"] : team_st["played"];
+
         team_st["team"] = {"id":team[2],"team_name":team[3],"team_badge":""};
         team_st["team_name"] = team_st["team"]["team_name"];
         team_st["team_badge"] = team_st["team"]["team_badge"];
@@ -266,6 +271,9 @@ class Scrap {
         if((compitition["comp_name"].indexOf("الأوروبي")>=0 || compitition["comp_name"].indexOf("أوروبا"))>=0 && compitition["country"]==""){
           compitition["country"]="EURO";
         }
+        if((compitition["comp_name"].indexOf("الأفريقية")>=0 || compitition["comp_name"].indexOf("أفريقيا"))>=0 && compitition["country"]==""){
+          compitition["country"]="AFRICA";
+        }
         for(let x=0;x<exceptions.length;x++){
           if(compitition["comp_name"].toLocaleLowerCase().indexOf(exceptions[x].toLocaleLowerCase())>=0){
             is_allowed = true;
@@ -312,7 +320,7 @@ class Scrap {
     let matche = {};
     let j = 0;
     let is_ok = true;
-    let live = 0;
+    let live = 0, is_done=0;
     let time_playerd=0;
     for(let f=0;f< json_["matches_list"].length;f++){
       matche[ mat_header[j] ] = json_["matches_list"][f].trim ? json_["matches_list"][f].trim() : json_["matches_list"][f];
@@ -321,6 +329,7 @@ class Scrap {
         //is_ok = matche[ mat_header[j] ].indexOf("$f")>=0 ? false : true;
         matche[ "time_old" ] = matche[ mat_header[j] ];
         live = matche[ mat_header[j] ].indexOf("@")>=0 ? 1 : 0;
+        is_done = matche[ mat_header[j] ].indexOf("$f")>=0 ? 1 : 0;
         matche[ mat_header[j] ] = matche[ mat_header[j] ].replace(/[^0-9\:]/g,"");
         matche[ mat_header[j] ] = matche[ mat_header[j] ].slice(0,5)//API_.convert_time(matche[ mat_header[j] ].slice(0,5),+1);
         try{
@@ -340,11 +349,13 @@ class Scrap {
           if(matche["id"]==2924810){
             console.log(live, time_playerd,_time_playerd,matche[ "time_old" ] );
           }
-          if(live==1 && time_playerd!=false){
+          if(live==1 && time_playerd!=false && is_done==0){
             matche["time_played"] = matche[ "time_old" ].includes("$p") ? "Pen" :time_playerd;
             matche["live"] = live;
+          }else if( is_done &&  live==0){
+            matche["is_done"] = true;
           }
-
+          
         }catch(err){console.log("Error",err)}
       }
       if( ["home_team","away_team"].includes(mat_header[j]) ){
@@ -387,13 +398,14 @@ class Scrap {
         }
         is_ok = true;
         live = 0;
+        is_done = 0;
         matche = {};
         j=0;
         time_playerd=0;
       }
     }
     matches = Object.values(matches) ;
-    const periority_cc= ["NL","ES","IT","EN","MA","EURO"];
+    const periority_cc= ["NL","ES","IT","EN","AFRICA","EURO","MA"];
     matches = matches.sort((a,b)=>{return periority_cc.indexOf(a["country"]) > periority_cc.indexOf(b["country"])? -1 : 1;});
     //matches = matches.sort((a,b)=>{return a["country"]=="MA"? -1 : 1;});
     return matches;

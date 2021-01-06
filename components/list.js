@@ -90,6 +90,9 @@ class ItemsList extends React.Component {
       let time_style = JSON.parse(JSON.stringify(this.state.dynamic_style.matche_team_time_live));
       if(item.time_played=="Pen"){
         time_style["color"]="#ff5252";
+      }else if(item.is_done){
+        time_style["color"]="#8fa2ff";
+        time_style["fontSize"]=16;
       }
       let time_played= item.time_played>0?item.time_played+"'": item.time_played;
       //console.log(this.props.notifications_matches[item.id]);
@@ -99,6 +102,9 @@ class ItemsList extends React.Component {
         <View style={[this.state.dynamic_style.matche_container,style_extra,this.state.dynamic_style.shadow_1]}>
           <View style={this.state.dynamic_style.matche_team_time}>
             <Text style={this.state.dynamic_style.matche_team_time_t} noFonts={true}>{item.time}</Text>
+            {item.is_done==true ? 
+              <Text style={time_style}>{"انتهت"}</Text> 
+            : null}            
             {item.live==1 ? 
               <Text style={time_style}  noFonts={true}>{time_played}</Text> 
             : null}
@@ -181,8 +187,8 @@ class ItemsList extends React.Component {
       //league_id = API_.leagueId_byTitle(title,league_id);
       id = API_.common_league_id({title,id});
       fav_icon = this.props.favorite.includes(id) ?
-        <IconButton name={icon} onPress={()=>{this.props.set_fav(id)}} color={color} /> :
-        <IconButton name={icon+"-o"} onPress={()=>{this.props.set_fav(id)}} color={color}/> ;
+        <IconButton name={icon} onPress={()=>{this.props.set_fav(id, title)}} color={color} /> :
+        <IconButton name={icon+"-o"} onPress={()=>{this.props.set_fav(id, title)}} color={color}/> ;
     }
     return fav_icon;
   }
@@ -238,14 +244,6 @@ class ItemsList extends React.Component {
     let header_style = {flex:1};
     const max_lenght = parseInt(this.windowWidth/14) ;
     if(title.length>max_lenght){ header_style={fontSize:17}; }
-
-    //console.log(this.refs_map[title] , this.refs_map[title].ind);
-    /*
-            nextFocusUp={this.refs_map[title] && this.refs_map[title].ind>=0 && this.refs_list[this.refs_map[title].ind-1]? this.refs_list[this.refs_map[title].ind-1] : null}
-        nextFocusDown={this.refs_map[title] && this.refs_map[title].ind>=0 && this.refs_list[this.refs_map[title].ind+1]? this.refs_list[this.refs_map[title].ind+1] : null}
-        ref={this.refs_map[title] && this.refs_map[title].ind>=0 ? this.refs_list[this.refs_map[title].ind] : null}
-
-    */
     return (
       <TouchableHighlight style={this.state.dynamic_style.header_container}
         underlayColor={"green"}
@@ -322,7 +320,7 @@ class ItemsList extends React.Component {
       this.create_refs();
       const list_lists = this.list.map(k=>{
       return (
-          <View style={{width:"100%"}} key={k.title}>
+          <View style={{width:"100%"}} key={k.title+k.id}>
             {this._render_header({section:k})}
             { this.state.header_to_hide.includes(API_.common_league_id(k))==false ? 
               <FlatList
