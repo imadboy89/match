@@ -1,6 +1,5 @@
 import {  StyleSheet, Dimensions} from 'react-native';
-import Constants from 'expo-constants';
-import API from '../Libs/API';
+
 
 function _isMobile(isWeb){
   var isMobile = true;
@@ -484,6 +483,7 @@ function generateTheme(theme_name=false){
       alignSelf : "center",
       color: theme.news_title_color,
       paddingHorizontal:3,//backgroundColor:"red"
+      fontWeight: "bold",
     },
     news_title_icon:{
       //fontSize:15,
@@ -559,7 +559,7 @@ function generateTheme(theme_name=false){
       marginBottom:5,
     },
     article_title_t:{
-      //fontWeight: "bold",
+      fontWeight: "bold",
       padding:10,
       width:"100%",
       marginTop:8,
@@ -725,25 +725,32 @@ function generateTheme(theme_name=false){
       padding:3
     },
     lineup2_container:{
-      marginTop:3,
+      marginVertical:1,
       flexDirection:'row', 
       flexWrap:'wrap',
     },
+    lineup2_lr_container:{
+      flex:1,
+    },
     lineup2_l:{
       flex:9,
-      marginLeft:3,
       textAlign: 'left',
       color : theme.match_lineup2_color,
-      borderRightWidth:1,
-      borderColor:theme.text_color_default
+      borderLeftWidth:1,
+      paddingLeft:3,
+      borderBottomWidth:1,
+      borderColor:"#5a6d8aa3",
+      borderRadius:10,
     },
     lineup2_r:{
       flex:9,
-      marginRight:3,
       textAlign: 'right',
       color : theme.match_lineup2_color,
-      borderLeftWidth:1,
-      borderColor:theme.text_color_default
+      borderRightWidth:1,
+      paddingRight:3,
+      borderBottomWidth:1,
+      borderColor:"#5a6d8aa3",
+      borderRadius:10,
     },
     lineup2_m:{
       flex:1,
@@ -753,13 +760,14 @@ function generateTheme(theme_name=false){
     },
     lineup2_number:{
       width:20,
+      borderRadius:20,
       marginHorizontal:3,
       textAlign: 'center',
       color : theme.match_lineup2_number_color,
     },
     lineup2_number_subs:{
-      width:35,
-      //marginHorizontal:3,
+      width:30,
+      marginHorizontal:0,
       textAlign: 'center',
       color : theme.live_borderColor,
     },
@@ -893,14 +901,16 @@ function generateTheme(theme_name=false){
     match_results_team_scor_penalties_t:{
       fontSize: 23,
       lineHeight:20,
-      paddingVertical:1,
+      //paddingVertical:1,
       borderWidth:1,
       //fontWeight: 'bold',
       color : theme.match_results_team_scor_color,
       //paddingHorizontal:5,
       textAlign:"center",
-      height:25,
-      width:25,
+      //height:23,
+      padding:2,
+      //width:18,
+      backgroundColor:"#4500ff3d",
       marginHorizontal:"auto",
       alignSelf:"center",
       marginBottom:2,
@@ -1042,6 +1052,9 @@ function generateTheme(theme_name=false){
   }
   var styles_notif = StyleSheet.create({
     container:{
+      zIndex: 99999, // works on ios
+      elevation: 99999, // works on android    
+
       height:0,
       width:"100%",
       position: "absolute",
@@ -1066,8 +1079,8 @@ function generateTheme(theme_name=false){
     },
     box_inside:{
       //top:-50,
-      zIndex: 3, // works on ios
-      elevation: 3, // works on android    
+      zIndex: 99999, // works on ios
+      elevation: 99999, // works on android    
       width:"100%",
       flex:1,
       backgroundColor:  theme.activeBackgroundColor,
@@ -1214,6 +1227,13 @@ function generateTheme(theme_name=false){
     },
     modal_view_meduim: {
       height : 350,
+    },
+    modal_view_fill_width: {
+      width : window_width-50,
+    },
+    modal_view_fill: {
+      height : window_height-100,
+      width : window_width-50,
     },
     modal_body: {
       backgroundColor:"#646c78",

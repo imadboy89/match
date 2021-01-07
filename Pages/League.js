@@ -195,7 +195,7 @@ class LeagueScreen extends React.Component {
     this.setState({favorite:o});
     await API_.setConfig(localS_fav_key,o);
     this.setState({});
-    API_.showMsg(`الفريق ${team_name} ${msg_action} المفضلة!`);
+    API_.showMsg(`الفريق ٭${team_name}٭ ${msg_action} المفضلة!`);
   }
   render_standing(){
     if(this.state.league_details==undefined || this.state.league_details.length==0){

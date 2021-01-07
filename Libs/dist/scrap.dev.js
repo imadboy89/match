@@ -386,7 +386,7 @@ function () {
         if (mat_header[j] == "time") {
           //is_ok = matche[ mat_header[j] ].indexOf("$f")>=0 ? false : true;
           matche["time_old"] = matche[mat_header[j]];
-          live = matche[mat_header[j]].indexOf("@") >= 0 ? 1 : 0;
+          live = matche[mat_header[j]].indexOf("@") >= 0 || matche[mat_header[j]].indexOf("تبدأ قريبا") >= 0 ? 1 : 0;
           is_done = matche[mat_header[j]].indexOf("$f") >= 0 ? 1 : 0;
           matche[mat_header[j]] = matche[mat_header[j]].replace(/[^0-9\:]/g, "");
           matche[mat_header[j]] = matche[mat_header[j]].slice(0, 5); //API_.convert_time(matche[ mat_header[j] ].slice(0,5),+1);

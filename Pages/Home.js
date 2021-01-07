@@ -150,7 +150,7 @@ class HomeScreen extends React.Component {
       }
       this.setState({favorite:o});
       API_.setConfig("favorite_leagues",o);
-      API_.showMsg(`الدوري ${league_name} ${msg_action} المفضلة!`);
+      API_.showMsg(`الدوري ٭${league_name}٭ ${msg_action} المفضلة!`);
     });
     this.setState({});
   }
@@ -316,7 +316,7 @@ async get_favs(data){
       const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
       if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
-        matche_f["league_id"] = 1;
+        //matche_f["league_id"] = 1;
         //matche_f["league"] = "fav_list";
         fav_list.data.push(matche_f);
       }
@@ -437,9 +437,11 @@ show_DateP(){
     </Picker>
   </View>);
     return (
-      <GestureRecognizer style={this.state.dynamic_style.container}
-      onSwipeRight={(state) => this.onSwipeRight(state)}
-      onSwipeLeft={(state) => this.onSwipeLeft(state)}
+      <GestureRecognizer 
+        style={this.state.dynamic_style.container}
+        directionalOffsetThreshold={60}
+        onSwipeRight={(state) => this.onSwipeRight(state)}
+        onSwipeLeft={(state) => this.onSwipeLeft(state)}
 
       >        
         <ItemsList 
@@ -447,7 +449,7 @@ show_DateP(){
           favorite={this.state.favorite}
           set_fav={this.set_fav}
           refresh_list={this.refresh_list}
-          refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={()=>{this.state.page=1 ;this.get_matches()}} />}
+          refreshControl={<RefreshControl progressViewOffset={200} refreshing={this.state.loading} onRefresh={()=>{this.state.page=1 ;this.get_matches()}} />}
           loading={this.state.loading} 
           list={this.state.list} 
           onLeaguePressed={this.onLeaguePressed}
@@ -458,7 +460,7 @@ show_DateP(){
             />
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
 
-      { this.state.show_datPicker===true ? this.show_DateP() : null }       
+      { this.state.show_datPicker===true ? this.show_DateP() : null }
       </GestureRecognizer>
     );
   }

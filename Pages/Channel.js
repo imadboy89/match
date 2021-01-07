@@ -12,6 +12,7 @@ class HLSP extends React.Component {
     super(props);
     this.state = {
       modalVisible_match :this.props.modalVisible_match,
+      dynamic_style:this.props.dynamic_style,
     }
     this.playerRef = React.createRef();
   }
@@ -40,7 +41,9 @@ class HLSP extends React.Component {
     }
   }
   render(){
+    this.state.dynamic_style = this.props.dynamic_style;
     const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
+    if(this.state.dynamic_style==undefined) return null;
     return (          
         <MModal 
           animationType="slide"
@@ -51,14 +54,21 @@ class HLSP extends React.Component {
           } }
           
         > 
-        <View style={{flex: 1,justifyContent: "center",alignItems: "center",width:"100%",paddingTop: 22,backgroundColor:"#2f333738"}}>
-          <View style={this.props.dynamic_style.modalView}>
-            <Button title="Close" onPress={()=>{
-              this.props.closeM();
-              this.setState({p_url:""});
-              }} ></Button>
-            <Text >   {this.props.url} </Text>
-            {this.props.modalVisible_match==true && this.props.p_url!="" ? this.render_ReactHlsPlayer() : null}
+        <View style={this.state.dynamic_style.modal_view_container}>
+          <View style={[this.state.dynamic_style.modal_view,this.state.dynamic_style.modal_view_meduim,this.state.dynamic_style.modal_view_fill_width]}>
+            <View style={this.state.dynamic_style.modal_body}>
+              <Text >   {this.props.url} </Text>
+              {this.props.modalVisible_match==true && this.props.p_url!="" ? this.render_ReactHlsPlayer() : null}
+            </View>
+            <View style={this.state.dynamic_style.footer}>
+            <View style={this.state.dynamic_style.footer_button}>
+              <Button
+                  title={"Close"}
+                  color="#f39c12"
+                  onPress={()=>this.props.closeM()}
+              ></Button>
+            </View>
+          </View>
           </View>
         </View>
         </MModal>
@@ -91,6 +101,7 @@ class ChannelScreen extends React.Component {
   }
   componentDidMount(){
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
+    getTheme("styles_settings").then(theme=>this.setState({dynamic_style_modals:theme}) );
   }
   get_channel(){
       this.channel_photo = this.props.route.params.channel_photo;
@@ -101,12 +112,11 @@ class ChannelScreen extends React.Component {
       });
   }
 
-  render_modal_credentials(){
-    const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
+  render_modal_HLSP(){
     return (    
       <HLSP 
         modalVisible_match={this.state.modalVisible_match}
-        dynamic_style={this.state.dynamic_style}
+        dynamic_style={this.state.dynamic_style_modals}
         p_url={this.state.p_url}
         player_type={this.state.player_type}
         closeM={()=>{this.setState({modalVisible_match:false})}}
@@ -195,7 +205,7 @@ class ChannelScreen extends React.Component {
         </View>
         }
         </View>
-        {this.render_modal_credentials()}
+        {this.render_modal_HLSP()}
         </ScrollView >
     );
   }

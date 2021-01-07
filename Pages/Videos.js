@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Modal, Button, TouchableOpacity,Picker } from 'react-native';
+import { View, RefreshControl, Modal, Button, TouchableOpacity,Picker } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -59,7 +59,7 @@ get_Videos_m(){
     API_.nextPageToken = "";
   });
 }
-get_Videos(){
+get_Videos = ()=>{
   if(this.state.loading==false){
     this.setState({list:[],loading:true});
   }
@@ -101,6 +101,8 @@ get_Videos(){
           <Picker.Item label="AlMthkb" value={1} />
           <Picker.Item label="arriadia" value={2} />
           <Picker.Item label="Mtkhb" value={3} />
+          <Picker.Item label="heSport" value={4} />
+          
       </Picker>
     </View>);
     return (
@@ -109,6 +111,7 @@ get_Videos(){
         <ItemsList 
           ListHeaderComponent = {ListFooterComponent}
           ListFooterComponent = {ListFooterComponent}
+          refreshControl={<RefreshControl progressViewOffset={200} refreshing={this.state.loading} onRefresh={this.get_Videos} />}
           loading={this.state.loading} 
           list={this.state.list} 
           onclick={this.onItem_clicked} 

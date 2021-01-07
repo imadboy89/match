@@ -87,7 +87,7 @@ get_news =(loading=true,keep_list=false)=>{
         <ItemsList 
           ListFooterComponent = {ListFooterComponent}
           refresh_list={this.refresh_list}
-          refreshControl={<RefreshControl refreshing={this.state.loading} onRefresh={this.get_news} />}
+          refreshControl={<RefreshControl progressViewOffset={200} refreshing={this.state.loading} onRefresh={this.get_news} />}
           loading={this.state.loading} 
           list={this.state.list} 
           onclick={this.onItem_clicked} 

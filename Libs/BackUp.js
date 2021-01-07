@@ -35,7 +35,7 @@ class BackUp{
         await this.checkConnectedUserChange();
       }
       if(this.isConnected==false && is_silent==false){
-        API_.showMsg("You need internet connection!","warning");
+        API_.showMsg("تحتاج إلى اتصال بالإنترنت!","warning");
       }
       return this.isConnected;
     }
@@ -137,7 +137,7 @@ class BackUp{
         this.loadingClient = false;
         API_.set_settings({});
         await this.setClientInfo(); 
-        if(this.is_auth) {API_.showMsg(`Welcom back  ${this.email} !`,"success");}
+        if(this.is_auth) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
         return this.is_auth;
       } catch (error) {
         API_.showMsg((error.message ? error.message : error)+"","danger");
@@ -157,7 +157,7 @@ class BackUp{
         .then((output) => {
           //this.registerForPushNotificationsAsync();
           //console.log("Successfully sent account confirmation email!", JSON.stringify(output) );
-          API_.showMsg(`Signed up successfullly ${credents.email} !`,"success");
+          API_.showMsg(`تم التسجيل بنجاح ٭${credents.email}٭ !`,"success");
           return true;
         })
         .catch(error => {
@@ -310,7 +310,7 @@ class BackUp{
       let results = {};
       try {
         results = await this.client.callFunction("Users_managements",[user_email,new_status]);
-        API_.showMsg("User updated successfully!","success");
+        API_.showMsg("تم تحديث المستخدم بنجاح!","success");
       } catch (error) {
         API_.debugMsg((error.message ? error.message : error)+"","danger");
         return false;
@@ -345,7 +345,7 @@ class BackUp{
           }
         }
         if(pushednotifto>0){
-          API_.showMsg("Notification Pushed successfully to "+pushednotifto+" users.","success");
+          API_.showMsg("تم إرسال الإخطار بنجاح إلى "+pushednotifto+" مستخدمين.","success");
         }
         return pushednotifto;
       } catch (error) {
