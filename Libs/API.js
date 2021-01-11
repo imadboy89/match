@@ -36,7 +36,10 @@ class API {
     //this.set_token();
     this.is_debug=false;
     this.messages_history = [];
+    this.filtering = false;
+    this.matches_bl = [];
     this.getConfig("is_debug",false).then(o=>this.is_debug=o);
+    this.getConfig("filtering",false).then(o=>this.filtering=o);
 
   }
   _isBigScreen(){

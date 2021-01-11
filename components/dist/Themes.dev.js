@@ -58,6 +58,7 @@ var Themes = {
     home_title_color: "#d1d8e0",
     alert_body_backgroundColor: "#686de0",
     alert_body_color: "#dff9fb",
+    fav_background: "#0093fb4a",
     text_color_default: "#fff",
     list_header_backgroundColor: "#a29bfe",
     live_borderColor: "#2ecc71",
@@ -103,6 +104,7 @@ var Themes = {
     text_color_default: "#fff",
     alert_body_backgroundColor: "#3c6382",
     alert_body_color: "#dff9fb",
+    fav_background: "#0093fb4a",
     list_header_backgroundColor: "#4a69bd",
     live_borderColor: "#78e08f",
     match_name_backgroundColor: "#1e3799",
@@ -140,13 +142,14 @@ var Themes = {
     //#####f39c12
     headerStyle_backgroundColor: '#f39c12',
     headerTintColor: '#57606f',
-    activeBackgroundColor: '#eccc68',
+    activeBackgroundColor: '#fbebbb',
     inactiveBackgroundColor: '#a4b0be',
     activeTintColor: '#2f3542',
     inactiveTintColor: '#2f3542',
     background_color_default: "#ced6e0",
     home_title_color: "#2f3542",
     text_color_default: "#000",
+    fav_background: "#0093fb4a",
     list_header_backgroundColor: "#e67e22",
     live_borderColor: "#2ecc71",
     match_name_backgroundColor: "#dfe4ea",
@@ -187,6 +190,7 @@ exports.themes_list = themes_list;
 function generateTheme() {
   var theme_name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
   var isWeb = false;
+  var _Global_theme_name = "";
 
   var window_width = _reactNative.Dimensions.get('window').width;
 
@@ -198,6 +202,12 @@ function generateTheme() {
     };
   } catch (err) {
     isWeb = false;
+  }
+
+  try {
+    _Global_theme_name = Global_theme_name;
+  } catch (err) {
+    _Global_theme_name = "false";
   }
 
   theme_name = theme_name == false ? "light" : theme_name;
@@ -281,20 +291,33 @@ function generateTheme() {
     title: {
       fontSize: 23
     },
+    shadow_3: {
+      boxShadow: _Global_theme_name.indexOf("light") == -1 ? 'rgba(255, 255, 255, 0.20) 0px 2px 2px 2px, rgba(255, 255, 255, 0.18) 0px 4px 2px 3px, rgba(255, 255, 255, 0.12) 0px 5px 2px 4px' : 'rgba(0,0,0 , 0.20) 0px 2px 2px 2px, rgba(0,0,0, 0.18) 0px 4px 2px 3px, rgba(0,0,0, 0.12) 0px 5px 2px 4px'
+    },
     shadow_1: {
       shadowColor: theme.text_color_default,
       shadowOffset: {
-        width: 2,
+        width: 5,
         height: 3
       },
-      shadowOpacity: 0.20,
+      shadowOpacity: 0.25,
+      //shadowRadius: 3,
+      elevation: 5
+    },
+    shadow_2: {
+      shadowColor: theme.text_color_default,
+      shadowOffset: {
+        width: 5,
+        height: 3
+      },
+      shadowOpacity: 0.30,
       //shadowRadius: 3,
       elevation: 5
     },
     matche_container: {
       width: "98%",
-      marginLeft: 3,
-      marginVertical: 3,
+      marginLeft: 5,
+      marginVertical: 5,
       flexDirection: 'row',
       flexWrap: 'wrap',
       flex: 1,
@@ -439,7 +462,7 @@ function generateTheme() {
       //width:200,
       //backgroundColor: "#00000005",//theme.news_cont_backgroundColor,
       backgroundColor: theme.news_cont_backgroundColor,
-      borderRadius: 10,
+      //borderRadius: 10,
       justifyContent: 'center'
     },
     news_img_v: {

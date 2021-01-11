@@ -84,10 +84,12 @@ function () {
         var channels = [];
 
         for (var i = 0; i < details_dict["l"].length; i++) {
+          var commentator = details_dict["l"][i].length >= 4 && details_dict["l"][i][4] ? details_dict["l"][i][4] : "";
           channels.push({
             id: details_dict["l"][i][1],
             en_name: details_dict["l"][i][2],
-            "is_koora": true
+            "is_koora": true,
+            commentator: commentator
           });
         }
 
@@ -225,6 +227,7 @@ function () {
       var h = 0;
       var team_st = {};
       var group_name = false;
+      json_["ranks_table"] = json_["ranks_table"] ? json_["ranks_table"] : [];
 
       try {
         for (var i = 0; i < json_["ranks_table"].length; i++) {
@@ -285,6 +288,7 @@ function () {
     value: function get_matches_k(html, date) {
       var is_oneMatch = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var is_only_live = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      API_.matches_bl = [];
       var json_ = {
         "matches_comps": [],
         "matches_list": []
@@ -299,15 +303,16 @@ function () {
 
       var date_str = date ? API_.get_date2(date) : false; //parse matches_comps
 
-      var blacklisted_comps = is_oneMatch ? [] : ["الدرجة الثانية", "الدرجة الثالثة", "الهواة", "سيدات", "الدرجة الخامسة", "الدرجة الرابعة", "رديف", "جنوب", " الثاني", "تحت ", "شمال", "الثالث", " A ", " B ", " C ", " D ", "الدرجة D", "الدرجة C", "الدرجة B", "الدوري النرويجي الدرجة"];
-      var blacklisted_countries = is_oneMatch ? [] : ["SA", "BH", "KW", "IQ", "PS", "ND", "AR", "BR", "CO", "JO", "SS", "VN", "ZA", "TR", "UZ"];
-      var exceptions = ["افريقيا"];
+      var blacklisted_comps = is_oneMatch || API_.filtering ? [] : ["الدرجة الثانية", "الدرجة الثالثة", "الهواة", "سيدات", "الدرجة الخامسة", "الدرجة الرابعة", "رديف", "جنوب", " الثاني", "تحت ", "شمال", "الثالث", " A ", " B ", " C ", " D ", "الدرجة D", "الدرجة C", "الدرجة B", "الدوري النرويجي الدرجة"];
+      var blacklisted_countries = is_oneMatch || API_.filtering ? [] : ["SA", "BH", "KW", "IQ", "PS", "ND", "AR", "BR", "CO", "JO", "SS", "VN", "ZA", "TR", "UZ"];
+      var exceptions = ["افريقيا", "مباريات دولية ودية"];
       var compititions = {};
+      var compititions_bl = {};
       var compitition = {
         "country": ""
       };
       var comp_header = ["divider", "league_id", "comp_name", "comp_logo", "comp_id_news", "options"];
-      var MIN_ALLOWED_OPTIONS = is_oneMatch ? 1 : 3;
+      var MIN_ALLOWED_OPTIONS = is_oneMatch || API_.filtering ? 1 : 3;
       var k = 0;
 
       for (var i = 0; i < json_["matches_comps"].length; i++) {
@@ -358,6 +363,8 @@ function () {
               id: compitition["league_id"],
               title: compitition["comp_name"]
             });
+          } else {
+            compititions_bl[compitition["league_id"]] = compitition;
           } //console.log(compitition);
 
 
@@ -372,6 +379,7 @@ function () {
 
       var mat_header = ["league_id", "com_id_page", "id_1", "id", "datetime", "inf_1", "time", "home_team_id", "home_team_status", "home_team", "home_scorers", "score", "away_team_id", "away_team_status", "away_team", "away_scorers", "inf_7", "inf_8", "inf_9", "details"];
       var matches = {};
+      var matches_bl = {};
       var matche = {};
       var j = 0;
       var is_ok = true;
@@ -428,7 +436,8 @@ function () {
         j++;
 
         if (mat_header.length == j) {
-          var comp_match = compititions[matche["league_id"]];
+          var is_bl = compititions_bl[matche["league_id"]] && compititions[matche["league_id"]] == undefined ? true : false;
+          var comp_match = is_bl ? compititions_bl[matche["league_id"]] : compititions[matche["league_id"]];
 
           if (is_only_live == false || matche["live"] == 1 && is_only_live) {
             if (comp_match != undefined && (is_ok || comp_match["country"] == "MA")) {
@@ -442,8 +451,12 @@ function () {
                 "options": comp_match["options"]
               }; //league["img"] = API_.leagueLogo_byTitle(league["title"],league["img"]);
 
-              if (matches[matche["league_id"]] == undefined) {
+              if (matches[matche["league_id"]] == undefined && !is_bl) {
                 matches[matche["league_id"]] = league;
+              }
+
+              if (matches_bl[matche["league_id"]] == undefined && is_bl) {
+                matches_bl[matche["league_id"]] = league;
               }
 
               var score_p = matche["score"].split("~");
@@ -460,7 +473,12 @@ function () {
               matche["home_team_score"] = score && score.length == 2 ? score[0] : "-";
               matche["away_team_score"] = score && score.length == 2 ? score[1] : "-";
               matche["league"] = league["title"];
-              matches[matche["league_id"]]["data"].push(matche);
+
+              if (is_bl) {
+                matches_bl[matche["league_id"]]["data"].push(matche);
+              } else {
+                matches[matche["league_id"]]["data"].push(matche);
+              }
             }
           }
 
@@ -474,11 +492,13 @@ function () {
       }
 
       matches = Object.values(matches);
-      var periority_cc = ["NL", "ES", "IT", "EN", "AFRICA", "EURO", "MA"];
+      matches_bl = Object.values(matches_bl);
+      var periority_cc = ["NL", "DE", "ES", "IT", "EN", "AFRICA", "EURO", "MA"];
       matches = matches.sort(function (a, b) {
-        return periority_cc.indexOf(a["country"]) > periority_cc.indexOf(b["country"]) ? -1 : 1;
+        return periority_cc.indexOf(a["country"]) >= periority_cc.indexOf(b["country"]) ? -1 : 1;
       }); //matches = matches.sort((a,b)=>{return a["country"]=="MA"? -1 : 1;});
 
+      API_.matches_bl = matches_bl;
       return matches;
     }
   }, {

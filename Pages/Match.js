@@ -109,18 +109,18 @@ class Matchcreen extends React.Component {
     return fav_icon;
   }
   get_View_general(){
-    this.state.matche_details.channels = this.state.matche_details.channels ? 
-      this.state.matche_details.channels.sort((a,b)=>{return (this.state.favorite.indexOf(a.en_name)>this.state.favorite.indexOf(b.en_name))?-1:1;})
-      :this.state.matche_details.channels;
+    this.state.matche_details.channels = this.state.matche_details.channels ? this.state.matche_details.channels : [];
+    this.state.matche_details.channels = this.state.matche_details.channels.sort((a,b)=>{return (a.commentator && b.commentator==undefined )?-1:0;})
+    this.state.matche_details.channels = this.state.matche_details.channels.sort((a,b)=>{return (this.state.favorite.indexOf(a.en_name)>=this.state.favorite.indexOf(b.en_name))?-1:1;})
     let channels = this.state.matche_details.channels ?
       this.state.matche_details.channels.map(ch => (
         <View style={{margin:1}} key={ch.id}>
           {ch.is_koora==undefined ?
-            <Button onPress={()=>this.onmt_clicked(ch)} title={ch.en_name} style={{margin:4}}></Button>
+            <Button onPress={()=>this.onmt_clicked(ch)} title={ch.en_name} style={{margin:1}}></Button>
            : 
             <TouchableOpacity style={{flexDirection:'row', flexWrap:'wrap',width:"100%",marginLeft:10}} onPress={()=>this.set_fav(ch.en_name)}>
               {this.get_fav_icon(ch.en_name)}
-              <Text style={{flex:1,backgroundColor:global_theme.background_color_default,color:global_theme.text_color_default}} >{ch.en_name}</Text>
+              <Text style={{flex:1,backgroundColor:global_theme.background_color_default,color:global_theme.text_color_default}} >{ch.en_name}{ch.commentator!=""?" - "+ch.commentator:""}</Text>
             </TouchableOpacity>
           }
         </View>
@@ -238,9 +238,9 @@ class Matchcreen extends React.Component {
       if(home_p==undefined || !home_p){
         return null;
       }
-      console.log(home_p.lineup_number, style_sub_h);
-      const home_pl_tyle = home_p.lineup_player && this.state.favorite_p.includes(home_p.lineup_player) ? {backgroundColor:"#0093fb4a"} : {};
-      const away_pl_tyle = away_p.lineup_player && this.state.favorite_p.includes(away_p.lineup_player) ? {backgroundColor:"#0093fb4a"} : {};
+      
+      const home_pl_tyle = home_p.lineup_player && this.state.favorite_p.includes(home_p.lineup_player) ? {backgroundColor: global_theme.fav_background} : {};
+      const away_pl_tyle = away_p.lineup_player && this.state.favorite_p.includes(away_p.lineup_player) ? {backgroundColor: global_theme.fav_background} : {};
       return (
           <View style={this.state.dynamic_style.lineup2_container} key={home_p.lineup_number+home_p.lineup_player+away_p.lineup_player}>
             

@@ -5,7 +5,7 @@ import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
 import Loading from '../components/Loader';
-import {styles_league,getTheme} from "../components/Themes";
+import {styles_league,getTheme,global_theme} from "../components/Themes";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 
 let list = [
@@ -28,7 +28,8 @@ class LeagueScreen extends React.Component {
         dynamic_style:styles_league,
         notifications_matches:{},
         scorers:[],
-        favorite:[]
+        favorite:[],
+        favorite_p:[],
     };
     this.league_name = this.props.route.params.league_details.league;
     this.league_img   = this.props.route.params.league_details.league_img;
@@ -50,7 +51,7 @@ class LeagueScreen extends React.Component {
       this.is_k = true;
       return this.get_standing_k();
     }
-    const favorite = await API_.getConfig("favorite_teams",this.state.favorite) ;
+    const favorite = await API_.getConfig("favorite_teams",this.state.favorite);
     const resp = await API_.get_standing(id);
 
     if(resp["data"] && resp["data"] ){
@@ -150,6 +151,21 @@ class LeagueScreen extends React.Component {
           notifications_matches={this.state.notifications_matches}
           key_="home_team" key_key="id"  />;
   }
+  set_fav_p= async(player_name)=>{
+    let favorite_p = await API_.getConfig("favorite_players",this.state.favorite_p);
+    let msg_action = "";
+    if( favorite_p.includes(player_name) ){
+      favorite_p = favorite_p.filter(o=>{if(o!=player_name)return o;});
+      msg_action = "تمت إزالته من";
+    }else{
+      favorite_p.push(player_name);
+      msg_action = "تمت إضافته إلى";
+    }
+    this.setState({favorite_p:favorite_p});
+    API_.setConfig("favorite_players",favorite_p);
+    API_.showMsg(`اللاعب ٭${player_name}٭ ${msg_action} المفضلة!`);
+    this.setState({});
+  }
   render_scorers(){
     if(this.state.league_details==undefined || this.state.league_details.length==0 || this.state.scorers.length==0){
       return null;
@@ -158,7 +174,12 @@ class LeagueScreen extends React.Component {
     return scorers.map(p=>{
         const p_name = p.player_name_ar ? p.player_name_ar : p.player_name_en ;
         const p_img = false;
-        return <View style={this.state.dynamic_style.team_view} key={p.player_id+""}>
+        const fav_style = this.state.favorite_p.includes(p_name) ? {backgroundColor: global_theme.fav_background} : {};
+        return  <TouchableOpacity  style={[this.state.dynamic_style.team_view,fav_style]} key={p.player_id+""}
+          delayLongPress={300}
+          activeOpacity={0.7}
+          onLongPress={()=>this.set_fav_p(p_name)}
+          >
           
           <View style={{flex:1,padding:2}} >
             {p_img!=false ? <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} /> : null}
@@ -167,7 +188,7 @@ class LeagueScreen extends React.Component {
           <View style={{flex:7}}><Text style={this.state.dynamic_style.team_name_t}>{p_name}</Text></View>
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{""}</Text></View>
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{p.goals}</Text></View>
-        </View>;
+        </TouchableOpacity>;
       });
   }
   get_fav_icon(id,bool=false){
@@ -230,7 +251,7 @@ class LeagueScreen extends React.Component {
         let goals     = row && row.overall_league_GF>=0 ? row.overall_league_GF : 0 ;
         goals = row && row.overall_league_GA ? goals-row.overall_league_GA : goals;
         goals = row && row.goals=="Gls" ? row.goals : goals;
-        const fav_style = row.team && this.get_fav_icon(row.team.id, true) ? {backgroundColor:"#0093fb4a"} : {};
+        const fav_style = row.team && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
         return (
         <TouchableOpacity 
           activeOpacity={0.7}
@@ -275,10 +296,12 @@ class LeagueScreen extends React.Component {
 
         <View style={this.state.dynamic_style.tabs_list}>
           <View style={{flex:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing"})}/></View>
-          <View style={{flex:1}}><Button title="Scorers"  onPress={()=>{
+          <View style={{flex:1}}><Button title="Scorers"  onPress={async()=>{
             if(this.state.scorers == undefined || this.state.scorers.length==0 ){
               this.setState({loading : true,});
-              API_.get_scorers(this.real_id).then(o=>this.setState({scorers:o,loading : false}));
+              const favorite_p = await API_.getConfig("favorite_players",this.state.favorite_p);
+              const scorers = await API_.get_scorers(this.real_id);
+              this.setState({scorers:scorers,loading : false, favorite_p:favorite_p})
             }
             this.setState({visible_tab:"scorers"});}}/></View>
           {/*<View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"}) }/></View> */}

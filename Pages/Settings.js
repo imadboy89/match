@@ -24,6 +24,7 @@ class SettingsScreen extends React.Component {
         window_width : parseInt(Dimensions.get('window').width),
         modalVisible_users:false,
         is_debug:API_.is_debug,
+        filtering:API_.filtering,
         
     };
     this.apk_url = "https://exp-shell-app-assets.s3.us-west-1.amazonaws.com/android/%40imadboss/koooora-d599e60f46e046c4a62e4ed327dd3641-signed.apk";
@@ -41,6 +42,7 @@ class SettingsScreen extends React.Component {
         fav_channels_nbr : fav_c.length ? fav_c.length : 0,
         fav_players_nbr  : fav_p.length ? fav_p.length : 0,
         is_debug         : API_.is_debug,
+        filtering        : API_.filtering,
       });
   }
   componentDidMount(){
@@ -134,6 +136,25 @@ class SettingsScreen extends React.Component {
             <Text style={this.state.dynamic_style.settings_row_label}>Clean cache </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>clean</Text>
           </View>
+
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Filtering Matches </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={()=>{
+                  API_.filtering = !this.state.filtering;
+                  API_.setConfig("filtering",API_.filtering);
+                  this.setState({filtering:API_.filtering});
+                }}
+                value={this.state.filtering}
+              />
+            </Text>
+          </View>
+
           { backup.admin!=true ? null : 
             <View style={this.state.dynamic_style.settings_row}>
               <Text style={this.state.dynamic_style.settings_row_label}>Users </Text> 

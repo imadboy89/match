@@ -60,6 +60,7 @@ class ItemsList extends React.Component {
     return true;
   } 
   get_item(item,col_key){
+    const shadow_style = API_.isWeb ? this.state.dynamic_style.shadow_3  : this.state.dynamic_style.shadow_1;
     if(col_key=="home_team"){
 
       const style_small = {}
@@ -99,7 +100,7 @@ class ItemsList extends React.Component {
       let style_extra = this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
       style_extra = item.live==1 ? this.state.dynamic_style.matche_container_live: style_extra;
       return (
-        <View style={[this.state.dynamic_style.matche_container,style_extra,this.state.dynamic_style.shadow_1]}>
+        <View style={[this.state.dynamic_style.matche_container,style_extra,shadow_style]}>
           <View style={this.state.dynamic_style.matche_team_time}>
             <Text style={this.state.dynamic_style.matche_team_time_t} noFonts={true}>{item.time}</Text>
             {item.is_done==true ? 
@@ -145,7 +146,7 @@ class ItemsList extends React.Component {
       let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
       const resizemode = col_key=="title_news" ? "stretch" : "center";
       return (
-        <View style={[this.state.dynamic_style.news_container,this.state.dynamic_style.shadow_1]}>
+        <View style={[this.state.dynamic_style.news_container,shadow_style]}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: item.img}} imageStyle={{resizeMode:resizemode}}>
           { item.date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,textAlign:"center",}}>{date}</Text> : null}
 
@@ -162,7 +163,7 @@ class ItemsList extends React.Component {
         );
     }else if(col_key=="category_name"){  
       return (
-        <View style={[this.state.dynamic_style.news_container,this.state.dynamic_style.shadow_1]}>
+        <View style={[this.state.dynamic_style.news_container,shadow_style]}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: API_.domain_o+item.category_photo}} imageStyle={{resizeMode:"stretch"}}>
             <View style={this.state.dynamic_style.news_img_v}>
 

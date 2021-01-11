@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
-import {styles_home,getTheme,themes_list} from "../components/Themes";
+import {global_theme,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
 import * as Notifications from 'expo-notifications';
 import AppLoading from 'expo-app-loading';
@@ -306,9 +306,9 @@ async get_favs(data){
   this.favorite_teams = await API_.getConfig("favorite_teams_k",[]) ;
   this.state.favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
   try{
-    data = data.sort((a,b)=>{ return (API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:1 );});
+    data = data.sort((a,b)=>{ return (API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:0 );});
   }catch(e){console.log(e);}
-  data = data.sort((a,b)=>{return (this.state.favorite.indexOf(a.id)>this.state.favorite.indexOf(b.id))?-1:1;});
+  data = data.sort((a,b)=>{return (this.state.favorite.indexOf(a.id)>this.state.favorite.indexOf(b.id))?-1:0;});
   let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
   for(let j=0;j<data.length;j++){
     for(let m=0;m<data[j]["data"].length;m++){
@@ -316,12 +316,22 @@ async get_favs(data){
       const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
       if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
-        //matche_f["league_id"] = 1;
-        //matche_f["league"] = "fav_list";
         fav_list.data.push(matche_f);
       }
     }
   }
+  ////////////////////////////////  Black listed matches 
+  for(let j=0;j<API_.matches_bl.length;j++){
+    for(let m=0;m<API_.matches_bl[j]["data"].length;m++){
+      const matche_f = JSON.parse(JSON.stringify(API_.matches_bl[j]["data"][m]));
+      const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
+      const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
+      if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
+        fav_list.data.push(matche_f);
+      }
+    }
+  }
+  //////////////////////////////////////////////////////////////////
   data = fav_list.data.length>0 ? [fav_list,].concat(data) : data ;
   return data;
 }
@@ -428,7 +438,7 @@ show_DateP(){
       name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.nextPage()}  />
     <Picker
         selectedValue={this.state.source_id}
-        style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+        style={{ height:"90%",flex:1,backgroundColor:"#000",color:"#fff" }}
         onValueChange={this.changesource}
       >
         <Picker.Item label="AL match" value={0} />
