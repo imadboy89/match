@@ -7,6 +7,7 @@ import Video from 'expo';
 import Loading from '../components/Loader';
 import {styles_league,getTheme,global_theme} from "../components/Themes";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
+import Player from "../components/Player";
 
 let list = [
 
@@ -30,6 +31,8 @@ class LeagueScreen extends React.Component {
         scorers:[],
         favorite:[],
         favorite_p:[],
+        modalVisible_player:false,
+        player:false,
     };
     this.league_name = this.props.route.params.league_details.league;
     this.league_img   = this.props.route.params.league_details.league_img;
@@ -73,6 +76,7 @@ class LeagueScreen extends React.Component {
       if(this.real_id!=this.league_id && this.real_id!=undefined){
         return this.get_matches_k();
       }
+      //API_.days[this.state.matches_date.getDay()]
       API_.get_league_matches(this.league_id).then(resp=>{
       if(resp && resp["status"]=="true"){
         let list = [];
@@ -90,10 +94,15 @@ class LeagueScreen extends React.Component {
                 resp["data"][k][i].live = 0;
               }
             }
-
+            let dayname = "";
+            try {
+              dayname = API_.days[API_.convert_time_o(resp["data"][k][i].date+" 00:00").getDay()]
+            } catch (error) {
+              
+            }
             date_str = resp["data"][k][i].date;
             if( maches[date_str] == undefined){
-              maches[date_str] = {title: date_str, data: [ resp["data"][k][i],] };
+              maches[date_str] = {title: date_str + " - " + dayname, data: [ resp["data"][k][i],] };
             }else{
               maches[date_str]["data"].push(resp["data"][k][i]);
             }
@@ -121,9 +130,15 @@ class LeagueScreen extends React.Component {
         try{
           data = data[0]["data"].map(row =>{
             const date_str = row.date;
+            let dayname = "";
+            try {
+              dayname = API_.days[API_.convert_time_o(date_str+" 00:00").getDay()]
+            } catch (error) {
+              
+            }
             if(matches[date_str] == undefined){
               matches[date_str] = JSON.parse(JSON.stringify(header));
-              matches[date_str].title = date_str;
+              matches[date_str].title = date_str+" - "+dayname;
             }
             matches[date_str].data.push(row);
 
@@ -166,23 +181,28 @@ class LeagueScreen extends React.Component {
     API_.showMsg(`اللاعب ٭${player_name}٭ ${msg_action} المفضلة!`);
     this.setState({});
   }
+  get_player_info=(player)=>{
+    this.setState({modalVisible_player:true,player_id:player.player_id});
+  }
   render_scorers(){
     if(this.state.league_details==undefined || this.state.league_details.length==0 || this.state.scorers.length==0){
       return null;
     }
     const scorers = [{"player_name_ar":"Player name","player_id":1,"team_badge":"","overall_league_payed":"","goals":"Gls"}].concat(this.state.scorers);
     return scorers.map(p=>{
-        const p_name = p.player_name_ar ? p.player_name_ar : p.player_name_en ;
-        const p_img = false;
+        const p_name = p && p.player_name_ar ? p.player_name_ar : p.player_name_en ;
+        const p_img = p && p.team_badge && p.team_badge!="" ? p.team_badge : false;
         const fav_style = this.state.favorite_p.includes(p_name) ? {backgroundColor: global_theme.fav_background} : {};
-        return  <TouchableOpacity  style={[this.state.dynamic_style.team_view,fav_style]} key={p.player_id+""}
-          delayLongPress={300}
-          activeOpacity={0.7}
-          onLongPress={()=>this.set_fav_p(p_name)}
-          >
+        return  <TouchableOpacity  
+                  style={[this.state.dynamic_style.team_view,fav_style]} key={p.player_id+p_name}
+                  delayLongPress={300}
+                  activeOpacity={0.7}
+                  onLongPress={()=>this.set_fav_p(p_name)}
+                  onPress={()=>this.get_player_info(p)}
+                  >
           
           <View style={{flex:1,padding:2}} >
-            {p_img!=false ? <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} /> : null}
+            {p_img!=false ? <Image style={{height:"95%",width:"95%"}} source={{uri: p_img}} /> : null}
           </View>
           
           <View style={{flex:7}}><Text style={this.state.dynamic_style.team_name_t}>{p_name}</Text></View>
@@ -322,6 +342,16 @@ class LeagueScreen extends React.Component {
             { this.state.league_details!={} && this.state.visible_tab=="scorers" ? this.render_scorers() : null}
           </View>
         }
+        {
+          this.state.modalVisible_player==true ? 
+        <Player       
+          modal_visible={this.state.modalVisible_player}
+          dynamic_style={this.state.dynamic_style}
+          player_id = {this.state.player_id}
+          closeModal={()=>{
+          this.setState({modalVisible_player:false})}}></Player>
+
+          : null }
       </ScrollView>
     );
   }

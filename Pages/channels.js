@@ -35,6 +35,10 @@ class ChannelsScreen extends React.Component {
           API_.get_channel(resp["data"][i].channel_id).then(resp=>{
             this.chanels_data[i].en_name = resp["data"].en_name;
             //this.setState({list:[]});
+            const ch_n = this.chanels_data[i].en_name.replace(/\s/g,"").toLocaleLowerCase().trim() ;
+            API_.channels_dict[ch_n] = this.chanels_data[i] ;
+            API_.channels_dict[ch_n].id = API_.channels_dict[ch_n].channel_id;
+            
             this.setState({list:this.chanels_data});
           });
         }

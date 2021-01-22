@@ -16,7 +16,7 @@ class BackUp{
         this.email = "";
         this.doClean=false;
         this.admin = false;
-        this.isConnected = false;
+        this.isConected = false;
         this.PushToken = "";
         this.executingQueued_running = false;
         this.queue = [];
@@ -122,8 +122,9 @@ class BackUp{
        
     }
     login = async ()=>{
+      this.is_auth = false;
       const credents = await this.LS.getCredentials();
-      this.admin = true ;
+      this.admin = false ;
       let client=null;
       try{
         client = Stitch.defaultAppClient;
@@ -132,6 +133,7 @@ class BackUp{
        }
       try {
         const credential = new UserPasswordCredential(credents["email"],credents["password"]);
+        await client.auth.logout();
         this.client = await client.auth.loginWithCredential(credential);
         //this.registerForPushNotificationsAsync();
         this.loadingClient = false;

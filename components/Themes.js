@@ -610,7 +610,7 @@ function generateTheme(theme_name=false){
     },
     channel_logo_v:{
       width: "100%",
-      height:window_height/3,
+      height:300,
       padding:5,
       alignContent:"center",
       alignItems:"center",
@@ -703,7 +703,7 @@ function generateTheme(theme_name=false){
     },
     channel_logo_v:{
       width: "100%",
-      height:window_height/3,
+      height:300,
       padding:5,
       alignContent:"center",
       alignItems:"center",
@@ -1015,7 +1015,7 @@ function generateTheme(theme_name=false){
     },
     channel_logo_v : {
       width: "100%",
-      height: window_height/3>250 ? window_height/3 : 250,
+      height: window_height>800 ? 400 : 300,
       paddingHorizontal:5,
       alignContent:"center",
       alignItems:"center",
@@ -1298,8 +1298,103 @@ function generateTheme(theme_name=false){
     },
     icons:styles_home.icons,
   });
+  const styles_modal= StyleSheet.create({
+    modal_view: {
+      margin: 10,
+      width: __isMobile ? "90%" : "80%",
+      backgroundColor: theme.background_color_default,
+      borderRadius: 10,
+      padding: 10,
+      alignItems: "center",
+      shadowColor: theme.text_color_default,
+      shadowOffset: {
+        width: 5,
+        height: 10
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      borderWidth:1,
+      borderColor:theme.text_color_default,
+    },
+    modal_view_small: {
+      height : 200,
+    },
+    modal_view_large: {
+      height : 500,
+    },
+    modal_view_meduim: {
+      height : 350,
+    },
+    modal_view_fill_width: {
+      width : window_width-50,
+    },
+    modal_view_fill: {
+      height : window_height-100,
+      width : window_width-50,
+    },
+    modal_body: {
+      backgroundColor:"#646c78",
+      width:"98%",
+      flex:1,
+      justifyContent:"center",
+      alignItems:"center",
+    },
+    footer: {
+      padding:2,
+      height:50,
+      width:"98%",
+      justifyContent:"center",
+      alignItems: "center",
+      flexDirection:'row',
+      flexWrap:'wrap',
+    },
+    footer_button: {
+      margin: 2,
+      width:100,
+    },
+    text: {
+      color : theme.text_color_default,
+      fontSize: 20,
+      marginHorizontal:10,
+      justifyContent: 'center',
+      textAlign:"center",
+      width:20,
+    },
 
-  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles,styles_league,styles_settings,theme,styles_notif};
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      color : "#d1d8e0",
+    },
+    icons:styles_home.icons,
+    info_row:{
+      flexDirection:'row', 
+      flexWrap:'wrap',
+      width:"95%",
+      //marginHorizontal:5,
+      //marginVertical:5,
+      backgroundColor: "#0000",
+      color : theme.text_color_default,
+    },
+    info_row_label:{
+      width:"40%",
+      backgroundColor: theme.background_color_default,
+      color : theme.text_color_default,
+      paddingHorizontal : 5,
+      height:30,
+    },
+    info_row_input:{
+      width:"45%",
+      backgroundColor: theme.background_color_default,
+      color : theme.text_color_default,
+      height:30,
+      borderRadius: isWeb ? 10 : 8,
+      paddingHorizontal : 8,
+    },
+  });
+  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles,styles_league,styles_settings,theme,styles_notif,styles_modal};
 }
 var themes = generateTheme("dark blue");
 var styles_list    = themes["styles_list"];
@@ -1313,9 +1408,11 @@ var styles_league  = themes["styles_league"];
 var styles_settings= themes["styles_settings"];
 var global_theme   = themes["theme"];
 var styles_notif   = themes["styles_notif"];
+var styles_modal   = themes["styles_modal"];
 
 
-export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme,_isMobile,styles_settings,styles_notif};
+
+export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme,_isMobile,styles_settings,styles_notif, styles_modal};
 
 
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl, Picker , Switch} from 'react-native';
+import {  View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl, Picker , Switch} from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -7,7 +7,7 @@ import IconButton from "../components/IconButton";
 import {global_theme,getTheme,themes_list} from "../components/Themes";
 import ExpoCustomUpdater from '../Libs/update';
 import * as Notifications from 'expo-notifications';
-import AppLoading from 'expo-app-loading';
+import Loader from "../components/Loader";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
@@ -48,7 +48,8 @@ class HomeScreen extends React.Component {
         this.render_header();
       }
     );
-    
+
+
   }
   async componentWillUnmount(){
     this._isMounted = false;
@@ -305,46 +306,58 @@ async get_favs(data){
   }
   this.favorite_teams = await API_.getConfig("favorite_teams_k",[]) ;
   this.state.favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
+  let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
+  ////////////////////////////////  Black listed matches 
+  for(let j=0;j<API_.matches_bl.length;j++){
+    let is_league_has_fav = false;
+    for(let m=0;m<API_.matches_bl[j]["data"].length;m++){
+      const matche_f = JSON.parse(JSON.stringify(API_.matches_bl[j]["data"][m]));
+      const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
+      const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
+      if(this.state.notifications_matches && this.state.notifications_matches[matche_f.id]!=undefined){
+        is_league_has_fav = true;
+      }else if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
+        is_league_has_fav = true;
+      }
+    }
+    if( (is_league_has_fav  || this.state.favorite.includes(API_.matches_bl[j].id)) && data.includes(API_.matches_bl[j])==false){
+      data.push(API_.matches_bl[j]);
+    }
+  }
+  //////////////////////////////////////////////////////////////////
+
   try{
     data = data.sort((a,b)=>{ return (API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:0 );});
   }catch(e){console.log(e);}
   data = data.sort((a,b)=>{return (this.state.favorite.indexOf(a.id)>this.state.favorite.indexOf(b.id))?-1:0;});
-  let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
+  
   for(let j=0;j<data.length;j++){
     for(let m=0;m<data[j]["data"].length;m++){
       const matche_f = JSON.parse(JSON.stringify(data[j]["data"][m]));
       const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
-      if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
+      if(this.state.notifications_matches && this.state.notifications_matches[matche_f.id]!=undefined){
+        fav_list.data.push(matche_f);
+      }else if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
         fav_list.data.push(matche_f);
       }
     }
   }
-  ////////////////////////////////  Black listed matches 
-  for(let j=0;j<API_.matches_bl.length;j++){
-    for(let m=0;m<API_.matches_bl[j]["data"].length;m++){
-      const matche_f = JSON.parse(JSON.stringify(API_.matches_bl[j]["data"][m]));
-      const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
-      const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
-      if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
-        fav_list.data.push(matche_f);
-      }
-    }
-  }
-  //////////////////////////////////////////////////////////////////
+
   data = fav_list.data.length>0 ? [fav_list,].concat(data) : data ;
   return data;
 }
 get_matches_koora = async(date_obj=null)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-  const _notifications_matches = await get_notifications_matches();
+  this.state.notifications_matches = await get_notifications_matches();
   await API_.load_leagues(this.refresh_leagues);
+  API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
   let resp = await API_.get_matches_k(date_obj,this.state.is_only_live);
   resp = await API_.set_logos(resp);
   let data = resp && resp.length>0 ? resp : [];
   data = await this.get_favs(data);
   if(this._isMounted){
-    this.setState({list:data,loading:false,notifications_matches:_notifications_matches});
+    this.setState({list:data,loading:false});
   }
 }
  onChange = (event, selectedDate) => {
@@ -421,7 +434,13 @@ show_DateP(){
     this.render_header();
   }
   render() {
-    if(this.state.dynamic_style==undefined || this.state.dynamic_style===false) {return <AppLoading/>; }
+    let dayname="";
+    try {
+      dayname = API_.days[this.state.matches_date.getDay()];
+    } catch (error) {
+      
+    }
+    if(this.state.dynamic_style==undefined || this.state.dynamic_style===false || LoadedFonts==false) {return <Loader/>; }
     const ListHeaderComponent = (        <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
     <IconButton 
       disabled={this.state.loading}
@@ -431,7 +450,7 @@ show_DateP(){
       activeOpacity={0.5}
       onPress={()=>this.setState({show_datPicker:true})}
       >
-      <Text style={[this.state.dynamic_style.title,]} >{API_.get_date2(this.state.matches_date)}</Text>
+      <Text style={[this.state.dynamic_style.title,]} >{API_.get_date2(this.state.matches_date)+" - "+dayname}</Text>
     </TouchableOpacity>
     <IconButton 
       disabled={this.state.loading}

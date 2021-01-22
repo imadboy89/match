@@ -3,6 +3,7 @@ import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity,Imag
 import Loading from '../components/Loader';
 import {styles_match,getTheme,global_theme} from "../components/Themes";
 import IconButton from "../components/IconButton";
+import Player from "../components/Player";
 
 let list = [
 
@@ -25,6 +26,9 @@ class Matchcreen extends React.Component {
         dynamic_style:styles_match,
         favorite:[],
         favorite_p:[],
+        modalVisible_player:false,
+        player:false,
+
     };
     this.get_Match(this.props.route.params.match_item.id);
 
@@ -63,7 +67,9 @@ class Matchcreen extends React.Component {
 
 
   onmt_clicked(item){
-    this.props.navigation.navigate('Channel', { channel_id: item.id,channel_photo:item.channel_photo });
+    if(item.is_koora==undefined){
+      this.props.navigation.navigate('Channel', { channel_id: item.id,channel_photo:item.channel_photo });
+    }
   }
 
 
@@ -99,32 +105,36 @@ class Matchcreen extends React.Component {
     });
     this.setState({});
   }
-  get_fav_icon(ch_name){
+  get_fav_icon(ch){
     let fav_icon = null;
     if(this.state.favorite){
-      fav_icon = this.state.favorite.includes(ch_name) ? 
-        <IconButton name="star" style={{height:30,width:50}} color={global_theme.text_color_default} /> :
-        <IconButton name="star-o" style={{height:30,width:50}} color={global_theme.text_color_default}/> ;
+      fav_icon = this.state.favorite.includes(ch.en_name) ? 
+        <IconButton name="star" style={{height:30,width:50}} color={global_theme.text_color_default}   onPress={()=>this.set_fav(ch.en_name)}/> :
+        <IconButton name="star-o" style={{height:30,width:50}} color={global_theme.text_color_default} onPress={()=>this.set_fav(ch.en_name)}/> ;
     }
     return fav_icon;
   }
   get_View_general(){
     this.state.matche_details.channels = this.state.matche_details.channels ? this.state.matche_details.channels : [];
-    this.state.matche_details.channels = this.state.matche_details.channels.sort((a,b)=>{return (a.commentator && b.commentator==undefined )?-1:0;})
-    this.state.matche_details.channels = this.state.matche_details.channels.sort((a,b)=>{return (this.state.favorite.indexOf(a.en_name)>=this.state.favorite.indexOf(b.en_name))?-1:1;})
+    this.state.matche_details.channels = this.state.matche_details.channels.sort((a,b)=>{return ( this.state.favorite.indexOf(a.en_name)>=this.state.favorite.indexOf(b.en_name))?-1:1;});
+    this.state.matche_details.channels = this.state.matche_details.channels.sort((a,b)=>{return (a.commentator!=undefined && this.state.favorite.indexOf(b.en_name)==-1  )?-1:0;});
+    
     let channels = this.state.matche_details.channels ?
-      this.state.matche_details.channels.map(ch => (
-        <View style={{margin:1}} key={ch.id}>
-          {ch.is_koora==undefined ?
-            <Button onPress={()=>this.onmt_clicked(ch)} title={ch.en_name} style={{margin:1}}></Button>
-           : 
-            <TouchableOpacity style={{flexDirection:'row', flexWrap:'wrap',width:"100%",marginLeft:10}} onPress={()=>this.set_fav(ch.en_name)}>
-              {this.get_fav_icon(ch.en_name)}
-              <Text style={{flex:1,backgroundColor:global_theme.background_color_default,color:global_theme.text_color_default}} >{ch.en_name}{ch.commentator!=""?" - "+ch.commentator:""}</Text>
+      this.state.matche_details.channels.map(ch => { 
+        const key_ch = ch.id;
+        const commentator = ch.commentator;
+        const ch_name_ = API_.fix_channel_name(ch.en_name);
+
+        ch = API_.channels_dict && ch_name_ in API_.channels_dict ? API_.channels_dict[ch_name_]  : ch ;
+        const ch_style = ch.is_koora==undefined ? {backgroundColor: global_theme.fav_background} : {};
+        return (
+        <View style={[{margin:1,flex:1},ch_style]} key={key_ch}>
+            <TouchableOpacity style={[{flexDirection:'row', flexWrap:'wrap',width:"100%",marginLeft:10},]} onPress={()=>this.onmt_clicked(ch)}>
+              {this.get_fav_icon(ch)}
+              <Text style={[{flex:1,backgroundColor:global_theme.background_color_default,color:global_theme.text_color_default},ch_style]} >{ch.en_name}{commentator!=""?" - "+commentator:""}</Text>
             </TouchableOpacity>
-          }
         </View>
-      ))
+      )})
     : null;
     if(this.state.matche_details=={}) {return null;}
 
@@ -191,7 +201,9 @@ class Matchcreen extends React.Component {
     subs = subs.sort((a,b)=>{return a.time<b.time?-1:1;});
     return subs;
   }
-
+  get_player_info=(player)=>{
+    this.setState({modalVisible_player:true,player_id:player.player_key});
+  }
   get_View_lineup_2(){
 
     let h_lineup = this.state.matche_details.home_lineup ? this.state.matche_details.home_lineup : [];
@@ -249,6 +261,7 @@ class Matchcreen extends React.Component {
               delayLongPress={300}
               activeOpacity={0.7}
               onLongPress={()=>this.set_fav_p(away_p.lineup_player)}
+              onPress={()=>this.get_player_info(away_p)}
               style={[this.state.dynamic_style.lineup2_lr_container ]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_l, away_pl_tyle]} numberOfLines={1}>
                 {away_p && away_p.lineup_player? scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
@@ -259,6 +272,7 @@ class Matchcreen extends React.Component {
               delayLongPress={300}
               activeOpacity={0.7}
               onLongPress={()=>this.set_fav_p(home_p.lineup_player)}
+              onPress={()=>this.get_player_info(home_p)}
               style={[this.state.dynamic_style.lineup2_lr_container]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_r,home_pl_tyle]} numberOfLines={1}>
                 {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
@@ -502,7 +516,15 @@ class Matchcreen extends React.Component {
             { this.state.matche_details!={} && this.state.visible_tab=="lineup2"   ? this.get_View_lineup_2() : null}
           </View>
         }
-        
+        { this.state.modalVisible_player==true ?
+        <Player       
+          modal_visible={this.state.modalVisible_player}
+          dynamic_style={this.state.dynamic_style}
+          player_id = {this.state.player_id}
+          closeModal={()=>{
+          this.setState({modalVisible_player:false})}}></Player>
+
+          : null }
       </ScrollView>
     );
   }

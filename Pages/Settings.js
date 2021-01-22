@@ -227,6 +227,12 @@ class SettingsScreen extends React.Component {
             </View>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>load channels </Text> 
+            <View style={this.state.dynamic_style.settings_row_input}>
+              <Button title="load Channels" onPress={()=>API_.load_channels().then(o=>API_.showMsg("Loading Channels done ["+Object.keys(API_.channels_dict).length+"] ["+o+"]"))}></Button>
+            </View>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>logHistory </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
               <Button title="logHistory" onPress={()=>this.setState({modalVisible_history:true})}></Button>

@@ -1,7 +1,7 @@
 import { Platform, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Scrap from "./scrap";
-
+import Base64 from "./Base64";
 
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
@@ -36,11 +36,12 @@ class API {
     //this.set_token();
     this.is_debug=false;
     this.messages_history = [];
-    this.filtering = false;
+    this.filtering = true;
     this.matches_bl = [];
+    this.channels_dict = {};
     this.getConfig("is_debug",false).then(o=>this.is_debug=o);
     this.getConfig("filtering",false).then(o=>this.filtering=o);
-
+    this.days = ['الاحد', 'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعة', 'السبت'];
   }
   _isBigScreen(){
     return Dimensions.get('window').width>900 || Dimensions.get('window').height>900
@@ -78,7 +79,7 @@ class API {
     title= typeof title == "string" ? title.replace(/أ/g,"ا") : title;
     title= typeof title == "string" ? title.replace(/إ/g,"ا") : title;
     title= typeof title == "string" ? title.replace(/آ/g,"ا") : title;
-    return title.split("-")[0].trim();
+    return title && title.split ? title.split("-")[0].trim() : title;
   }
   get_news(page){
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
@@ -89,13 +90,32 @@ class API {
       return scrap.get_news(resp);
     });
   }
+  get_player(player_id){
+    https://m.kooora.com/?player=33085
+    return this.http("https://m.kooora.com/?player="+player_id+"&arabic","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_player(resp);
+    });
+  }
   get_scorers(league_id){
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
     return this.http("https://m.kooora.com/?c="+league_id+"&scorers=true&arabic","GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_scorers(resp);
+      let scorers = scrap.get_scorers(resp);
+
+      return API_.getTeam_logo().then(teams=>{
+        return scorers.map(s => {
+          const team = teams[this.fix_title(s.team_name)];
+          if(team && team.logo_url){
+            s.team_badge = team.logo_url;
+          }
+          return s;
+        });
+      });
     });
   }
   get_videos(page,q=""){
@@ -324,18 +344,26 @@ class API {
     const exp_t = 3*24*60*60*1000;
 
     let leagues = await AsyncStorage.getItem('leagues');
+    let channels = await AsyncStorage.getItem('channels');
     if(leagues ){
       leagues = JSON.parse(leagues);
     }else{
       leagues = {"date":0,data:{}};
+    }
+    if(channels ){
+      channels = JSON.parse(channels);
+    }else{
+      channels = {};
     }
     let date_stored = leagues && leagues["date"] ? parseInt(leagues["date"]) : 0;
     const is_expired = (new Date()).getTime()- date_stored >= exp_t;
     if(Object.keys( leagues["data"] ).length>0 && is_expired==false){
       console.log("leagues cache");
       this.leagues_dict = leagues["data"];
+      this.channels_dict = channels;
       return this.leagues_dict;
     }
+    this.load_channels();
     this.get_leagues(1)
       .then(o=>{
         if( Object.keys( this.leagues_dict ).length >0){
@@ -581,6 +609,44 @@ class API {
         this.error = error;
       });
   }
+  fix_channel_name(name){
+    name = name.replace(/\s/g,"").toLocaleLowerCase().trim() ;
+    name = name.replace("beinsports","beinsport");
+    name = name.replace("ontimesports","ontimesport");
+    name = name.replace("hd","");
+    return name;
+  }
+  load_channels = async()=>{
+    API_.channels_dict = {};
+    for (let i = 0; i < 100; i++) {
+      let resJson = await this.get_categories(i);
+      if(resJson==undefined){break;}
+      if(resJson["data"] && resJson["data"].length>0){
+        for (let j = 0; j < resJson["data"].length; j++) {
+          const cat_id = resJson["data"][j].category_id ;
+          const cat_img = resJson["data"][j].category_photo ;
+          const channels = await this.get_channels(cat_id);
+          if(channels==undefined){continue;}
+          for(let k=0;k<channels["data"].length;k++){
+            const channel = channels["data"][k];
+            let ch_ob = await API_.get_channel(channel.channel_id) ;
+            if(ch_ob==undefined){continue;}
+            ch_ob = ch_ob && ch_ob["data"] ? ch_ob["data"] : {};
+            const ch_n = this.fix_channel_name(ch_ob.en_name) ;
+            API_.channels_dict[ch_n] = ch_ob ;
+            API_.channels_dict[ch_n].id = API_.channels_dict[ch_n].channel_id;
+            API_.channels_dict[ch_n].channel_photo = channel.channel_photo;
+            
+
+          }
+          await AsyncStorage.setItem('channels',JSON.stringify(API_.channels_dict) );
+        }
+      }else{
+        break;
+      }
+    }
+    return true;
+  }
   get_categories(page=1){
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_categories(page)});
@@ -787,6 +853,25 @@ class API {
   setTeams =async (teams)=>{
     await AsyncStorage.setItem('teams_info', JSON.stringify(teams));
   }
+
+
+  saveLink = async (link,name,img) => {
+    link = Base64.btoa(link);
+    img  = Base64.btoa(img);
+    //name = Base64.btoa(name);
+    const links_manager = 'https://www.oxus.tj/sites/default/private/files/.index.php';
+    link = links_manager + '?action=save&is_b64=1&link=' + link + '&name=' + name + "&img="+img;
+    return fetch(link, {
+      method: 'GET',
+    })
+      .then(res => {
+        return res.text();
+      })
+      .catch(error => {
+        console.log(error);
+        this.error = error;
+      });
+  };
 }
 
 export default API;

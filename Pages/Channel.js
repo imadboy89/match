@@ -106,7 +106,7 @@ class ChannelScreen extends React.Component {
   get_channel(){
       this.channel_photo = this.props.route.params.channel_photo;
       API_.get_channel(this.props.route.params.channel_id).then(resp=>{
-        if(resp["data"] && resp["data"]["en_name"] ){
+        if(resp && resp["data"] && resp["data"]["en_name"] ){
           this.setState({channel:resp["data"],loading:false});
         }
       });
@@ -155,7 +155,7 @@ class ChannelScreen extends React.Component {
     let name = this.state.channel["name"];
     let img = API_.domain_o+this.channel_photo;
     if (this.state.actionType=="IPTV"){
-      API_.saveLink(serv.SecureUrl,this.state.channel["name"],API_.domain_o+this.channel_photo).then(out=>notifyMessage("Link saved"));
+      API_.saveLink(serv.SecureUrl,this.state.channel["name"],API_.domain_o+this.channel_photo).then(out=>notifyMessage("تمت إضافة القناة!"));
       
     }else if ("PLAYER"){
       if(API_.isWeb){
@@ -180,6 +180,7 @@ class ChannelScreen extends React.Component {
         </View>
       ))
     : null;
+    const pickers = ["IPTV","PLAYER"].map(o=> (backup && backup.admin==true) || o=="PLAYER" ? <Picker.Item label={o} value={o} key={o}/> : null);
     return (
       <ScrollView style={this.state.dynamic_style.container}>
       <View style={this.state.dynamic_style.channel_logo_v}>
@@ -197,8 +198,7 @@ class ChannelScreen extends React.Component {
                 style={{ height: 50, width: 150,backgroundColor:"#2c3e50",color:"#fff" }}
                 onValueChange={(itemValue, itemIndex) => this.setState({actionType:itemValue})}
               >
-                <Picker.Item label="IPTV" value="IPTV" />
-                <Picker.Item label="PLAYER" value="PLAYER" />
+                {pickers}
           </Picker>
 
           {servers_list}

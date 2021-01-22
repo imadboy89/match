@@ -199,7 +199,7 @@ class ItemsList extends React.Component {
     fav_icon = id && id>1 ? <IconButton name={icon}  color={color} /> : null ;
     return fav_icon;
   }
-  setHidden(id,is_new=true){
+  setHidden(id,is_new=false){
     if(this.props.favorite==undefined || this.props.set_fav==undefined){
       return ;
     }
@@ -297,9 +297,12 @@ class ItemsList extends React.Component {
     }
   }
   render_list() {
-    
-    let is_new = JSON.stringify(this.list_origin) != JSON.stringify(this.props.list);
+    /*let is_new = JSON.stringify(this.list_origin) != JSON.stringify(this.props.list);
     is_new = is_new && (this.props.ListHeaderComponent!= this.ListHeaderComponent || this.props.ListFooterComponent!=this.ListFooterComponent);
+    */
+    const list_o = this.list_origin ? JSON.parse(JSON.stringify(this.list_origin)).map(o=>{ delete o["data"];return o}) : [];
+    const list_n = this.props.list ? JSON.parse(JSON.stringify(this.props.list)).map(o=>{ delete o["data"];return o}) : [];
+    let is_new = JSON.stringify(list_o) != JSON.stringify(list_n);
     const is_paginated = this.props.ListHeaderComponent!= this.ListHeaderComponent || this.props.ListFooterComponent!=this.ListFooterComponent ;
 
     this.list_origin = this.props.list;
@@ -310,12 +313,12 @@ class ItemsList extends React.Component {
     if (this.list && this.list[0] && this.list[0]["title"]==undefined){
       this.list=[{"title":"",data:this.list}];
       if(is_new && this.flatListRef){
-        //this.toTop();
+        this.toTop();
       }
     }
     //this.list = this.list[0] ? this.list[0]["data"]: [];
     if(is_new){
-      this.setHidden(false,is_paginated);
+      this.setHidden(false,is_new);
     }
     if(this.list.length>0 && this.list[0]["title"]!=""){
       this.create_refs();
@@ -397,15 +400,18 @@ class ItemsList extends React.Component {
 
   }
   render() {
-    if( this.props.loading==false && (this.check_width(false) || this.state.dynamic_style==false || this.props.list==undefined || this.props.list.length==0)){
+    if( this.props.loading==false && (this.check_width(false) || this.state.dynamic_style==false || this.props.list==undefined)){
       return (<View style={this.state.dynamic_style.container}>
         {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : null}
         <Loader/>
         {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : null}
         </View>);
     }
+    if(this.props.loading==false && this.props.list && this.props.list.length == 0){
+      return null;
+    }
     return (<View style={this.state.dynamic_style.container}>
-      {this.props.loading && (this.props.refreshControl==undefined || API_.isWeb)  ? <Loader/> : this.render_list()}
+      {this.props.loading && (this.props.refreshControl==undefined || API_.isWeb || this.props.list==undefined || this.props.list.length == 0)  ? <Loader/> : this.render_list()}
     </View>);
   }
 }

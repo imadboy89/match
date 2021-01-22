@@ -240,18 +240,18 @@ class Scrap {
     }catch(err){console.log(err,html);return [];}
     const date_str = date ? API_.get_date2(date): false;
     //parse matches_comps
-    const blacklisted_comps = is_oneMatch || API_.filtering ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب",
+    const blacklisted_comps = is_oneMatch || API_.filtering==false ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب",
     " الثاني","تحت ","شمال","الثالث"," A ", " B ", " C "," D ","الدرجة D","الدرجة C","الدرجة B",
     "الدوري النرويجي الدرجة"
   ]
-    const blacklisted_countries = is_oneMatch || API_.filtering ? [] :  ["SA","BH","KW","IQ","PS","ND","AR","BR","CO","JO","SS","VN","ZA","TR","UZ"];
+    const blacklisted_countries = is_oneMatch || API_.filtering==false ? [] :  ["SA","BH","KW","IQ","PS","ND","AR","BR","CO","JO","SS","VN","ZA","TR","UZ"];
     const exceptions = ["افريقيا","مباريات دولية ودية"];
     let compititions = {};
     let compititions_bl = {};
     let compitition = {"country":""};
     
     const comp_header = ["divider","league_id","comp_name","comp_logo","comp_id_news","options"];
-    const MIN_ALLOWED_OPTIONS = is_oneMatch || API_.filtering ? 1 : 3;
+    const MIN_ALLOWED_OPTIONS = is_oneMatch || API_.filtering==false ? 1 : 3;
     let k = 0;
     for(let i=0;i< json_["matches_comps"].length;i++){
       compitition[ comp_header[k] ] = json_["matches_comps"][i];
@@ -481,6 +481,42 @@ class Scrap {
       return final_out;
     } 
     return [];
+  }
+  get_var(html,var_name, is_array=false){
+    const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gi");
+    let m = html.match(patttern);
+    let body = m && m.length>0 ? m[0] : "" ;
+    body = body && body!="" ? body.replace(/\"/g,"") : "";
+    body = body && body!="" ? body.replace(/\'/g,"") : "";
+    body = body && body!="" ? body.replace(/;/g,"") : "";
+    body = body.split(' = ').length>1 ? body.split(' = ')[1].trim() : "Error";
+
+    return this.decodeEntities(body);
+  }
+  get_player(html){
+    let infos = {
+      "player_id":"",
+      "player_sport":"",
+      "player_gender":"",
+      "player_position":"",
+      "player_name_ar":"",
+      "player_nickname_ar":"",
+      "player_photo":"",
+      "player_nationality":"",
+      "player_nationality_flag":"",
+      "player_team_id":"",
+      "player_team_name":"",
+      "player_teamcountry":"",
+      "player_weight":"",
+      "player_height":"",
+      "player_birthdate":"",
+      "player_career":"",
+    }
+    for(let i=0;i<Object.keys(infos).length;i++){
+      const k = Object.keys(infos)[i];
+      infos[k] = this.get_var(html, k);
+    }
+    return infos;
   }
   get_news(html){
     let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
