@@ -51,10 +51,10 @@ class ItemsList extends React.Component {
     //this.setState({numColumns:this.windowWidth/500});
     this.state.numColumns = parseInt(this.windowWidth/this.minWidth);
     this.state.numColumns = this.state.numColumns>=1 ? this.state.numColumns : 1;
-    this.elem_width = parseInt((this.windowWidth-margin2add)/this.state.numColumns);
+    this.elem_width = this.props.fixedWidth ? this.minWidth : parseInt((this.windowWidth-margin2add)/this.state.numColumns);
     if(render && this.props.refresh_list){
       if(this._isMounted){
-        this.props.refresh_list(1)
+        this.props.refresh_list(1);
       }
     }
     return true;
@@ -87,8 +87,17 @@ class ItemsList extends React.Component {
       if(item.away_team_status && item.away_team_status.toLowerCase()=="l"){ 
         away_team_style["color"]=this.state.dynamic_style.team_name_drawer; 
       }
+      if(this.props.favorite_teams && this.props.favorite_teams.includes(item.home_team_id)){
+        home_team_style["textDecorationLine"]='underline'; 
+      }
+      if(this.props.favorite_teams && this.props.favorite_teams.includes(item.away_team_id)){
+        away_team_style["textDecorationLine"]='underline'; 
+      }
       //"#ffffff87"
-      let time_style = JSON.parse(JSON.stringify(this.state.dynamic_style.matche_team_time_live));
+      let time_style={};
+      try {
+        time_style = JSON.parse(JSON.stringify(this.state.dynamic_style.matche_team_time_live));
+      } catch (error) {}
       if(item.time_played=="Pen"){
         time_style["color"]="#ff5252";
       }else if(item.is_done){
@@ -99,6 +108,7 @@ class ItemsList extends React.Component {
       //console.log(this.props.notifications_matches[item.id]);
       let style_extra = this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
       style_extra = item.live==1 ? this.state.dynamic_style.matche_container_live: style_extra;
+      console.log(item);
       return (
         <View style={[this.state.dynamic_style.matche_container,style_extra,shadow_style]}>
           <View style={this.state.dynamic_style.matche_team_time}>
@@ -200,7 +210,7 @@ class ItemsList extends React.Component {
     return fav_icon;
   }
   setHidden(id,is_new=false){
-    if(this.props.favorite==undefined || this.props.set_fav==undefined){
+    if(this.props.favorite==undefined || this.props.set_fav==undefined || this.props.disableHide==true ){
       return ;
     }
     if(this.windowHeight>=1000 || this.windowWidth>=1000){
@@ -250,7 +260,11 @@ class ItemsList extends React.Component {
         underlayColor={"green"}
         activeOpacity={0.9}
         onPress={()=>{
-          const id_ = API_.common_league_id({title,id,is_koora});
+          let id_=0;
+          try {
+            id_ = API_.common_league_id({title,id,is_koora});
+          } catch (error) {}
+          if (id_==0 || this.props.refresh_list == undefined) return;
           if(this.state.header_to_hide.includes(id_)){
             this.state.header_to_hide=this.state.header_to_hide.filter(x=>{if(x!=id_)return x});
           }else{

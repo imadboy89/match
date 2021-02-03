@@ -304,7 +304,7 @@ async get_favs(data){
   if(data && data.length > 0 && data[0].id==1){
     data = data.filter(o=>o.id && o.id!=1);
   }
-  this.favorite_teams = await API_.getConfig("favorite_teams_k",[]) ;
+  this.state.favorite_teams = await API_.getConfig("favorite_teams_k",[]) ;
   this.state.favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
   let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
   ////////////////////////////////  Black listed matches 
@@ -316,7 +316,7 @@ async get_favs(data){
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
       if(this.state.notifications_matches && this.state.notifications_matches[matche_f.id]!=undefined){
         is_league_has_fav = true;
-      }else if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
+      }else if(this.state.favorite_teams.includes(home_team_id) || this.state.favorite_teams.includes(away_team_id)){
         is_league_has_fav = true;
       }
     }
@@ -338,7 +338,7 @@ async get_favs(data){
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
       if(this.state.notifications_matches && this.state.notifications_matches[matche_f.id]!=undefined){
         fav_list.data.push(matche_f);
-      }else if(this.favorite_teams.includes(home_team_id) || this.favorite_teams.includes(away_team_id)){
+      }else if(this.state.favorite_teams.includes(home_team_id) || this.state.favorite_teams.includes(away_team_id)){
         fav_list.data.push(matche_f);
       }
     }
@@ -476,6 +476,7 @@ show_DateP(){
         <ItemsList 
           ListHeaderComponent = {ListHeaderComponent}
           favorite={this.state.favorite}
+          favorite_teams={this.state.favorite_teams}
           set_fav={this.set_fav}
           refresh_list={this.refresh_list}
           refreshControl={<RefreshControl progressViewOffset={200} refreshing={this.state.loading} onRefresh={()=>{this.state.page=1 ;this.get_matches()}} />}

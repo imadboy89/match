@@ -3,6 +3,7 @@ import {  View, Dimensions, Modal, Button, Linking, ScrollView, Picker , ImageBa
 import {styles_settings,getTheme, themes_list} from "../components/Themes";
 import Credentials from "../components/Credentials";
 import AppLogHistory from "../components/AppLogHistory";
+import MatchesNotifs from "../components/MatchesNotifs";
 import Users from "../components/Users";
 import * as Updates from 'expo-updates';
 class SettingsScreen extends React.Component {
@@ -23,6 +24,7 @@ class SettingsScreen extends React.Component {
         window_height : parseInt(Dimensions.get('window').height),
         window_width : parseInt(Dimensions.get('window').width),
         modalVisible_users:false,
+        modalVisible_matchesNotif:false,
         is_debug:API_.is_debug,
         filtering:API_.filtering,
         
@@ -88,6 +90,15 @@ class SettingsScreen extends React.Component {
       closeModal={()=>{
         this.setState({modalVisible_history:false})}}
       ></AppLogHistory>);
+  }
+  render_modal_matchesNotifs(){
+    return (<MatchesNotifs
+      navigation={this.props.navigation}
+      modal_visible={this.state.modalVisible_matchesNotif}
+      dynamic_style={this.state.dynamic_style}
+      closeModal={()=>{
+        this.setState({modalVisible_matchesNotif:false})}}
+      ></MatchesNotifs>);
   }
   render_modal_login(){
     return ( 
@@ -238,9 +249,18 @@ class SettingsScreen extends React.Component {
               <Button title="logHistory" onPress={()=>this.setState({modalVisible_history:true})}></Button>
             </View>
           </View>
-          
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>matches notif </Text> 
+            <View style={this.state.dynamic_style.settings_row_input}>
+              <Button title="logHistory" onPress={()=>this.setState({modalVisible_matchesNotif:true})}></Button>
+            </View>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
+          <Text style={this.state.dynamic_style.settings_row_label}> </Text> 
+          </View>
           {this.render_modal_history()}
           {this.render_modal_login()}
+          { this.state.modalVisible_matchesNotif==true ? this.render_modal_matchesNotifs() : null}
           { backup.admin!=true ? null : this.render_modal_users()}
         </ScrollView >
     );

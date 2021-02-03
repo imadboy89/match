@@ -42,6 +42,12 @@ class API {
     this.getConfig("is_debug",false).then(o=>this.is_debug=o);
     this.getConfig("filtering",false).then(o=>this.filtering=o);
     this.days = ['الاحد', 'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+    this.player_positions={
+      1:"حارس",
+      2:"دفاع",
+      3:"وسط",
+      4:"هجوم"};
   }
   _isBigScreen(){
     return Dimensions.get('window').width>900 || Dimensions.get('window').height>900

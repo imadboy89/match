@@ -355,6 +355,9 @@ function generateTheme(theme_name=false){
       lineHeight:25,
       textAlign:"right",
     },
+    matche_team_name_text_fav:{
+      textDecorationLine: 'underline',
+    },
     matche_team_score:{
       flex: 2 ,
       backgroundColor: theme.match_score_backgroundColor,
@@ -916,6 +919,7 @@ function generateTheme(theme_name=false){
       textAlign:"center"
       //textAlign:"right"
     },
+
     match_results_team_scor_t:{
       fontSize: 35,
       //fontWeight: 'bold',
@@ -1167,6 +1171,7 @@ function generateTheme(theme_name=false){
       //paddingTop: Constants.statusBarHeight,
       backgroundColor: theme.background_color_default,
       color : "#fff",
+      paddingBottom:10,
     },
     settings_row:{
       flexDirection:'row', 
@@ -1361,7 +1366,21 @@ function generateTheme(theme_name=false){
       textAlign:"center",
       width:20,
     },
-
+    text_info: {
+      color : theme.text_color_default,
+      fontSize: 18,
+      lineHeight:26,
+      marginHorizontal:5,
+      flex:1
+    },
+    text_carrier: {
+      lineHeight:22,
+      color : theme.text_color_default,
+      fontSize: 14,
+      marginHorizontal:10,
+      flex:1,
+      borderTopWidth:1,
+    },
     title: {
       fontSize: 20,
       fontWeight: 'bold',
