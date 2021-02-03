@@ -252,7 +252,7 @@ class SettingsScreen extends React.Component {
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>matches notif </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
-              <Button title="logHistory" onPress={()=>this.setState({modalVisible_matchesNotif:true})}></Button>
+              <Button title="List" onPress={()=>this.setState({modalVisible_matchesNotif:true})}></Button>
             </View>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
