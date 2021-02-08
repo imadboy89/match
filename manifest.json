@@ -3,20 +3,20 @@
   "description": "real time macthes events, live streaming and more...",
   "display": "standalone",
   "lang": "en",
-  "name": "koooora",
-  "short_name": "koooora",
+  "name": "AlMatch",
+  "short_name": "AlMatch",
   "start_url": "/match",
   "crossorigin": "no-referrer",
   "orientation": "portrait",
   "related_applications": [
     {
       "platform": "itunes",
-      "id": "com.imados.koooora"
+      "id": "com.imados.AlMatch"
     },
     {
       "platform": "play",
-      "url": "http://play.google.com/store/apps/details?id=com.imados.koooora",
-      "id": "com.imados.koooora"
+      "url": "http://play.google.com/store/apps/details?id=com.imados.AlMatch",
+      "id": "com.imados.AlMatch"
     }
   ],
   "prefer_related_applications": true,
