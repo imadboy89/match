@@ -4,7 +4,7 @@
   "display": "standalone",
   "lang": "en",
   "name": "AlMatch",
-  "scope": "/match",
+  "scope": "/",
   "short_name": "AlMatch",
   "start_url": "/match",
   "crossorigin": "no-referrer",
