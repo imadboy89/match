@@ -11,12 +11,12 @@
   "related_applications": [
     {
       "platform": "itunes",
-      "id": "com.imados.AlMatch"
+      "id": "com.imados.almatch"
     },
     {
       "platform": "play",
-      "url": "http://play.google.com/store/apps/details?id=com.imados.AlMatch",
-      "id": "com.imados.AlMatch"
+      "url": "http://play.google.com/store/apps/details?id=com.imados.almatch",
+      "id": "com.imados.almatch"
     }
   ],
   "prefer_related_applications": true,
