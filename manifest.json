@@ -6,7 +6,7 @@
   "name": "AlMatch",
   "scope": "/",
   "short_name": "AlMatch",
-  "start_url": "/match",
+  "start_url": "/",
   "crossorigin": "no-referrer",
   "orientation": "portrait",
   "related_applications": [
