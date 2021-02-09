@@ -25,10 +25,17 @@ class ArticleScreen extends React.Component {
   }
   get_article(){
     this.state.article.date = API_.get_date2(new Date(this.state.article.date.replace("#","") * 1000));
-    API_.get_article(this.props.route.params.article.link)
+    API_.get_article(this.props.route.params.article.link, this.state.article.source)
     .then(body =>{
-      this.state.article.body = body;
+      if(body.constructor == Object){
+        this.state.article.body = body["body"];  
+        this.state.article.date = body["date"];  
+        this.state.article.img = body["img"]; 
+      }else{
+        this.state.article.body = body;
+      }
       this.setState({loading:false});
+      API_.setTitleWeb(this.state.article.title_news);
     });
   }
   render() {

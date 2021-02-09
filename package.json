@@ -4,6 +4,7 @@
   "scripts": {
     "deploy": "gh-pages -d web-build",
     "predeploy": "expo build:web",
+    "depl": "gh-pages -d web-build",
     "publish": "expo publish",
     "start_wp": "webpack-dev-server -d --config ./web/webpack.config.js --inline --hot --colors",
     "start": "expo start:web",

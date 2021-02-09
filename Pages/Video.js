@@ -16,12 +16,10 @@ class VideoScreen extends React.Component {
         loading:true,
         video:this.props.route.params.item,
         dynamic_style:styles_article,
+        videoQuality:"380",
         
     };
-      const didBlurSubscription = this.props.navigation.addListener(
-        'didFocus',
-        payload => {}
-      );
+
     this.get_video();
 
   }
@@ -37,7 +35,10 @@ class VideoScreen extends React.Component {
   get_video(){
     if(this.state.loading==false){this.setState({loading:true});}
     if(this.state.video.is_yt && this.state.video.videoId){
-      setTimeout(()=>{this.setState({loading:false});},500);
+      setTimeout(()=>{
+        this.setState({loading:false});
+        API_.setTitleWeb(this.state.video.title_news);
+      },500);
       return true;
     }
     let short_title = this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : this.state.video.title_news;
@@ -53,7 +54,7 @@ class VideoScreen extends React.Component {
         url = videoId;
       }
       this.state.video.videoId = videoId;
-      setTimeout(()=>{this.setState({loading:false});},500);
+      setTimeout(()=>{this.setState({loading:false});API_.setTitleWeb(this.state.video.title_news);},500);
       this.props.navigation.setOptions({
         "headerRight":()=>(
                 <IconButton 
@@ -68,8 +69,8 @@ class VideoScreen extends React.Component {
   }
   render_wv(){
     if(this.state.video.videoId==false){return null}
-    const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality=380&info=0&logo=0&autoplay=false';
-    const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq=380&color='+global_theme.text_color_default;
+    const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality='+this.state.videoQuality+'&info=0&logo=0&autoplay=false';
+    const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq='+this.state.videoQuality+'&color='+global_theme.text_color_default;
     const uri_direct = this.state.video.videoId.slice(0,4)=="http" ? this.state.video.videoId : "";
     let uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
     uri_ = this.state.video.source_id==3 ? uri_direct :  uri_;
@@ -111,7 +112,20 @@ class VideoScreen extends React.Component {
           </View>
           <Text style={this.state.dynamic_style.article_body_t}>{this.state.video&&this.state.video.desc?this.state.video.desc :""}</Text>
           {this.state.video &&this.state.video.videoId ? null : <Loader/> }
-      
+          <Picker
+            selectedValue={this.state.videoQuality}
+            style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+            onValueChange={(itemValue, itemIndex)=>{
+              this.setState({videoQuality : itemValue});
+            }}
+          >
+            <Picker.Item label={"144"} value={"144p"} key={"144"} />
+            <Picker.Item label={"240"} value={"240p"} key={"240"} />
+            <Picker.Item label={"360"} value={"360p"} key={"360"} />
+            <Picker.Item label={"480"} value={"480p"} key={"480"} />
+            <Picker.Item label={"720"} value={"hd720&hd=1"} key={"720"} />
+            <Picker.Item label={"1080"} value={"hd1080&hd=1"} key={"1080"} />
+        </Picker>
         </ScrollView >
     );
   }

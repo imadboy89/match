@@ -52,6 +52,12 @@ class API {
   _isBigScreen(){
     return Dimensions.get('window').width>900 || Dimensions.get('window').height>900
   }
+  setTitleWeb(title){
+    if(API_.isWeb && document && document.title){
+      document.title = title ;
+    }
+  }
+
   common_league_id(league){
     if(typeof league == "string"){
       const league_id = this.leagueId_byTitle(league);
@@ -87,13 +93,22 @@ class API {
     title= typeof title == "string" ? title.replace(/آ/g,"ا") : title;
     return title && title.split ? title.split("-")[0].trim() : title;
   }
-  get_news(page){
+  get_news(page, source_id=1){
+    const news_links = {
+      1:"https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,
+      2:"https://www.hesport.com/mountakhab/index."+page+".html",
+      3:"https://www.hesport.com/professionnels/index."+page+".html",
+      4:"https://www.hesport.com/botola/index."+page+".html",
+      5:"https://www.hesport.com/mondial/index."+page+".html",
+      
+      }
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
-    return this.http("https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,"GET",null,{})
+    const url = news_links[source_id] ? news_links[source_id] : news_links[1];
+    return this.http(url,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_news(resp);
+      return source_id==1?scrap.get_news(resp) : scrap.get_news_hp(resp);
     });
   }
   get_player(player_id){
@@ -153,13 +168,16 @@ class API {
       return scrap.get_video(resp,source_id);
     });
   }
-  get_article(link){
-    return this.http("https://m.kooora.com/?"+link+"&arabic","GET",null,{})
+  get_article(link,source_id=1){
+    //https://www.hesport.com/akhbar/122520.html
+    const url = source_id==1 ? "https://m.kooora.com/?"+link+"&arabic" : "https://www.hesport.com/"+link;
+    return this.http(url,"GET",null,{})
     .then(html=>{
       try{
         let scrap = new Scrap();
         scrap.isWeb = this.isWeb;
-        return scrap.get_article(html);
+        const article  = source_id==1 ? scrap.get_article(html) : scrap.get_article_hp(html);
+        return article;
       }catch(err){console.log(err);}
 
     });

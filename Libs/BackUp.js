@@ -341,13 +341,17 @@ class BackUp{
         results = await this.client.callFunction("pushNotification",args);
         this.last_notification_time = new Date() .getTime();
         let pushednotifto=0;
+        let error = "";
         if(results && results["data"] && results["data"].length>0){
           for (let i = 0; i < results["data"].length; i++) {
             pushednotifto += results["data"][i]["status"] && results["data"][i]["status"]=="ok" ? 1 : 0 ;
+            error = results["data"][i]["status"] && results["data"][i]["status"]=="error" ? results["data"][i]["message"] : "" ;
           }
         }
         if(pushednotifto>0){
           API_.showMsg("تم إرسال الإخطار بنجاح إلى "+pushednotifto+" مستخدمين.","success");
+        }else if (error!=""){
+          API_.showMsg(error,"danger");
         }
         return pushednotifto;
       } catch (error) {

@@ -41,6 +41,7 @@ class Matchcreen extends React.Component {
     const home_name = this.state.match_dets && this.state.match_dets.home_team_ar ? this.state.match_dets.home_team_ar : this.state.match_dets.home_team;
     const away_name = this.state.match_dets && this.state.match_dets.away_team_ar ? this.state.match_dets.away_team_ar : this.state.match_dets.away_team;
     this.props.navigation.setOptions({title: <Text >{home_name +" - "+ away_name}</Text>});
+    
   }
   get_Match(id){
       if(this.state.match_dets.details){
@@ -51,6 +52,7 @@ class Matchcreen extends React.Component {
           this.setState({matche_details:resp["data"][0],loading:false});
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
+          API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
         }
       });
   }
@@ -61,6 +63,8 @@ class Matchcreen extends React.Component {
           this.setState({matche_details: resp,loading:false});
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
+
+          API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
         }
       });
   }

@@ -108,7 +108,7 @@ class ItemsList extends React.Component {
       //console.log(this.props.notifications_matches[item.id]);
       let style_extra = this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
       style_extra = item.live==1 ? this.state.dynamic_style.matche_container_live: style_extra;
-      console.log(item);
+      
       return (
         <View style={[this.state.dynamic_style.matche_container,style_extra,shadow_style]}>
           <View style={this.state.dynamic_style.matche_team_time}>
@@ -421,9 +421,11 @@ class ItemsList extends React.Component {
         {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : null}
         </View>);
     }
+    /*
+    this cause to not show date+source header component for matches pages
     if(this.props.loading==false && this.props.list && this.props.list.length == 0){
       return null;
-    }
+    }*/
     return (<View style={this.state.dynamic_style.container}>
       {this.props.loading && (this.props.refreshControl==undefined || API_.isWeb || this.props.list==undefined || this.props.list.length == 0)  ? <Loader/> : this.render_list()}
     </View>);

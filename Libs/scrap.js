@@ -581,6 +581,34 @@ class Scrap {
     }
     return lineups;
   }
+  get_news_hp(html){
+    if(html==""){return []}
+    let doc = new DomParser().parseFromString(html,'text/html');
+    let items = doc.querySelect('.articles .article');
+    let articles = [];
+    for(let i=0;i<items.length;i++){
+      let article = {"link":"","title_news":"","img":"","date":""};
+      const item = items[i];
+      article["link"] = item.querySelect("a")[0].getAttribute("href")+"";
+      article["title_news"] = item.querySelect("img")[0].getAttribute("alt")+"";
+      article["img"] = item.querySelect("img")[0].getAttribute("src")+"";
+      article["desc"] = item.querySelect("p")[0].childNodes+"";
+      articles.push(article);
+    }
+    return articles;
+  }
+  get_article_hp(html){
+    if(html==""){return []}
+    
+    let doc = new DomParser().parseFromString(html,'text/html');
+    let body = doc.getElementsByClassName('article_body')[0];
+    let article = {"body":"","date":""};
+    article["body"] = body.querySelect("p").map(p=>p.childNodes+"\n").join("");
+    article["date"] = body.getElementsByClassName("story_date");
+    article["date"] = article["date"] && article["date"][0] ? article["date"][0].childNodes+"" : "";
+    article["img"] = body.querySelect("img")[0].getAttribute("src")+""
+    return article;
+  }
   get_videos_m(html){
     if(html==""){return []}
     let doc = new DomParser().parseFromString(html,'text/html');

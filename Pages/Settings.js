@@ -29,7 +29,7 @@ class SettingsScreen extends React.Component {
         filtering:API_.filtering,
         
     };
-    this.apk_url = "https://exp-shell-app-assets.s3.us-west-1.amazonaws.com/android/%40imadboss/koooora-d599e60f46e046c4a62e4ed327dd3641-signed.apk";
+    this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
   }
   async load_favs(){
     const fav_l = await API_.getConfig("favorite_leagues",[]);
@@ -38,11 +38,11 @@ class SettingsScreen extends React.Component {
     const fav_c = await API_.getConfig("favorite_channels",[]);
     const fav_p = await API_.getConfig("favorite_players",[]);
     this.setState({
-        fav_leagues_nbr  : fav_l.length ? fav_l.length : 0,
-        fav_teams_nbr    : fav_t.length ? fav_t.length : 0,
+        fav_leagues_nbr  : fav_l.length  ? fav_l.length : 0,
+        fav_teams_nbr    : fav_t.length  ? fav_t.length : 0,
         fav_teams_k_nbr  : fav_tk.length ? fav_tk.length : 0,
-        fav_channels_nbr : fav_c.length ? fav_c.length : 0,
-        fav_players_nbr  : fav_p.length ? fav_p.length : 0,
+        fav_channels_nbr : fav_c.length  ? fav_c.length : 0,
+        fav_players_nbr  : fav_p.length  ? fav_p.length : 0,
         is_debug         : API_.is_debug,
         filtering        : API_.filtering,
       });

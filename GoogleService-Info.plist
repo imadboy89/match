@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>886245579369-12scb1j0f88l4t4dn8u1bjuuuh6sgmht.apps.googleusercontent.com</string>
+	<string>90095132620-9q86qbctcnbrqvqh6desavv88gv53q6i.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.886245579369-12scb1j0f88l4t4dn8u1bjuuuh6sgmht</string>
+	<string>com.googleusercontent.apps.90095132620-9q86qbctcnbrqvqh6desavv88gv53q6i</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCXxqEnFHAtHNTw_Hl_KRiHWiNZEnKE7dc</string>
+	<string>AIzaSyAnCCIULg58Uyn-fIj7Qf-wbR7M8SFu1UM</string>
 	<key>GCM_SENDER_ID</key>
-	<string>886245579369</string>
+	<string>90095132620</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.imados.koooora</string>
+	<string>com.imados.almatch</string>
 	<key>PROJECT_ID</key>
-	<string>koora-f8b51</string>
+	<string>almatch-8bdbf</string>
 	<key>STORAGE_BUCKET</key>
-	<string>koora-f8b51.appspot.com</string>
+	<string>almatch-8bdbf.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:886245579369:ios:846b4ded1a96e353e160f8</string>
+	<string>1:90095132620:ios:3519029ffc2bb90e944769</string>
 </dict>
 </plist>

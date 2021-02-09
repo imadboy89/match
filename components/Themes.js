@@ -1109,8 +1109,8 @@ function generateTheme(theme_name=false){
     },
     box_inside:{
       //top:-50,
-      zIndex: 99999, // works on ios
-      elevation: 99999, // works on android    
+      zIndex: 1000, // works on ios
+      elevation: 1000, // works on android    
       width:"100%",
       flex:1,
       backgroundColor:  theme.activeBackgroundColor,

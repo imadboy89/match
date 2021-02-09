@@ -33,7 +33,7 @@ class VideosScreen extends React.Component {
   }
   changesource = (itemValue, itemIndex)=>{
     this.state.source_id = parseInt(itemValue);
-    this.setState({page:1});
+    this.state.page=1;
     this.get_Videos();
   }
 

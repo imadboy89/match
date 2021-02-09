@@ -32,12 +32,17 @@ import ToastMsg from "./components/ToastMsg";
 
 Text = TextF;
 global. API_ = new API();
+global. API_.appname = "AlMatch"
 global. Global_theme_name = "dark violet";
 global.reloading_app = false;
 var _app_styles = app_styles;
 global.backup = new backUp();
 global.backup.executingQueued();
 global.api_type=0;
+
+if(API_.isWeb){
+  global. Global_theme_name = window.matchMedia  && window.matchMedia('(prefers-color-scheme: dark)').matches===true?"dark violet" :"light" ;
+}
 
 global. LoadedFonts = false;
 function _loadFontsAsync() {
@@ -267,8 +272,8 @@ class APP extends React.Component {
     }
     return (
       <NavigationContainer>
-        <MyTabs showTMsg={this.showTMsg}/>
         <ToastMsg body={this.state.body} speed={this.state.speed} delay={this.state.delay} type={this.state.type} debug={this.state.debug}/>
+        <MyTabs showTMsg={this.showTMsg}/>
       </NavigationContainer>
     );
   }

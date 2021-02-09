@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "886245579369",
-    "project_id": "koora-f8b51",
-    "storage_bucket": "koora-f8b51.appspot.com"
+    "project_number": "90095132620",
+    "project_id": "almatch-8bdbf",
+    "storage_bucket": "almatch-8bdbf.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:886245579369:android:d146b29b49177792e160f8",
+        "mobilesdk_app_id": "1:90095132620:android:49cea514b0ef9dde944769",
         "android_client_info": {
-          "package_name": "com.imados.koooora"
+          "package_name": "com.imados.almatch"
         }
       },
       "oauth_client": [
         {
-          "client_id": "886245579369-u29cc7p2gqcoqmaodmvots8ord5g4es4.apps.googleusercontent.com",
+          "client_id": "90095132620-ig3ulcdd9ejo8se3ar8bm0pojms8iteu.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBTrpdn-uqKuaL8KcTlicb39AG3Mvn6XKc"
+          "current_key": "AIzaSyA_TEEOOhar2RbnPX6d3iGfih7E2jvFQMw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "886245579369-u29cc7p2gqcoqmaodmvots8ord5g4es4.apps.googleusercontent.com",
+              "client_id": "90095132620-ig3ulcdd9ejo8se3ar8bm0pojms8iteu.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

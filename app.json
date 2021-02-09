@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "koooora",
-    "slug": "koooora",
+    "name": "AlMatch",
+    "slug": "AlMatch",
     "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,12 +18,12 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.imados.koooora",
+      "bundleIdentifier": "com.imados.almatch",
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist"      
     },
     "android": {
-      "package": "com.imados.koooora",
+      "package": "com.imados.almatch",
       "googleServicesFile": "./google-services.json",
       "useNextNotificationsApi": true,
       "adaptiveIcon": {
@@ -36,18 +36,21 @@
       "icon": "./assets/icon.png",
       "backgroundColor": "#000",
       "lang": "en",
-      "startUrl": "/match",
+      "startUrl": "/",
+      "homepage":"/match/",
       "crossorigin": "no-referrer",
+      "preferRelatedApplications":false,
+      "scope":"/",
+      "dir":"/",
       "config":{
         "firebase":{
-          "apiKey": "AIzaSyDorDacYslEUtZW03Uwhwd0iPT4a7PqIB8",
-          "authDomain": "koora-f8b51.firebaseapp.com",
-          "projectId": "koora-f8b51",
-          "storageBucket": "koora-f8b51.appspot.com",
-          "messagingSenderId": "886245579369",
-          "appId": "1:886245579369:web:886803aa935af9c3e160f8",
-          "measurementId": "G-9LCB0N0CH8"
-      
+          "apiKey": "AIzaSyCeFIS-SVWZtguMdcvJ9FcLqaoihd69BKM",
+          "authDomain": "almatch-8bdbf.firebaseapp.com",
+          "projectId": "almatch-8bdbf",
+          "storageBucket": "almatch-8bdbf.appspot.com",
+          "messagingSenderId": "90095132620",
+          "appId": "1:90095132620:web:acf75479c5ef1432944769",
+          "measurementId": "G-E3VRCMJEJQ"
         }
       }
     },
