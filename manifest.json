@@ -19,7 +19,7 @@
       "id": "com.imados.almatch"
     }
   ],
-  "prefer_related_applications": true,
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "\\match\\pwa\\chrome-icon\\chrome-icon-144.png",
