@@ -34,4 +34,4 @@ workbox.routing.registerNavigationRoute("\\match\\index.html", {
   blacklist: [/^\/_/,/\/[^/]+\.[^/]+$/],
 });
 
-workbox.routing.registerRoute(/^https?.*/, workbox.strategies.networkFirst({ "cacheName":"offlineCache", plugins: [new workbox.expiration.Plugin({"maxEntries":200,"purgeOnQuotaError":false})] }), 'GET');
+workbox.routing.registerRoute(/^https?.*/, workbox.strategies.StaleWhileRevalidate({ "cacheName":"offlineCache", plugins: [new workbox.expiration.Plugin({"maxEntries":200,"purgeOnQuotaError":false})] }), 'GET');
