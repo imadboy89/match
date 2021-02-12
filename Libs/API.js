@@ -86,12 +86,37 @@ class API {
     title = this.fix_title(title);
     return  this.leagues_dict[title] ? this.domain_o+this.leagues_dict[title].logo : logo ;
   }
-  fix_title(title){
+  fix_title(title,change_G=false){
+    const replacemnt = {
+      "بايرن ميونيخ"
+      :
+      "بايرن ميونخ",
+      "ليون"
+      :"أولمبيك ليون",
+      "مارسيليا"
+      :"أولمبيك مارسيليا",
+      "سانت إيتيان"
+      :"سانت اتيان",
+      "مولودية وجدة"
+      :"المولودية الوجدية",
+
+      "لايبزيج"
+      :"ار بي ليبزيج",
+      "ستاد بريست 29"
+      :"ستاد بريست",
+      
+    }
+    if(change_G){
+      title= typeof title == "string" ? title.replace(/ج/g,"غ") : title;
+    }
+    title= typeof title == "string" && replacemnt[title] ? replacemnt[title] : title;
     title= typeof title == "string" ? title.trim() : title;
     title= typeof title == "string" ? title.replace(/أ/g,"ا") : title;
     title= typeof title == "string" ? title.replace(/إ/g,"ا") : title;
     title= typeof title == "string" ? title.replace(/آ/g,"ا") : title;
-    return title && title.split ? title.split("-")[0].trim() : title;
+    title=  title && title.split ? title.split("-")[0].trim() : title;
+
+    return title;
   }
   get_news(page, source_id=1){
     const news_links = {
@@ -126,7 +151,10 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      let scorers = scrap.get_scorers(resp);
+      let scorers = [];
+      try {
+        scorers = scrap.get_scorers(resp);
+      } catch (error) {}
 
       return API_.getTeam_logo().then(teams=>{
         return scorers.map(s => {
@@ -147,7 +175,11 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_videos(resp);
+      let videos = [];
+      try {
+        videos = scrap.get_videos(resp);
+      } catch (error) {}
+      return videos;
     });
   }
   get_videos_m(page,q=""){
@@ -157,7 +189,11 @@ class API {
       
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_videos_m(resp);
+      let videos = [];
+      try {
+        videos = scrap.get_videos_m(resp);
+      } catch (error) {}
+      return videos;
     });
   }
   get_video(link,source_id){
@@ -165,7 +201,11 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_video(resp,source_id);
+      let video = {};
+      try {
+        video = scrap.get_video(resp,source_id);
+      } catch (error) {}
+      return video;
     });
   }
   get_article(link,source_id=1){
@@ -176,7 +216,10 @@ class API {
       try{
         let scrap = new Scrap();
         scrap.isWeb = this.isWeb;
-        const article  = source_id==1 ? scrap.get_article(html) : scrap.get_article_hp(html);
+        let article  = {};
+        try {
+          article  = source_id==1 ? scrap.get_article(html) : scrap.get_article_hp(html);
+        } catch (error) {}
         return article;
       }catch(err){console.log(err);}
 
@@ -204,7 +247,7 @@ class API {
   async set_token(){
     if(this.headers["device-token"]==""){
       let out = await this.getConfig("token");
-      if(out!=false){
+      if(out!=null && out!=false){
         this.token=out;
         this.headers["device-token"]=this.token;
         return true;
@@ -215,6 +258,7 @@ class API {
     const url = this.domain+"device_app";
     this.token_post["token"] = this.token;
     //alert(JSON.stringify(url,this.token_post) + JSON.stringify(this.headers)); 
+    await this.sleep(500);
     return fetch(url, {
       method: "POST",
       headers: this.headers,
@@ -361,9 +405,12 @@ class API {
   is_ascii(text){
     return /^[\x00-\x7F]*$/.test(text) ? true : false ;
   }
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }  
   async load_leagues(refresh_leagues=false){
     if(this.headers["device-token"]==""){
-      return this.set_token().then(()=> { return this.load_leagues(refresh_leagues)});
+      return await this.set_token().then(()=> { return this.load_leagues(refresh_leagues)});
     }
     const exp_t = 3*24*60*60*1000;
 
@@ -387,8 +434,8 @@ class API {
       this.channels_dict = channels;
       return this.leagues_dict;
     }
-    this.load_channels();
-    this.get_leagues(1)
+    
+    await this.get_leagues(1)
       .then(o=>{
         if( Object.keys( this.leagues_dict ).length >0){
           this.save_leagues((new Date()).getTime());
@@ -398,6 +445,8 @@ class API {
           return this.leagues_dict;
         }
         });
+    await this.sleep(1000);
+    this.load_channels();
     return false;
   }
   async save_leagues(date=false){
@@ -448,7 +497,10 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      let matches = scrap.get_matches_k(resp,date_obj,false, is_only_live);
+      let matches = [];
+      try {
+        matches = scrap.get_matches_k(resp,date_obj,false, is_only_live);
+      } catch (e) {}
       return matches;//this.set_logos(matches);
     });
   }
@@ -458,7 +510,11 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_matches_k(resp);
+      let matches = [];
+      try {
+        matches = scrap.get_matches_k(resp);
+      } catch (e) {}
+      return matches
     });
   }
   get_match_k(id){
@@ -467,7 +523,11 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_matche_k(resp,false,true);
+      let matches = [];
+      try {
+        matches = scrap.get_matche_k(resp,false,true);
+      } catch (e) {}
+      return matches
     });
   }
   get_lineup_k(id){
@@ -476,7 +536,11 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_lineup(resp);
+      let lineup = [];
+      try {
+        lineup = scrap.get_lineup(resp);
+      } catch (e) {}
+      return lineup
     });
   }
   get_standing_k(id){
@@ -484,19 +548,24 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_standing(resp);
+      let standing = [];
+      try {
+        standing = scrap.get_standing(resp);
+      } catch (e) {}
+      return standing
     });
   }
   async set_logos(matches){
     const teams = await API_.getTeam_logo();
-
     for(let i=0;i<matches.length;i++){
       for(let j=0;j<matches[i]["data"].length;j++){
         if(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]){
-          matches[i]["data"][j]["home_team_badge"] = teams[this.fix_title(matches[i]["data"][j]["home_team"])];
-          matches[i]["data"][j]["away_team_badge"] = teams[this.fix_title(matches[i]["data"][j]["away_team"])];
-          matches[i]["data"][j]["home_team_badge"] = matches[i]["data"][j]["home_team_badge"] && matches[i]["data"][j]["home_team_badge"]["logo_url"] ? matches[i]["data"][j]["home_team_badge"]["logo_url"] : "";
-          matches[i]["data"][j]["away_team_badge"] = matches[i]["data"][j]["away_team_badge"] && matches[i]["data"][j]["away_team_badge"]["logo_url"] ? matches[i]["data"][j]["away_team_badge"]["logo_url"] : "";
+          let h_team = teams[this.fix_title(matches[i]["data"][j]["home_team"])];
+          h_team = h_team  ? h_team : teams[this.fix_title(matches[i]["data"][j]["home_team"], true)];
+          let a_team = teams[this.fix_title(matches[i]["data"][j]["away_team"])];
+          a_team = a_team  ? a_team : teams[this.fix_title(matches[i]["data"][j]["away_team"], true)];
+          matches[i]["data"][j]["home_team_badge"] = h_team && h_team["logo_url"] ? h_team["logo_url"] : "";
+          matches[i]["data"][j]["away_team_badge"] = a_team && a_team["logo_url"] ? a_team["logo_url"] : "";
         }
       }
     }
@@ -609,6 +678,7 @@ class API {
         return resJson;
       })
       .catch(error => {
+        API_.showMsg(error,"danger");
         console.log('ERROR', error);
         this.error = error;
       });
@@ -660,15 +730,15 @@ class API {
             API_.channels_dict[ch_n] = ch_ob ;
             API_.channels_dict[ch_n].id = API_.channels_dict[ch_n].channel_id;
             API_.channels_dict[ch_n].channel_photo = channel.channel_photo;
-            
-
           }
           await AsyncStorage.setItem('channels',JSON.stringify(API_.channels_dict) );
+          await this.sleep(300);
         }
       }else{
         break;
       }
     }
+    console.log("load_channels [Done]");
     return true;
   }
   get_categories(page=1){
@@ -861,7 +931,7 @@ class API {
   };
   getTeam_logo = async (team_name=undefined) => {
     if(team_name!=undefined && this.is_ascii(team_name)==true){ return true;}
-    team_name = team_name!=undefined ? this.fix_title(team_name) : team_name;
+    team_name = this.fix_title(team_name);
     
     let teams_info = await AsyncStorage.getItem('teams_info');
     if(teams_info){
@@ -869,10 +939,10 @@ class API {
     }else{
         teams_info = {} ;
     }
-    if(team_name!=undefined){
-      return teams_info[team_name.trim()]==undefined ? false: teams_info[team_name.trim()];
+    if(team_name==undefined){
+      return teams_info;
     }
-    return teams_info;
+    return teams_info[team_name.trim()]==undefined ? false: teams_info[team_name.trim()];
   };
   setTeams =async (teams)=>{
     await AsyncStorage.setItem('teams_info', JSON.stringify(teams));

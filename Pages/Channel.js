@@ -16,9 +16,7 @@ class HLSP extends React.Component {
     }
     this.playerRef = React.createRef();
   }
-  componentDidMount(){  
-    
-  }
+
   render_ReactHlsPlayer(){
     if (this.props.player_type == 1){
       return ( <ReactHlsPlayer
@@ -95,13 +93,11 @@ class ChannelScreen extends React.Component {
         
     };
     this.playerRef = React.createRef();
-
-    this.get_channel();
-
   }
   componentDidMount(){
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style_modals:theme}) );
+    this.get_channel();
   }
   get_channel(){
       this.channel_photo = this.props.route.params.channel_photo;
@@ -109,7 +105,7 @@ class ChannelScreen extends React.Component {
         if(resp && resp["data"] && resp["data"]["en_name"] ){
           this.setState({channel:resp["data"],loading:false});
         }
-      });
+      }).catch(err=>API_.showMsg(err,"danger"));
   }
 
   render_modal_HLSP(){
@@ -123,37 +119,11 @@ class ChannelScreen extends React.Component {
       />
         );
 }
-  onchannel_clicked_hls =(item)=>{
-    alert("onchannel_clicked_hsl");
-    API_.get_channel(item.channel_id).then(resp=>{
-      if(resp["data"]["name"] != undefined){
-        let list = [];
-        let data = resp["data"];
-        this.channel_servers = data["channel_servers"];
-        let url =this.channel_servers[0].SecureUrl;
-        this.setState({modalVisible_match:true,url:url,player_type:1});
-
-      }
-    });
-  }
-  onchannel_clicked_vid =(item)=>{
-    alert("onchannel_clicked_vid");
-    API_.get_channel(item.channel_id).then(resp=>{
-      if(resp["data"]["name"] != undefined){
-        let list = [];
-        let data = resp["data"];
-        this.channel_servers = data["channel_servers"];
-        let url =this.channel_servers[0].SecureUrl;
-        this.setState({modalVisible_match:true,url:url,player_type:2});
-
-      }
-    });
-  }
 
   onch_clicked(serv){
     let url = serv.SecureUrl;
-    let name = this.state.channel["name"];
-    let img = API_.domain_o+this.channel_photo;
+    //let name = this.state.channel["name"];
+    //let img = API_.domain_o+this.channel_photo;
     if (this.state.actionType=="IPTV"){
       API_.saveLink(serv.SecureUrl,this.state.channel["name"],API_.domain_o+this.channel_photo).then(out=>notifyMessage("تمت إضافة القناة!"));
       
@@ -173,7 +143,7 @@ class ChannelScreen extends React.Component {
   }
   render() {
     
-    let servers_list = this.state.channel ?
+    let servers_list = this.state.channel && this.state.channel.channel_servers && this.state.channel.channel_servers.map ?
       this.state.channel.channel_servers.map(serv => (
         <View style={{margin:8}} key={serv.id}>
           <Button onPress={()=>this.onch_clicked(serv)} title={serv.name} style={{margin:5}}></Button>

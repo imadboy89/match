@@ -216,6 +216,7 @@ class HomeScreen extends React.Component {
     }
     
     this.props.navigation.setOptions({
+        title:"المباريات",
         "headerLeft":headerLeft,
         "headerRight":()=>(
           <View style={{flexDirection:"row",margin:5}}>
@@ -350,12 +351,12 @@ async get_favs(data){
 get_matches_koora = async(date_obj=null)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
   this.state.notifications_matches = await get_notifications_matches();
-  await API_.load_leagues(this.refresh_leagues);
+  API_.load_leagues(this.refresh_leagues);
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
   let resp = await API_.get_matches_k(date_obj,this.state.is_only_live);
-  resp = await API_.set_logos(resp);
   let data = resp && resp.length>0 ? resp : [];
   data = await this.get_favs(data);
+  data = await API_.set_logos(data);
   if(this._isMounted){
     this.setState({list:data,loading:false});
   }
@@ -450,14 +451,14 @@ show_DateP(){
       activeOpacity={0.5}
       onPress={()=>this.setState({show_datPicker:true})}
       >
-      <Text style={[this.state.dynamic_style.title,]} >{API_.get_date2(this.state.matches_date)+" - "+dayname}</Text>
+      <Text style={[this.state.dynamic_style.date_text,]} >{API_.get_date2(this.state.matches_date)+" - "+dayname}</Text>
     </TouchableOpacity>
     <IconButton 
       disabled={this.state.loading}
       name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.nextPage()}  />
     <Picker
         selectedValue={this.state.source_id}
-        style={{ height:"90%",flex:1,backgroundColor:"#000",color:"#fff" }}
+        style={{ height:"90%",width:80,backgroundColor:"#000",color:"#fff" }}
         onValueChange={this.changesource}
       >
         <Picker.Item label="AL match" value={0} />

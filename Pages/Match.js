@@ -4,7 +4,7 @@ import Loading from '../components/Loader';
 import {styles_match,getTheme,global_theme} from "../components/Themes";
 import IconButton from "../components/IconButton";
 import Player from "../components/Player";
-
+import Icon from 'react-native-vector-icons/FontAwesome';
 let list = [
 
           ];
@@ -472,7 +472,8 @@ class Matchcreen extends React.Component {
           </View>
 
           <View style={[this.state.dynamic_style.match_results_team_name_r,home_style]}>
-          <Image style={{height:100,width:"95%",resizeMode:"contain"}} source={{uri: this.state.match_dets.home_team_badge}} ></Image>
+            <Icon  name={"home"}  size={28}  color={global_theme.list_header_backgroundColor} style={{position:"absolute",right:5}} />
+            <Image style={{height:100,width:"95%",resizeMode:"contain"}} source={{uri: this.state.match_dets.home_team_badge}} ></Image>
             <View styles={[this.state.dynamic_style.match_results_team_name_r,{flex:1}]}>
               <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{home_name}</Text>
               <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{home_sc}</Text>

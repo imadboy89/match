@@ -136,7 +136,7 @@ export class ToastMsg extends React.Component {
     }else{
       this.state.body   = this.props.body ? this.props.body : "";
     }
-    this.state.body = this.state.body.charAt(0).toUpperCase() + this.state.body.slice(1);
+    this.state.body = this.state.body && this.state.body.charAt ? this.state.body.charAt(0).toUpperCase() + this.state.body.slice(1) : "";
     this.state.delay  = this.props.delay ? this.props.delay : this.delay;
     this.state.height = this.props.height ? this.props.height : this.height;
     this.state.speed  = this.props.speed ? this.props.speed : this.speed;

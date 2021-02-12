@@ -33,6 +33,7 @@ class LeagueScreen extends React.Component {
         favorite_p:[],
         modalVisible_player:false,
         player:false,
+        matches_only_fav:false,
     };
     this.league_name = this.props.route.params.league_details.league;
     this.league_img   = this.props.route.params.league_details.league_img;
@@ -100,6 +101,12 @@ class LeagueScreen extends React.Component {
             } catch (error) {
               
             }
+            if(
+              this.state.matches_only_fav==true && 
+              !this.state.favorite.includes(resp["data"][k][i].home_team_id) && 
+              !this.state.favorite.includes(resp["data"][k][i].away_team_id)  ){
+              continue;
+            }
             date_str = resp["data"][k][i].date;
             if( maches[date_str] == undefined){
               maches[date_str] = {title: date_str + " - " + dayname, data: [ resp["data"][k][i],] };
@@ -124,10 +131,14 @@ class LeagueScreen extends React.Component {
     get_notifications_matches().then(_notifications_matches=>{
       API_.get_matches_league_k(this.real_id).then(resp=>{
         let data = resp && resp.length>0 ? resp : [];
-        let header = JSON.parse(JSON.stringify(data[0])) ;
+        let header = {};
+        try {
+          header = JSON.parse(JSON.stringify(data[0])) ;
+        } catch (error) {}
         header["data"] = [];
         data["data"];
         try{
+          //let _data = data[0]["data"].map
           data = data[0]["data"].map(row =>{
             const date_str = row.date;
             let dayname = "";
@@ -135,6 +146,12 @@ class LeagueScreen extends React.Component {
               dayname = API_.days[API_.convert_time_o(date_str+" 00:00").getDay()]
             } catch (error) {
               
+            }
+            if(
+              this.state.matches_only_fav==true && 
+              !this.state.favorite.includes(row.home_team_id) && 
+              !this.state.favorite.includes(row.away_team_id)  ){
+                return;
             }
             if(matches[date_str] == undefined){
               matches[date_str] = JSON.parse(JSON.stringify(header));
@@ -160,6 +177,7 @@ class LeagueScreen extends React.Component {
   }
   render_matches(){
     return <ItemsList 
+          favorite_teams={this.state.favorite}
           loading={this.state.loading} list={this.state.matches} 
           onclick={this.onMatch_clicked}
           onLongPress={this._onMatch_LongPressed}
@@ -326,6 +344,10 @@ class LeagueScreen extends React.Component {
             this.setState({visible_tab:"scorers"});}}/></View>
           {/*<View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"}) }/></View> */}
           <View style={{flex:1}}><Button title="Matches" onPress={()=>{
+            if(this.state.visible_tab == "matches"){
+              this.state.matches_only_fav = !this.state.matches_only_fav;
+              this.state.matches = undefined;
+            }
             if(this.state.matches == undefined){
               this.setState({loading : true, matches:[]});
               this.get_matches();

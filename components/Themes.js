@@ -245,9 +245,9 @@ function generateTheme(theme_name=false){
       //paddingRight: __isMobile ? 10 : 20
     },
     item: {
-      padding: 10,
+      padding: 2,
       fontSize: 18,
-      height: 44,
+      //height: 50,
       flex:1,
       color:theme.text_color_default,
     },
@@ -261,6 +261,7 @@ function generateTheme(theme_name=false){
       borderTopRightRadius:20,
       borderBottomLeftRadius:5,
       borderBottomRightRadius:5,
+      textAlign:"left"
     },
     header: {
       borderTopLeftRadius:20,
@@ -537,6 +538,13 @@ function generateTheme(theme_name=false){
       marginRight:10,
       justifyContent: 'center',
       alignItems: 'center'
+    },
+    date_text: {
+      fontSize: 15,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      color : theme.home_title_color,
+      //fontFamily : "cairoregular",
     },
     title: {
       fontSize: 20,
