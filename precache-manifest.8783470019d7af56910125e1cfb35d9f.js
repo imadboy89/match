@@ -1,7 +1,7 @@
 self.__precacheManifest = [
   {
-    "revision": "dd1390ab96d693ed8526",
-    "url": "/match/static/js/app.3e08ab0d.chunk.js"
+    "revision": "e958cf0041e5b592b6ae",
+    "url": "/match/static/js/app.fc4dde63.chunk.js"
   },
   {
     "revision": "f8bcc2919955976d4024",
@@ -32,7 +32,7 @@ self.__precacheManifest = [
     "url": "/match/./fonts/Ionicons.ttf"
   },
   {
-    "revision": "e07be0987e775fd230f1bd5d9271f020",
+    "revision": "dccb02d40f91264816a48d9c1cf3be32",
     "url": "/match/index.html"
   },
   {
