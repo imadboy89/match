@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Modal, Button, Linking, Picker, TouchableOpacity,Image, ImageBackground, ScrollView, Dimensions} from 'react-native';
+import { View, TouchableHighlight, Modal, Button, Linking, Picker, TouchableOpacity,Image, ImageBackground, ScrollView, Dimensions} from 'react-native';
 import Loading from '../components/Loader';
 import {styles_match,getTheme,global_theme} from "../components/Themes";
 import IconButton from "../components/IconButton";
@@ -29,6 +29,7 @@ class Matchcreen extends React.Component {
         favorite_p:[],
         modalVisible_player:false,
         player:false,
+        favorite_t:[],
 
     };
     this.get_Match(this.props.route.params.match_item.id);
@@ -38,6 +39,8 @@ class Matchcreen extends React.Component {
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
     API_.getConfig("favorite_channels",this.state.favorite).then(o=>{this.setState({favorite:o});});
     API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{this.setState({favorite_p:o});});
+    API_.getConfig("favorite_teams_k",this.state.favorite_t).then(o=>{this.setState({favorite_t:o});});
+    
     
     this.home_name = this.state.match_dets && this.state.match_dets.home_team_ar ? this.state.match_dets.home_team_ar : this.state.match_dets.home_team;
     this.away_name = this.state.match_dets && this.state.match_dets.away_team_ar ? this.state.match_dets.away_team_ar : this.state.match_dets.away_team;
@@ -149,9 +152,9 @@ class Matchcreen extends React.Component {
         const ch_style = ch.is_koora==undefined ? {backgroundColor: global_theme.fav_background} : {};
         return (
         <View style={[{margin:1,flex:1},ch_style]} key={key_ch}>
-            <TouchableOpacity style={[{flexDirection:'row', flexWrap:'wrap',width:"100%",marginLeft:10},]} onPress={()=>this.onmt_clicked(ch)}>
+            <TouchableOpacity style={[{flexDirection:'row', flexWrap:'wrap',width:"100%",marginLeft:10,justifyContent:"center"},]} onPress={()=>this.onmt_clicked(ch)}>
               {this.get_fav_icon(ch)}
-              <Text style={[{flex:1,backgroundColor:global_theme.background_color_default,color:global_theme.text_color_default},ch_style]} >{ch.en_name}{commentator!=""?" - "+commentator:""}</Text>
+              <Text style={[{flex:1,backgroundColor:global_theme.background_color_default,color:global_theme.text_color_default,paddingVertical:4},ch_style]} >{ch.en_name}{commentator!=""?" - "+commentator:""}</Text>
             </TouchableOpacity>
         </View>
       )})
@@ -170,11 +173,11 @@ class Matchcreen extends React.Component {
     const fav_style={};
     const team_badge_h= this.state.matche_details && this.state.matche_details.home_team_logo ? this.state.matche_details.home_team_logo : false;
     const team_badge_a= this.state.matche_details && this.state.matche_details.away_team_logo ? this.state.matche_details.away_team_logo : false;
-    const style_team_name ={flexDirection:'row',flexWrap:'wrap',width:"100%",height:50,borderColor:global_theme.text_color_default,borderBottomWidth :1,borderRadius:40,};
+    const style_team_name ={flexDirection:'row',flexWrap:'wrap',width:"100%",height:50,borderColor:global_theme.text_color_default,borderBottomWidth :1,borderRadius:40,justifyContent:"center"};
     return (
       <View style={this.state.dynamic_style.view_tab}>
         <Text style={this.state.dynamic_style.text_info}>{this.state.matche_details.date} { API_.convert_time(this.state.matche_details.time)} </Text>
-        {this.state.matche_details && this.home_name!="-" ?
+        {1==2 && this.state.matche_details && this.home_name!="-" ?
           <TouchableOpacity 
             activeOpacity={0.7}
             style={[fav_style, style_team_name]} 
@@ -190,7 +193,7 @@ class Matchcreen extends React.Component {
           <View style={{flex:1}}></View>
         </TouchableOpacity>
          : null}
-        {this.state.matche_details && this.away_name!="-" ?
+        {1==2 &&  this.state.matche_details && this.away_name!="-" ?
           <TouchableOpacity 
           activeOpacity={0.7}
           style={[fav_style, style_team_name]} 
@@ -497,6 +500,9 @@ class Matchcreen extends React.Component {
           <Text style={this.state.dynamic_style.matche_team_score_text_penalties} noFonts={true}>{this.state.match_dets.away_team_score_penalties ? this.state.match_dets.away_team_score_penalties : "-"}</Text>
         </View>
       }
+      const fav_style_h = this.state.favorite_t.includes(this.state.matche_details.home_team_id ) ? {backgroundColor: global_theme.fav_background} : {};
+      const fav_style_a = this.state.favorite_t.includes(this.state.matche_details.away_team_id ) ? {backgroundColor: global_theme.fav_background} : {};
+      console.log(this.state.matche_details,this.state.favorite_t);
     return (
       <ScrollView style={this.state.dynamic_style.container}>
         <TouchableOpacity 
@@ -507,7 +513,14 @@ class Matchcreen extends React.Component {
           <View style={[away_style]}>
             <Image style={{height:100,width:"95%",justifyContent: "center",resizeMode:"contain"}} source={{uri: this.state.match_dets.away_team_badge}} ></Image>
             <View styles={{flex:1,}}>
-              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{this.away_name}</Text>
+              <TouchableHighlight 
+                activeOpacity={0.4}
+                style={[this.state.dynamic_style.match_results_team_name,fav_style_a]} 
+                onPress={() => { if (this.state.matche_details.away_team_id)this.setState({modalVisible_team:true,team_id:this.state.matche_details.away_team_id}) } }
+                delayLongPress={300}
+              ><Text style={this.state.dynamic_style.match_results_team_name} numberOfLines={1}> {this.away_name}</Text>
+            </TouchableHighlight>
+
               <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{away_sc}</Text>
               { this.state.match_dets.home_team_score_penalties==undefined ? null :
                 <Text style={this.state.dynamic_style.match_results_team_scor_penalties_t} noFonts={true}>{this.state.match_dets.away_team_score_penalties ? this.state.match_dets.away_team_score_penalties : "-"}</Text>
@@ -524,7 +537,13 @@ class Matchcreen extends React.Component {
             <Icon  name={"home"}  size={28}  color={global_theme.list_header_backgroundColor} style={{position:"absolute",right:5}} />
             <Image style={{height:100,width:"95%",resizeMode:"contain"}} source={{uri: this.state.match_dets.home_team_badge}} ></Image>
             <View styles={[this.state.dynamic_style.match_results_team_name_r,{flex:1}]}>
-              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{this.home_name}</Text>
+              <TouchableHighlight 
+                activeOpacity={0.4}
+                style={[this.state.dynamic_style.match_results_team_name,fav_style_h]} 
+                onPress={() => { if (this.state.matche_details.home_team_id)this.setState({modalVisible_team:true,team_id:this.state.matche_details.home_team_id}) } }
+                delayLongPress={300}
+              ><Text style={this.state.dynamic_style.match_results_team_name} numberOfLines={1}> {this.home_name}</Text>
+            </TouchableHighlight>
               <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{home_sc}</Text>
               { this.state.match_dets.home_team_score_penalties==undefined ? null : 
                 <Text style={this.state.dynamic_style.match_results_team_scor_penalties_t} noFonts={true}>{this.state.match_dets.home_team_score_penalties ? this.state.match_dets.home_team_score_penalties : "-"}</Text>

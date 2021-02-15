@@ -20,7 +20,7 @@ class IconButton extends React.Component {
                 disabled={this.props.disabled ? this.props.disabled : false}
                 activeOpacity={this.props.activeOpacity ? this.props.activeOpacity : 0.5}
                 onPress={this.props.onPress}
-                style={[{paddingHorizontal:5,paddingVertical:10,justifyContent:"center"}]}
+                style={[{paddingHorizontal:5,paddingVertical:5,justifyContent:"center"}]}
                 >
                 <Icon 
                     name={this.props.name!=undefined?this.props.name:"rocket"} 
