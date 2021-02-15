@@ -39,8 +39,10 @@ class VideosScreen extends React.Component {
 
   refresh_list=()=>{
     const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
-    this.setState({list:[]}); 
-    this.setState({list:tmp_list});
+    if(this._isMounted){
+      this.setState({list:[]}); 
+      this.setState({list:tmp_list});
+    }
   }
 get_Videos_m(){
   if(this.state.source_id==3){

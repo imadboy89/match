@@ -142,15 +142,15 @@ class ChannelScreen extends React.Component {
     }
   }
   render() {
-    
     let servers_list = this.state.channel && this.state.channel.channel_servers && this.state.channel.channel_servers.map ?
-      this.state.channel.channel_servers.map(serv => (
+      this.state.channel.channel_servers.map(serv => serv && serv.name ? (
         <View style={{margin:8}} key={serv.id}>
           <Button onPress={()=>this.onch_clicked(serv)} title={serv.name} style={{margin:5}}></Button>
         </View>
-      ))
+      ):null)
     : null;
-    const pickers = ["IPTV","PLAYER"].map(o=> (backup && backup.admin==true) || o=="PLAYER" ? <Picker.Item label={o} value={o} key={o}/> : null);
+    let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER"] : ["PLAYER",];
+    const pickers = picker_options.map(o=><Picker.Item label={o} value={o} key={o}/>);
     return (
       <ScrollView style={this.state.dynamic_style.container}>
       <View style={this.state.dynamic_style.channel_logo_v}>

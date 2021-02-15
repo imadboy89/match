@@ -5,6 +5,7 @@ import {styles_match,getTheme,global_theme} from "../components/Themes";
 import IconButton from "../components/IconButton";
 import Player from "../components/Player";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Team from "../components/Team";
 let list = [
 
           ];
@@ -38,9 +39,9 @@ class Matchcreen extends React.Component {
     API_.getConfig("favorite_channels",this.state.favorite).then(o=>{this.setState({favorite:o});});
     API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{this.setState({favorite_p:o});});
     
-    const home_name = this.state.match_dets && this.state.match_dets.home_team_ar ? this.state.match_dets.home_team_ar : this.state.match_dets.home_team;
-    const away_name = this.state.match_dets && this.state.match_dets.away_team_ar ? this.state.match_dets.away_team_ar : this.state.match_dets.away_team;
-    this.props.navigation.setOptions({title: <Text >{home_name +" - "+ away_name}</Text>});
+    this.home_name = this.state.match_dets && this.state.match_dets.home_team_ar ? this.state.match_dets.home_team_ar : this.state.match_dets.home_team;
+    this.away_name = this.state.match_dets && this.state.match_dets.away_team_ar ? this.state.match_dets.away_team_ar : this.state.match_dets.away_team;
+    this.props.navigation.setOptions({title: <Text >{this.home_name +" - "+ this.away_name}</Text>});
     
   }
   get_Match(id){
@@ -56,6 +57,20 @@ class Matchcreen extends React.Component {
         }
       });
   }
+  load_logos(){
+    if(this.state.matche_details.home_team_logo && this.state.matche_details.away_team_logo)return true;
+    if(this.home_team_ar){
+      API_.getTeam_logo(this.home_team_ar).then(lo=>{
+        this.state.matche_details.home_team_logo = lo && lo.logo_url ? lo.logo_url : false;
+        if(this.away_team_ar){
+          API_.getTeam_logo(this.away_team_ar).then(lo=>{
+            this.state.matche_details.away_team_logo = lo && lo.logo_url ? lo.logo_url : false;
+            this.setState({});
+          });
+        }
+      });
+    }
+  }
   get_Match_k(id){
       API_.get_match_k(id).then(resp=>{
         //console.log("get_Match_k ",Object.values(resp)[0]["data"][0]);
@@ -65,6 +80,7 @@ class Matchcreen extends React.Component {
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
 
           API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
+          this.load_logos();
         }
       });
   }
@@ -149,10 +165,47 @@ class Matchcreen extends React.Component {
     this.state.matche_details.round        = this.state.matche_details.round ? this.state.matche_details.round : "-";
     this.state.matche_details.retour_score = this.state.matche_details.retour_score ? this.state.matche_details.retour_score : "-";
     this.state.matche_details.stadium      = this.state.matche_details.stadium ? this.state.matche_details.stadium : "-";
-    
+    //const fav_style_h = this.state.matche_details && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
+    //const fav_style_a = this.state.matche_details && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
+    const fav_style={};
+    const team_badge_h= this.state.matche_details && this.state.matche_details.home_team_logo ? this.state.matche_details.home_team_logo : false;
+    const team_badge_a= this.state.matche_details && this.state.matche_details.away_team_logo ? this.state.matche_details.away_team_logo : false;
+    const style_team_name ={flexDirection:'row',flexWrap:'wrap',width:"100%",height:50,borderColor:global_theme.text_color_default,borderBottomWidth :1,borderRadius:40,};
     return (
       <View style={this.state.dynamic_style.view_tab}>
         <Text style={this.state.dynamic_style.text_info}>{this.state.matche_details.date} { API_.convert_time(this.state.matche_details.time)} </Text>
+        {this.state.matche_details && this.home_name!="-" ?
+          <TouchableOpacity 
+            activeOpacity={0.7}
+            style={[fav_style, style_team_name]} 
+            onPress={() => { if (this.state.matche_details.home_team_id)this.setState({modalVisible_team:true,team_id:this.state.matche_details.home_team_id}) } }
+            delayLongPress={300}
+            >
+          <View style={{flex:1}}></View>
+          <View style={{flex:5}}><Text style={this.state.dynamic_style.text_info}>HomeTeam :</Text></View>
+          <View style={{flex:2,padding:2}} >
+            {team_badge_h ? <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge_h}} /> : null}
+          </View>
+          <View style={{flex:7}}><Text style={this.state.dynamic_style.text_info} numberOfLines={1}> {this.home_name}</Text></View>
+          <View style={{flex:1}}></View>
+        </TouchableOpacity>
+         : null}
+        {this.state.matche_details && this.away_name!="-" ?
+          <TouchableOpacity 
+          activeOpacity={0.7}
+          style={[fav_style, style_team_name]} 
+          onPress={() => { if (this.state.matche_details.away_team_id)this.setState({modalVisible_team:true,team_id:this.state.matche_details.away_team_id}) } }
+          delayLongPress={300}
+          >
+        <View style={{flex:1}}></View>
+        <View style={{flex:5}}><Text style={this.state.dynamic_style.text_info}>AwayTeam :</Text></View>
+        <View style={{flex:2,padding:2}} >
+          {team_badge_a ? <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge_a}} /> : null}
+        </View>
+        <View style={{flex:7}}><Text style={this.state.dynamic_style.text_info} numberOfLines={1}> {this.away_name}</Text></View>
+        <View style={{flex:1}}></View>
+      </TouchableOpacity>
+         : null}
         {this.state.matche_details.status!="-" ?
           <Text style={this.state.dynamic_style.text_info}>Status : {this.state.matche_details.status}</Text>
          : null}
@@ -200,13 +253,13 @@ class Matchcreen extends React.Component {
       if(el.time==""){
         continue;
       }
-      subs.push({lineup_player:pp[1].trim(), player_out:pp[0].trim(),time:el.time ,lineup_number:el.time ? el.time.split("+")[0]+'"':""});
+      subs.push({player_key:el.player_key,lineup_player:pp[1].trim(), player_out:pp[0].trim(),time:el.time ,lineup_number:el.time ? el.time.split("+")[0]+'"':""});
     }
     subs = subs.sort((a,b)=>{return a.time<b.time?-1:1;});
     return subs;
   }
-  get_player_info=(player)=>{
-    this.setState({modalVisible_player:true,player_id:player.player_key});
+  get_player_info=(player_id)=>{
+    this.setState({modalVisible_player:true,player_id:player_id});
   }
   get_View_lineup_2(){
 
@@ -265,7 +318,7 @@ class Matchcreen extends React.Component {
               delayLongPress={300}
               activeOpacity={0.7}
               onLongPress={()=>this.set_fav_p(away_p.lineup_player)}
-              onPress={()=>this.get_player_info(away_p)}
+              onPress={()=>this.get_player_info(away_p.player_key)}
               style={[this.state.dynamic_style.lineup2_lr_container ]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_l, away_pl_tyle]} numberOfLines={1}>
                 {away_p && away_p.lineup_player? scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
@@ -276,7 +329,7 @@ class Matchcreen extends React.Component {
               delayLongPress={300}
               activeOpacity={0.7}
               onLongPress={()=>this.set_fav_p(home_p.lineup_player)}
-              onPress={()=>this.get_player_info(home_p)}
+              onPress={()=>this.get_player_info(home_p.player_key)}
               style={[this.state.dynamic_style.lineup2_lr_container]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_r,home_pl_tyle]} numberOfLines={1}>
                 {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
@@ -413,8 +466,6 @@ class Matchcreen extends React.Component {
     
     let home_sc="";
     let away_sc="";
-    let home_name="h";
-    let away_name="a";
     let home_style=this.state.dynamic_style.match_results_drawer;
     let away_style =this.state.dynamic_style.match_results_drawer;
     let scores_home = this.get_scores("home");
@@ -436,8 +487,6 @@ class Matchcreen extends React.Component {
       }else if( (this.state.match_dets.away_team_status==undefined && home_sc>away_sc) || (this.state.match_dets.away_team_status && this.state.match_dets.away_team_status=="l") ){
         away_style = this.state.dynamic_style.match_results_loser;
       }
-      home_name = this.state.match_dets.home_team_ar ? this.state.match_dets.home_team_ar : this.state.match_dets.home_team;
-      away_name = this.state.match_dets.away_team_ar ? this.state.match_dets.away_team_ar : this.state.match_dets.away_team;
     }catch(e){
       return <View style={this.state.dynamic_style.container}><Text>ERR</Text></View>;
       }
@@ -458,7 +507,7 @@ class Matchcreen extends React.Component {
           <View style={[away_style]}>
             <Image style={{height:100,width:"95%",justifyContent: "center",resizeMode:"contain"}} source={{uri: this.state.match_dets.away_team_badge}} ></Image>
             <View styles={{flex:1,}}>
-              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{away_name}</Text>
+              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{this.away_name}</Text>
               <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{away_sc}</Text>
               { this.state.match_dets.home_team_score_penalties==undefined ? null :
                 <Text style={this.state.dynamic_style.match_results_team_scor_penalties_t} noFonts={true}>{this.state.match_dets.away_team_score_penalties ? this.state.match_dets.away_team_score_penalties : "-"}</Text>
@@ -475,7 +524,7 @@ class Matchcreen extends React.Component {
             <Icon  name={"home"}  size={28}  color={global_theme.list_header_backgroundColor} style={{position:"absolute",right:5}} />
             <Image style={{height:100,width:"95%",resizeMode:"contain"}} source={{uri: this.state.match_dets.home_team_badge}} ></Image>
             <View styles={[this.state.dynamic_style.match_results_team_name_r,{flex:1}]}>
-              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{home_name}</Text>
+              <Text style={[this.state.dynamic_style.match_results_team_name,]} numberOfLines={1}>{this.home_name}</Text>
               <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{home_sc}</Text>
               { this.state.match_dets.home_team_score_penalties==undefined ? null : 
                 <Text style={this.state.dynamic_style.match_results_team_scor_penalties_t} noFonts={true}>{this.state.match_dets.home_team_score_penalties ? this.state.match_dets.home_team_score_penalties : "-"}</Text>
@@ -529,6 +578,17 @@ class Matchcreen extends React.Component {
           closeModal={()=>{
           this.setState({modalVisible_player:false})}}></Player>
 
+          : null }
+        { this.state.modalVisible_team==true ?
+        <Team       
+          modal_visible={this.state.modalVisible_team}
+          team_id = {this.state.team_id}
+          get_player_info={this.get_player_info}
+          set_fav_p={this.set_fav_p}
+          favorite_p={this.state.favorite_p}
+          league_name={this.league_name}
+          league_id={this.real_id}
+          closeModal={()=>{this.setState({modalVisible_team:false});this.load_logos();}}></Team>
           : null }
       </ScrollView>
     );

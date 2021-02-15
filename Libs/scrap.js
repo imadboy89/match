@@ -165,9 +165,9 @@ class Scrap {
     let standing =[];
     if(json_ && json_["ranks_table"] && JSON.stringify(json_["ranks_table"])==JSON.stringify([-1]) ){
       notifyMessage("empty");
-      return lineups;
+      return standing;
     }
-    const lineup_header = [
+    const standing_header_ = [
       "table_r",
       "info_1",
       "position",
@@ -183,13 +183,35 @@ class Scrap {
       "points",
       "i",
       "last_matches_res"
-]
+    ];
+    const standing_header_cc = [
+      "table_r",
+      "info_1",
+      "position",
+      "team",
+      "c_code",
+      "played",
+      "info_2",//"wins",
+      "draws",
+      "loses",
+      "rest",
+      "goals_scored",
+      "goals_received",
+      "goals_difference",
+      "points",
+      "i",
+      "last_matches_res"
+    ];
     let h =0;
     let team_st = {};
     let group_name=false;
     json_["ranks_table"] = json_["ranks_table"] ? json_["ranks_table"] : [];
+    let standing_header = standing_header_;
     try{
       for(let i=0;i< json_["ranks_table"].length;i++){
+        if(standing.length==0 && h==4 && json_["ranks_table"][i].includes("~") ){
+          standing_header = standing_header_cc;
+        }
         if(h==0 && json_["ranks_table"][i-1]=="g"){
           group_name = json_["ranks_table"][i];
           continue;
@@ -197,9 +219,9 @@ class Scrap {
         if(h==0 && json_["ranks_table"][i]!="r"){
           continue;
         }
-        team_st [ lineup_header[h] ] = json_["ranks_table"][i];
+        team_st [ standing_header[h] ] = json_["ranks_table"][i];
         h++;
-        if(h==lineup_header.length){
+        if(h==standing_header.length){
           //team_st["subs_in_time"] = team_st["subs_in_time"]+""
           const team = team_st["team"].split("~");
           team_st["played"] = team_st["played"].includes("~") ? team_st["info_2"] : team_st["played"];
@@ -486,12 +508,31 @@ class Scrap {
     const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gi");
     let m = html.match(patttern);
     let body = m && m.length>0 ? m[0] : "" ;
+    body = this.decodeEntities(body)
     body = body && body!="" ? body.replace(/\"/g,"") : "";
     body = body && body!="" ? body.replace(/\'/g,"") : "";
     body = body && body!="" ? body.replace(/;/g,"") : "";
     body = body.split(' = ').length>1 ? body.split(' = ')[1].trim() : "Error";
 
-    return this.decodeEntities(body);
+    return body;
+  }
+  get_var_array(html,var_name){
+    //let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
+    //const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gmi");
+    const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\r\\n([^;\\r\\n]*\\r\\n)*","gmi");
+
+    let m = html.match(patttern);
+    if(m){
+      let out = "[["+m[0].trim().replace("var "+var_name+" = new Array (","").replace(/(,\r\n)?\s*\-1,0\);/mi,"").replace(/,$/i,'').replace(/	/g,'').replace(/,\r\n/gi,"],[") + "]]";
+      let out_list = []; 
+      try{
+        out = JSON.parse(out);
+        out = out ? out : [];
+        return out;
+      }catch (e){console.log(e);}
+      return out_list;
+    } 
+    return [];
   }
   get_player(html){
     let infos = {
@@ -515,6 +556,39 @@ class Scrap {
     for(let i=0;i<Object.keys(infos).length;i++){
       const k = Object.keys(infos)[i];
       infos[k] = this.get_var(html, k);
+      if(k=="player_position"){
+        infos[k] = API_.player_positions[infos[k]];
+      }
+    }
+    return infos;
+  }
+  get_team(html){
+    let infos = {
+      "team_id":"",
+      "team_type":"",
+      "team_name_ar":"",
+      "team_name_en":"",
+      "team_sport":"",
+      "team_class":"",
+      "team_country":"",
+      "team_url":"",
+      "team_flag":"",
+      "team_year_established":"",
+      "team_year_closed":"",
+      "team_team_merged_into":"",
+      "team_logo":"",
+      "team_group_photo":"",
+      "team_dress_home":"",
+      "team_dress_away":"",
+      "team_info":"",
+      "team_info2":"",
+
+      "squad_club":"array",
+      //"squad_club":"array",
+    }
+    for(let i=0;i<Object.keys(infos).length;i++){
+      const k = Object.keys(infos)[i];
+      infos[k] = infos[k]=="array" ? this.get_var_array(html, k) : this.get_var(html, k);
     }
     return infos;
   }
@@ -669,7 +743,6 @@ class Scrap {
   decodeEntities(str) {
     if(str && typeof str === 'string') {
       // strip script/html tags
-      
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&quot;/gi," ' ");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&nbsp;/gi," ");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&[^;]+;/gi,"");

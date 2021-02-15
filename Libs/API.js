@@ -16,6 +16,7 @@ class API {
     this.configs = {};
     this.proxy = 'https://www.oxus.tj/sites/default/private/files/.proxy2.php?url=';
     this.proxy1 = 'https://www.oxus.tj/sites/default/private/files/.proxy.php?url=';
+    this.cc_url = "https://o.kooora.com/f/big/[cc].png";
     this.method = "POST";
     this.usingproxy = Platform.OS == 'web';
     this.isWeb = Platform.OS == 'web';
@@ -44,10 +45,14 @@ class API {
     this.days = ['الاحد', 'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
     this.player_positions={
+      0:"مدرب",
       1:"حارس",
       2:"دفاع",
       3:"وسط",
       4:"هجوم"};
+  }
+  get_cc_img(flag){
+    return this.cc_url.replace("[cc]",flag) ; 
   }
   _isBigScreen(){
     return Dimensions.get('window').width>900 || Dimensions.get('window').height>900
@@ -59,6 +64,7 @@ class API {
   }
 
   common_league_id(league){
+    if(league==undefined)return 0;
     if(typeof league == "string"){
       const league_id = this.leagueId_byTitle(league);
       league = {id:league_id, title:league};
@@ -143,7 +149,16 @@ class API {
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       return scrap.get_player(resp);
-    });
+    }).catch(error=>API_.showMsg(error,"danger"));
+  }
+  get_team(team_id){
+    https://m.kooora.com/?player=33085
+    return this.http("https://m.kooora.com/?team="+team_id+"&arabic","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_team(resp);
+    }).catch(error=>API_.showMsg(error,"danger"));
   }
   get_scorers(league_id){
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
@@ -556,14 +571,13 @@ class API {
     });
   }
   async set_logos(matches){
-    const teams = await API_.getTeam_logo();
+    const teams = await this.getTeam_logo();
     for(let i=0;i<matches.length;i++){
       for(let j=0;j<matches[i]["data"].length;j++){
         if(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]){
-          let h_team = teams[this.fix_title(matches[i]["data"][j]["home_team"])];
-          h_team = h_team  ? h_team : teams[this.fix_title(matches[i]["data"][j]["home_team"], true)];
-          let a_team = teams[this.fix_title(matches[i]["data"][j]["away_team"])];
-          a_team = a_team  ? a_team : teams[this.fix_title(matches[i]["data"][j]["away_team"], true)];
+          const h_team = this.get_team_info(teams, matches[i]["data"][j]["home_team"]);
+          const a_team = this.get_team_info(teams, matches[i]["data"][j]["away_team"]);
+
           matches[i]["data"][j]["home_team_badge"] = h_team && h_team["logo_url"] ? h_team["logo_url"] : "";
           matches[i]["data"][j]["away_team_badge"] = a_team && a_team["logo_url"] ? a_team["logo_url"] : "";
         }
@@ -571,14 +585,24 @@ class API {
     }
     return matches;
   }
-  async set_logos_standing(standing_steams){
-    const teams = await API_.getTeam_logo();
-
+  get_team_info(teams, team_name){
+    let team_inf = teams[this.fix_title(team_name)];
+    team_inf = team_inf  ? team_inf : teams[this.fix_title(team_name, true)];
+    return team_inf ;
+  }
+  async set_logos_standing(standing_steams,second_exec=false){
+    const teams = await this.getTeam_logo();
     for(let i=0;i<standing_steams.length;i++){
+      if(Object.keys(standing_steams[i]).length==1 && second_exec==false){
+        for(let key in standing_steams[i]){
+          standing_steams[i][key] = await this.set_logos_standing(standing_steams[i][key],true);
+        }
+      }
       if(standing_steams[i]["team_name"] == undefined){ continue; }
-      standing_steams[i]["team_badge"] = teams[this.fix_title(standing_steams[i]["team_name"])];
-      standing_steams[i]["team_badge"] = standing_steams[i]["team_badge"] && standing_steams[i]["team_badge"]["logo_url"] ? standing_steams[i]["team_badge"]["logo_url"] : undefined;
+      const team_info = this.get_team_info(teams, standing_steams[i]["team_name"]);
+      standing_steams[i]["team_badge"] = team_info && team_info["logo_url"] ? team_info["logo_url"] : undefined;
     }
+
     return standing_steams;
   }
   async get_logos(){
@@ -588,8 +612,8 @@ class API {
         const item = this.matches[leagues[i]][j] ;
         const h_name = item.home_team_ar ? item.home_team_ar :item.home_team ;
         const a_name = item.away_team_ar ? item.away_team_ar :item.away_team ;
-        await API_.setTeam_logo(h_name,item.home_team_badge,item.league);
-        await API_.setTeam_logo(a_name,item.away_team_badge,item.league);
+        await this.setTeam_logo(h_name,item.home_team_badge,item.league);
+        await this.setTeam_logo(a_name,item.away_team_badge,item.league);
       }
     }
     backup.save_teams();
@@ -919,14 +943,17 @@ class API {
   setTeams_logo = async(teams)=>{
 
   }
-  setTeam_logo = async (team_name, logo_url, league_name, _league_id = undefined) => {
+  setTeam_logo = async (team_name, logo_url, league_name, _league_id = undefined,is_koora=flase,save_db=false) => {
     if(logo_url==undefined || this.is_ascii(team_name)==true){ return true;}
     team_name = team_name!=undefined ? this.fix_title(team_name.trim()) : team_name;
     const league_id = _league_id==undefined ? this.common_league_id(league_name) : _league_id;
     let teams_info = await this.getTeam_logo();
     if(teams_info[team_name] == undefined){
-      teams_info[team_name] = {team_name:team_name, logo_url:logo_url.trim(),league_id:league_id, league_name:league_name};
+      teams_info[team_name] = {team_name:team_name, logo_url:logo_url.trim(),league_id:league_id, league_name:league_name,is_koora:is_koora};
       await AsyncStorage.setItem('teams_info', JSON.stringify(teams_info));
+    }
+    if(save_db == true){
+      await backup.save_teams();
     }
   };
   getTeam_logo = async (team_name=undefined) => {
@@ -942,7 +969,8 @@ class API {
     if(team_name==undefined){
       return teams_info;
     }
-    return teams_info[team_name.trim()]==undefined ? false: teams_info[team_name.trim()];
+    return this.get_team_info(teams_info, team_name);
+    //return teams_info[team_name.trim()]==undefined ? false: teams_info[team_name.trim()];
   };
   setTeams =async (teams)=>{
     await AsyncStorage.setItem('teams_info', JSON.stringify(teams));

@@ -31,6 +31,7 @@ class ItemsList extends React.Component {
     Dimensions.addEventListener("change",this.check_width)
   }
   componentWillUnmount(){
+    alert("componentWillUnmount");
     this._isMounted=false;
     Dimensions.removeEventListener("change",this.check_width)
   }
@@ -388,6 +389,11 @@ class ItemsList extends React.Component {
         header["is_header"] = true;
         //final_list = final_list.concat([header]);
         final_list = final_list.concat(this.list[i] ? this.list[i]["data"]: []);
+      }
+      
+      //to avoid 'FlatList : Invariant Violation: Changing numColumns on the fly is not supported' error
+      if(this.props.loading==false && this.props.list && this.props.list.length == 0){
+        return null;
       }
       return (
         <View style={this.state.dynamic_style.list_container}>

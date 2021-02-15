@@ -119,6 +119,7 @@ class BackUp{
       this.lastActivity = "";
       let app = null;
       await this.login();
+      //if(this.is_auth==false) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
        
     }
     login = async ()=>{
@@ -132,15 +133,18 @@ class BackUp{
         client = await Stitch.initializeDefaultAppClient("ba9al-xpsly");
        }
       try {
-        const credential = new UserPasswordCredential(credents["email"],credents["password"]);
-        await client.auth.logout();
-        this.client = await client.auth.loginWithCredential(credential);
-        //this.registerForPushNotificationsAsync();
+        if(credents && credents.email && credents.password && credents.email!="" && credents.password!=""){
+          const credential = new UserPasswordCredential(credents["email"],credents["password"]);
+          await client.auth.logout();
+          this.client = await client.auth.loginWithCredential(credential);
+          //this.registerForPushNotificationsAsync();
+          API_.set_settings({});
+          await this.setClientInfo(); 
+          if(this.is_auth) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
+          return this.is_auth;
+        }
         this.loadingClient = false;
-        API_.set_settings({});
-        await this.setClientInfo(); 
-        if(this.is_auth) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
-        return this.is_auth;
+        return false;
       } catch (error) {
         API_.showMsg((error.message ? error.message : error)+"","danger");
         this.LS.setCredentials("","");

@@ -87,7 +87,7 @@ class Credentials extends React.Component{
               <View style={this.state.dynamic_style.settings_row_input}>
                 <Button
                     title={"Sign in"}
-                    disabled={this.state.savingCredents}
+                    disabled={this.state.savingCredents || this.state.email=="" || this.state.password=="" }
                     color= "#2ecc71"
                     onPress={()=>{
                       this.saveCredentials();
@@ -109,7 +109,7 @@ class Credentials extends React.Component{
               <View style={this.state.dynamic_style.settings_row_input}>
                 <Button
                     title={"SignUp"}
-                    disabled={this.state.savingCredents}
+                    disabled={this.state.savingCredents || this.state.email=="" || this.state.password=="" }
                     color="#3498db"
                     onPress={()=>{
                         this.signUp();

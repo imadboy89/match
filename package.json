@@ -6,12 +6,14 @@
     "predeploy": "expo build:web",
     "depl": "gh-pages -d web-build",
     "publish": "expo publish",
+    "pubdep": "expo publish && npm run predeploy",
     "start_wp": "webpack-dev-server -d --config ./web/webpack.config.js --inline --hot --colors",
     "start": "expo start:web",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start:web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "doall":"expo publish && npm run predeploy && git add . && git commit -m 'fix bugs and more ..DOALL' && git push origin"
   },
   "dependencies": {
     "@react-native-community/async-storage": "~1.12.0",

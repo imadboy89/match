@@ -40,8 +40,8 @@ class HomeScreen extends React.Component {
       'focus',
       payload => {
         if(this.state.is_auth!=backup.is_auth){
+          this.state.is_auth=backup.is_auth;
           if(backup.is_auth){
-            this.setState({is_auth:backup.is_auth });
             this.refresh_leagues();
           }
         }
@@ -137,7 +137,7 @@ class HomeScreen extends React.Component {
     if(this._isMounted){
       this.setState({list:[],page:1}); 
       this.setState({list:tmp_list});
-    }
+    }else{alert("unmounted")}
   }
   set_fav=(league_id,league_name)=>{
     let msg_action = "";
@@ -236,7 +236,7 @@ class HomeScreen extends React.Component {
               }}  />
               }
               <IconButton 
-                name={ this.state.is_auth ? "user" : "gears"}
+                name={ backup.is_auth ? "user" : "gears"}
                 size={iconsSize} style={this.state.dynamic_style.icons} onPress={()=>{
                 this.props.navigation.navigate('Settings');            
               }}  />
@@ -362,6 +362,9 @@ get_matches_koora = async(date_obj=null)=>{
   }
 }
  onChange = (event, selectedDate) => {
+    if(selectedDate==undefined){
+      this.setState({show_datPicker: false});
+    }
     const currentDate = selectedDate || date;
     this.setState({show_datPicker: Platform.OS === 'ios' ,list:[],matches_date:currentDate,loading:true,is_only_live:false});
     this.get_matches(currentDate);

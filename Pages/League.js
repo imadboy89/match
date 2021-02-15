@@ -8,6 +8,7 @@ import Loading from '../components/Loader';
 import {styles_league,getTheme,global_theme} from "../components/Themes";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 import Player from "../components/Player";
+import Team from "../components/Team";
 
 let list = [
 
@@ -34,6 +35,7 @@ class LeagueScreen extends React.Component {
         modalVisible_player:false,
         player:false,
         matches_only_fav:false,
+        modalVisible_team : false,
     };
     this.league_name = this.props.route.params.league_details.league;
     this.league_img   = this.props.route.params.league_details.league_img;
@@ -43,11 +45,11 @@ class LeagueScreen extends React.Component {
     if(API_.leagues_dict[this.league_name] && API_.leagues_dict[this.league_name].koora_id && api_type == 1){
       this.real_id = API_.leagues_dict[this.league_name].koora_id;
     }
-    this.get_standing(this.league_id);
   }
   componentDidMount(){
     getTheme("styles_league").then(theme=>this.setState({dynamic_style:theme}));
     this.props.navigation.setOptions({title: <Text>{this.league_name}</Text>});
+    this.get_standing(this.league_id);
   }
   async get_standing(id){
     this.is_k = false;
@@ -198,6 +200,7 @@ class LeagueScreen extends React.Component {
     API_.setConfig("favorite_players",favorite_p);
     API_.showMsg(`اللاعب ٭${player_name}٭ ${msg_action} المفضلة!`);
     this.setState({});
+    return favorite_p;
   }
   get_player_info=(player)=>{
     this.setState({modalVisible_player:true,player_id:player.player_id});
@@ -231,7 +234,7 @@ class LeagueScreen extends React.Component {
   }
   get_fav_icon(id,bool=false){
     id= parseInt(id);
-    if(id==0){return "";}
+    if(id<=0){return "";}
     if(bool==false){
       return this.state.favorite.includes(id ) ? "★" : "☆" ;
     }else{
@@ -290,19 +293,24 @@ class LeagueScreen extends React.Component {
         goals = row && row.overall_league_GA ? goals-row.overall_league_GA : goals;
         goals = row && row.goals=="Gls" ? row.goals : goals;
         const fav_style = row.team && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
+        const cc_flag = row && row.c_code && row.c_code.split("~").length>=2 ? row.c_code.split("~")[2] : false;
         return (
         <TouchableOpacity 
           activeOpacity={0.7}
           style={[this.state.dynamic_style.team_view,fav_style]} 
           key={team_name+row.id}
-          onPress={() => {}}
+          onPress={() => { if (row && row.team && row.team.id)this.setState({modalVisible_team:true,team_id:row.team.id}) } }
           delayLongPress={300}
           onLongPress={()=>this.set_fav(row.team ? row.team.id : -1, team_name)}
           >
           <View style={{flex:1,padding:2}} >
             <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} />
           </View>
-          <View style={{flex:6}}><Text style={this.state.dynamic_style.team_name_t}>{team_name}</Text></View>
+          <View style={{flex:6}}><Text style={this.state.dynamic_style.team_name_t} numberOfLines={1}>{team_name}</Text></View>
+          {cc_flag!=false ? 
+          <View style={{flex:1,padding:1}} >
+            <Image style={{height:"95%",width:"95%"}} source={{uri: API_.get_cc_img(cc_flag)}} />
+          </View> : null }
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{played}</Text></View>
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{goals}</Text></View>
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{points}</Text></View>
@@ -374,6 +382,20 @@ class LeagueScreen extends React.Component {
           this.setState({modalVisible_player:false})}}></Player>
 
           : null }
+        {
+          this.state.modalVisible_team==true ? 
+        <Team       
+          modal_visible={this.state.modalVisible_team}
+          dynamic_style={this.state.dynamic_style}
+          team_id = {this.state.team_id}
+          get_player_info={this.get_player_info}
+          set_fav_p={this.set_fav_p}
+          favorite_p={this.state.favorite_p}
+          league_name={this.league_name}
+          league_id={this.real_id}
+          closeModal={()=>{this.setState({modalVisible_team:false})}}></Team>
+          : null }
+
       </ScrollView>
     );
   }

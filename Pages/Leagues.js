@@ -22,8 +22,15 @@ class LeaguesScreen extends React.Component {
     },300);
 
   }
-  
+  refresh_list=()=>{
+    const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
+    if(this._isMounted){
+      this.setState({list:[]}); 
+      this.setState({list:tmp_list});
+    }
+  }
   componentDidMount(){ 
+    this._isMounted = true;
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
     API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{
       this.setState({favorite:o});
@@ -37,10 +44,8 @@ class LeaguesScreen extends React.Component {
   )
 });
   }
-  refresh_list=()=>{
-    const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
-    this.setState({list:[]}); 
-    this.setState({list:tmp_list});
+  componentWillUnmount(){
+    this._isMounted = false;
   }
   set_fav=(league_id)=>{
     API_.getConfig("favorite_leagues",this.state.favorite).then(o=>{
