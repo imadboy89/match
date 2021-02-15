@@ -29,7 +29,7 @@ class HomeScreen extends React.Component {
         favorite:[],
         source_id:1,
         is_only_live : false,
-        is_upd_available:false,
+        is_upd_available:-1,
         is_auth:false
         //dynamic_style_list:styles_list,
     };
@@ -126,9 +126,12 @@ class HomeScreen extends React.Component {
 
   }
   checkUpdAvailability(){
+    if(API_.isWeb){return;}
+    this.state.is_upd_available=-1
+    this.render_header();
     const customUpdater = new ExpoCustomUpdater()
     customUpdater.isAppUpdateAvailable().then(isAv=>{
-      this.setState({is_upd_available:isAv});
+      this.state.is_upd_available=isAv;
       this.render_header();
     });
   }
@@ -196,7 +199,7 @@ class HomeScreen extends React.Component {
 
     let headerLeft = null;
     const iconsSize = this.state.dynamic_style && this.state.dynamic_style.title ? this.state.dynamic_style.title.fontSize : 15;
-    if(this.state.is_upd_available){
+    if(this.state.is_upd_available===true){
       headerLeft = ()=>(
         <IconButton 
           name="cloud-download" size={iconsSize} style={this.state.dynamic_style.icons}
@@ -208,6 +211,7 @@ class HomeScreen extends React.Component {
       headerLeft = ()=>(
         <IconButton 
           name={API_.isWeb==true ? "search-plus" : "inbox" }
+          disabled={API_.isWeb==false && this.state.is_upd_available===-1}
           size={iconsSize} style={this.state.dynamic_style.icons} 
             onPress={()=>{
               this.checkUpdAvailability();
@@ -230,6 +234,7 @@ class HomeScreen extends React.Component {
             />
               {API_.isWeb==false ?null : 
               <IconButton 
+              disabled={true}
                 name="refresh" size={iconsSize} style={this.state.dynamic_style.icons} onPress={()=>{
                 this.get_matches(this.state.matches_date);
                 
