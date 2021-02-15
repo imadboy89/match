@@ -234,7 +234,6 @@ class HomeScreen extends React.Component {
             />
               {API_.isWeb==false ?null : 
               <IconButton 
-              disabled={true}
                 name="refresh" size={iconsSize} style={this.state.dynamic_style.icons} onPress={()=>{
                 this.get_matches(this.state.matches_date);
                 

@@ -299,7 +299,8 @@ class ItemsList extends React.Component {
 
   }
   toTop = () => {
-    if(this.flatListRef && this.flatListRef && this.flatListRef.scrollToOffset){
+    console.log(this.props.disable_toTop!=true);
+    if(this.props.disable_toTop!=true && this.flatListRef && this.flatListRef && this.flatListRef.scrollToOffset){
       this.flatListRef.scrollToOffset({ animated: true, offset: 0 });
     }
   }

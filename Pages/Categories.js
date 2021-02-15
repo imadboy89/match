@@ -75,6 +75,7 @@ class CategoriesScreen extends React.Component {
           list={this.state.list} 
           onclick={this.onchannel_clicked} 
           key_={this.state.key_} key_key={this.state.key_key}
+          disable_toTop={true}
           onEndReached={(info: {distanceFromEnd: number})=>{
             this.state.page = this.state.page+1;
             this.get_cats(this.state.page);

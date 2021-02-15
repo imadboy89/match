@@ -234,7 +234,7 @@ class SettingsScreen extends React.Component {
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Testing notifff </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
-              <Button title="Testing notifff" onPress={()=>API_.showMsg("Testing notifff 123",["info","danger","warning","success","info","danger","warning","success","info"][parseInt((Math.random(1)+"").slice(2,3))])}></Button>
+              <Button title="Testing notifff" onPress={()=>API_.showMsg("Testing notifff 123",["info","danger","warning","success","info","danger","warning","success","info"][parseInt((Math.random(1)+"").slice(2,3))],undefined,10000)}></Button>
             </View>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
