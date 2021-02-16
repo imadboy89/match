@@ -156,13 +156,13 @@ export class ToastMsg extends React.Component {
     const style_k = this.state.dynamic_style["txt_"+this.state.type] ? this.state.type : this.type;
     const indecator_style= this.state.dynamic_style["bg_"+style_k];
     const text_style= this.state.dynamic_style["txt_"+style_k];
+    const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
     return (
       <View style={this.state.dynamic_style.container}>
-        <Animated.View
+        <View
           style={[this.state.dynamic_style.box, {height:this.state.height,transform: [{ translateY: this.state.transY }] }]}
         >
-          <Pressable
-            hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}
+          <AnimatedTouchable
             style={this.state.dynamic_style.box_inside}
             activeOpacity={0.7}
             onPress={()=>{
@@ -171,8 +171,8 @@ export class ToastMsg extends React.Component {
           >
             <View style={[this.state.dynamic_style.indecator,indecator_style]}></View>
             <Text style={[this.state.dynamic_style.body, text_style ]}>{this.state.body}</Text>
-          </Pressable>
-          </Animated.View>
+          </AnimatedTouchable>
+          </View>
       </View>
     );
   }
