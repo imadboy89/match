@@ -162,7 +162,8 @@ export class ToastMsg extends React.Component {
           style={[this.state.dynamic_style.box, {height:this.state.height,transform: [{ translateY: this.state.transY }] }]}
         >
           <Pressable
-            style={[this.state.dynamic_style.box_inside,{height:this.state.height,}]}
+            hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}
+            style={this.state.dynamic_style.box_inside}
             activeOpacity={0.7}
             onPress={()=>{
               this.closing_im();
