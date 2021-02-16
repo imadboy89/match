@@ -1115,10 +1115,21 @@ function generateTheme(theme_name=false){
 
       justifyContent:"center",
     },
-    box_inside:{
+    box_inside_ani:{
       //top:-50,
-      zIndex: 1000, // works on ios
-      elevation: 1000, // works on android    
+      width:"100%",
+      flex:1,
+      backgroundColor:  theme.activeBackgroundColor,
+      marginHorizontal:"auto",
+      flexDirection:'row', 
+      flexWrap:'wrap',
+      borderWidth:1,
+      borderRadius:5,
+      borderColor:theme.activeTintColor,
+
+      justifyContent:"center",
+    },
+    box_inside:{
       width:"100%",
       flex:1,
       backgroundColor:  theme.activeBackgroundColor,

@@ -31,7 +31,7 @@ class ItemsList extends React.Component {
     Dimensions.addEventListener("change",this.check_width)
   }
   componentWillUnmount(){
-    alert("componentWillUnmount");
+    //alert("componentWillUnmount");
     this._isMounted=false;
     Dimensions.removeEventListener("change",this.check_width)
   }
