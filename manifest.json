@@ -7,6 +7,7 @@
   "scope": "/match/",
   "short_name": "AlMatch",
   "start_url": "/match/",
+  "theme_color": "#000",
   "crossorigin": "no-referrer",
   "orientation": "portrait",
   "related_applications": [
