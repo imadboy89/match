@@ -32,8 +32,12 @@ self.__precacheManifest = [
     "url": "/match/./fonts/Ionicons.ttf"
   },
   {
-    "revision": "f8363b915d84249eba1dee56e3ecb4ce",
+    "revision": "1270908d8b5ef0b69775181525fa5ad0",
     "url": "/match/index.html"
+  },
+  {
+    "revision": "15ef816cd6ba1022ea739dc1b0db0278",
+    "url": "/match/manifest.json"
   },
   {
     "revision": "ec543248d7b23864564429fc03837190",
@@ -62,9 +66,5 @@ self.__precacheManifest = [
   {
     "revision": "3c6b4bd0f10d67852133e8ae1b60e2d3",
     "url": "/match/favicon.ico"
-  },
-  {
-    "revision": "15ef816cd6ba1022ea739dc1b0db0278",
-    "url": "/match/manifest.json"
   }
 ];
