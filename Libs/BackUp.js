@@ -137,6 +137,7 @@ class BackUp{
         client = await Stitch.initializeDefaultAppClient("ba9al-xpsly");
        }
       try {
+        this.email="";
         if(credents && credents.email && credents.password && credents.email!="" && credents.password!="" && logout==false){
           const credential = new UserPasswordCredential(credents["email"],credents["password"]);
           await client.auth.logout();

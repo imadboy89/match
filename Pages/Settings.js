@@ -134,9 +134,13 @@ class SettingsScreen extends React.Component {
             <View style={this.state.dynamic_style.settings_row_input}>
               <Button
                 title={backup && backup.is_auth ? "LogOUT" :"Login"}
+                color={backup && backup.is_auth ? "#f39c12":"#3498db"}
                 onPress={()=>{
                   if(backup && backup.is_auth){
-                    backup.login(true).then(o=>this.setState({}));
+                    backup.login(true).then(o=>{
+                      API_.showMsg("تم تسجيل الخروج ، نراك لاحقًا!","warning");
+                      this.setState({});
+                    });
                     
                   }else{
                     this.setState({modalVisible_login:true});

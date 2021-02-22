@@ -434,7 +434,8 @@ class ItemsList extends React.Component {
       return null;
     }*/
     return (<View style={this.state.dynamic_style.container}>
-      {this.props.loading && (this.props.refreshControl==undefined || API_.isWeb || this.props.list==undefined || this.props.list.length == 0)  ? <Loader/> : this.render_list()}
+      {this.props.loading && (this.props.refreshControl==undefined || API_.isWeb || this.props.list==undefined || this.props.list.length == 0)  
+      ? <Loader/> : this.render_list()}
     </View>);
   }
 }

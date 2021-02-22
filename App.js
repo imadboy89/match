@@ -52,6 +52,7 @@ function _loadFontsAsync() {
     'DroidKufi-Bold': require('./assets/fonts/DroidKufi-Bold.ttf'),
     }).then(()=>{
     LoadedFonts=true;
+    console.log("FontsLoaded");
   });
   //this.setState({ fontsLoaded: true });
 }

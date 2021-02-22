@@ -50,6 +50,9 @@ class HomeScreen extends React.Component {
 
   }
   async componentWillUnmount(){
+    if(API_.isWeb){
+      document.removeEventListener("keydown", this.escFunction, false);
+    }
     this._isMounted = false;
     clearInterval(this.interval_refresh);
     if(backup.timer){
@@ -75,8 +78,15 @@ class HomeScreen extends React.Component {
 
     }
   }
+  escFunction = (event)=>{
+    if(event.keyCode === 27) {
+      this.props.navigation.goBack(null);
+    }
+  }
   componentDidMount(){
-
+    if(API_.isWeb){
+      document.addEventListener("keydown", this.escFunction, false);
+    }
     this.get_matches(this.state.matches_date);
     if(this.is_authenting==false){
       this.is_authenting = true;
@@ -86,7 +96,6 @@ class HomeScreen extends React.Component {
         if(output==false){return false;}
         backup.load_teams();
         backup.load_settings().then(o=>{
-          console.log(o);
           backup.savePushToken();
           this.refresh_leagues();
         }).catch(err=>{console.log(err)});
@@ -352,19 +361,18 @@ async get_favs(data){
 }
 get_matches_koora = async(date_obj=null)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-  console.log("get_notifications_matches");
   this.state.notifications_matches = await get_notifications_matches();
   API_.load_leagues(this.refresh_leagues);
-  console.log("getConfig -> favorite_leagues");
+  
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
-  console.log("get_matches_k");
+  
   let resp = await API_.get_matches_k(date_obj,this.state.is_only_live);
   let data = resp && resp.length>0 ? resp : [];
-  console.log("get_favs");
+  
   data = await this.get_favs(data);
-  console.log("set_logos");
+  
   data = await API_.set_logos(data);
-  console.log("set_logos .");
+  
   if(this._isMounted){
     this.setState({list:data,loading:false});
   }
@@ -452,7 +460,10 @@ show_DateP(){
     } catch (error) {
       
     }
-    if(this.state.dynamic_style==undefined || this.state.dynamic_style===false || LoadedFonts==false) {return <Loader/>; }
+    if(this.state.dynamic_style==undefined || this.state.dynamic_style===false || LoadedFonts==false) {
+      setTimeout(() =>this.setState({}), 100);
+      return <Loader/>; 
+    }
     const ListHeaderComponent = (        <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
     <IconButton 
       disabled={this.state.loading}

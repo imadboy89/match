@@ -1,11 +1,13 @@
 import React from 'react';
 import { StyleSheet, ActivityIndicator, View  } from 'react-native';
+import {_isMobile,getTheme,global_theme} from "./Themes";
 
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     flex:1,
-    //backgroundColor:"#fff"
+    width:"100%",
+    backgroundColor:global_theme.background_color_default
   },
   horizontal: {
     //flexDirection: 'row',
