@@ -101,6 +101,9 @@ class SettingsScreen extends React.Component {
       ></MatchesNotifs>);
   }
   render_modal_login(){
+    if(backup && backup.is_auth){
+      return 
+    }
     return ( 
       <Credentials
         modal_visible={this.state.modalVisible_login}
@@ -130,8 +133,16 @@ class SettingsScreen extends React.Component {
             <Text style={this.state.dynamic_style.settings_row_label}>Login </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
               <Button
-                title="Login"
-                onPress={()=>this.setState({modalVisible_login:true})}
+                title={backup && backup.is_auth ? "LogOUT" :"Login"}
+                onPress={()=>{
+                  if(backup && backup.is_auth){
+                    backup.login(true).then(o=>this.setState({}));
+                    
+                  }else{
+                    this.setState({modalVisible_login:true});
+                  }
+                  
+                }}
               ></Button>
             </View>
           </View>

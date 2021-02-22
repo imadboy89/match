@@ -6,14 +6,11 @@ class Credentials extends React.Component{
     constructor(props) {
       super(props);
       this.state = {
-        email:"",
+        email: backup&&backup.email ? backup.email : "",
         password:"",
         dynamic_style:this.props.dynamic_style,
         savingCredents:false,
       };
-      API_.getCredentials().then(output=>{
-        this.setState({email:output.email, password:output.password});
-      });
       }
       async saveCredentials(){
         this.setState({savingCredents:true});
@@ -35,6 +32,9 @@ class Credentials extends React.Component{
           await this.saveCredentials();
         }
         this.setState({savingCredents:false});
+      }
+      render_loggeding(){
+
       }
       render(){
         const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;

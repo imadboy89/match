@@ -67,9 +67,12 @@ export class ToastMsg extends React.Component {
   // and use runTiming method defined above to create a node that is going to be mapped
   // to the translateX transform.
   height = 70;
+  transofr_y = 70;
+  transofr_y_2 = 150;
   delay = 3000;
   speed = 500;
   type  = "info";
+  debug = false;
   constructor(props) {
     super(props);
     this.state = {
@@ -82,34 +85,35 @@ export class ToastMsg extends React.Component {
       start  : false,
       type   : this.props.type ? this.props.type : this.type,
     }
-    this.state.transY = new Value(this.state.height*-1)
+    this.transofr_y = this.props.is_second ? this.transofr_y_2 : this.transofr_y;
+    this.state.transY = new Value(this.state.transofr_y*-1)
     this.timeout_closing = 0;
     this.previous_body = "";
     console.log("TM constructor",this.state.body);
     this.notif_end=true;
   }
   closing=()=>{
-    this.setState({transY : runTiming(new Clock(), this.state.height, -1*this.state.height,this.state.speed, this.setend)});
+    this.setState({transY : runTiming(new Clock(), this.state.transofr_y, -1*this.state.transofr_y,this.state.speed, this.setend)});
     setTimeout(this.setend,this.state.speed+100);
   }
   closing_im=()=>{
-    this.setState({transY : runTiming(new Clock(), this.state.height, -1*this.state.height,this.state.speed/2, this.setend)});
+    this.setState({transY : runTiming(new Clock(), this.state.transofr_y, -1*this.state.transofr_y,this.state.speed/2, this.setend)});
     clearTimeout(this.timeout_closing);
     setTimeout(this.setend,this.state.speed+100);
   }
   start=()=>{
+    //await API_.getConfig("is_debug",this.debug).then(o=>API_.is_debug=o);
     API_.messages_history.push({body:this.state.body,type:this.state.type,time:API_.get_date_timeS(new Date()),is_debug:this.state.is_debug});
-    
     if(this.state.debug && API_.is_debug==false){
       return this.empty_stats();
     }
     console.log(this.notif_end , API_.is_debug==false);
     //this.setState({transY : runTiming(new Clock(), -1*this.state.height, 0)});
-    this.state.transY = runTiming(new Clock(), -1*this.state.height, this.state.height,this.state.speed,()=>{});
+    this.state.transY = runTiming(new Clock(), -1*this.state.transofr_y, this.state.transofr_y,this.state.speed,()=>{});
     this.timeout_closing = setTimeout(this.closing, this.state.delay+this.state.speed);
   }
   componentDidMount(){
-    getTheme("styles_notif").then(theme=>this.setState({dynamic_style:theme}) );
+    //getTheme("styles_notif").then(theme=>this.setState({dynamic_style:theme}) );
   }
   empty_stats(){
     this.state.body   = "";
@@ -126,6 +130,7 @@ export class ToastMsg extends React.Component {
     this.empty_stats();
     console.log("....setend")
     this.notif_end = true;
+    this.props.onEnd();
     return true;
   }
   fill_stats(){
@@ -139,6 +144,7 @@ export class ToastMsg extends React.Component {
     this.state.body = this.state.body && this.state.body.charAt ? this.state.body.charAt(0).toUpperCase() + this.state.body.slice(1) : "";
     this.state.delay  = this.props.delay ? this.props.delay : this.delay;
     this.state.height = this.props.height ? this.props.height : this.height;
+    this.state.transofr_y = this.props.transofr_y ? this.props.transofr_y : this.transofr_y;
     this.state.speed  = this.props.speed ? this.props.speed : this.speed;
     this.state.type   = this.props.type ? this.props.type : this.type;
     this.state.debug  = this.props.debug ? this.props.debug : this.debug;
@@ -153,24 +159,24 @@ export class ToastMsg extends React.Component {
     }else{
       this.previous_body = "";
     }
-    const style_k = this.state.dynamic_style["txt_"+this.state.type] ? this.state.type : this.type;
-    const indecator_style= this.state.dynamic_style["bg_"+style_k];
-    const text_style= this.state.dynamic_style["txt_"+style_k];
+    const style_k = this.props.dynamic_style["txt_"+this.state.type] ? this.state.type : this.type;
+    const indecator_style= this.props.dynamic_style["bg_"+style_k];
+    const text_style= this.props.dynamic_style["txt_"+style_k];
     return (
-      <View style={this.state.dynamic_style.container}>
+      <View style={this.props.is_second ? this.props.dynamic_style.container_2 : this.props.dynamic_style.container}>
         <Animated.View
-          style={[this.state.dynamic_style.box, {height:this.state.height,transform: [{ translateY: this.state.transY }] }]}
+          style={[this.props.dynamic_style.box, {height:this.state.height,transform: [{ translateY: this.state.transY }] }]}
         >
           <Pressable
             hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}
-            style={this.state.dynamic_style.box_inside}
+            style={this.props.dynamic_style.box_inside}
             activeOpacity={0.7}
             onPress={()=>{
               this.closing_im();
             }}
           >
-            <View style={[this.state.dynamic_style.indecator,indecator_style]}></View>
-            <Text style={[this.state.dynamic_style.body, text_style ]}>{this.state.body}</Text>
+            <View style={[this.props.dynamic_style.indecator,indecator_style]}></View>
+            <Text style={[this.props.dynamic_style.body, text_style ]}>{this.state.body}</Text>
           </Pressable>
           </Animated.View>
       </View>

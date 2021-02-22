@@ -1104,6 +1104,21 @@ function generateTheme(theme_name=false){
       alignItems:"center",
       zIndex: 1,
     },
+    container_2:{
+      zIndex: 99999, // works on ios
+      elevation: 99999, // works on android    
+
+      height:0,
+      width:"100%",
+      position: "absolute",
+      top: isWeb?-30:-1,
+      left:0,
+      backgroundColor:"#0000",
+      padding:5,
+      justifyContent:"center",
+      alignItems:"center",
+      zIndex: 1,
+    },
     box:{
       //top:-50,
       width: "80%",

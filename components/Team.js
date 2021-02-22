@@ -38,9 +38,10 @@ class Team extends React.Component{
         let img_logo_uri = res && res.team_logo ? res.team_logo : false;
         img_uri = img_uri && img_uri.slice(0,2)=="//" ? img_uri.replace("//","https://") : img_uri;
         img_logo_uri = img_logo_uri && img_logo_uri.slice(0,2)=="//" ? img_logo_uri.replace("//","https://") : img_logo_uri;
-        img_logo_uri=res.team_flag = res && res.team_type && res.team_type==2? API_.get_cc_img(res.team_flag) : img_logo_uri;
+        img_logo_uri=res && res.team_type && res.team_type==2? API_.get_cc_img(res.team_flag) : img_logo_uri;
         res.team_group_photo = img_uri;
-        res.team_logo = img_logo_uri;
+        res.team_logo = img_logo_uri;console.log(res);
+        res.team_country;
         this.setState({team:res,loading:false});
         if(res && res.team_name_ar && img_logo_uri && img_logo_uri!=""){
           //console.log(this.props.league_id,this.props.league_name);

@@ -247,7 +247,11 @@ class APP extends React.Component {
         //dynamic_style_list:styles_list,
         msg:"", 
         speed:0, 
-        delay:0
+        delay:0,
+        showMsg:false,
+        notif_dynamic_style:false,
+        showMsg:false,
+        showMsg_2:false,
     };
     getTheme("app_styles").then(theme=>{
       if(_app_styles==theme){return true;}
@@ -259,12 +263,26 @@ class APP extends React.Component {
   componentDidMount(){
     API_.showMsg = this.showTMsg;
     API_.debugMsg= this.debugMsg;
+    getTheme("styles_notif").then(theme=>this.setState({notif_dynamic_style:theme}) );
   }
   showTMsg = (body,type, speed, delay)=>{
-    this.setState({body:body,type:type, speed:speed, delay:delay,debug:false});
+    if(this.state.showMsg==false){
+      this.setState({body:body,type:type, speed:speed, delay:delay,debug:false,showMsg:true});
+    }else if(this.state.showMsg==true && this.state.showMsg_2==false){
+      this.setState({body_2:body,type_2:type, speed_2:speed, delay_2:delay,debug_2:false,showMsg_2:true});
+    }
   }
   debugMsg = (body,type, speed, delay)=>{
-    this.setState({body:body,type:type, speed:speed, delay:delay,debug:true});
+    if(this.state.showMsg==false){
+      this.setState({body:body,type:type, speed:speed, delay:delay,debug:true,showMsg:true});
+    }else if(this.state.showMsg==true && this.state.showMsg_2==false){
+      this.setState({body_2:body,type_2:type, speed_2:speed, delay_2:delay,debug_2:true,showMsg_2:true});
+    }  }
+  onMsgEnd = ()=>{
+    this.setState({showMsg:false});
+  }
+  onMsgEnd_2 = ()=>{
+    this.setState({showMsg_2:false});
   }
   render(){
     if(this.state.style_loaded==false){
@@ -272,7 +290,28 @@ class APP extends React.Component {
     }
     return (
       <NavigationContainer>
-        <ToastMsg body={this.state.body} speed={this.state.speed} delay={this.state.delay} type={this.state.type} debug={this.state.debug}/>
+        {this.state.showMsg===true ? 
+        <ToastMsg 
+          dynamic_style={this.state.notif_dynamic_style}
+          is_second={false}
+          body={this.state.body} 
+          speed={this.state.speed} 
+          delay={this.state.delay} 
+          type={this.state.type} 
+          debug={this.state.debug} 
+          onEnd={this.onMsgEnd}/>
+        : null }
+        {this.state.showMsg_2===true ? 
+        <ToastMsg 
+          dynamic_style={this.state.notif_dynamic_style}
+          is_second={true}
+          body={this.state.body_2} 
+          speed={this.state.speed_2} 
+          delay={this.state.delay_2} 
+          type={this.state.type_2} 
+          debug={this.state.debug_2} 
+          onEnd={this.onMsgEnd_2}/>
+        : null }
         <MyTabs showTMsg={this.showTMsg}/>
       </NavigationContainer>
     );

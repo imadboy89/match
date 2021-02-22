@@ -91,7 +91,7 @@ class VideoScreen extends React.Component {
                 return true;
               }}
               source={{ uri: uri_ }}
-              userAgent='Mozilla/5.0 (Linux; Android 9.0.0;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.116 Mobile Safari/537.36'
+              userAgent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36'
               />;
   }
   render() {

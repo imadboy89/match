@@ -41,9 +41,7 @@ class HomeScreen extends React.Component {
       payload => {
         if(this.state.is_auth!=backup.is_auth){
           this.state.is_auth=backup.is_auth;
-          if(backup.is_auth){
-            this.refresh_leagues();
-          }
+          this.refresh_leagues();
         }
         this.render_header();
       }
@@ -354,13 +352,19 @@ async get_favs(data){
 }
 get_matches_koora = async(date_obj=null)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
+  console.log("get_notifications_matches");
   this.state.notifications_matches = await get_notifications_matches();
   API_.load_leagues(this.refresh_leagues);
+  console.log("getConfig -> favorite_leagues");
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
+  console.log("get_matches_k");
   let resp = await API_.get_matches_k(date_obj,this.state.is_only_live);
   let data = resp && resp.length>0 ? resp : [];
+  console.log("get_favs");
   data = await this.get_favs(data);
+  console.log("set_logos");
   data = await API_.set_logos(data);
+  console.log("set_logos .");
   if(this._isMounted){
     this.setState({list:data,loading:false});
   }

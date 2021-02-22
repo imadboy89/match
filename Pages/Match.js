@@ -502,7 +502,7 @@ class Matchcreen extends React.Component {
       }
       const fav_style_h = this.state.favorite_t.includes(this.state.matche_details.home_team_id ) ? {backgroundColor: global_theme.fav_background} : {};
       const fav_style_a = this.state.favorite_t.includes(this.state.matche_details.away_team_id ) ? {backgroundColor: global_theme.fav_background} : {};
-      console.log(this.state.matche_details,this.state.favorite_t);
+      
     return (
       <ScrollView style={this.state.dynamic_style.container}>
         <TouchableOpacity 

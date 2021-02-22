@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "privacy": "public",
+    "primaryColor":"#000",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -35,12 +36,13 @@
       "favicon": "./assets/favicon.png",
       "icon": "./assets/icon.png",
       "backgroundColor": "#000",
+      "themeColor ":"#000",
       "lang": "en",
-      "startUrl": "/",
+      "startUrl": "/match/",
       "homepage":"/match/",
       "crossorigin": "no-referrer",
       "preferRelatedApplications":false,
-      "scope":"/",
+      "scope":"/match/",
       "config":{
         "firebase":{
           "apiKey": "AIzaSyCeFIS-SVWZtguMdcvJ9FcLqaoihd69BKM",

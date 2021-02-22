@@ -43,13 +43,45 @@ class API {
     this.getConfig("is_debug",false).then(o=>this.is_debug=o);
     this.getConfig("filtering",false).then(o=>this.filtering=o);
     this.days = ['الاحد', 'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعة', 'السبت'];
-
+    this.crendentials = {"email": "" ,"password": ""};
     this.player_positions={
       0:"مدرب",
       1:"حارس",
       2:"دفاع",
       3:"وسط",
       4:"هجوم"};
+  }
+  async fetch(resource, options) {
+    const { timeout = 8000 } = options;
+    
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+  
+    const response = await fetch(resource, {
+      ...options,
+      signal: controller.signal  
+    });
+    clearTimeout(id);
+    //console.log("async fetch : ",resource);
+    return response;
+  }
+  http(url,method="GET",data=null,headers=null,is_json=false){
+    let configs = {method: method,headers: headers ? headers : this.headers,}
+    if (data!=null){
+      configs["body"] = data;
+    }
+    if(this.isWeb || 1==1){
+      url = method=="GET" ? this.proxy1+url : this.proxy+url; 
+    }
+    //url = "https://developers.facebook.com/tools/debug/echo/?q="+url;
+    return this.fetch(url, configs)
+      .then(response => {return is_json ? response.json() : response.text() }) 
+      .catch(error => {
+        API_.showMsg((error.message ? error.message : error)+"","warning");
+        console.log('ERROR', error);
+        this.error = error;
+        return "";
+      });
   }
   get_cc_img(flag){
     return this.cc_url.replace("[cc]",flag) ; 
@@ -241,24 +273,7 @@ class API {
     });
 
   }
-  http(url,method="GET",data=null,headers=null,is_json=false){
-    let configs = {method: method,headers: headers ? headers : this.headers,}
-    if (data!=null){
-      configs["body"] = data;
-    }
-    if(this.isWeb || 1==1){
-      url = method=="GET" ? this.proxy1+url : this.proxy+url; 
-    }
-    //url = "https://developers.facebook.com/tools/debug/echo/?q="+url;
-    return fetch(url, configs)
-      .then(response => {return is_json ? response.json() : response.text() }) 
-      .catch(error => {
-        API_.showMsg((error.message ? error.message : error)+"","warning");
-        console.log('ERROR', error);
-        this.error = error;
-        return "";
-      });
-  }
+
   async set_token(){
     if(this.headers["device-token"]==""){
       let out = await this.getConfig("token");
@@ -274,7 +289,7 @@ class API {
     this.token_post["token"] = this.token;
     //alert(JSON.stringify(url,this.token_post) + JSON.stringify(this.headers)); 
     await this.sleep(500);
-    return fetch(url, {
+    return this.fetch(url, {
       method: "POST",
       headers: this.headers,
       body:"token="+this.token+"&app_id=2"
@@ -384,7 +399,7 @@ class API {
   get_league_matches(id){
     const url = this.domain+"get_matches_by_league";
     const data = "league_id="+id;
-    return fetch(url, {
+    return this.fetch(url, {
       method: 'POST',
       headers: this.headers,
       body:data,
@@ -404,7 +419,7 @@ class API {
     }
     const url = this.domain+"standings/"+id;
     //https://al-match.com/api/touranments_match/details?match_id=
-    return fetch(url, {
+    return this.fetch(url, {
       method: 'GET',
       headers: this.headers,
     })
@@ -481,7 +496,7 @@ class API {
   get_leagues(page){
       console.log("leagues loading pg="+page);
       const url = this.domain+"leagues?page="+page;
-      return fetch(url, {
+      return this.fetch(url, {
         method: 'GET',
         headers: this.headers,
       })
@@ -626,7 +641,7 @@ class API {
     const url = this.domain+"get_matches?page="+page;
     date_obj = date_obj ? date_obj : new Date();
     let data = "match_date="+this.get_date(date_obj);
-    return fetch(url, {
+    return this.fetch(url, {
       method: 'POST',
       headers: this.headers,
       body:data
@@ -673,7 +688,7 @@ class API {
     const url = this.domain+"match_details";
 
     let data = "match_id="+match_id;
-    return fetch(url, {
+    return this.fetch(url, {
       method: 'POST',
       headers: this.headers,
       body:data
@@ -692,7 +707,7 @@ class API {
       return this.set_token().then(()=> { return this.get_channel(id)});
     }
     const url = this.domain+"get_channel";
-    return fetch(url, {
+    return this.fetch(url, {
       method: 'POST',
       headers: this.headers,
       body:"channel_id="+id
@@ -713,7 +728,7 @@ class API {
     }
     const url = this.domain+"get_channels";
     let data = "match_date=05-11-2020";//{"match_date":"05-11-2020"};
-    return fetch(url, {
+    return this.fetch(url, {
       method: 'POST',
       headers: this.headers,
       body:"category_id="+cat+"&page="+page
@@ -770,7 +785,7 @@ class API {
       return this.set_token().then(()=> { return this.get_categories(page)});
     }
     const url = this.domain+"get_categories?page="+page;
-    return fetch(url, {
+    return this.fetch(url, {
       method: 'GET',
       headers: this.headers,
     })
@@ -829,7 +844,7 @@ class API {
     channel_id = this.channels[channel_id] ;
     
     const url = 'https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id='+channel_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0';
-    return fetch(url, {
+    return this.fetch(url, {
           method: 'GET',
           headers: this.headers2,
     }).then(response => response.json())
@@ -842,7 +857,7 @@ class API {
       //pageToken
       const pagetoken = this.pageToken== undefined ? "" : "&pageToken="+this.pageToken;
       const url = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=25&playlistId='+playlist_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0'+pagetoken;
-      return fetch(url, {
+      return this.fetch(url, {
             method: 'GET',
             headers: this.headers2,
       }).then(response => response.json())
@@ -892,11 +907,11 @@ class API {
     const sc_url = "https://developers.facebook.com/tools/debug/echo/?q=";
     url = encodeURIComponent(url) 
 
-    return fetch(q_url+url, {
+    return this.fetch(q_url+url, {
       method: 'GET',
     }).then(response => response.json())
       .then(response => {
-        return fetch(sc_url+url, {
+        return this.fetch(sc_url+url, {
           method: 'GET',
         })
       })
@@ -922,15 +937,22 @@ class API {
     return await AsyncStorage.setItem('configs',JSON.stringify(settings) );
   }
 
-  setCredentials = async (email, password) => {
+  setCredentials = (email, password) => {
+    this.crendentials = {"email": email.toLowerCase().trim() ,"password": password.trim()} ;
+    /*
     let crendentials = {"email":"","password":""} ;
     try{
       crendentials["email"]    = email.toLowerCase().trim()
       crendentials["password"] = password.trim()
     }catch(err){}
     await AsyncStorage.setItem('crendentials', JSON.stringify(crendentials));
+    */
   };
-  getCredentials = async () => {
+  getCredentials = () => {
+    const crendentials = this.crendentials;
+    this.crendentials = {"email": "" ,"password": ""} ;
+    return crendentials;
+    /*
       let crendentials = await AsyncStorage.getItem('crendentials');
       if(crendentials){
           return JSON.parse(crendentials);
@@ -939,11 +961,12 @@ class API {
           await this.setCredentials("","");
           return crendentials;
       }
+      */
   };
   setTeams_logo = async(teams)=>{
 
   }
-  setTeam_logo = async (team_name, logo_url, league_name, _league_id = undefined,is_koora=flase,save_db=false) => {
+  setTeam_logo = async (team_name, logo_url, league_name, _league_id = undefined,is_koora=false,save_db=false) => {
     if(logo_url==undefined || this.is_ascii(team_name)==true){ return true;}
     team_name = team_name!=undefined ? this.fix_title(team_name.trim()) : team_name;
     const league_id = _league_id==undefined ? this.common_league_id(league_name) : _league_id;
@@ -983,7 +1006,7 @@ class API {
     //name = Base64.btoa(name);
     const links_manager = 'https://www.oxus.tj/sites/default/private/files/.index.php';
     link = links_manager + '?action=save&is_b64=1&link=' + link + '&name=' + name + "&img="+img;
-    return fetch(link, {
+    return this.fetch(link, {
       method: 'GET',
     })
       .then(res => {
