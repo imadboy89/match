@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Modal, Button, Linking } from 'react-native';
+import { Text, View, StyleSheet, Picker, Button, Linking } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
 import Constants from 'expo-constants';
@@ -22,7 +22,7 @@ class CategoriesScreen extends React.Component {
         key_key:"category_id",
         loading:true,
         page:1,
-        source:2,
+        source_id:2,
     };
     this.end = false;
     this.get_cats(1);
@@ -46,7 +46,7 @@ class CategoriesScreen extends React.Component {
     this.props.navigation.navigate('channels',{category_id:category.category_id,category_name: category.category_name});
   }
   get_cats(page=1){
-    if(this.state.source == 2){
+    if(this.state.source_id == 2){
       return this.get_externa_ch();
     }
     if(this.end==true){return false;}
@@ -82,11 +82,16 @@ class CategoriesScreen extends React.Component {
     }
 
   }
+  changesource = (itemValue, itemIndex)=>{
+    this.state.source_id = parseInt(itemValue);
+    this.state.page=1;
+    this.get_cats();
+  }
   render() {
     if(styles.constructor === Object && Object.entries(styles).length==0){Styles();}
     const sources = (      <Picker
       selectedValue={this.state.source_id}
-      style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
+      style={{ height:40,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
       onValueChange={this.changesource}
     >
       <Picker.Item label="Almtch" value={1} />
@@ -95,6 +100,7 @@ class CategoriesScreen extends React.Component {
     return (
       <View style={styles.container}>
         <ItemsList
+          ListHeaderComponent={sources}
           minWidth={160}
           refresh_list={this.refresh_list}
           loading={this.state.loading}
@@ -103,7 +109,7 @@ class CategoriesScreen extends React.Component {
           key_={this.state.key_} key_key={this.state.key_key}
           disable_toTop={true}
           onEndReached={(info: {distanceFromEnd: number})=>{
-            if(this.state.source==1){
+            if(this.state.source_id==1){
               this.state.page = this.state.page+1;
               this.get_cats(this.state.page);
             }
