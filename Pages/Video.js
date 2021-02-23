@@ -79,12 +79,13 @@ class VideoScreen extends React.Component {
     }else{
       const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality='+this.state.videoQuality+'&info=0&logo=0&autoplay=false';
       const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq='+this.state.videoQuality+'&color='+global_theme.text_color_default;
-      const uri_direct = this.state.video.videoId.slice(0,4)=="http" ? this.state.video.videoId : "";
+      const uri_direct = this.state.video.videoId && this.state.video.videoId.slice(0,4)=="http" ? this.state.video.videoId : "";
       uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
       uri_ = this.state.video.source_id==3 ? uri_direct :  uri_;
     }
     if (API_.isWeb) {
-      return <iframe src={uri_} style={{flex:1,backgroundColor: "#000",borderWidth:0}} seamless/>;
+      console.log(uri_);
+      return <iframe src={uri_} style={{flex:1,backgroundColor: "#000",borderWidth:0,height:"100%",width:"100%"}} seamless/>;
     }
     return  <WebView 
               allowsFullscreenVideo={true}
@@ -104,7 +105,7 @@ class VideoScreen extends React.Component {
               />;
   }
   render() {
-    const style= this.state.video && this.state.video.videoId ? {height:300,width:"100%",position:'absolute'} : {width:1,height:1};
+    const style= this.state.video && (this.state.video.videoId || this.state.video.url) ? {height:300,width:"100%",position:'absolute'} : {width:1,height:1};
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
         <ImageBackground style={{height:300,width:"100%"}} source={{uri: this.state.video.img}} >
@@ -120,7 +121,7 @@ class VideoScreen extends React.Component {
             
           </View>
           <Text style={this.state.dynamic_style.article_body_t}>{this.state.video&&this.state.video.desc?this.state.video.desc :""}</Text>
-          {this.state.video &&this.state.video.videoId ? null : <Loader/> }
+          {this.state.video && (this.state.video.videoId || this.state.video.url) ? null : <Loader/> }
           <Picker
             selectedValue={this.state.videoQuality}
             style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}

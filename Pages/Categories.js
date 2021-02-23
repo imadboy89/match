@@ -67,7 +67,9 @@ class CategoriesScreen extends React.Component {
     if(API_.external_channels==undefined){
       await API_.load_external_channels();
     }
-    this.setState({list:Object.values(API_.external_channels), key_:"category_name",key_key:"category_id",loading:false});
+    setTimeout(() => {
+      this.setState({list:Object.values(API_.external_channels), key_:"category_name",key_key:"category_id",loading:false});
+    }, 300);
   }
 
   onchannel_clicked =(item)=>{
@@ -82,6 +84,14 @@ class CategoriesScreen extends React.Component {
   }
   render() {
     if(styles.constructor === Object && Object.entries(styles).length==0){Styles();}
+    const sources = (      <Picker
+      selectedValue={this.state.source_id}
+      style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
+      onValueChange={this.changesource}
+    >
+      <Picker.Item label="Almtch" value={1} />
+      <Picker.Item label="kora-live" value={2} />      
+  </Picker>);
     return (
       <View style={styles.container}>
         <ItemsList

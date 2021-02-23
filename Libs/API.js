@@ -120,6 +120,11 @@ class API {
     let scrap = new Scrap();
     scrap.isWeb = this.isWeb;
     this.external_channels = scrap.get_ch_ext(html);
+    try {
+      await AsyncStorage.setItem('external_channels',JSON.stringify(this.external_channels) );
+    } catch (error) {
+      API_.debugMsg("Could not stringify external channels results!","danger");
+    }
   }
   get_cc_img(flag){
     return this.cc_url.replace("[cc]",flag) ; 
@@ -484,6 +489,7 @@ class API {
 
     let leagues = await AsyncStorage.getItem('leagues');
     let channels = await AsyncStorage.getItem('channels');
+    let external_channels = await AsyncStorage.getItem('external_channels');
     if(leagues ){
       leagues = JSON.parse(leagues);
     }else{
@@ -494,12 +500,18 @@ class API {
     }else{
       channels = {};
     }
+    if(external_channels ){
+      external_channels = JSON.parse(external_channels);
+    }else{
+      external_channels = {};
+    }
     let date_stored = leagues && leagues["date"] ? parseInt(leagues["date"]) : 0;
     const is_expired = (new Date()).getTime()- date_stored >= exp_t;
     if(Object.keys( leagues["data"] ).length>0 && is_expired==false){
       console.log("leagues cache");
       this.leagues_dict = leagues["data"];
       this.channels_dict = channels;
+      this.external_channels = external_channels;
       return this.leagues_dict;
     }
     
@@ -515,6 +527,7 @@ class API {
         });
     await this.sleep(1000);
     this.load_channels();
+    this.load_external_channels();
     return false;
   }
   async save_leagues(date=false){
@@ -788,7 +801,6 @@ class API {
     return name;
   }
   load_channels = async()=>{
-    this.load_external_channels();
     API_.channels_dict = {};
     for (let i = 0; i < 100; i++) {
       let resJson = await this.get_categories(i);
