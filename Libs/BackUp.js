@@ -50,7 +50,7 @@ class BackUp{
         this.db_settings = this.db.collection("settings");
         this.db_teams_info = this.db.collection("teams_info");
         this.is_auth = this.email!="" && this.email !=undefined;
-        console.log("hererererer");
+        if(this.is_auth) {setTimeout(()=>API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success"),1000)}
         await this.isAdmin();
         return this.is_auth;
 
@@ -121,7 +121,6 @@ class BackUp{
       }
       this.email = "";
       this.lastActivity = "";
-      let app = null;
       await this.login();
       //if(this.is_auth==false) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
        
@@ -145,7 +144,7 @@ class BackUp{
           //this.registerForPushNotificationsAsync();
           API_.set_settings({});
           await this.setClientInfo(); 
-          if(this.is_auth) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
+          //if(this.is_auth) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
           return this.is_auth;
         }else if(logout){
           await client.auth.logout();

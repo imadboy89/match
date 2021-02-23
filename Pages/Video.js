@@ -20,10 +20,10 @@ class VideoScreen extends React.Component {
         
     };
 
-    this.get_video();
-
   }
   componentDidMount(){
+    this.state.video.title_news = this.state.video.name ? this.state.video.name : this.state.video.title_news
+    this.get_video();
     activateKeepAwake();
     let short_title = this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : 
     getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme})); 
@@ -34,7 +34,10 @@ class VideoScreen extends React.Component {
   }
   get_video(){
     if(this.state.loading==false){this.setState({loading:true});}
-    if(this.state.video.is_yt && this.state.video.videoId){
+
+    if(this.state.video.is_external){
+
+    }else if(this.state.video.is_yt && this.state.video.videoId){
       setTimeout(()=>{
         this.setState({loading:false});
         API_.setTitleWeb(this.state.video.title_news);
@@ -68,12 +71,18 @@ class VideoScreen extends React.Component {
     return <ActivityIndicator color='#009b88' size='large' />
   }
   render_wv(){
-    if(this.state.video.videoId==false){return null}
-    const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality='+this.state.videoQuality+'&info=0&logo=0&autoplay=false';
-    const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq='+this.state.videoQuality+'&color='+global_theme.text_color_default;
-    const uri_direct = this.state.video.videoId.slice(0,4)=="http" ? this.state.video.videoId : "";
-    let uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
-    uri_ = this.state.video.source_id==3 ? uri_direct :  uri_;
+    console.log(this.state.video);
+    if(this.state.video.videoId===false ){return null}
+    let uri_ = "";
+    if(this.state.video.is_external){
+      uri_ = this.state.video.url;
+    }else{
+      const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality='+this.state.videoQuality+'&info=0&logo=0&autoplay=false';
+      const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq='+this.state.videoQuality+'&color='+global_theme.text_color_default;
+      const uri_direct = this.state.video.videoId.slice(0,4)=="http" ? this.state.video.videoId : "";
+      uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
+      uri_ = this.state.video.source_id==3 ? uri_direct :  uri_;
+    }
     if (API_.isWeb) {
       return <iframe src={uri_} style={{flex:1,backgroundColor: "#000",borderWidth:0}} seamless/>;
     }

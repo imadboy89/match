@@ -22,6 +22,7 @@ class CategoriesScreen extends React.Component {
         key_key:"category_id",
         loading:true,
         page:1,
+        source:2,
     };
     this.end = false;
     this.get_cats(1);
@@ -45,6 +46,9 @@ class CategoriesScreen extends React.Component {
     this.props.navigation.navigate('channels',{category_id:category.category_id,category_name: category.category_name});
   }
   get_cats(page=1){
+    if(this.state.source == 2){
+      return this.get_externa_ch();
+    }
     if(this.end==true){return false;}
     API_.get_categories(page).then(resp=>{
       if(resp["data"].length>0){
@@ -59,9 +63,21 @@ class CategoriesScreen extends React.Component {
     });
 
   }
+  async get_externa_ch(){
+    if(API_.external_channels==undefined){
+      await API_.load_external_channels();
+    }
+    this.setState({list:Object.values(API_.external_channels), key_:"category_name",key_key:"category_id",loading:false});
+  }
 
   onchannel_clicked =(item)=>{
-    this.props.navigation.navigate('Channels',{category_id:item.category_id,category_name: item.category_name});
+    if(item.url){
+      //API_.open_ext_url(item.url);
+      
+      this.props.navigation.navigate('Video', { item: item });
+    }else{
+      this.props.navigation.navigate('Channels',{category_id:item.category_id,category_name: item.category_name});
+    }
 
   }
   render() {
@@ -77,8 +93,10 @@ class CategoriesScreen extends React.Component {
           key_={this.state.key_} key_key={this.state.key_key}
           disable_toTop={true}
           onEndReached={(info: {distanceFromEnd: number})=>{
-            this.state.page = this.state.page+1;
-            this.get_cats(this.state.page);
+            if(this.state.source==1){
+              this.state.page = this.state.page+1;
+              this.get_cats(this.state.page);
+            }
             }}
           /> 
       </View>

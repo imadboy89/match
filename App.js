@@ -140,6 +140,7 @@ function ChannelsStackScreen() {
       <ChannelsStack.Screen options={_app_styles.screenHeader} name="ChannelsCat" component={CategoriesScreen} />
       <ChannelsStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
       <ChannelsStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
+      <ChannelsStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
     </ChannelsStack.Navigator>
   );
 }

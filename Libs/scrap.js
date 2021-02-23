@@ -655,6 +655,35 @@ class Scrap {
     }
     return lineups;
   }
+
+  get_ch_ext(html){
+    if(html==""){return []}
+    
+    let doc = new DomParser().parseFromString(html,'text/html');
+    let as = doc.querySelect('a');
+    let chs = {};
+    for (let i=0;i<as.length;i++){
+      const as_ = as[i];
+      const ch = {"img":"","name":"", "url":"","id":"","is_external":true};
+      ch.url = as_.getAttribute("href");
+      ch.name = as_.getElementsByClassName("g_t_inf_schdiv");
+      ch.name = ch.name && ch.name[0] ? ch.name[0].childNodes+"" : "";
+      ch.name = ch.name.trim()
+      ch.codename = ch.name.toLocaleLowerCase().replace(/\s/gi,"").replace(/hd/g,"").replace("beinsports","beinsport");
+      if (ch.name==""){continue;}
+      ch.img = as_.querySelect("img")[0].getAttribute("src")+"";
+      ch.id=ch.url;
+
+      ch.category_name = ch.name;
+      ch.category_photo = ch.img;
+      ch.category_id = ch.id;
+      chs[ch.codename] = ch;
+      
+    }
+    return chs;
+  }
+
+
   get_news_hp(html){
     if(html==""){return []}
     let doc = new DomParser().parseFromString(html,'text/html');

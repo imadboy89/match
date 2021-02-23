@@ -2,6 +2,7 @@ import { Platform, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Scrap from "./scrap";
 import Base64 from "./Base64";
+import { Linking } from 'react-native';
 
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
@@ -59,7 +60,14 @@ class API {
   
     const response = await fetch(resource, {
       ...options,
-      signal: controller.signal  
+      signal: controller.signal
+    })
+    .catch(err=>{
+      if("AbortError" == err.name){
+        throw "هناك مشكلة في الاتصال بالإنترنت أو الخادم الخاص بنا!";
+      }
+      console.log(err);
+      return err;
     });
     clearTimeout(id);
     //console.log("async fetch : ",resource);
@@ -75,13 +83,43 @@ class API {
     }
     //url = "https://developers.facebook.com/tools/debug/echo/?q="+url;
     return this.fetch(url, configs)
-      .then(response => {return is_json ? response.json() : response.text() }) 
+      .then(response => {
+        try {
+          return is_json ? response.json() : response.text();
+        } catch (error) {
+          API_.showMsg((error.message ? error.message : error)+"","warning");
+          return is_json ? [] : "" ;
+        }
+
+      }) 
       .catch(error => {
         API_.showMsg((error.message ? error.message : error)+"","warning");
         console.log('ERROR', error);
         this.error = error;
         return "";
       });
+  }
+  open_ext_url(url){
+    Linking.canOpenURL(url).then(supported=>{
+      if(supported){
+        if(API_.isWeb){
+          //const lk = Linking.openURL(url, '_blank');
+          window.open(url,"_blank");
+        }else{
+          Linking.openURL(url).then(out=>{API_.showMsg("Opening channel.");});;
+        }
+      }else{
+        API_.showMsg("This link is not supported : "+url,"warning");
+      }
+    });
+  }
+  async load_external_channels(source_id){
+    const url = "http://goal.kora-live.tv/channels.html";
+    const html = await  this.http(url,"GET", null,{});
+    //console.log(html);
+    let scrap = new Scrap();
+    scrap.isWeb = this.isWeb;
+    this.external_channels = scrap.get_ch_ext(html);
   }
   get_cc_img(flag){
     return this.cc_url.replace("[cc]",flag) ; 
@@ -750,6 +788,7 @@ class API {
     return name;
   }
   load_channels = async()=>{
+    this.load_external_channels();
     API_.channels_dict = {};
     for (let i = 0; i < 100; i++) {
       let resJson = await this.get_categories(i);

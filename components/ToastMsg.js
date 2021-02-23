@@ -175,8 +175,8 @@ export class ToastMsg extends React.Component {
               this.closing_im();
             }}
           >
-            <View style={[this.props.dynamic_style.indecator,indecator_style]}></View>
             <Text style={[this.props.dynamic_style.body, text_style ]}>{this.state.body}</Text>
+            <View style={[this.props.dynamic_style.indecator,indecator_style]}></View>
           </Pressable>
           </Animated.View>
       </View>

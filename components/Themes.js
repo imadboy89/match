@@ -1228,7 +1228,7 @@ function generateTheme(theme_name=false){
       color : theme.text_color_default,
       height:30,
       borderRadius: isWeb ? 10 : 8,
-      paddingHorizontal : 10,
+      paddingHorizontal : 3,
     },
     log_time_text:{
       width:40,

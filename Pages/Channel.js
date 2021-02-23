@@ -90,7 +90,6 @@ class ChannelScreen extends React.Component {
         dynamic_style:styles_channel,
         p_url:"",
         
-        
     };
     this.playerRef = React.createRef();
   }
@@ -124,7 +123,9 @@ class ChannelScreen extends React.Component {
     let url = serv.SecureUrl;
     //let name = this.state.channel["name"];
     //let img = API_.domain_o+this.channel_photo;
-    if (this.state.actionType=="IPTV"){
+    if(serv.is_external==true){
+      API_.open_ext_url(serv.url);
+    }else if (this.state.actionType=="IPTV"){
       API_.saveLink(serv.SecureUrl,this.state.channel["name"],API_.domain_o+this.channel_photo).then(out=>notifyMessage("تمت إضافة القناة!"));
       
     }else if ("PLAYER"){
@@ -132,25 +133,26 @@ class ChannelScreen extends React.Component {
         this.setState({p_url:url,modalVisible_match:true});
         return;
       }
-       Linking.canOpenURL(url).then(supported=>{
-         if(supported){
-           Linking.openURL(url).then(out=>{notifyMessage("Opening channel.");});
-         }else{
-           notifyMessage("This link is not supported : "+url);
-         }
-       });
+      API_.open_ext_url(url);
+
     }
   }
   render() {
-    let servers_list = this.state.channel && this.state.channel.channel_servers && this.state.channel.channel_servers.map ?
-      this.state.channel.channel_servers.map(serv => serv && serv.name ? (
+    const ch_name_ = this.state.channel && this.state.channel.en_name ? this.state.channel.en_name.toLocaleLowerCase().trim().replace(/\s/g,"").replace(/hd/g,"") : "";
+    const ext_ch = API_.external_channels && API_.external_channels[ch_name_] ? API_.external_channels[ch_name_] : null;
+
+    const _channel_servers = this.state.channel && this.state.channel.channel_servers && this.state.channel.channel_servers.map ?this.state.channel.channel_servers:[];
+    if(ext_ch){_channel_servers.push(ext_ch);}
+    let servers_list = _channel_servers.map(serv => serv && serv.name ? (
         <View style={{margin:8}} key={serv.id}>
-          <Button onPress={()=>this.onch_clicked(serv)} title={serv.name} style={{margin:5}}></Button>
+          <Button 
+            color={serv.is_external ? "#f39c12":"#3498db"}
+            onPress={()=>this.onch_clicked(serv)} title={serv.name} style={{margin:5}}></Button>
         </View>
-      ):null)
-    : null;
+      ):null);
     let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER"] : ["PLAYER",];
     const pickers = picker_options.map(o=><Picker.Item label={o} value={o} key={o}/>);
+
     return (
       <ScrollView style={this.state.dynamic_style.container}>
       <View style={this.state.dynamic_style.channel_logo_v}>
