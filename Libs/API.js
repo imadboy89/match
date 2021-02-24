@@ -125,6 +125,7 @@ class API {
     } catch (error) {
       API_.debugMsg("Could not stringify external channels results!","danger");
     }
+    return true
   }
   get_cc_img(flag){
     return this.cc_url.replace("[cc]",flag) ; 

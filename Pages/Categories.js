@@ -7,6 +7,7 @@ import ItemsList from '../components/list';
 import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
 import IconButton from "../components/IconButton";
+import {styles_home} from "../components/Themes";
 
 let list = [
 
@@ -133,5 +134,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color : "#fff",
   },
+  icons:styles_home.icons,
 });
 export default CategoriesScreen;

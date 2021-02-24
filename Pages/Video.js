@@ -36,7 +36,14 @@ class VideoScreen extends React.Component {
     if(this.state.loading==false){this.setState({loading:true});}
 
     if(this.state.video.is_external){
-
+      this.props.navigation.setOptions({
+        "headerRight":()=>(
+                <IconButton 
+                  name="chrome" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
+                  onPress={()=>{ API_.open_ext_url(this.state.video.url); }}  />
+        )
+      });
+      return true;
     }else if(this.state.video.is_yt && this.state.video.videoId){
       setTimeout(()=>{
         this.setState({loading:false});
@@ -71,7 +78,7 @@ class VideoScreen extends React.Component {
     return <ActivityIndicator color='#009b88' size='large' />
   }
   render_wv(){
-    console.log(this.state.video);
+    
     if(this.state.video.videoId===false ){return null}
     let uri_ = "";
     if(this.state.video.is_external){
@@ -84,7 +91,6 @@ class VideoScreen extends React.Component {
       uri_ = this.state.video.source_id==3 ? uri_direct :  uri_;
     }
     if (API_.isWeb) {
-      console.log(uri_);
       return <iframe src={uri_} style={{flex:1,backgroundColor: "#000",borderWidth:0,height:"100%",width:"100%"}} seamless/>;
     }
     return  <WebView 

@@ -395,7 +395,10 @@ class ItemsList extends React.Component {
       
       //to avoid 'FlatList : Invariant Violation: Changing numColumns on the fly is not supported' error
       if(this.props.loading==false && this.props.list && this.props.list.length == 0){
-        return null;
+        return (
+        <>
+        {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : undefined}
+        </>);
       }
       return (
         <View style={this.state.dynamic_style.list_container}>
@@ -434,9 +437,14 @@ class ItemsList extends React.Component {
     if(this.props.loading==false && this.props.list && this.props.list.length == 0){
       return null;
     }*/
+    
     return (<View style={this.state.dynamic_style.container}>
       {this.props.loading && (this.props.refreshControl==undefined || API_.isWeb || this.props.list==undefined || this.props.list.length == 0)  
-      ? <Loader/> : this.render_list()}
+      ? <>
+        {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : null}
+        <Loader/>
+        {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : null}
+      </> : this.render_list()}
     </View>);
   }
 }
