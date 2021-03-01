@@ -111,7 +111,8 @@ class VideoScreen extends React.Component {
               />;
   }
   render() {
-    const style= this.state.video && (this.state.video.videoId || this.state.video.url) ? {height:300,width:"100%",position:'absolute'} : {width:1,height:1};
+    let style = {height: this.state.video && this.state.video.url ? 500 : 300,width:"100%",position:'absolute'};
+    style = this.state.video && (this.state.video.videoId || this.state.video.url) ? style : {width:1,height:1};
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
         <ImageBackground style={{height:300,width:"100%"}} source={{uri: this.state.video.img}} >

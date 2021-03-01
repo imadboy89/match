@@ -294,6 +294,8 @@ class Scrap {
       matche_dict["league"] = matche_.getElementsByClassName("league-title") && matche_.getElementsByClassName("league-title").length ? matche_.getElementsByClassName("league-title")[0].childNodes+"" : "";
       const imgs = matche_.querySelect("img");
       //"إنتهت المباراة"
+      matche_dict["datetime"] = matche_dict["datetime"].replace(/\//g,"-").trim();//API_.convert_time_o(matche_dict["datetime"].replace(/\//g,"-"));
+      matche_dict["time"] = matche_dict["datetime"] && matche_dict["datetime"].split && matche_dict["datetime"].split(" ").length ==2 ? matche_dict["datetime"].split(" ")[1] :"";
       if(imgs && imgs.length==2){
         matche_dict["home_team"] = imgs[0].getAttribute("alt");
         matche_dict["home_team_badge"] = imgs[0].getAttribute("src");
