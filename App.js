@@ -153,6 +153,7 @@ function MatchesStackScreen() {
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
       <MatchesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
       
     </MatchesStack.Navigator>
   );

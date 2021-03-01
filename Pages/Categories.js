@@ -76,7 +76,6 @@ class CategoriesScreen extends React.Component {
   onchannel_clicked =(item)=>{
     if(item.url){
       //API_.open_ext_url(item.url);
-      
       this.props.navigation.navigate('Video', { item: item });
     }else{
       this.props.navigation.navigate('Channels',{category_id:item.category_id,category_name: item.category_name});

@@ -254,6 +254,78 @@ class Scrap {
     }catch(err){console.log(err)}
     return standing;
   }
+  get_matches_kora_star(html,date,is_oneMatch=false,is_only_live=false){
+    if(html==""){return []}
+    
+    let doc = new DomParser().parseFromString(html,'text/html');
+    let matches_ = doc.querySelect("#today")[0].getElementsByClassName('alba_sports_events-event_item');
+    //console.log(matches_);
+    let matches = {};
+    API_.test_doc = doc;
+    for (let i=0;i<matches_.length;i++){
+      let matche_dict = {"league_id":"","url":"",
+      "com_id_page":"",
+      "id":"",
+      "datetime":"",
+      "time":"",
+      "home_team_id":"",
+      "home_team_status":"",
+      "home_team":"",
+      "home_scorers":"",
+      "score":"",
+      "away_team_id":"",
+      "away_team_status":"",
+      "away_team":"",
+      "away_scorers":"",
+      "details":"",
+      "home_team_badge":"",
+      "away_team_badge":"",
+      "channels":[],
+      "commenter":"",
+      "league":"",
+      "is_kora_star":true,
+    };
+
+      const matche_ = matches_[i];
+      matche_dict["url"] = matche_.querySelect("a") && matche_.querySelect("a").length ? matche_.querySelect("a")[0].getAttribute("href") : "";
+      matche_dict["id"] = matche_.getAttribute("id");
+      matche_dict["id"] = matche_dict["id"] && matche_dict["id"].split && matche_dict["id"].split("_").length == 2 ? matche_dict["id"].split("_")[1] : "";
+      matche_dict["datetime"] = matche_.getAttribute("rel");
+      matche_dict["league"] = matche_.getElementsByClassName("league-title") && matche_.getElementsByClassName("league-title").length ? matche_.getElementsByClassName("league-title")[0].childNodes+"" : "";
+      const imgs = matche_.querySelect("img");
+      //"إنتهت المباراة"
+      if(imgs && imgs.length==2){
+        matche_dict["home_team"] = imgs[0].getAttribute("alt");
+        matche_dict["home_team_badge"] = imgs[0].getAttribute("src");
+        matche_dict["away_team"] = imgs[1].getAttribute("alt");
+        matche_dict["away_team_badge"] = imgs[1].getAttribute("src");
+      }
+      
+      let ch = matche_.getElementsByClassName("event_commenter") && matche_.getElementsByClassName("event_commenter").length ? matche_.getElementsByClassName("event_commenter")[0].childNodes+"" : "";
+      let commenter = matche_.getElementsByClassName("event_chanel") && matche_.getElementsByClassName("event_chanel").length ? matche_.getElementsByClassName("event_chanel")[0].childNodes+"" : "";
+      ch  = this.decodeEntities( ch ).trim();
+      commenter  = this.decodeEntities( commenter ).trim();
+      matche_dict["channels"] = [{"id":ch,"commentator":commenter,"en_name":ch,"url":matche_dict["url"]},]
+      //console.log("here ",i,matches.length);
+
+      let league = {
+        "title": matche_dict["league"], 
+        "id":matche_dict["league"],
+        "img":"", 
+        "data":[],
+        "country":"",
+        "is_koora":false,
+        "options" : "",
+      };
+      if(matche_dict["league"] in matches){
+        matches[matche_dict["league"]].data.push(matche_dict);
+      }else{
+        league.data.push(matche_dict);
+        matches[matche_dict["league"]] = league;
+      }
+    }
+    return Object.values(matches);
+  }
   get_matches_k(html,date,is_oneMatch=false,is_only_live=false){
     API_.matches_bl = [];
     let json_={"matches_comps":[],"matches_list":[]};

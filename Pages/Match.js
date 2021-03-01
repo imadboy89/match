@@ -32,10 +32,10 @@ class Matchcreen extends React.Component {
         favorite_t:[],
 
     };
-    this.get_Match(this.props.route.params.match_item.id);
 
   }
   componentDidMount(){
+    this.get_Match(this.props.route.params.match_item.id);
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
     API_.getConfig("favorite_channels",this.state.favorite).then(o=>{this.setState({favorite:o});});
     API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{this.setState({favorite_p:o});});
@@ -48,17 +48,21 @@ class Matchcreen extends React.Component {
     
   }
   get_Match(id){
-      if(this.state.match_dets.details){
-        return this.get_Match_k(id);
+    if(this.props.route.params.match_item.is_kora_star){
+      this.setState({matche_details:this.props.route.params.match_item,loading:false});
+      return ;
+    }
+    if(this.state.match_dets.details){
+      return this.get_Match_k(id);
+    }
+    API_.get_match(id).then(resp=>{
+      if(resp["data"] && resp["data"][0] ){
+        this.setState({matche_details:resp["data"][0],loading:false});
+        this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
+        this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
+        API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
       }
-      API_.get_match(id).then(resp=>{
-        if(resp["data"] && resp["data"][0] ){
-          this.setState({matche_details:resp["data"][0],loading:false});
-          this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
-          this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
-          API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
-        }
-      });
+    });
   }
   load_logos(){
     if(this.state.matche_details.home_team_logo && this.state.matche_details.away_team_logo)return true;
@@ -90,8 +94,24 @@ class Matchcreen extends React.Component {
 
 
   onmt_clicked(item){
-    if(item.is_koora==undefined){
+    if(item.is_koora==undefined && this.state.matche_details.is_kora_star==undefined){
       this.props.navigation.navigate('Channel', { channel_id: item.id,channel_photo:item.channel_photo });
+    }else if(this.state.matche_details.is_kora_star==true && item.url){
+      let ch = 
+      {
+      "category_id": item.url,
+      "category_name": item.en_name,
+      "category_photo": "",
+      "codename": "beinsportnews",
+      "id": item.url,
+      "img": "",
+      "is_external": true,
+      "name": item.en_name,
+      "title_news": item.en_name,
+      "url": item.url,
+      };
+      this.props.navigation.navigate('Video', { item: ch });
+      //API_.open_ext_url(item.url);
     }
   }
 

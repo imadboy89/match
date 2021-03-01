@@ -365,8 +365,8 @@ get_matches_koora = async(date_obj=null)=>{
   API_.load_leagues(this.refresh_leagues);
   
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
-  
-  let resp = await API_.get_matches_k(date_obj,this.state.is_only_live);
+  let resp = [];
+  resp = await API_.get_matches_k(date_obj,this.state.is_only_live,this.state.source_id);
   let data = resp && resp.length>0 ? resp : [];
   
   data = await this.get_favs(data);
@@ -485,7 +485,7 @@ show_DateP(){
       >
         <Picker.Item label="AL match" value={0} />
         <Picker.Item label="Kooora" value={1} />
-        <Picker.Item label="arriadia" value={2} />
+        <Picker.Item label="kora-star" value={2} />
     </Picker>
   </View>);
     return (

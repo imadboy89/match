@@ -571,18 +571,27 @@ class API {
         this.error = error;
       });
   }
-  get_matches_k(date_obj, is_only_live){
-    let url = "https://www.kooora.com/?region=-1&area=0&dd=";
-    url = is_only_live ? "https://www.kooora.com/?region=-1&area=6&dd=" : url;
-    url +=date_obj.getDate()+"&mm="+(date_obj.getMonth()+1)+"&yy="+date_obj.getFullYear()+"&arabic&ajax=1";
+  get_matches_k(date_obj, is_only_live, source_id=1){
+    let url = "";
+    if(source_id==1){
+      url = "https://www.kooora.com/?region=-1&area=0&dd=";
+      url = is_only_live ? "https://www.kooora.com/?region=-1&area=6&dd=" : url;
+      url +=date_obj.getDate()+"&mm="+(date_obj.getMonth()+1)+"&yy="+date_obj.getFullYear()+"&arabic&ajax=1";
+    }else if(source_id==2){
+      url = "https://table.super-kora.tv/";
+    }
     return this.http(url,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       let matches = [];
       try {
-        matches = scrap.get_matches_k(resp,date_obj,false, is_only_live);
-      } catch (e) {}
+        if(source_id==1){
+          matches = scrap.get_matches_k(resp,date_obj,false, is_only_live);
+        }else if(source_id==2){
+          matches = scrap.get_matches_kora_star(resp,date_obj,false, is_only_live);
+        }
+      } catch (e) { console.log(e);}
       return matches;//this.set_logos(matches);
     });
   }
