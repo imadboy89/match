@@ -1,11 +1,11 @@
 {
   "files": {
-    "app.js": "/match/static/js/app.0d75118a.chunk.js",
-    "app.js.map": "/match/static/js/app.0d75118a.chunk.js.map",
+    "app.js": "/match/static/js/app.b5cf5230.chunk.js",
+    "app.js.map": "/match/static/js/app.b5cf5230.chunk.js.map",
     "runtime~app.js": "/match/static/js/runtime~app.ade8d0e9.js",
     "runtime~app.js.map": "/match/static/js/runtime~app.ade8d0e9.js.map",
-    "static/js/2.cedaff35.chunk.js": "/match/static/js/2.cedaff35.chunk.js",
-    "static/js/2.cedaff35.chunk.js.map": "/match/static/js/2.cedaff35.chunk.js.map",
+    "static/js/2.14dad890.chunk.js": "/match/static/js/2.14dad890.chunk.js",
+    "static/js/2.14dad890.chunk.js.map": "/match/static/js/2.14dad890.chunk.js.map",
     "fonts/DroidKufi-Bold.ttf": "/match/./fonts/DroidKufi-Bold.ttf",
     "fonts/DroidKufi-Regular.ttf": "/match/./fonts/DroidKufi-Regular.ttf",
     "fonts/FontAwesome.ttf": "/match/./fonts/FontAwesome.ttf",
@@ -16,12 +16,12 @@
     "index.html": "/match/index.html",
     "manifest.json": "/match/manifest.json",
     "serve.json": "/match/serve.json",
-    "static/js/2.cedaff35.chunk.js.LICENSE.txt": "/match/static/js/2.cedaff35.chunk.js.LICENSE.txt",
+    "static/js/2.14dad890.chunk.js.LICENSE.txt": "/match/static/js/2.14dad890.chunk.js.LICENSE.txt",
     "static/media/ptch.jpg": "/match/static/media/ptch.a355ccf1.jpg"
   },
   "entrypoints": [
     "static/js/runtime~app.ade8d0e9.js",
-    "static/js/2.cedaff35.chunk.js",
-    "static/js/app.0d75118a.chunk.js"
+    "static/js/2.14dad890.chunk.js",
+    "static/js/app.b5cf5230.chunk.js"
   ]
 }
