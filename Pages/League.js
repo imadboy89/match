@@ -47,9 +47,13 @@ class LeagueScreen extends React.Component {
     }
   }
   componentDidMount(){
+    this._isMounted = true;
     getTheme("styles_league").then(theme=>this.setState({dynamic_style:theme}));
     this.props.navigation.setOptions({title: <Text>{this.league_name}</Text>});
     this.get_standing(this.league_id);
+  }
+  async componentWillUnmount(){
+    this._isMounted = false;
   }
   async get_standing(id){
     this.is_k = false;
@@ -74,7 +78,9 @@ class LeagueScreen extends React.Component {
   }
   get_matches(league_id){
       get_notifications_matches().then(o=>{
-        this.setState({notifications_matches:o});
+        if(this._isMounted){
+          this.setState({notifications_matches:o});
+        }
         });
       if(this.real_id!=this.league_id && this.real_id!=undefined){
         return this.get_matches_k();
@@ -127,46 +133,47 @@ class LeagueScreen extends React.Component {
       }
     });
   }
-  get_matches_k = ()=>{
+  get_matches_k = async()=>{
     this.setState({loading:true});
     let matches = {};
-    get_notifications_matches().then(_notifications_matches=>{
-      API_.get_matches_league_k(this.real_id).then(resp=>{
-        let data = resp && resp.length>0 ? resp : [];
-        let header = {};
+    const _notifications_matches = await get_notifications_matches();
+    let resp = await API_.get_matches_league_k(this.real_id);
+    let data = resp && resp.length>0 ? resp : [];
+    let header = {};
+    try {
+      header = JSON.parse(JSON.stringify(data[0])) ;
+    } catch (error) {}
+    header["data"] = [];
+    data["data"];
+    try{
+      //let _data = data[0]["data"].map
+      data = data[0]["data"].map(row =>{
+        const date_str = row.date;
+        let dayname = "";
         try {
-          header = JSON.parse(JSON.stringify(data[0])) ;
-        } catch (error) {}
-        header["data"] = [];
-        data["data"];
-        try{
-          //let _data = data[0]["data"].map
-          data = data[0]["data"].map(row =>{
-            const date_str = row.date;
-            let dayname = "";
-            try {
-              dayname = API_.days[API_.convert_time_o(date_str+" 00:00").getDay()]
-            } catch (error) {
-              
-            }
-            if(
-              this.state.matches_only_fav==true && 
-              !this.state.favorite.includes(row.home_team_id) && 
-              !this.state.favorite.includes(row.away_team_id)  ){
-                return;
-            }
-            if(matches[date_str] == undefined){
-              matches[date_str] = JSON.parse(JSON.stringify(header));
-              matches[date_str].title = date_str+" - "+dayname;
-            }
-            matches[date_str].data.push(row);
+          dayname = API_.days[API_.convert_time_o(date_str+" 00:00").getDay()]
+        } catch (error) {
+          
+        }
+        if(
+          this.state.matches_only_fav==true && 
+          !this.state.favorite.includes(row.home_team_id) && 
+          !this.state.favorite.includes(row.away_team_id)  ){
+            return;
+        }
+        if(matches[date_str] == undefined){
+          matches[date_str] = JSON.parse(JSON.stringify(header));
+          matches[date_str].title = date_str+" - "+dayname;
+        }
+        matches[date_str].data.push(row);
 
-          });
-        }catch(e){console.log(e)}
-      matches = Object.values(matches) ? Object.values(matches) : [];
-      this.setState({matches:matches,loading:false,visible_tab:"matches",notifications_matches:_notifications_matches});
       });
-    });
+    }catch(e){console.log(e)}
+    matches = Object.values(matches) ? Object.values(matches) : [];
+    matches = await API_.set_logos(matches);
+    if(this._isMounted){
+      this.setState({matches:matches,loading:false,visible_tab:"matches",notifications_matches:_notifications_matches});
+    }
   }
   
   onMatch_clicked =(item)=>{

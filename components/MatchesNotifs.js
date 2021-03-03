@@ -17,7 +17,42 @@ class MatchesNotifs extends React.Component{
       }
       componentDidMount(){
         getTheme("styles_notif").then(theme=>this.setState({dynamic_style_colors:theme}) );
-        get_notifications_matches().then(o=>{this.setState({notifications_matches:o});});
+        this.load_notif_matches();
+      }
+      load_notif_matches=async()=>{
+        const notifications_matches = await get_notifications_matches();
+        let list = notifications_matches ? Object.values(notifications_matches).map(oo=>{
+          let data = oo.content && oo.content.data && oo.content.data.data ? oo.content.data.data : {};
+          try {
+            data = JSON.parse(data);
+          } catch (error) {data = JSON.parse(oo.content.data);}
+          return data;
+         }) : [];
+
+        list = list.filter(o=> o && Object.keys(o) && Object.keys(o).length>0 );
+        list = list.sort((a,b)=> a.date<b.date ? -1 : 0);
+
+        let list_new = {};
+        for(let i=0; i<list.length;i++){
+          const item = list[i];
+          if(list_new[item["date"]] == undefined ){
+            list_new[item["date"]] = [item,];
+          }else{
+            list_new[item["date"]].push(item);
+          }
+        }
+
+        list = list_new &&  Object.keys(list_new).length>0 ? Object.keys(list_new).map(k=>{
+          let dayname = "";
+          try {
+            dayname = API_.days[API_.convert_time_o(list_new[k][0].date+" 00:00").getDay()]
+          } catch (error) {}
+          return {"title":k + "-" + dayname,"data":list_new[k]};
+        }) : [];
+
+        list = await API_.set_logos(list);
+        this.setState({list:list});
+
       }
       _onMatch_LongPressed=(item)=>{
         onMatch_LongPressed(item).then(oo=>{
@@ -33,48 +68,6 @@ class MatchesNotifs extends React.Component{
       }
       render(){
         const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
-        let i=0;
-        const history = [{time:" Time",type:"Type",body:"Body"}].concat(API_.messages_history).map(line=>{
-          const style_k = this.state.dynamic_style_colors["txt_"+line.type] ? line.type : "";
-          const indecator_style= style_k!="" ? this.state.dynamic_style_colors["bg_"+style_k] : {};
-          const text_style= style_k!="" ?  this.state.dynamic_style_colors["txt_"+style_k] : {};
-          i+=1;
-          return (<View style={{flexDirection:'row', flexWrap:'wrap',width:"100%",paddingVertical:2}} key={line.time+i}>
-          <Text style={this.state.dynamic_style.log_time_text}>{line.time.split(" ").length==2 ? line.time.split(" ")[1]:""}</Text>
-          <Text style={[this.state.dynamic_style.log_type_text,text_style]}>{line.type}</Text>
-          <View style={[this.state.dynamic_style_colors.indecator_thin,indecator_style]}></View>
-          <Text style={[this.state.dynamic_style.log_msg_text,text_style]}>{line.body}</Text>
-        </View>);
-        });
-        this.state.list = this.state.notifications_matches ? Object.values(this.state.notifications_matches).map(oo=>{
-          let data = oo.content && oo.content.data && oo.content.data.data ? oo.content.data.data : {};
-          try {
-            data = JSON.parse(data);
-          } catch (error) {data = JSON.parse(oo.content.data);}
-          return data;
-         }) : [];
-         
-        this.state.list = this.state.list.filter(o=> o && Object.keys(o) && Object.keys(o).length>0 );
-        this.state.list = this.state.list.sort((a,b)=> a.date<b.date ? -1 : 0);
-        let list_new = {};
-        for(let i=0; i<this.state.list.length;i++){
-          const item = this.state.list[i];
-          if(list_new[item["date"]] == undefined ){
-            list_new[item["date"]] = [item,];
-          }else{
-            list_new[item["date"]].push(item);
-          }
-        }
-        this.state.list = list_new &&  Object.keys(list_new).length>0 ? Object.keys(list_new).map(k=>{
-          let dayname = "";
-          try {
-            dayname = API_.days[API_.convert_time_o(list_new[k][0].date+" 00:00").getDay()]
-          } catch (error) {}
-          return {"title":k + "-" + dayname,"data":list_new[k]};
-        }) : [];
-        //this.state.list = this.state.list.slice(0,1);
-        //alert(JSON.stringify(this.state.list));
-        //API_.showMsg(JSON.stringify(list));
         return (
           <MModal 
           animationType="slide"

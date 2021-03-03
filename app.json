@@ -19,6 +19,7 @@
       "**/*"
     ],
     "ios": {
+      "icon": "./assets/icon_ios.png",
       "bundleIdentifier": "com.imados.almatch",
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist"      
