@@ -94,7 +94,7 @@ class Scrap {
     match_details["group"] = details_dict["sl"] && details_dict["sl"].length>0 ? details_dict["sl"][0][1] : "-" ;
 
     match_details["retour_score"] = details_dict["sl"] && details_dict["sl"].length>0 ? 
-      details_dict["sl"][0][1] + " - " +details_dict["sl"][0][2] : "-" ;
+    match_details["away_team"]+" "+details_dict["sl"][0][1] + " - " +details_dict["sl"][0][2]+" "+match_details["home_team"] : "-" ;
 
     return match_details;
   }
