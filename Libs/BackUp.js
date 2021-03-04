@@ -148,6 +148,8 @@ class BackUp{
           return this.is_auth;
         }else if(logout){
           await client.auth.logout();
+        }else{
+          this.client = await client.auth.loginWithCredential(new  AnonymousCredential());
         }
         this.loadingClient = false;
         return false;
@@ -156,6 +158,18 @@ class BackUp{
         this.LS.setCredentials("","");
       }
 
+    }
+    user_log = async()=>{
+      if(_ClientInfo == undefined ){
+        return false;
+      }
+      let clientInfos = await _ClientInfo.getInfo();
+      clientInfos.email = this.email;
+      try{
+        const results = await this.client.callFunction("users_log",[clientInfos]);
+      }catch(error){
+        API_.debugMsg(error,"danger");
+      }
     }
     newUser = async()=>{
       if( ! await this.checkCnx()){

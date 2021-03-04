@@ -29,7 +29,7 @@ import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
 import backUp from "./Libs/BackUp";
 import ToastMsg from "./components/ToastMsg";
-
+import ClientInfo from "./Libs/ClientInfo";
 Text = TextF;
 global. API_ = new API();
 global. API_.appname = "AlMatch"
@@ -39,6 +39,7 @@ var _app_styles = app_styles;
 global.backup = new backUp();
 global.backup.executingQueued();
 global.api_type=0;
+global._ClientInfo = new ClientInfo();
 
 if(API_.isWeb){
   global. Global_theme_name = window.matchMedia  && window.matchMedia('(prefers-color-scheme: dark)').matches===true?"dark violet" :"light" ;

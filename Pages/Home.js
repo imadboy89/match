@@ -93,6 +93,7 @@ class HomeScreen extends React.Component {
       backup._loadClient().then(output=>{
         this.setState({is_auth:backup.is_auth });
         this.render_header();
+        backup.user_log();
         if(output==false){return false;}
         backup.load_teams();
         backup.load_settings().then(o=>{

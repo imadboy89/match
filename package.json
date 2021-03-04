@@ -13,7 +13,7 @@
     "ios": "expo start --ios",
     "web": "expo start:web",
     "eject": "expo eject",
-    "doall":"expo publish && npm run deploy && git add . && git commit -m 'fix bugs and more ..DOALL' && git push origin"
+    "doall": "expo publish && npm run deploy && git add . && git commit -m 'fix bugs and more ..DOALL' && git push origin"
   },
   "dependencies": {
     "@react-native-community/async-storage": "~1.12.0",
@@ -43,6 +43,7 @@
     "react-dom": "16.13.1",
     "react-hls-player": "*",
     "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.0.tar.gz",
+    "react-native-device-info": "^8.0.2",
     "react-native-gesture-handler": "~1.8.0",
     "react-native-html-parser": "^0.1.0",
     "react-native-paper": "^4.0.1",

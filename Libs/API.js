@@ -585,6 +585,7 @@ class API {
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       let matches = [];
+      is_only_live = false;
       try {
         if(source_id==1){
           matches = scrap.get_matches_k(resp,date_obj,false, is_only_live);
