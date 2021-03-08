@@ -64,7 +64,6 @@ class HomeScreen extends React.Component {
   }
   goFullscreen = ()=>{
     if(API_.isWeb){
-      console.log(document.fullscreenElement);
       if(document.fullscreenElement){
         document.exitFullscreen();
         API_.showMsg("Going Back to normal mode!","info");
@@ -99,8 +98,9 @@ class HomeScreen extends React.Component {
         backup.load_settings().then(o=>{
           backup.savePushToken();
           this.refresh_leagues();
-        }).catch(err=>{console.log(err)});
-      }).catch(err=>{
+        }).catch(error=>{console.log(error)});
+      }).catch(error=>{
+        console.log(error);
         API_.debugMsg(error,"danger");
       });
     }

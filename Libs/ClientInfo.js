@@ -1,4 +1,4 @@
-import DeviceInfo from 'react-native-device-info';
+import * as DeviceInfo from 'expo-device';
 
 class ClientInfo {
     constructor() {
@@ -9,6 +9,31 @@ class ClientInfo {
 
     getInfo = async()=>{
         let infos = {};
+        infos.device_type       = DeviceInfo.DeviceType[await DeviceInfo.getDeviceTypeAsync()];
+        infos.osName            = DeviceInfo.osName;
+        //infos.osName            = DeviceInfo.DeviceType;
+        infos.osInternalBuildId = DeviceInfo.osInternalBuildId;
+        infos.manufacturer      = DeviceInfo.manufacturer;
+        infos.brand             = DeviceInfo.brand;
+        infos.modelName         = DeviceInfo.modelName;
+        infos.modelId           = DeviceInfo.modelId;
+        infos.designName        = DeviceInfo.designName;
+        infos.productName       = DeviceInfo.productName;
+        infos.platformApiLevel  = DeviceInfo.platformApiLevel;
+        
+        
+        infos.navigator          = this.getinfoBrowser();
+        const _keys= Object.keys(infos);
+        for(let i=0;i<_keys.length;i++){
+            infos[_keys[i]] = infos[_keys[i]] == null ? "-" : infos[_keys[i]];
+            infos[_keys[i]] = infos[_keys[i]].toLowerCase && ["unknown","unknown.unknown"].includes(infos[_keys[i]].toLowerCase()) ? "-" : infos[_keys[i]];
+        }
+        return infos;
+    }
+
+    _getInfo = async()=>{
+        let infos = {};
+        
         infos.base_od            = await DeviceInfo.getBaseOs();
         infos.brand              = await DeviceInfo.getBrand();
         infos.device             = await DeviceInfo.getDevice();
@@ -32,7 +57,7 @@ class ClientInfo {
     }
 
     getinfoBrowser(){
-        if(navigator==undefined)return false;
+        if(API_ && API_.isWeb==true && navigator==undefined)return false;
         this.browser_infos = {};
         for(var p in navigator){
            try {

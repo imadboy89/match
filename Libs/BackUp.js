@@ -27,9 +27,9 @@ class BackUp{
     checkCnx = async(check_client=true,is_silent=false)=>{
       const state = await NetInfo.fetch();
       this.isConnected = state.isConnected;
-      //console.log(".............isConnected", this.isConnected);
       if(check_client && (!this.client || !this.client.callFunction )){
-        await this.setClientInfo();
+        const res = await this.setClientInfo();
+        
       }
       if(this.isConnected && check_client){
         await this.checkConnectedUserChange();
@@ -41,25 +41,37 @@ class BackUp{
     }
     setClientInfo = async()=>{
       try {
-        this.client = Stitch.defaultAppClient;
+        this.client = await this.get_default_appClient();
         const mongoClient = this.client.getServiceClient(RemoteMongoClient.factory,"mongodb-atlas");
-        this.lastActivity = this.client.auth.activeUserAuthInfo.lastAuthActivity;
-        this.email = this.client.auth.activeUserAuthInfo.userProfile.data.email;
-        this.email = this.email.toLocaleLowerCase().trim();
+        try {
+          this.lastActivity = this.client.auth.activeUserAuthInfo.lastAuthActivity;
+        } catch (error) {this.lastActivity=""}
+        try {
+          this.email = this.client.auth.activeUserAuthInfo.userProfile.data.email;
+        } catch (error) {this.email="";}
+        this.email = this.email ? this.email.toLocaleLowerCase().trim() : "";
         this.db = mongoClient.db("ba9al");
         this.db_settings = this.db.collection("settings");
         this.db_teams_info = this.db.collection("teams_info");
         this.is_auth = this.email!="" && this.email !=undefined;
-        if(this.is_auth) {setTimeout(()=>API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success"),1000)}
-        await this.isAdmin();
+        if(this.is_auth) {
+          setTimeout(()=>API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success"),1000);
+          await this.isAdmin();
+        }else{
+          await this.client.auth.loginWithCredential(new  AnonymousCredential());
+          this.client = this.client = await this.get_default_appClient();
+        }
+        
         return this.is_auth;
 
       } catch (error) {
+        console.log(error);
         return new Promise(resolve=>{resolve(false);});
       }
       
     }
     executingQueued = async()=>{
+      return true;
       if(this.executingQueued_running){
         return ;
       }
@@ -125,19 +137,24 @@ class BackUp{
       //if(this.is_auth==false) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
        
     }
-    login = async (logout=false)=>{
-      this.is_auth = false;
-      const credents = this.LS.getCredentials();
-      this.admin = false ;
-      let client=null;
+    get_default_appClient = async()=>{
+      let client = false;
       try{
         client = Stitch.defaultAppClient;
        }catch(err){
-        client = await Stitch.initializeDefaultAppClient("ba9al-xpsly");
+         //console.log(err);
+          client = await Stitch.initializeDefaultAppClient("ba9al-xpsly");
        }
+       return client;
+    }
+    login = async (logout=false)=>{
+      const credents = this.LS.getCredentials();
+      this.admin = false ;
+      let client= await this.get_default_appClient();
       try {
-        this.email="";
         if(credents && credents.email && credents.password && credents.email!="" && credents.password!="" && logout==false){
+          this.email="";
+          this.is_auth = false;
           const credential = new UserPasswordCredential(credents["email"],credents["password"]);
           await client.auth.logout();
           this.client = await client.auth.loginWithCredential(credential);
@@ -147,9 +164,12 @@ class BackUp{
           //if(this.is_auth) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
           return this.is_auth;
         }else if(logout){
+          this.email="";
+          this.is_auth = false;
           await client.auth.logout();
         }else{
-          this.client = await client.auth.loginWithCredential(new  AnonymousCredential());
+          await this.setClientInfo(); 
+          //this.client = await client.auth.loginWithCredential(new  AnonymousCredential());
         }
         this.loadingClient = false;
         return false;
@@ -160,7 +180,7 @@ class BackUp{
 
     }
     user_log = async()=>{
-      if(_ClientInfo == undefined ){
+      if(_ClientInfo == undefined || !this.client || !this.client.callFunction){
         return false;
       }
       let clientInfos = await _ClientInfo.getInfo();
@@ -199,13 +219,14 @@ class BackUp{
           this.loadingClient = false;
           return false;
         }
+        /*
         const credents = this.LS.getCredentials();
         let credential= new  AnonymousCredential();
         let usingAnon = true;
         if(credents && credents.email && credents.password){
           credential = new UserPasswordCredential(credents["email"],credents["password"]);
           usingAnon = false;
-        } 
+        }*/
         await this.login();
       }
 
