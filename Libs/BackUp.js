@@ -51,9 +51,10 @@ class BackUp{
         } catch (error) {this.email="";}
         this.email = this.email ? this.email.toLocaleLowerCase().trim() : "";
         this.db = mongoClient.db("ba9al");
-        this.db_settings = this.db.collection("settings");
+        this.db_settings   = this.db.collection("settings");
         this.db_teams_info = this.db.collection("teams_info");
-        this.is_auth = this.email!="" && this.email !=undefined;
+        this.db_IPTV       = this.db.collection("IPTV");
+        this.is_auth       = this.email!="" && this.email !=undefined;
         if(this.is_auth) {
           setTimeout(()=>API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success"),1000);
           await this.isAdmin();
