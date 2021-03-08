@@ -418,18 +418,28 @@ class BackUp{
           });
     }
     load_iptv = async()=>{
-      const channels = await this.db_IPTV.find({}).asArray();
-      return channels;
-    }
-    save_iptv = async(ch)=>{
-      ch.user_id = this.client.auth.activeUserAuthInfo.userId;
-      const o = await this.db_IPTV.insertOne(ch);
-      if(o && o.insertedId){
-        API_.showMsg("تمت إضافة القناة");
-      }else{
-        API_.showMsg("Something wrong : "+JSON.stringify(o) ,"danger");
+      try {
+        
+        const channels = await this.db_IPTV.find({}, { sort: { datetime: -1 } }).asArray();
+        return channels; 
+      } catch (error) {
+        console.log(error.message);
+        API_.showMsg(error,"danger");
+        return [];
       }
     }
+    save_iptv = async(ch)=>{
+      try {
+        ch.user_id = this.client.auth.activeUserAuthInfo.userId;
+        const o = await this.db_IPTV.insertOne(ch);
+        if(o && o.insertedId){
+          API_.showMsg("تمت إضافة القناة  *"+ch.name+"*","success");
+        }else{
+          API_.showMsg("Something wrong : "+JSON.stringify(o) ,"danger");
+        }
+      } catch (error) {API_.showMsg(error,"danger");}
+    }
+
 }
 
 export default BackUp ;
