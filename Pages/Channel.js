@@ -100,6 +100,12 @@ class ChannelScreen extends React.Component {
   }
   get_channel(){
       this.channel_photo = this.props.route.params.channel_photo;
+      const ch_item = this.props.route.params.ch_item;
+      if(ch_item){
+        console.log(ch_item);
+        setTimeout(()=>{this.setState({channel:ch_item,loading:false});},300);
+        return ;
+      }
       API_.get_channel(this.props.route.params.channel_id).then(resp=>{
         if(resp && resp["data"] && resp["data"]["en_name"] ){
           this.setState({channel:resp["data"],loading:false});
@@ -117,24 +123,27 @@ class ChannelScreen extends React.Component {
         closeM={()=>{this.setState({modalVisible_match:false})}}
       />
         );
-}
+  }
 
   onch_clicked(serv){
-    let url = serv.SecureUrl;
     //let name = this.state.channel["name"];
     //let img = API_.domain_o+this.channel_photo;
     if(serv.is_external==true){
       API_.open_ext_url(serv.url);
     }else if (this.state.actionType=="IPTV"){
-      API_.saveLink(serv.SecureUrl,this.state.channel["name"],API_.domain_o+this.channel_photo).then(out=>notifyMessage("تمت إضافة القناة!"));
+      API_.saveLink(serv.SecureUrl,this.state.channel["name"],API_.domain_o+this.channel_photo).then(out=>API_.showMsg("تمت إضافة القناة!"));
       
-    }else if ("PLAYER"){
+    }else if (this.state.actionType=="PLAYER"){
       if(API_.isWeb){
-        this.setState({p_url:url,modalVisible_match:true});
+        this.setState({p_url:serv.SecureUrl,modalVisible_match:true});
         return;
       }
-      API_.open_ext_url(url);
+      API_.open_ext_url(serv.SecureUrl);
 
+    }else if(this.state.actionType=="inApp-IPTV"){
+      const ch = JSON.parse(JSON.stringify(this.state.channel));
+      ch.channel_photo = this.channel_photo;
+      backup.save_iptv(ch);
     }
   }
   render() {
@@ -150,7 +159,7 @@ class ChannelScreen extends React.Component {
             onPress={()=>this.onch_clicked(serv)} title={serv.name} style={{margin:5}}></Button>
         </View>
       ):null);
-    let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER"] : ["PLAYER",];
+    let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER",];
     const pickers = picker_options.map(o=><Picker.Item label={o} value={o} key={o}/>);
 
     return (

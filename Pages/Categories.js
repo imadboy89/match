@@ -8,6 +8,7 @@ import ReactHlsPlayer from "react-hls-player";
 import Video from 'expo';
 import IconButton from "../components/IconButton";
 import {styles_home} from "../components/Themes";
+import BackUp from '../Libs/BackUp';
 
 let list = [
 
@@ -49,6 +50,8 @@ class CategoriesScreen extends React.Component {
   get_cats(page=1){
     if(this.state.source_id == 2){
       return this.get_externa_ch();
+    }else if(this.state.source_id == 3){
+      return this.get_IPTV_ch();
     }
     if(this.end==true){return false;}
     API_.get_categories(page).then(resp=>{
@@ -64,6 +67,23 @@ class CategoriesScreen extends React.Component {
     });
 
   }
+  get_IPTV_ch=async()=>{
+    let chs = await backup.load_iptv();
+    let chs_list = [];
+    for(let i=0;i<chs.length;i++){
+      const ch = {"channel_photo":"","name":"", "url":"","id":"","is_external":false,"category_name":"","category_photo":"","category_id":""};
+      ch.name = chs[i].name;
+      ch.channel_photo = chs[i].channel_photo;
+      ch.category_photo = ch.channel_photo;
+      ch.quality = chs[i].quality;
+      ch.id = chs[i].name+"-"+chs[i].quality;
+      ch.category_id = chs[i].name+"-"+chs[i].quality;
+      ch.category_name = chs[i].name;
+      ch.ch_item = chs[i];
+      chs_list.push(ch);
+    }
+    this.setState({list:chs_list, key_:"category_name",key_key:"category_id",loading:false});
+  }
   async get_externa_ch(){
     if(API_.external_channels==undefined){
       await API_.load_external_channels();
@@ -78,7 +98,11 @@ class CategoriesScreen extends React.Component {
       //API_.open_ext_url(item.url);
       this.props.navigation.navigate('Video', { item: item });
     }else{
-      this.props.navigation.navigate('Channels',{category_id:item.category_id,category_name: item.category_name});
+      if(this.state.source_id==3){
+        this.props.navigation.navigate('Channel', { channel_id: item.ch_item.channel_id,channel_photo:item.ch_item.channel_photo,ch_item : item.ch_item });
+      }else{
+        this.props.navigation.navigate('Channels',{category_id:item.category_id,category_name: item.category_name});
+      }
     }
 
   }
@@ -95,7 +119,8 @@ class CategoriesScreen extends React.Component {
       onValueChange={this.changesource}
     >
       <Picker.Item label="Almtch" value={1} />
-      <Picker.Item label="kora-live" value={2} />      
+      <Picker.Item label="kora-live" value={2} />
+      <Picker.Item label="inApp-IPTV" value={3} />
   </Picker>);
     return (
       <View style={styles.container}>

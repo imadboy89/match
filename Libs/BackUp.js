@@ -417,8 +417,19 @@ class BackUp{
               this.appendLog ("    XXX Found : "+err.message);
           });
     }
-
-
+    load_iptv = async()=>{
+      const channels = await this.db_IPTV.find({}).asArray();
+      return channels;
+    }
+    save_iptv = async(ch)=>{
+      ch.user_id = this.client.auth.activeUserAuthInfo.userId;
+      const o = await this.db_IPTV.insertOne(ch);
+      if(o && o.insertedId){
+        API_.showMsg("تمت إضافة القناة");
+      }else{
+        API_.showMsg("Something wrong : "+JSON.stringify(o) ,"danger");
+      }
+    }
 }
 
 export default BackUp ;

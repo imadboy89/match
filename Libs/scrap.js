@@ -738,7 +738,7 @@ class Scrap {
     let chs = {};
     for (let i=0;i<as.length;i++){
       const as_ = as[i];
-      const ch = {"img":"","name":"", "url":"","id":"","is_external":true};
+      const ch = {"img":"","name":"", "url":"","id":"","is_external":true,"category_name":"","category_photo":"","category_id":""};
       ch.url = as_.getAttribute("href");
       ch.name = as_.getElementsByClassName("g_t_inf_schdiv");
       ch.name = ch.name && ch.name[0] ? ch.name[0].childNodes+"" : "";
