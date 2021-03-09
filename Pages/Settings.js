@@ -30,6 +30,8 @@ class SettingsScreen extends React.Component {
         
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
+
+
   }
   async load_favs(){
     const fav_l = await API_.getConfig("favorite_leagues",[]);

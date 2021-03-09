@@ -173,7 +173,9 @@ class ItemsList extends React.Component {
         </View>
         );
     }else if(col_key=="category_name"){  
-      const img_uri = item.category_photo && item.category_photo.slice(0,4)=="http" ? item.category_photo : API_.domain_o+item.category_photo;
+      const item_ph = item ? ( item.category_photo ? item.category_photo : item.category_photo ) : undefined;
+      const img_uri = item_ph && item_ph.slice(0,4)=="http" ? item_ph : API_.domain_o+item_ph;
+      console.log(img_uri);
       return (
         <View style={[this.state.dynamic_style.news_container,shadow_style]}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: img_uri}} imageStyle={{resizeMode:"stretch"}}>
