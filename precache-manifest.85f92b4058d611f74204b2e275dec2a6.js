@@ -1,7 +1,7 @@
 self.__precacheManifest = [
   {
-    "revision": "d222fe6016767723ee41",
-    "url": "/match/static/js/app.0cae43e7.chunk.js"
+    "revision": "8daf45ea6ce7b5f90059",
+    "url": "/match/static/js/app.e82c6eab.chunk.js"
   },
   {
     "revision": "f8bcc2919955976d4024",
@@ -32,10 +32,6 @@ self.__precacheManifest = [
     "url": "/match/./fonts/Ionicons.ttf"
   },
   {
-    "revision": "8d6997d994fb10921593e1f237e268f2",
-    "url": "/match/index.html"
-  },
-  {
     "revision": "ec543248d7b23864564429fc03837190",
     "url": "/match/serve.json"
   },
@@ -44,7 +40,7 @@ self.__precacheManifest = [
     "url": "/match/expo-service-worker.js"
   },
   {
-    "revision": "d04dfc90772ae1e1a8952a81097d50b0",
+    "revision": "7f7bfacc7ec32aad628d8cdd3f9c9e77",
     "url": "/match/register-service-worker.js"
   },
   {
@@ -62,6 +58,10 @@ self.__precacheManifest = [
   {
     "revision": "3c6b4bd0f10d67852133e8ae1b60e2d3",
     "url": "/match/favicon.ico"
+  },
+  {
+    "revision": "cb3b978550ab8b150307949aeab08d19",
+    "url": "/match/index.html"
   },
   {
     "revision": "15ef816cd6ba1022ea739dc1b0db0278",
