@@ -96,7 +96,9 @@ class HomeScreen extends React.Component {
         if(output==false){return false;}
         backup.load_teams();
         backup.load_settings().then(o=>{
-          backup.savePushToken();
+          if(API_.isWeb==false){
+            backup.savePushToken();
+          }
           this.refresh_leagues();
         }).catch(error=>{console.log(error)});
       }).catch(error=>{

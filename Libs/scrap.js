@@ -207,8 +207,9 @@ class Scrap {
     let group_name=false;
     json_["ranks_table"] = json_["ranks_table"] ? json_["ranks_table"] : [];
     let standing_header = standing_header_;
-    try{
-      for(let i=0;i< json_["ranks_table"].length;i++){
+    
+    for(let i=0;i< json_["ranks_table"].length;i++){
+      try{
         if(standing.length==0 && h==4 && json_["ranks_table"][i].includes("~") ){
           standing_header = standing_header_cc;
         }
@@ -249,9 +250,8 @@ class Scrap {
           h=0;
           team_st={};
         }
-        
-      }
-    }catch(err){console.log(err)}
+      }catch(err){console.log(err)}
+    }
     return standing;
   }
   get_matches_kora_star(html,date,is_oneMatch=false,is_only_live=false){

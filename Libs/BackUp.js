@@ -105,18 +105,39 @@ class BackUp{
       });
     }
 
+    subscribeUser = async() =>{
+      const server_key = "BPRLuFzkQnqlKVNs-ksQ34d24FtZFa_Fenl6ds6QbrlbadXlpmlTsJ_EGfIEW5STO_AaCuNPj6RhryOdXwIi6xM";
+      const applicationServerKey = server_key;
+      let subscription = await serviceWorker.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey
+      });
+      console.log(subscription);
+      return subscription
+    }
     savePushToken = async()=>{
+      if(API_.isWeb){
+        try {
+          console.log("savePushToken start2");
+          this.PushToken = await this.subscribeUser();
+          this.PushToken = JSON.stringify(this.PushToken);
+          console.log("savePushToken END");
+        } catch (error) {
+          API_.showMsg(error,"danger");
+          return false;
+        }
+      }
       if( ! await this.checkCnx() || this.PushToken==undefined || this.PushToken ==""){
         return new Promise(resolve=>{resolve(false);});
       }
       let  results ={};
       try {
-        results = await this.client.callFunction("savePushToken",[this.PushToken,"ar"]);
+        results = await this.client.callFunction("savePushToken",[this.PushToken,"ar",API_.isWeb?1:0]);
       } catch (error) {
         console.log(error);
         return false;
       }
-      return results["deleted"];
+      return results;
     }
 
     checkConnectedUserChange = async()=>{

@@ -70,7 +70,6 @@ class CategoriesScreen extends React.Component {
 
   }
   get_local_saved_chs=async()=>{
-    console.log(Object.values(API_.channels_dict)[0]);
     const list = Object.values(API_.channels_dict).map(row => {
       row.category_name = row.name;
       row.category_photo = row.channel_photo;
