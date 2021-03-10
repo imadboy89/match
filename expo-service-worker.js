@@ -11,7 +11,7 @@ self.addEventListener("notificationclick",t=>{
     t.notification.close(),console.log(t.notification,t.notification.data);
     t.waitUntil((async()=>{const i=await self.clients.matchAll({includeUncontrolled:!0});
     let e;
-    const n=t.notification.data._webPath||location.href;
+    const n=t.notification.data._webPath||location.href.replace("expo-service-worker.js","");
     for(const t of i){if(new URL(t.url).pathname===n){t.focus(),e=t;break}}
     e||(e=await self.clients.openWindow(n)),e.postMessage({origin:"selected",
     data:t.notification.data,remote:!t.notification._isLocal})})())}),self.importScripts("service-worker.js");
