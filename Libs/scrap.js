@@ -6,7 +6,7 @@ class Scrap {
   constructor() {
     this.error = null;
     this.html="";
-    this.isWeb = false;
+    this.isWeb = API_.isWeb;
     this.img_q = "410w";
   }
   get_article(html){
@@ -756,7 +756,19 @@ class Scrap {
     }
     return chs;
   }
+  get_iframe_url(html){
+    if(html==""){return []}
+    let doc = new DomParser().parseFromString(html,'text/html');
+    let iframes = doc.querySelect('iframe');
 
+    for (let i=0;i<iframes.length;i++){
+      const iframe_url = iframes[i].getAttribute("src") ;
+      if(iframe_url && iframe_url.match(/kora-live/i)){
+        return iframe_url;
+      }
+    }
+    return false;
+  }
 
   get_news_hp(html){
     if(html==""){return []}

@@ -89,23 +89,28 @@ export class ToastMsg extends React.Component {
     this.state.transY = new Value(this.state.transofr_y*-1)
     this.timeout_closing = 0;
     this.previous_body = "";
-    console.log("TM constructor",this.state.body);
+    console.log("TM constructor",this.props.body);
     this.notif_end=true;
   }
   closing=()=>{
+    if(this.mounted==false){return}
     this.setState({transY : runTiming(new Clock(), this.state.transofr_y, -1*this.state.transofr_y,this.state.speed, this.setend)});
     setTimeout(this.setend,this.state.speed+100);
   }
   closing_im=()=>{
+    if(this.mounted==false){return}
     this.setState({transY : runTiming(new Clock(), this.state.transofr_y, -1*this.state.transofr_y,this.state.speed/2, this.setend)});
     clearTimeout(this.timeout_closing);
     setTimeout(this.setend,this.state.speed+100);
   }
-  start=()=>{
+  start=async()=>{
+    if(this.mounted==false){return}
     //await API_.getConfig("is_debug",this.debug).then(o=>API_.is_debug=o);
     API_.messages_history.push({body:this.state.body,type:this.state.type,time:API_.get_date_timeS(new Date()),is_debug:this.state.is_debug});
     if(this.state.debug && API_.is_debug==false){
-      return this.empty_stats();
+      this.empty_stats();
+      this.setend();
+      return ;
     }
     console.log(this.notif_end , API_.is_debug==false);
     //this.setState({transY : runTiming(new Clock(), -1*this.state.height, 0)});
@@ -113,7 +118,11 @@ export class ToastMsg extends React.Component {
     this.timeout_closing = setTimeout(this.closing, this.state.delay+this.state.speed);
   }
   componentDidMount(){
+    this.mounted=true;
     //getTheme("styles_notif").then(theme=>this.setState({dynamic_style:theme}) );
+  }
+  componentWillUnmount(){
+    this.mounted=false;
   }
   empty_stats(){
     this.state.body   = "";
@@ -127,6 +136,7 @@ export class ToastMsg extends React.Component {
     //this.notif_end = true;
   }
   setend = ()=>{
+    if(this.mounted==false){return}
     this.empty_stats();
     console.log("....setend")
     this.notif_end = true;

@@ -290,7 +290,7 @@ class BackUp{
         return false;
       }
       let settings = await API_.get_settings();
-      if(settings.favorite_leagues.length == 0 && settings.favorite_teams_k.length == 0 ){
+      if(settings.favorite_leagues.length == 0 && settings.favorite_teams_k.length == 0 && settings.favorite_channels.length == 0  ){
         API_.debugMsg("saving empty configs","info");
         return false;
       }
@@ -302,7 +302,7 @@ class BackUp{
         try{
           const res = await this.db_settings.updateOne({"email":this.email},settings,{upsert:true});
         }catch(err){
-          notifyMessage(err.message,"Save settings on cloud!");
+          API_.showMsg(message,"danger");
         }
         return settings ;
       }

@@ -265,9 +265,13 @@ class APP extends React.Component {
     API_.showTMsg = this.showTMsg;
   }
   componentDidMount(){
+    this.mounted = true;
     API_.showMsg = this.showTMsg;
     API_.debugMsg= this.debugMsg;
     getTheme("styles_notif").then(theme=>this.setState({notif_dynamic_style:theme}) );
+  }
+  componentWillUnmount(){
+    this.mounted = false;
   }
   showTMsg = (body,type, speed, delay)=>{
     if(this.state.showMsg==false){
@@ -283,10 +287,18 @@ class APP extends React.Component {
       this.setState({body_2:body,type_2:type, speed_2:speed, delay_2:delay,debug_2:true,showMsg_2:true});
     }  }
   onMsgEnd = ()=>{
-    this.setState({showMsg:false});
+    if(this.mounted){
+      setTimeout(() => {
+        this.setState({showMsg:false});
+      }, 1);
+    }
   }
   onMsgEnd_2 = ()=>{
-    this.setState({showMsg_2:false});
+    if(this.mounted){
+      setTimeout(() => {
+        this.setState({showMsg_2:false});
+      }, 1);
+    }
   }
   render(){
     if(this.state.style_loaded==false){

@@ -21,6 +21,7 @@ class API {
     this.method = "POST";
     this.usingproxy = Platform.OS == 'web';
     this.isWeb = Platform.OS == 'web';
+    this.load_channels_running = false;
     if (this.isWeb){
       this.domain = this.proxy+this.domain;
       this.method = "GET";
@@ -135,6 +136,15 @@ class API {
       API_.debugMsg("Could not stringify external channels results!","danger");
     }
     return true
+  }
+  get_iframe = async(url)=>{
+    const html = await  this.http(url,"GET", null,{});
+    let scrap = new Scrap();
+    const iframe_url = scrap.get_iframe_url(html);
+
+    const html2 = await  this.http(iframe_url,"GET", null,{});
+    const final_url = scrap.get_iframe_url(html2,2);
+    return final_url;
   }
   get_cc_img(flag){
     return this.cc_url.replace("[cc]",flag) ; 
@@ -821,8 +831,9 @@ class API {
     return name;
   }
   load_channels = async()=>{
+    this.load_channels_running = true;
     API_.channels_dict = {};
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1; i++) {
       let resJson = await this.get_categories(i);
       if(resJson==undefined){break;}
       if(resJson["data"] && resJson["data"].length>0){
@@ -849,6 +860,8 @@ class API {
       }
     }
     console.log("load_channels [Done]");
+    API_.showMsg("Loading Channels done ["+Object.keys(API_.channels_dict).length+"]")
+    this.load_channels_running = false;
     return true;
   }
   get_categories(page=1){

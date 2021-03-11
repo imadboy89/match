@@ -24,7 +24,7 @@ class CategoriesScreen extends React.Component {
         key_key:"category_id",
         loading:true,
         page:1,
-        source_id:1,
+        source_id:2,
     };
     this.end = false;
     this.get_cats(1);
@@ -136,7 +136,6 @@ class CategoriesScreen extends React.Component {
       <Picker.Item label="inApp-IPTV" value={3} />
       <Picker.Item label="local-IPTV" value={4} />
   </Picker>);
-  console.log(this.state.list[0]);
     return (
       <View style={styles.container}>
         <ItemsList

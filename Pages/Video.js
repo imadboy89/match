@@ -19,7 +19,8 @@ class VideoScreen extends React.Component {
         videoQuality:"380",
         
     };
-
+    this.is_external_loaded = false;
+    this.js_setIframeWidth = "(function() { const iframes = document.getElementsByTagName('iframe');for(let i = 0; i<iframes.length;i++ )iframes[0].width = '100%';})();";
   }
   componentDidMount(){
     this.state.video.title_news = this.state.video.name ? this.state.video.name : this.state.video.title_news
@@ -42,6 +43,11 @@ class VideoScreen extends React.Component {
                   name="chrome" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
                   onPress={()=>{ API_.open_ext_url(this.state.video.url); }}  />
         )
+      });
+      API_.get_iframe(this.state.video.url).then(final_url=>{
+        this.state.video.url = final_url;
+        this.is_external_loaded = true;
+        this.setState({});
       });
       return true;
     }else if(this.state.video.is_yt && this.state.video.videoId){
@@ -83,6 +89,7 @@ class VideoScreen extends React.Component {
     let uri_ = "";
     if(this.state.video.is_external){
       uri_ = this.state.video.url;
+      if(this.is_external_loaded==false) return;
     }else{
       const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality='+this.state.videoQuality+'&info=0&logo=0&autoplay=false';
       const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq='+this.state.videoQuality+'&color='+global_theme.text_color_default;
@@ -100,6 +107,7 @@ class VideoScreen extends React.Component {
               domStorageEnabled={true}
               ref={(ref) => (this.webview = ref)}
               onShouldStartLoadWithRequest={(request) => {
+                this.webview.injectJavaScript(this.js_setIframeWidth);
                 if(request.url.replace("/m.","/").replace("/www.","/") != uri_.replace("/m.","/").replace("/www.","/")){
                   console.log("stopLoading");
                   return false;
@@ -111,37 +119,38 @@ class VideoScreen extends React.Component {
               />;
   }
   render() {
-    let style = {height: this.state.video && this.state.video.url ? 500 : 300,width:"100%",position:'absolute'};
+    const height = this.state.video && this.state.video.url ? 500 : 300 ;
+    let style = {height: height,width:"100%",position:'absolute'};
     style = this.state.video && (this.state.video.videoId || this.state.video.url) ? style : {width:1,height:1};
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
-        <ImageBackground style={{height:300,width:"100%"}} source={{uri: this.state.video.img}} >
+        <ImageBackground style={{height:height,width:"100%"}} source={{uri: this.state.video.img}} >
         </ImageBackground>
         <View style={style} source={{uri: this.state.video.img}} >
         {this.render_wv()}
         </View>
         
-          <View style={this.state.dynamic_style.article_v}>
-            <Text style={this.state.dynamic_style.article_date_t}>{this.state.video && this.state.video.date ? this.state.video.date :""}</Text> 
-            <Text style={this.state.dynamic_style.article_title_t}>{this.state.video && this.state.video.title_news ? this.state.video.title_news : ""}</Text>
-            
-            
-          </View>
-          <Text style={this.state.dynamic_style.article_body_t}>{this.state.video&&this.state.video.desc?this.state.video.desc :""}</Text>
-          {this.state.video && (this.state.video.videoId || this.state.video.url) ? null : <Loader/> }
-          <Picker
-            selectedValue={this.state.videoQuality}
-            style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-            onValueChange={(itemValue, itemIndex)=>{
-              this.setState({videoQuality : itemValue});
-            }}
-          >
-            <Picker.Item label={"144"} value={"144p"} key={"144"} />
-            <Picker.Item label={"240"} value={"240p"} key={"240"} />
-            <Picker.Item label={"360"} value={"360p"} key={"360"} />
-            <Picker.Item label={"480"} value={"480p"} key={"480"} />
-            <Picker.Item label={"720"} value={"hd720&hd=1"} key={"720"} />
-            <Picker.Item label={"1080"} value={"hd1080&hd=1"} key={"1080"} />
+        <View style={this.state.dynamic_style.article_v}>
+          <Text style={this.state.dynamic_style.article_date_t}>{this.state.video && this.state.video.date ? this.state.video.date :""}</Text> 
+          <Text style={this.state.dynamic_style.article_title_t}>{this.state.video && this.state.video.title_news ? this.state.video.title_news : ""}</Text>
+          
+          
+        </View>
+        <Text style={this.state.dynamic_style.article_body_t}>{this.state.video&&this.state.video.desc?this.state.video.desc :""}</Text>
+        {this.state.video && (this.state.video.videoId || this.state.video.url) ? null : <Loader/> }
+        <Picker
+          selectedValue={this.state.videoQuality}
+          style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+          onValueChange={(itemValue, itemIndex)=>{
+            this.setState({videoQuality : itemValue});
+          }}
+        >
+          <Picker.Item label={"144"} value={"144p"} key={"144"} />
+          <Picker.Item label={"240"} value={"240p"} key={"240"} />
+          <Picker.Item label={"360"} value={"360p"} key={"360"} />
+          <Picker.Item label={"480"} value={"480p"} key={"480"} />
+          <Picker.Item label={"720"} value={"hd720&hd=1"} key={"720"} />
+          <Picker.Item label={"1080"} value={"hd1080&hd=1"} key={"1080"} />
         </Picker>
         </ScrollView >
     );
