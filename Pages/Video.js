@@ -19,6 +19,7 @@ class VideoScreen extends React.Component {
         videoQuality:"380",
         
     };
+    console.log(this.state.video);
     this.is_external_loaded = false;
     this.js_setIframeWidth = "(function() { const iframes = document.getElementsByTagName('iframe');for(let i = 0; i<iframes.length;i++ )iframes[0].width = '100%';})();";
   }
@@ -33,7 +34,7 @@ class VideoScreen extends React.Component {
   componentWillUnmount(){
     deactivateKeepAwake();
   }
-  get_video(){
+  get_video = async()=>{
     if(this.state.loading==false){this.setState({loading:true});}
 
     if(this.state.video.is_external){
@@ -44,12 +45,14 @@ class VideoScreen extends React.Component {
                   onPress={()=>{ API_.open_ext_url(this.state.video.url); }}  />
         )
       });
-      API_.get_iframe(this.state.video.url).then(final_url=>{
-        console.log(this.state.video.title_news,final_url);
+      try {
+        const final_url = await API_.get_iframe(this.state.video.url); 
         this.state.video.url = final_url ? final_url : this.state.video.url;
-        this.is_external_loaded = true;
-        this.setState({});
-      });
+      } catch (error) {API_.showMsg(error,"danger");}
+      this.is_external_loaded = true;
+      this.state.video.desc = this.state.video.url;
+      this.setState({});
+      
       return true;
     }else if(this.state.video.is_yt && this.state.video.videoId){
       setTimeout(()=>{
@@ -138,7 +141,8 @@ class VideoScreen extends React.Component {
           
         </View>
         <Text style={this.state.dynamic_style.article_body_t}>{this.state.video&&this.state.video.desc?this.state.video.desc :""}</Text>
-        {this.state.video && (this.state.video.videoId || this.state.video.url) ? null : <Loader/> }
+        { this.state.video && (this.state.video.videoId || this.state.video.url || this.is_external_loaded) 
+        ? null : <Loader/> }
         <Picker
           selectedValue={this.state.videoQuality}
           style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
