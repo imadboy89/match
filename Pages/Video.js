@@ -115,7 +115,7 @@ class VideoScreen extends React.Component {
                 return true;
               }}
               source={{ uri: uri_ }}
-              userAgent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36'
+              userAgent={this.state.video.is_external ? API_.user_agents["Android 10"] : API_.user_agents["Windows 10"] }
               />;
   }
   render() {
