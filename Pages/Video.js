@@ -19,7 +19,6 @@ class VideoScreen extends React.Component {
         videoQuality:"380",
         
     };
-    console.log(this.state.video);
     this.is_external_loaded = false;
     this.js_setIframeWidth = "(function() { const iframes = document.getElementsByTagName('iframe');for(let i = 0; i<iframes.length;i++ )iframes[0].width = '100%';})();";
   }
@@ -47,7 +46,7 @@ class VideoScreen extends React.Component {
       });
       try {
         const final_url = await API_.get_iframe(this.state.video.url); 
-        this.state.video.url = final_url ? final_url : this.state.video.url;
+        this.state.video.url = final_url && final_url.length>0 ? final_url : this.state.video.url;
       } catch (error) {API_.showMsg(error,"danger");}
       this.is_external_loaded = true;
       this.state.video.desc = this.state.video.url;
@@ -102,11 +101,11 @@ class VideoScreen extends React.Component {
       uri_ = this.state.video.source_id==3 ? uri_direct :  uri_;
     }
     if (API_.isWeb) {
-      return <iframe src={uri_} style={{flex:1,backgroundColor: "#000",borderWidth:0,height:"100%",width:"100%"}} seamless/>;
+      return <iframe src={uri_} style={{flex:1,backgroundColor: "#353b48",borderWidth:0,height:"100%",width:"100%"}} seamless/>;
     }
     return  <WebView 
               allowsFullscreenVideo={true}
-              style={{flex:1,backgroundColor: "#000"}}
+              style={{flex:1,backgroundColor: "#353b48"}}
               javaScriptEnabled={true}
               domStorageEnabled={true}
               ref={(ref) => (this.webview = ref)}

@@ -303,8 +303,8 @@ class Scrap {
         matche_dict["away_team_badge"] = imgs[1].getAttribute("src");
       }
       
-      let ch = matche_.getElementsByClassName("event_commenter") && matche_.getElementsByClassName("event_commenter").length ? matche_.getElementsByClassName("event_commenter")[0].childNodes+"" : "";
-      let commenter = matche_.getElementsByClassName("event_chanel") && matche_.getElementsByClassName("event_chanel").length ? matche_.getElementsByClassName("event_chanel")[0].childNodes+"" : "";
+      let commenter = matche_.getElementsByClassName("event_commenter") && matche_.getElementsByClassName("event_commenter").length ? matche_.getElementsByClassName("event_commenter")[0].childNodes+"" : "";
+      let ch = matche_.getElementsByClassName("event_chanel") && matche_.getElementsByClassName("event_chanel").length ? matche_.getElementsByClassName("event_chanel")[0].childNodes+"" : "";
       ch  = this.decodeEntities( ch ).trim();
       commenter  = this.decodeEntities( commenter ).trim();
       matche_dict["channels"] = [{"id":ch,"commentator":commenter,"en_name":ch,"url":matche_dict["url"]},]
@@ -763,7 +763,7 @@ class Scrap {
 
     for (let i=0;i<iframes.length;i++){
       const iframe_url = iframes[i].getAttribute("src") ;
-      if(iframe_url && iframe_url.match(/kora-live/i)){
+      if(iframe_url && iframe_url.match(/kora-live/i)){ console.log(iframe_url);
         return iframe_url;
       }
     }

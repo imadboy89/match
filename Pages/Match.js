@@ -97,20 +97,14 @@ class Matchcreen extends React.Component {
     if(item.is_koora==undefined && this.state.matche_details.is_kora_star==undefined){
       this.props.navigation.navigate('Channel', { channel_id: item.id,channel_photo:item.channel_photo });
     }else if(this.state.matche_details.is_kora_star==true && item.url){
-      let ch = 
-      {
-      "category_id": item.url,
-      "category_name": item.en_name,
-      "category_photo": "",
-      "codename": "beinsportnews",
-      "id": item.url,
-      "img": "",
-      "is_external": true,
-      "name": item.en_name,
-      "title_news": item.en_name,
-      "url": item.url,
-      };
-      this.props.navigation.navigate('Video', { item: ch });
+      item.id =item.category_id = item.url;
+      item.category_name =item.codename = item.name = item.en_name;
+      item.category_photo = "";
+      item.is_external = true;
+      try {
+        const ch = JSON.parse(JSON.stringify(item)) ;
+        this.props.navigation.navigate('Video', { item: ch });
+      } catch (error) {API_.debugMsg(error, "danger")}
       //API_.open_ext_url(item.url);
     }
   }
