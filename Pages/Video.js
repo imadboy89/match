@@ -45,7 +45,8 @@ class VideoScreen extends React.Component {
         )
       });
       API_.get_iframe(this.state.video.url).then(final_url=>{
-        this.state.video.url = final_url;
+        console.log(this.state.video.title_news,final_url);
+        this.state.video.url = final_url ? final_url : this.state.video.url;
         this.is_external_loaded = true;
         this.setState({});
       });
