@@ -30,6 +30,7 @@ class SettingsScreen extends React.Component {
         modalVisible_matchesNotif:false,
         is_debug:API_.is_debug,
         filtering:API_.filtering,
+        is_landScape:false,
         
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
@@ -271,7 +272,8 @@ class SettingsScreen extends React.Component {
                     ScreenOrientation.supportsOrientationLockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT)
                     .then(o=>{
                       if(o){
-                        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT)
+                        const orientation = this.state.is_landScape ? ScreenOrientation.OrientationLock.LANDSCAPE_LEFT : ScreenOrientation.OrientationLock.PORTRAIT_UP;
+                        ScreenOrientation.lockAsync(orientation)
                         .then(o=>{
                           if(o){
                             this.setState({is_landScape : true});
