@@ -272,11 +272,11 @@ class SettingsScreen extends React.Component {
                     ScreenOrientation.supportsOrientationLockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT)
                     .then(o=>{
                       if(o){
-                        const orientation = this.state.is_landScape ? ScreenOrientation.OrientationLock.LANDSCAPE_LEFT : ScreenOrientation.OrientationLock.PORTRAIT_UP;
+                        const orientation = this.state.is_landScape ? ScreenOrientation.OrientationLock.PORTRAIT_UP : ScreenOrientation.OrientationLock.LANDSCAPE_LEFT;
                         ScreenOrientation.lockAsync(orientation)
                         .then(o=>{
                           if(o){
-                            this.setState({is_landScape : true});
+                            this.setState({is_landScape : !this.state.is_landScape});
                           }
                         }).catch(error=>{
                           API_.showMsg(error+"","warning");
