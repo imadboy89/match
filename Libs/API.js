@@ -41,6 +41,8 @@ class API {
       'Content-Type': 'application/json; charset=utf-8',
       'User-Agent': this.user_agents["Windows 10"]
     }
+
+    this.token_tries = 2;
     this.token_post = {"token":"","app_id":2} ;
     this.token = "";
     this.is_auth = false;
@@ -340,7 +342,7 @@ class API {
   async set_token(){
     if(this.headers["device-token"]==""){
       let out = await this.getConfig("token");
-      if(out!=null && out!=false){
+      if(out!=null && out!=false  ||this.token_tries==0){
         this.token=out;
         this.headers["device-token"]=this.token;
         return true;
@@ -366,6 +368,7 @@ class API {
         }
       })
       .catch(error => {
+        this.token_tries-=1;
         console.log('ERROR', error);
         this.error = error;
         API_.showMsg((error.message ? error.message : error)+"","warning");
@@ -477,6 +480,7 @@ class API {
       });
   }
   get_standing(id){
+    if(this.token_tries<=0){return false;}
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_standing(id)});
     }
@@ -502,6 +506,7 @@ class API {
     return new Promise(resolve => setTimeout(resolve, ms));
   }  
   async load_leagues(refresh_leagues=false){
+    if(this.token_tries<=0){return false;}
     if(this.headers["device-token"]==""){
       return await this.set_token().then(()=> { return this.load_leagues(refresh_leagues)});
     }
@@ -715,6 +720,7 @@ class API {
     backup.save_teams();
   }
   get_matches(date_obj=null, page=1){
+    if(this.token_tries<=0){return new Promise((resolve, reject)=>{return resolve([])});}
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_matches(date_obj,page)});
     }
@@ -760,6 +766,7 @@ class API {
       });
   }
   get_match(match_id){
+    if(this.token_tries<=0){return new Promise((resolve, reject)=>{return resolve([])});}
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_matches(match_id)});
     }
@@ -784,6 +791,7 @@ class API {
       });
   }
   get_channel(id){
+    if(this.token_tries<=0){return new Promise((resolve, reject)=>{return resolve([])});}
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_channel(id)});
     }
@@ -804,6 +812,7 @@ class API {
       });
   }
   get_channels(cat,page=1){
+    if(this.token_tries<=0){return new Promise((resolve, reject)=>{return resolve([])});}
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_channels(cat,page)});
     }
@@ -865,6 +874,7 @@ class API {
     return true;
   }
   get_categories(page=1){
+    if(this.token_tries<=0){return new Promise((resolve, reject)=>{return resolve([])});}
     if(this.headers["device-token"]==""){
       return this.set_token().then(()=> { return this.get_categories(page)});
     }

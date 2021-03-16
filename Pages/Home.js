@@ -82,10 +82,24 @@ class HomeScreen extends React.Component {
       this.props.navigation.goBack(null);
     }
   }
-  componentDidMount(){
+  componentDidMount=async()=>{
     if(API_.isWeb){
       document.addEventListener("keydown", this.escFunction, false);
+      await navigator.serviceWorker.removeEventListener('message',()=>{});
+      navigator.serviceWorker.addEventListener('message', event => {
+        console.log(event.data);
+        const match_data = event.data && event.data.data ? event.data.data : false;
+        if(match_data){
+          this.onMatch_clicked(match_data);
+        }
+      });
+
+      if(match_data){
+        this.onMatch_clicked(match_data);
+        match_id = false ;
+      }
     }
+
     this.get_matches(this.state.matches_date);
     if(this.is_authenting==false){
       this.is_authenting = true;
@@ -191,17 +205,25 @@ class HomeScreen extends React.Component {
     }
 
   _handleNotification = notification => {
+    API_.showMsg("_handleNotification : "+JSON.stringify(notification.request.content.data.data) );
     try{
-      let item = JSON.parse(notification.request.content.data.data);
-      this.onMatch_clicked(item);
-    }catch(err){}
+      const data = notification.request.content.data.data;
+      let item = typeof data == "string" ? JSON.parse(data) : data;
+      if(item){
+        this.onMatch_clicked(item);
+      }
+    }catch(error){API_.debugMsg(error,"danger")}
   };
 
   _handleNotificationResponse = response => {
+    API_.showMsg("_handleNotificationResponse : "+ JSON.stringify(response.notification.request.content.data.data) );
     try{
-      let item = JSON.parse(response.notification.request.content.data.data);
-      this.onMatch_clicked(item);
-    }catch(err){}
+      const data = response.notification.request.content.data.data;
+      let item = typeof data == "string" ? JSON.parse(data) : data;
+      if(item){
+        this.onMatch_clicked(item);
+      }
+    }catch(error){API_.debugMsg(error,"danger")}
   };
 
 

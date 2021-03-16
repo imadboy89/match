@@ -14,7 +14,7 @@
     "web": "expo start:web",
     "eject": "expo eject",
     "doall": "expo publish && npm run deploy && git add . && git commit -a -m \"fix bugs and more ..DOALL\" && git push origin",
-    "git":"git commit -a -m \"fix bugs and more ..DOALL\" && git push origin"
+    "git": "git commit -a -m \"fix bugs and more ..DOALL\" && git push origin"
   },
   "dependencies": {
     "@react-native-community/async-storage": "~1.12.0",
@@ -58,7 +58,8 @@
     "react-native-web": "~0.13.12",
     "react-native-webview": "11.0.0",
     "remove": "^0.1.5",
-    "webpack": "^5.10.2"
+    "webpack": "^5.10.2",
+    "expo-screen-orientation": "~2.1.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",

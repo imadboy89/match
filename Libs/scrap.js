@@ -29,12 +29,6 @@ class Scrap {
         details_dict[el[0]] = [el,];
       }else{
         details_dict[el[0]].push(el);
-        /*
-        if(typeof details_dict[el[0]][0] == "object"){
-          details_dict[el[0]].push(el);
-        }else{
-          details_dict[el[0]] = [details_dict[el[0]],el];
-        }*/
       }
     }
     return details_dict;
@@ -500,6 +494,7 @@ class Scrap {
             matche["home_team_score"] = score && score.length ==2 ? score[0] : "-";
             matche["away_team_score"] = score && score.length ==2 ? score[1] : "-";
             matche["league"] = league["title"];
+            matche.is_koora = true;
             if(is_bl){
               matches_bl[ matche["league_id"] ]["data"].push(matche);
             }else{

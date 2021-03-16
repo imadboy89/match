@@ -6,7 +6,7 @@ if ('serviceWorker' in navigator) {
       .then(function (info) {
         console.info('Registered service-worker', info);
         serviceWorker = info;
-        try { backup.savePushToken(); } catch (error) { }
+        try { backup.savePushToken(); } catch (error) { console.log(error);}
       })
       .catch(function (error) {
         console.info('Failed to register service-worker', error);

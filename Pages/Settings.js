@@ -6,6 +6,9 @@ import AppLogHistory from "../components/AppLogHistory";
 import MatchesNotifs from "../components/MatchesNotifs";
 import Users from "../components/Users";
 import * as Updates from 'expo-updates';
+import * as ScreenOrientation from 'expo-screen-orientation';
+
+
 class SettingsScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -54,6 +57,15 @@ class SettingsScreen extends React.Component {
     let short_title = "Settings" ;
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style:theme})); 
     //this.props.navigation.setOptions({title: <Text >{short_title}</Text>});
+    ScreenOrientation.getOrientationLockAsync().then(o=>{
+      //console.log(o,ScreenOrientation.OrientationLock,);
+    }).catch(error=>API_.showMsg(error+"","warning"));
+
+    ScreenOrientation.getOrientationAsync().then(o=>{
+      //ScreenOrientation.OrientationLock
+      console.log(o,ScreenOrientation.Orientation);
+      this.setState({ is_landScape : [3,4].includes(o) });
+    }).catch(error=>API_.showMsg(error+"","warning"));
   }
   componentWillUnmount(){
   }
@@ -246,7 +258,39 @@ class SettingsScreen extends React.Component {
               />
             </Text>
           </View>
-
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>landScape mode : </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={()=>{
+                  try{
+                    ScreenOrientation.supportsOrientationLockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT)
+                    .then(o=>{
+                      if(o){
+                        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT)
+                        .then(o=>{
+                          if(o){
+                            this.setState({is_landScape : true});
+                          }
+                        }).catch(error=>{
+                          API_.showMsg(error+"","warning");
+                        });
+                      }else{
+                        API_.showMsg("LANDSCAPE_LEFT not supported on this device !");
+                      }
+                    })
+                  }catch(error){
+                    console.log(error);
+                  }                  
+                }}
+                value={this.state.is_landScape}
+              />
+            </Text>
+          </View>
 
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Testing notifff </Text> 

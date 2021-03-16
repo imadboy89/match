@@ -29,7 +29,10 @@ self.addEventListener('push', event => {
     // as a plain string and display it as the body.
     payload = { title: '', body: event.data.text() };
   }
-
+  // imd ; try to use json from string
+  try {
+    payload = JSON.parse(payload.body);
+  } catch (error) {}
   const title = payload.title;
   const data = payload.data || payload.custom || {};
   const options = {
@@ -43,7 +46,9 @@ self.addEventListener('push', event => {
   if (options.tag) {
     options.renotify = data._renotify;
   }
-
+  if(payload && payload.timeout && payload.timeout>0){
+    setTimeout(()=>{},payload.timeout);
+  }
   event.waitUntil(self.registration.showNotification(title, options));
 });
 

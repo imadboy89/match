@@ -1,11 +1,12 @@
 import React from "react";
-import { View, TouchableHighlight, Modal, Button, Linking, Picker, TouchableOpacity,Image, ImageBackground, ScrollView, Dimensions} from 'react-native';
+import { View, TouchableHighlight, Modal, Button, Switch, Picker, TouchableOpacity,Image, ImageBackground, ScrollView, Dimensions} from 'react-native';
 import Loading from '../components/Loader';
 import {styles_match,getTheme,global_theme} from "../components/Themes";
 import IconButton from "../components/IconButton";
 import Player from "../components/Player";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Team from "../components/Team";
+import BackUp from "../Libs/BackUp";
 let list = [
 
           ];
@@ -30,13 +31,16 @@ class Matchcreen extends React.Component {
         modalVisible_player:false,
         player:false,
         favorite_t:[],
+        is_live_match:false,
 
     };
 
   }
   componentDidMount(){
+    console.log("componentDidMount",this.props.route.params.match_item.id);
     this.get_Match(this.props.route.params.match_item.id);
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
+    backup.check_live_match(this.props.route.params.match_item.id).then(o=>this.setState({is_live_match:o?true:false}));
     API_.getConfig("favorite_channels",this.state.favorite).then(o=>{this.setState({favorite:o});});
     API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{this.setState({favorite_p:o});});
     API_.getConfig("favorite_teams_k",this.state.favorite_t).then(o=>{this.setState({favorite_t:o});});
@@ -48,11 +52,12 @@ class Matchcreen extends React.Component {
     
   }
   get_Match(id){
+    console.log("get_Match",id,this.state.match_dets);
     if(this.props.route.params.match_item.is_kora_star){
       this.setState({matche_details:this.props.route.params.match_item,loading:false});
       return ;
     }
-    if(this.state.match_dets.details){
+    if(this.state.match_dets.is_koora){
       return this.get_Match_k(id);
     }
     API_.get_match(id).then(resp=>{
@@ -244,13 +249,30 @@ class Matchcreen extends React.Component {
         {this.state.matche_details.stadium!="-" ?
           <Text style={this.state.dynamic_style.text_info}>Staduim : {this.state.matche_details.stadium}</Text>
          : null}
+        <View style={{flexDirection:'row', flexWrap:'wrap', flex:1}}>
+          <Text style={this.state.dynamic_style.text_info}>Live match :</Text>
+          <Switch
+                    style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                    thumbColor={this.state.is_live_match ? "#f5dd4b" : "#f4f3f4"}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={async()=>{
+                      if(this.state.is_live_match){
+                        this.state.is_live_match = await backup.remove_live_match(this.state.matche_details.id, this.away_name + " VS " + this.home_name);
+                      }else{
+                        this.state.is_live_match = await backup.save_live_match(this.state.matche_details, this.away_name + " VS " + this.home_name);
+                      }
+                      this.setState({ is_live_match : this.state.is_live_match ? true : false});
+                    }}
+                    value={this.state.is_live_match}
+                  />
+        </View>
         {channels!=null && channels.length>0 ?
           <Text style={this.state.dynamic_style.text_info}>Channels :</Text>
          : null}
         {channels!=null && channels.length>0 ?
           channels
          : null}
-        
       </View> 
     );
   }

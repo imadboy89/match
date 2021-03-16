@@ -57,7 +57,7 @@ class CategoriesScreen extends React.Component {
     }
     if(this.end==true){return false;}
     API_.get_categories(page).then(resp=>{
-      if(resp["data"].length>0){
+      if(resp && resp.data && resp["data"].length>0){
         let list = [];
         let data = resp["data"];
         data = page==1 ? data : this.state.list .concat(data);

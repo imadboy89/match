@@ -11,6 +11,7 @@ NetInfo.configure({
 });
 class BackUp{
     constructor() {
+        this.appName = "almatch";
         this.LS = API_;
         this.lastActivity = "";
         this.email = "";
@@ -51,10 +52,11 @@ class BackUp{
         } catch (error) {this.email="";}
         this.email = this.email ? this.email.toLocaleLowerCase().trim() : "";
         this.db = mongoClient.db("ba9al");
-        this.db_settings   = this.db.collection("settings");
-        this.db_teams_info = this.db.collection("teams_info");
-        this.db_IPTV       = this.db.collection("IPTV");
-        this.is_auth       = this.email!="" && this.email !=undefined;
+        this.db_settings     = this.db.collection("settings");
+        this.db_teams_info   = this.db.collection("teams_info");
+        this.db_IPTV         = this.db.collection("IPTV");
+        this.db_live_matches = this.db.collection("live_matches");
+        this.is_auth         = this.email!="" && this.email !=undefined;
         if(this.is_auth) {
           setTimeout(()=>API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success"),1000);
           await this.isAdmin();
@@ -112,7 +114,6 @@ class BackUp{
         userVisibleOnly: true,
         applicationServerKey: applicationServerKey
       });
-      console.log(subscription);
       return subscription
     }
     savePushToken = async()=>{
@@ -132,7 +133,7 @@ class BackUp{
       }
       let  results ={};
       try {
-        results = await this.client.callFunction("savePushToken",[this.PushToken,"ar",API_.isWeb?1:0]);
+        results = await this.client.callFunction("savePushToken",[this.PushToken,"ar",API_.isWeb?1:0,this.appName]);
       } catch (error) {
         console.log(error);
         return false;
@@ -367,7 +368,7 @@ class BackUp{
       return results;
     }
 
-    pushNotification = async(title="", body="",data={},partner=false,chanelId=false)=>{
+    pushNotification = async(title="", body="",data={},partner=false,chanelId=undefined)=>{
       if( ! await this.checkCnx()){
         return new Promise(resolve=>{resolve(false);});
       }
@@ -380,10 +381,7 @@ class BackUp{
       }
       const datetime = API_.get_date_time();
       let results = {};
-      let args = [partner,title,body , data,datetime] ;
-      if(chanelId){
-        args.push(chanelId);
-      }
+      let args = [partner,title,body , data,datetime,chanelId,this.appName] ;
       try {
         results = await this.client.callFunction("pushNotification",args);
         this.last_notification_time = new Date() .getTime();
@@ -459,6 +457,52 @@ class BackUp{
           API_.showMsg("Something wrong : "+JSON.stringify(o) ,"danger");
         }
       } catch (error) {API_.showMsg(error,"danger");}
+    }
+    save_live_match = async(match_details,match_title)=>{
+      try {
+        const live_match       = {match_id:match_details.id,};
+        live_match.user_id     = this.client.auth.activeUserAuthInfo.userId;
+        live_match.user_email  = this.email;
+        live_match.active      = true;
+        live_match.match_title = match_title;
+        live_match.match_details = match_details;
+        live_match.isWeb        = API_.isWeb;
+        const o = await this.db_live_matches.insertOne(live_match);
+        const is_ok = o && o.insertedId ;
+        if(is_ok){
+          API_.showMsg("تمت إضافة مباراة  *"+match_title+"*","success");
+        }else{
+          API_.showMsg("Something wrong : "+JSON.stringify(o) ,"danger");
+        }
+        return is_ok ;
+      } catch (error) {API_.showMsg(error,"danger");}
+      return false;
+    }
+    remove_live_match = async(match_id,match_title)=>{
+      try {
+        const live_match       = {match_id:match_id,};
+        live_match.user_id     = this.client.auth.activeUserAuthInfo.userId;
+        live_match.user_email  = this.email;
+        live_match.isWeb       = API_.isWeb;
+        const o = await this.db_live_matches.deleteOne(live_match);
+        const is_ok = o && o.deletedCount ;
+        if(is_ok){
+          API_.showMsg("تمت إزالة مباراة  *"+match_title+"*","success");
+        }
+        return  !is_ok ;
+      } catch (error) {API_.showMsg(error,"danger");}
+      return true;
+    }
+    check_live_match = async(match_id)=>{
+      try {
+        const live_match       = {match_id:match_id,};
+        live_match.user_id     = this.client.auth.activeUserAuthInfo.userId;
+        live_match.isWeb        = API_.isWeb;
+        const o = await this.db_live_matches.find(live_match).asArray();
+        const is_ok = o && o.length ;
+        return  is_ok ;
+      } catch (error) {API_.showMsg(error,"danger");}
+      return false;
     }
 
 }
