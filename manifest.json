@@ -9,7 +9,7 @@
   "start_url": "/match/",
   "theme_color": "#000",
   "crossorigin": "no-referrer",
-  "orientation": "portrait",
+  "orientation": "any",
   "related_applications": [
     {
       "platform": "itunes",

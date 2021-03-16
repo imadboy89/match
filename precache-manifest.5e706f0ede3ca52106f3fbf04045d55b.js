@@ -64,7 +64,7 @@ self.__precacheManifest = [
     "url": "/match/index.html"
   },
   {
-    "revision": "15ef816cd6ba1022ea739dc1b0db0278",
+    "revision": "ba1bb191c324dfdf8b7645ad81f1577b",
     "url": "/match/manifest.json"
   }
 ];
