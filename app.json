@@ -44,6 +44,7 @@
       "crossorigin": "no-referrer",
       "preferRelatedApplications":false,
       "scope":"/match/",
+      "orientation":"any",
       "config":{
         "firebase":{
           "apiKey": "AIzaSyCeFIS-SVWZtguMdcvJ9FcLqaoihd69BKM",
