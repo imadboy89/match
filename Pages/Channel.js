@@ -6,6 +6,7 @@ import ReactHlsPlayer from "react-hls-player";
 import {Video} from 'expo-av';
 import Loading from "../components/Loader";
 import {styles_channel,getTheme} from "../components/Themes";
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 class HLSP extends React.Component {
   constructor(props) {
@@ -97,6 +98,7 @@ class ChannelScreen extends React.Component {
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style_modals:theme}) );
     this.get_channel();
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> API_.debugMSg(error+"","warning") );
   }
   get_channel(){
       this.channel_photo = this.props.route.params.channel_photo;

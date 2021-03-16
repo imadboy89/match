@@ -268,7 +268,6 @@ class SettingsScreen extends React.Component {
                 thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={()=>{
-                  try{
                     ScreenOrientation.supportsOrientationLockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT)
                     .then(o=>{
                       if(o){
@@ -284,10 +283,7 @@ class SettingsScreen extends React.Component {
                       }else{
                         API_.showMsg("LANDSCAPE_LEFT not supported on this device !");
                       }
-                    })
-                  }catch(error){
-                    console.log(error);
-                  }                  
+                    }).catch(error=>API_.showMsg(error+"","warning"));           
                 }}
                 value={this.state.is_landScape}
               />
