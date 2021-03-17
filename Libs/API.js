@@ -22,6 +22,7 @@ class API {
     this.usingproxy = Platform.OS == 'web';
     this.isWeb = Platform.OS == 'web';
     this.load_channels_running = false;
+    this.notifcation_type ="push";
     if (this.isWeb){
       this.domain = this.proxy+this.domain;
       this.method = "GET";

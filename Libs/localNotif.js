@@ -39,6 +39,9 @@ async function save_notification_web(item, content, trigger){
 
 
 const AsyncAlert = (message,title,btn_add=true) => {
+  if(API_.isWeb){
+    return new Promise((resolve, reject) => { return resolve(btn_add?1:2);});
+  }
     return new Promise((resolve, reject) => {
         return Alert.alert(
             title,
@@ -53,12 +56,11 @@ const AsyncAlert = (message,title,btn_add=true) => {
     })
 }    
 
-const  onMatch_LongPressed=async(item)=>{
+const  onMatch_LongPressed=async(item,notifications_matches)=>{
   let home_team_name = item["home_team_ar"] ? item["home_team_ar"] : item["home_team"];
   let away_team_name = item["away_team_ar"] ? item["away_team_ar"] : item["away_team"];
   let league = item["league"] ? item["league"] :"";
   let trigger = API_.convert_time_o(item.date+" "+item.time);
-  let trigger_s = API_.convert_time_o(item.date+" "+item.time, true);
   const trigger_2 = new Date((new Date).getTime()+5000);
   let content= {
       title: home_team_name+" 𝒱𝒮 "+away_team_name,
@@ -66,31 +68,25 @@ const  onMatch_LongPressed=async(item)=>{
       sound: true,
       data:{data : JSON.stringify(item)}
     };
-  if (API_.isWeb){
-    return save_notification_web(item, content, trigger_s);
-  }
   let action=2;
-  let is_exist = false;
-  const saved_notifs = await Notifications.getAllScheduledNotificationsAsync() ;
-  for(let i=0;i<saved_notifs.length;i++){
-    if(saved_notifs[i].identifier == item.id+""){
-      is_exist = saved_notifs[i] ;
-    }
-  }
+  let is_exist = notifications_matches && notifications_matches[item.id] ? true : false;
+  console.log(is_exist);
   action = await AsyncAlert(content.title+"\nAdd/Remove Notification : "+API_.get_date_time(trigger),"Reminder",is_exist==false)
 
   if(action==1){
     //save(item, content, trigger2);
     return save(item, content, trigger);
   }else if(action==2){
-    return cancelNotif(item.id+"");
+    return cancelNotif(item.id+"",content);
   }
   return new Promise((resolve, reject)=>{return resolve(false)});
 
 }
 
 const save=(item, content, trigger)=>{
-
+  if(API_.notifcation_type=="push"){
+    return backup.save_live_match(item,content.title);
+  }
   return Permissions.askAsync(Permissions.NOTIFICATIONS).then(o=>{
     if(o.status=="granted"){
       return Notifications.getAllScheduledNotificationsAsync().then(o=>{
@@ -112,8 +108,12 @@ const save=(item, content, trigger)=>{
       notifyMessage("Permissions not granted","Reminder");
     }
   });
+
 }
-const cancelNotif=(id)=>{
+const cancelNotif=(id,content)=>{
+  if(API_.notifcation_type=="push"){
+    return backup.remove_live_match(parseInt(id),content.title);
+  }
   if(API_.isWeb){
     return new Promise((resolve, reject)=>{return resolve([])});
   }
@@ -127,7 +127,18 @@ const cancelNotif=(id)=>{
     return notif_matches;
   });
 }
-const get_notifications_matches=()=>{
+const get_notifications_matches=(date_obj)=>{
+  if(API_.notifcation_type=="push"){
+    return backup.get_match_live(date_obj).then(l=>{
+      if(l && l.length>0){
+        let ll = {};
+        for(let i =0;i<l.length;i++){
+          ll[l[i].match_id] = l[i].match_details ;
+        }
+        return ll ;
+      }
+    });
+  }
   if(API_.isWeb){
     return new Promise((resolve, reject)=>{return resolve([])});
   }

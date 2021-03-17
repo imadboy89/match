@@ -84,15 +84,17 @@ class HomeScreen extends React.Component {
   }
   componentDidMount=async()=>{
     if(API_.isWeb){
+      if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
+        navigator.serviceWorker.removeEventListener('message',()=>{});
+        navigator.serviceWorker.addEventListener('message', event => {
+          console.log(event.data);
+          const match_data = event.data && event.data.data ? event.data.data : false;
+          if(match_data){
+            this.onMatch_clicked(match_data);
+          }
+        });
+      }
       document.addEventListener("keydown", this.escFunction, false);
-      await navigator.serviceWorker.removeEventListener('message',()=>{});
-      navigator.serviceWorker.addEventListener('message', event => {
-        console.log(event.data);
-        const match_data = event.data && event.data.data ? event.data.data : false;
-        if(match_data){
-          this.onMatch_clicked(match_data);
-        }
-      });
 
       if(match_data){
         this.onMatch_clicked(match_data);
@@ -183,7 +185,7 @@ class HomeScreen extends React.Component {
     this.setState({});
   }
   _onMatch_LongPressed=(item)=>{
-    onMatch_LongPressed(item).then(oo=>{
+    onMatch_LongPressed(item,this.state.notifications_matches).then(oo=>{
       if(oo==false){return false;}
       this.setState({notifications_matches:[]});
       get_notifications_matches().then(o=>{this.setState({notifications_matches:o});} );
@@ -386,7 +388,7 @@ async get_favs(data){
 }
 get_matches_koora = async(date_obj=null)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-  this.state.notifications_matches = await get_notifications_matches();
+  this.state.notifications_matches = await get_notifications_matches(date_obj);
   API_.load_leagues(this.refresh_leagues);
   
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
@@ -401,6 +403,7 @@ get_matches_koora = async(date_obj=null)=>{
   if(this._isMounted){
     this.setState({list:data,loading:false});
   }
+
 }
  onChange = (event, selectedDate) => {
     if(selectedDate==undefined){

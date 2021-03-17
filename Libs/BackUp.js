@@ -460,12 +460,22 @@ class BackUp{
     }
     save_live_match = async(match_details,match_title)=>{
       try {
+        match_details = JSON.parse(JSON.stringify(match_details));
         const live_match       = {match_id:match_details.id,};
         live_match.user_id     = this.client.auth.activeUserAuthInfo.userId;
         live_match.user_email  = this.email;
         live_match.active      = true;
         live_match.match_title = match_title;
+        live_match.createdAt = new Date();
+        live_match.startAt = new Date(match_details.datetime.replace(" ", "T")+":00.000+01:00");
+
+        delete match_details.matches_list;
+        delete match_details.details;
+        delete match_details.channels;
+        delete match_details.matches_list
+
         live_match.match_details = match_details;
+
         live_match.isWeb        = API_.isWeb;
         const o = await this.db_live_matches.insertOne(live_match);
         const is_ok = o && o.insertedId ;
@@ -504,7 +514,26 @@ class BackUp{
       } catch (error) {API_.showMsg(error,"danger");}
       return false;
     }
+    get_match_live = async(date_obj)=>{
+      if(!this.is_mdb_ok()){
+        return false;
+      }
+      const query = {active:true, isWeb:API_.isWeb} ;
+      if(date_obj){
+        let dateTime_s =new Date(date_obj);
+        let dateTime_e =new Date(date_obj);
+        
+        dateTime_e.setHours(23);
+        dateTime_e.setMinutes(59);
+        dateTime_e.setSeconds(59);
 
+        query.startAt = {$gte:dateTime_s,$lte:dateTime_e}
+      }
+
+
+      const o = await this.db_live_matches.find(query).asArray();
+      return o;
+    }
 }
 
 export default BackUp ;

@@ -107,6 +107,7 @@ class ItemsList extends React.Component {
       }
       let time_played= item.time_played>0?item.time_played+"'": item.time_played;
       //console.log(this.props.notifications_matches[item.id]);
+      console.log(this.props.notifications_matches, this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined);
       let style_extra = this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
       style_extra = item.live==1 ? this.state.dynamic_style.matche_container_live: style_extra;
       

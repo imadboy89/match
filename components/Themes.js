@@ -334,7 +334,14 @@ function generateTheme(theme_name=false){
     matche_container_notif:{
       borderRadius:10,
       borderWidth: 2,
-      borderColor: theme.list_header_backgroundColor,
+      borderColor: theme.text_color_default,
+      //borderColor: theme.list_header_backgroundColor,
+      //backgroundColor:"yellow"
+    },
+    matche_container_liveNotif:{
+      borderRadius:10,
+      borderWidth: 2,
+      borderColor: theme.activeBackgroundColor,
       //backgroundColor:"yellow"
     },
     team_name_winner :theme.live_borderColor,
