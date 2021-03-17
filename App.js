@@ -44,10 +44,13 @@ global.match_data = false;
 if(API_.isWeb){
   global. Global_theme_name = window.matchMedia  && window.matchMedia('(prefers-color-scheme: dark)').matches===true?"dark violet" :"light" ;
 
-  navigator.serviceWorker.addEventListener('message', event => {
-    console.log(event.data);
-    match_data = event.data ? event.data.data : false;
-  });
+  if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
+    navigator.serviceWorker.addEventListener('message', event => {
+      console.log(event.data);
+      match_data = event.data ? event.data.data : false;
+    });
+  }
+
 }
 
 
