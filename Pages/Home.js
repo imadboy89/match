@@ -111,11 +111,12 @@ class HomeScreen extends React.Component {
         backup.user_log();
         if(output==false){return false;}
         backup.load_teams();
-        backup.load_settings().then(o=>{
+        backup.load_settings().then(async o=>{
           if(API_.isWeb==false){
             backup.savePushToken();
           }
-          this.refresh_leagues();
+          API_.notifications_matches = await get_notifications_matches();
+          console.log("API_.notifications_matches", API_.notifications_matches);
         }).catch(error=>{console.log(error)});
       }).catch(error=>{
         console.log(error);
@@ -185,10 +186,17 @@ class HomeScreen extends React.Component {
     this.setState({});
   }
   _onMatch_LongPressed=(item)=>{
-    onMatch_LongPressed(item,this.state.notifications_matches).then(oo=>{
+    onMatch_LongPressed(item).then(oo=>{
       if(oo==false){return false;}
-      this.setState({notifications_matches:[]});
-      get_notifications_matches().then(o=>{this.setState({notifications_matches:o});} );
+      //API_.notifications_matches[API_.notifications_matches.id] = API_.notifications_matches ;
+      //this.setState({notifications_matches:API_.notifications_matches});
+      this.refresh_leagues();
+      /*
+      get_notifications_matches(this.state.matches_date).then(o=>{
+        console.log("get_notifications_matches",o);
+        API_.notifications_matches = o;
+      } );
+      */
     });
   }
 
@@ -353,7 +361,7 @@ async get_favs(data){
       const matche_f = JSON.parse(JSON.stringify(API_.matches_bl[j]["data"][m]));
       const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
-      if(this.state.notifications_matches && this.state.notifications_matches[matche_f.id]!=undefined){
+      if(API_.notifications_matches && API_.notifications_matches[matche_f.id]!=undefined){
         is_league_has_fav = true;
       }else if(this.state.favorite_teams.includes(home_team_id) || this.state.favorite_teams.includes(away_team_id)){
         is_league_has_fav = true;
@@ -375,7 +383,7 @@ async get_favs(data){
       const matche_f = JSON.parse(JSON.stringify(data[j]["data"][m]));
       const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
-      if(this.state.notifications_matches && this.state.notifications_matches[matche_f.id]!=undefined){
+      if(API_.notifications_matches && API_.notifications_matches[matche_f.id]!=undefined){
         fav_list.data.push(matche_f);
       }else if(this.state.favorite_teams.includes(home_team_id) || this.state.favorite_teams.includes(away_team_id)){
         fav_list.data.push(matche_f);
@@ -388,7 +396,7 @@ async get_favs(data){
 }
 get_matches_koora = async(date_obj=null)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-  this.state.notifications_matches = await get_notifications_matches(date_obj);
+  //API_.notifications_matches = await get_notifications_matches(date_obj);
   API_.load_leagues(this.refresh_leagues);
   
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
@@ -536,7 +544,6 @@ show_DateP(){
           onLeaguePressed={this.onLeaguePressed}
           onclick={this.onMatch_clicked}
           onLongPress={this._onMatch_LongPressed}
-          notifications_matches={this.state.notifications_matches}
           key_="home_team" key_key="id"
             />
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}

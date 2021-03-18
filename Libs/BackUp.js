@@ -499,7 +499,7 @@ class BackUp{
         if(is_ok){
           API_.showMsg("تمت إزالة مباراة  *"+match_title+"*","success");
         }
-        return  !is_ok ;
+        return  is_ok ;
       } catch (error) {API_.showMsg(error,"danger");}
       return true;
     }

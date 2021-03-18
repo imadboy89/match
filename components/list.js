@@ -106,11 +106,9 @@ class ItemsList extends React.Component {
         time_style["fontSize"]=16;
       }
       let time_played= item.time_played>0?item.time_played+"'": item.time_played;
-      //console.log(this.props.notifications_matches[item.id]);
-      console.log(this.props.notifications_matches, this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined);
-      let style_extra = this.props.notifications_matches && this.props.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
+      //console.log(API_.notifications_matches[item.id]);
+      let style_extra = API_.notifications_matches && API_.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
       style_extra = item.live==1 ? this.state.dynamic_style.matche_container_live: style_extra;
-      
       return (
         <View style={[this.state.dynamic_style.matche_container,style_extra,shadow_style]}>
           <View style={this.state.dynamic_style.matche_team_time}>
@@ -239,7 +237,7 @@ class ItemsList extends React.Component {
     if(this.refs_list[item[this.props.key_key]]){
       this.refs_list[item[this.props.key_key]];
     }*/
-    return (<TouchableOpacity
+    const item2render=  (<TouchableOpacity
       
       style={{width:this.elem_width,alignSelf:"center"}}
       activeOpacity={0.5}
@@ -248,6 +246,7 @@ class ItemsList extends React.Component {
         {this.get_item(item,this.props.key_)}
       </View>
     </TouchableOpacity>);
+    return item2render;
   }
 
   _render_header=({ section: { title,img,id,is_koora,options } })=>{

@@ -69,7 +69,7 @@ const  onMatch_LongPressed=async(item,notifications_matches)=>{
       data:{data : JSON.stringify(item)}
     };
   let action=2;
-  let is_exist = notifications_matches && notifications_matches[item.id] ? true : false;
+  let is_exist = API_.notifications_matches && API_.notifications_matches[item.id] ? true : false;
   console.log(is_exist);
   action = await AsyncAlert(content.title+"\nAdd/Remove Notification : "+API_.get_date_time(trigger),"Reminder",is_exist==false)
 
@@ -85,7 +85,13 @@ const  onMatch_LongPressed=async(item,notifications_matches)=>{
 
 const save=(item, content, trigger)=>{
   if(API_.notifcation_type=="push"){
-    return backup.save_live_match(item,content.title);
+    return backup.save_live_match(item,content.title).then(o=>{
+      if (o){
+        API_.notifications_matches[item.id] = item;
+      }
+      return o;
+    });
+    
   }
   return Permissions.askAsync(Permissions.NOTIFICATIONS).then(o=>{
     if(o.status=="granted"){
@@ -112,7 +118,12 @@ const save=(item, content, trigger)=>{
 }
 const cancelNotif=(id,content)=>{
   if(API_.notifcation_type=="push"){
-    return backup.remove_live_match(parseInt(id),content.title);
+    return backup.remove_live_match(parseInt(id),content.title).then(o=>{
+      if (o){
+        delete API_.notifications_matches[parseInt(id)];
+      }
+      return o
+    });
   }
   if(API_.isWeb){
     return new Promise((resolve, reject)=>{return resolve([])});

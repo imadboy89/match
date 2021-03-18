@@ -190,7 +190,6 @@ class LeagueScreen extends React.Component {
           loading={this.state.loading} list={this.state.matches} 
           onclick={this.onMatch_clicked}
           onLongPress={this._onMatch_LongPressed}
-          notifications_matches={this.state.notifications_matches}
           key_="home_team" key_key="id"  />;
   }
   set_fav_p= async(player_name)=>{

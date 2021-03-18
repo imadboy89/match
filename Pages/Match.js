@@ -257,7 +257,7 @@ class Matchcreen extends React.Component {
                     ios_backgroundColor="#3e3e3e"
                     onValueChange={async()=>{
                       if(this.state.is_live_match){
-                        this.state.is_live_match = await backup.remove_live_match(this.state.matche_details.id, this.away_name + " VS " + this.home_name);
+                        this.state.is_live_match = !await backup.remove_live_match(this.state.matche_details.id, this.away_name + " VS " + this.home_name);
                       }else{
                         this.state.is_live_match = await backup.save_live_match(this.state.matche_details, this.away_name + " VS " + this.home_name);
                       }
