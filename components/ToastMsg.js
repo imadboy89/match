@@ -183,6 +183,9 @@ export class ToastMsg extends React.Component {
             activeOpacity={0.7}
             onPress={()=>{
               this.closing_im();
+              if(this.props.onCLicked){
+                this.props.onCLicked();
+              }
             }}
           >
             <Text style={[this.props.dynamic_style.body, text_style ]}>{this.state.body}</Text>

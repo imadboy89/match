@@ -82,8 +82,22 @@ class HomeScreen extends React.Component {
       this.props.navigation.goBack(null);
     }
   }
+  promtInstallWPA(){
+    //API_.showMsg("Click here to install *AlMatch* as PWA!","success", undefined, 5000, ()=>{console.log("clicked.....");});
+    
+    setTimeout( async function(){
+        API_.showMsg("Click here to install *AlMatch* as PWA!","success", undefined, 10000, async()=>{
+          if(deferredPrompt && deferredPrompt.prompt){
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log(`User response to the install prompt: ${outcome}`);
+          }else{console.log(`not ok var`);}
+        })
+      },15000);
+  }
   componentDidMount=async()=>{
     if(API_.isWeb){
+      this.promtInstallWPA();
       if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
         navigator.serviceWorker.removeEventListener('message',()=>{});
         navigator.serviceWorker.addEventListener('message', event => {

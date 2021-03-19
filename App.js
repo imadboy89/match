@@ -49,6 +49,17 @@ if(API_.isWeb){
       console.log(event.data);
       match_data = event.data ? event.data.data : false;
     });
+
+    global.deferredPrompt=0;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      deferredPrompt = e;
+      console.log(`'beforeinstallprompt' event was fired.`);
+      //API_.showMsg("Installing 'AlMatch' app will provider you better experiece !");
+    });
+    
   }
 
 }
@@ -116,7 +127,7 @@ async function registerForPushNotificationsAsync() {
 }
 registerForPushNotificationsAsync()
 global.notifyMessage = function(msg,title, buttons,speed=1000,delay=1000) {
-    API_.showTMsg(msg,speed,delay);
+    API_.showMsg(msg,speed,delay);
     return;
     if(API_.isWeb){
       alert(msg);
@@ -272,22 +283,21 @@ class APP extends React.Component {
       _app_styles=theme;
       this.setState({style_loaded:true});
     });
-    API_.showTMsg = this.showTMsg;
   }
   componentDidMount(){
     this.mounted = true;
-    API_.showMsg = this.showTMsg;
+    API_.showMsg = this.showMsg;
     API_.debugMsg= this.debugMsg;
     getTheme("styles_notif").then(theme=>this.setState({notif_dynamic_style:theme}) );
   }
   componentWillUnmount(){
     this.mounted = false;
   }
-  showTMsg = (body,type, speed, delay)=>{
+  showMsg = (body,type, speed, delay, onCLicked)=>{
     if(this.state.showMsg==false){
-      this.setState({body:body,type:type, speed:speed, delay:delay,debug:false,showMsg:true});
+      this.setState({body:body,type:type, speed:speed, delay:delay,debug:false,showMsg:true,onCLicked:onCLicked});
     }else if(this.state.showMsg==true && this.state.showMsg_2==false){
-      this.setState({body_2:body,type_2:type, speed_2:speed, delay_2:delay,debug_2:false,showMsg_2:true});
+      this.setState({body_2:body,type_2:type, speed_2:speed, delay_2:delay,debug_2:false,showMsg_2:true,onCLicked:onCLicked});
     }
   }
   debugMsg = (body,type, speed, delay)=>{
@@ -325,7 +335,9 @@ class APP extends React.Component {
           delay={this.state.delay} 
           type={this.state.type} 
           debug={this.state.debug} 
-          onEnd={this.onMsgEnd}/>
+          onEnd={this.onMsgEnd}
+          onCLicked={this.state.onCLicked}
+          />
         : null }
         {this.state.showMsg_2===true ? 
         <ToastMsg 
@@ -336,9 +348,11 @@ class APP extends React.Component {
           delay={this.state.delay_2} 
           type={this.state.type_2} 
           debug={this.state.debug_2} 
-          onEnd={this.onMsgEnd_2}/>
+          onEnd={this.onMsgEnd_2}
+          onCLicked={this.state.onCLicked2}
+          />
         : null }
-        <MyTabs showTMsg={this.showTMsg}/>
+        <MyTabs showMsg={this.showMsg}/>
       </NavigationContainer>
     );
   }
