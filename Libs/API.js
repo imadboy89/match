@@ -230,7 +230,7 @@ class API {
       3:"https://www.hesport.com/professionnels/index."+page+".html",
       4:"https://www.hesport.com/botola/index."+page+".html",
       5:"https://www.hesport.com/mondial/index."+page+".html",
-      
+      6:"https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,
       }
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
     const url = news_links[source_id] ? news_links[source_id] : news_links[1];

@@ -95,7 +95,8 @@ get_news =(loading=true,keep_list=false)=>{
           style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
           onValueChange={this.changesource}
         >
-          <Picker.Item label="Kooora" value={1} />
+          <Picker.Item label="Kooora_MA" value={1} />
+          <Picker.Item label="Kooora" value={6} />
           <Picker.Item label="HP_mountakhab" value={2} />
           <Picker.Item label="HP_professionnels" value={3} />
           <Picker.Item label="HP_botola" value={4} />

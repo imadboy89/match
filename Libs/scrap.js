@@ -15,7 +15,12 @@ class Scrap {
     let body = m && m.length>0 ? m[0].replace(/\\"/g,"'") : "";
     body = body.split('"').length>1 ? body.split('"')[1] : "Error";
     //body = body.replace("<p");
-    return this.decodeEntities(body);
+    const article = {};
+    article.related =this.get_var_array(html, "article_links");
+    article.related_news =this.get_var_array(html, "article_related");
+    //article.news =this.get_var_array(html, "news");
+    article.body = this.decodeEntities(body);
+    return article;
   }
   parse_details(details){
     details = details.split("~");
