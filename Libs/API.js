@@ -230,7 +230,8 @@ class API {
       3:"https://www.hesport.com/professionnels/index."+page+".html",
       4:"https://www.hesport.com/botola/index."+page+".html",
       5:"https://www.hesport.com/mondial/index."+page+".html",
-      6:"https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,
+      6:"https://m.kooora.com/?n=0&o=n&arabic&pg="+page,
+      7:"https://m.kooora.com/?arabic",
       }
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
     const url = news_links[source_id] ? news_links[source_id] : news_links[1];
@@ -238,7 +239,7 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return source_id==1?scrap.get_news(resp) : scrap.get_news_hp(resp);
+      return url.includes("kooora.com")?scrap.get_news(resp) : scrap.get_news_hp(resp);
     });
   }
   get_player(player_id){
