@@ -224,6 +224,7 @@ class API {
     return title;
   }
   get_news(page, source_id=1){
+    
     const news_links = {
       1:"https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,
       2:"https://www.hesport.com/mountakhab/index."+page+".html",
@@ -231,7 +232,7 @@ class API {
       4:"https://www.hesport.com/botola/index."+page+".html",
       5:"https://www.hesport.com/mondial/index."+page+".html",
       6:"https://m.kooora.com/?n=0&o=n&arabic&pg="+page,
-      7:"https://m.kooora.com/?arabic",
+      7:"https://m.kooora.com/?ok&arabic&ok",
       }
     //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
     const url = news_links[source_id] ? news_links[source_id] : news_links[1];
@@ -325,7 +326,7 @@ class API {
   }
   get_article(link,source_id=1){
     //https://www.hesport.com/akhbar/122520.html
-    const url = source_id==1 ? "https://m.kooora.com/?"+link+"&arabic" : "https://www.hesport.com/"+link;
+    const url = [1,6,7].includes(source_id) ? "https://m.kooora.com/?"+link+"&arabic" : "https://www.hesport.com/"+link;
     return this.http(url,"GET",null,{})
     .then(html=>{
       try{
@@ -333,8 +334,9 @@ class API {
         scrap.isWeb = this.isWeb;
         let article  = {};
         try {
-          article  = source_id==1 ? scrap.get_article(html) : scrap.get_article_hp(html);
-        } catch (error) {}
+          article  = [1,6,7].includes(source_id)  ? scrap.get_article(html) : scrap.get_article_hp(html);
+          console.log(article);
+        } catch (error) {console.log(error)}
         return article;
       }catch(err){console.log(err);}
 

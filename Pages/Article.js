@@ -28,7 +28,10 @@ class ArticleScreen extends React.Component {
     API_.get_article(this.props.route.params.article.link, this.state.article.source)
     .then(article =>{
       if(article.constructor == Object){
-        this.state.article = article;
+        this.state.article.body = article.body ? article.body : this.state.article.body;
+        this.state.article.img  = article.img  ? article.img  : this.state.article.img;
+        this.state.article.date = article.date ? article.date : this.state.article.date;
+
       }else{
         this.state.article.body = article;
       }

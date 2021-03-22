@@ -51,6 +51,7 @@ get_news =(loading=true,keep_list=false)=>{
     this.setState({loading:true});
   }
   API_.get_news(this.state.page,this.state.source_id).then(data=>{
+    console.log(data);
     if(this._isMounted){
       if(keep_list){
         data = this.state.list.concat(data);

@@ -667,24 +667,16 @@ class Scrap {
     return infos;
   }
   get_news(html){
-    let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
-    let m = html.match(patttern);
-    if(m){
-      let out = "[["+m[0].trim().replace("var news = new Array (","").replace(/(,\r\n)?\s*\-1,0\);/mi,"").replace(/,\r\n/gi,"],[") + "]]";
-      let out_list = []; 
-      try{
-        out = JSON.parse(out);
-        out = out ? out : [];
-        for (let i=0; i<out.length;i++){
-          let line = out[i];
-          
-          let img = this.isWeb==false ? line[3].replace("//","https://") : line[3];
-          out_list.push({link:line[1], date:line[2], img:img, title_news:line[4], desc:line[5],});
-        }
-      }catch (e){console.log(e);}
-      return out_list;
-    } 
-    return [];
+    let news = this.get_var_array(html, "news");
+    console.log(news);
+    let out_list = []; 
+    for (let i=0; i<news.length;i++){
+      let line = news[i];
+      
+      let img = this.isWeb==false ? line[3].replace("//","https://") : line[3];
+      out_list.push({link:line[1], date:line[2], img:img, title_news:line[4], desc:line[5],});
+    }
+    return out_list;
   }
   get_video(html,source_id=0){
     if(source_id==3){
