@@ -593,13 +593,13 @@ class Scrap {
   get_var_array(html,var_name){
     //let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
     //const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gmi");
-    const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\r\\n([^;\\r\\n]*\\r\\n)*","gmi");
-
+    const patttern  = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\r\\n(((?!-1,0\\);).)*\\r\\n)*","gmi");
     let m = html.match(patttern);
     if(m){
       let out = "[["+m[0].trim().replace("var "+var_name+" = new Array (","").replace(/(,\r\n)?\s*\-1,0\);/mi,"").replace(/,$/i,'').replace(/	/g,'').replace(/,\r\n/gi,"],[") + "]]";
       let out_list = []; 
       try{
+        
         out = JSON.parse(out);
         out = out ? out : [];
         return out;
@@ -668,7 +668,6 @@ class Scrap {
   }
   get_news(html){
     let news = this.get_var_array(html, "news");
-    console.log(news);
     let out_list = []; 
     for (let i=0; i<news.length;i++){
       let line = news[i];
