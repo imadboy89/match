@@ -18,6 +18,7 @@ class API {
     this.proxy = 'https://www.oxus.tj/sites/default/private/files/.proxy2.php?url=';
     this.proxy1 = 'https://www.oxus.tj/sites/default/private/files/.proxy.php?url=';
     this.cc_url = "https://o.kooora.com/f/big/[cc].png";
+    this.IPTV_json = "https://www.oxus.tj/sites/default/private/files/.index.php?action=json"
     this.method = "POST";
     this.usingproxy = Platform.OS == 'web';
     this.isWeb = Platform.OS == 'web';
@@ -234,7 +235,6 @@ class API {
       6:"https://m.kooora.com/?n=0&o=n&arabic&pg="+page,
       7:"https://m.kooora.com/?ok&arabic&ok",
       }
-    //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
     const url = news_links[source_id] ? news_links[source_id] : news_links[1];
     return this.http(url,"GET",null,{})
     .then(resp=>{
@@ -262,7 +262,6 @@ class API {
     }).catch(error=>API_.showMsg(error,"danger"));
   }
   get_scorers(league_id){
-    //view-source:https://www.oxus.tj/sites/default/private/files/.proxy.php?url=https://www.beinsports.com/ar/tag/%D8%A7%D9%84%D9%85%D9%84%D8%AE%D8%B5%D8%A7%D8%AA/
     return this.http("https://m.kooora.com/?c="+league_id+"&scorers=true&arabic","GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -1113,6 +1112,17 @@ class API {
       })
       .catch(error => {
         console.log(error);
+        this.error = error;
+      });
+  };
+
+  get_IPTV = () => {
+    return this.fetch(this.IPTV_json, {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .catch(error => {
+        API_.showMsg(error,"danger");
         this.error = error;
       });
   };

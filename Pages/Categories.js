@@ -54,6 +54,8 @@ class CategoriesScreen extends React.Component {
       return this.get_IPTV_ch();
     }else if(this.state.source_id == 4){
       return this.get_local_saved_chs();
+    }else if(this.state.source_id == 5){
+      return this.get_IPTV();
     }
     if(this.end==true){return false;}
     API_.get_categories(page).then(resp=>{
@@ -76,6 +78,28 @@ class CategoriesScreen extends React.Component {
       return row;
     });
     setTimeout(()=>{this.setState({list: list, key_:"category_name",key_key:"name",loading:false})}, 300);
+  }
+  get_IPTV=async()=>{
+    let items = await API_.get_IPTV();
+    let chs_list = [];
+    if(items==undefined){
+      return ;
+    }
+    for(let i=0;i<items.length;i++){
+      const item = items[i];
+      const ch = {"channel_photo":"","name":"", "url":"","id":"","is_external":false,"category_name":"","category_photo":"","category_id":""};
+      ch.name = item.name;
+      ch.channel_photo = item.img;
+      ch.category_photo = item.img;
+      ch.quality = item.quality ? item.quality : "";
+      ch.id = item.name+"-"+item.quality;
+      ch.category_id = item.name+"-"+item.quality;
+      ch.category_name = item.name;
+      ch.ch_item = item;
+      ch.channel_servers = [{id:item.link,name:item.name,SecureUrl:item.link},];
+      chs_list.push(ch);
+    }
+    this.setState({list:chs_list, key_:"category_name",key_key:"category_id",loading:false});
   }
   get_IPTV_ch=async()=>{
     let chs = await backup.load_iptv();
@@ -110,8 +134,9 @@ class CategoriesScreen extends React.Component {
     }else{
       if(this.state.source_id==3){
         this.props.navigation.navigate('Channel', { channel_id: item.ch_item.channel_id,channel_photo:item.ch_item.channel_photo,ch_item : item.ch_item });
-      }else if(this.state.source_id==4){
+      }else if(this.state.source_id==4 || this.state.source_id==5){
         //API_.channels_dict[API_.fix_channel_name(ch_ob.en_name)]
+        console.log(item);
         this.props.navigation.navigate('Channel', { channel_id: item.channel_id,channel_photo:item.channel_photo,ch_item : item });
       }else{
         this.props.navigation.navigate('Channels',{category_id:item.category_id,category_name: item.category_name});
@@ -135,6 +160,7 @@ class CategoriesScreen extends React.Component {
       <Picker.Item label="kora-live" value={2} />
       <Picker.Item label="inApp-IPTV" value={3} />
       <Picker.Item label="local-IPTV" value={4} />
+      <Picker.Item label="IPTV" value={5} />
   </Picker>);
     return (
       <View style={styles.container}>

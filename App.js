@@ -294,6 +294,7 @@ class APP extends React.Component {
     this.mounted = false;
   }
   showMsg = (body,type, speed, delay, onCLicked)=>{
+    console.log("msg1:",this.state.showMsg,"msg2:",this.state.showMsg);
     if(this.state.showMsg==false){
       this.setState({body:body,type:type, speed:speed, delay:delay,debug:false,showMsg:true,onCLicked:onCLicked});
     }else if(this.state.showMsg==true && this.state.showMsg_2==false){

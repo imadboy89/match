@@ -98,7 +98,7 @@ class ChannelScreen extends React.Component {
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style_modals:theme}) );
     this.get_channel();
-    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> API_.debugMSg(error+"","warning") );
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> API_.debugMsg(error+"","warning") );
   }
   get_channel(){
       this.channel_photo = this.props.route.params.channel_photo;
@@ -149,10 +149,12 @@ class ChannelScreen extends React.Component {
     }
   }
   render() {
+    console.log(this.state.channel?this.state.channel.channel_servers:null);
     const ch_name_ = this.state.channel && this.state.channel.en_name ? this.state.channel.en_name.toLocaleLowerCase().trim().replace(/\s/g,"").replace(/hd/g,"") : "";
     const ext_ch = API_.external_channels && API_.external_channels[ch_name_] ? API_.external_channels[ch_name_] : null;
 
     const _channel_servers = this.state.channel && this.state.channel.channel_servers && this.state.channel.channel_servers.map ?this.state.channel.channel_servers:[];
+    console.log(_channel_servers);
     if(ext_ch){_channel_servers.push(ext_ch);}
     let servers_list = _channel_servers.map(serv => serv && serv.name ? (
         <View style={{margin:8}} key={serv.id}>
@@ -167,7 +169,7 @@ class ChannelScreen extends React.Component {
     return (
       <ScrollView style={this.state.dynamic_style.container}>
       <View style={this.state.dynamic_style.channel_logo_v}>
-        { this.channel_photo ?  <Image style={this.state.dynamic_style.channel_logo} source={{uri: API_.domain_o+this.channel_photo}} />: null}
+        { this.channel_photo ?  <Image style={this.state.dynamic_style.channel_logo} source={{uri: this.channel_photo.slice(0,4)!="http"?API_.domain_o+this.channel_photo:this.channel_photo}} />: null}
          </View>
          <View style={this.state.dynamic_style.info_cont}>
          { this.state.loading ? <Loading /> : 

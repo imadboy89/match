@@ -3,6 +3,10 @@ import {  View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image , I
 import Constants from 'expo-constants';
 import Loader from "../components/Loader";
 import {styles_article,getTheme} from "../components/Themes";
+import { TouchableHighlight } from "react-native-gesture-handler";
+import ItemsList from '../components/list';
+import Player from "../components/Player";
+import Team from "../components/Team";
 
 class ArticleScreen extends React.Component {
   constructor(props) {
@@ -13,6 +17,8 @@ class ArticleScreen extends React.Component {
         loading:true,
         article:this.props.route.params.article,
         dynamic_style:styles_article,
+        modalVisible_player:false,
+        modalVisible_team:false,
         
     };
     this.get_article();
@@ -24,13 +30,18 @@ class ArticleScreen extends React.Component {
     this.props.navigation.setOptions({title: <Text>{short_title}</Text>})
   }
   get_article(){
-    this.state.article.date = API_.get_date2(new Date(this.state.article.date.replace("#","") * 1000));
+    this.state.article.date =  this.state.article && this.state.article.date ? API_.get_date2(new Date(this.state.article.date.replace("#","") * 1000)) : "";
     API_.get_article(this.props.route.params.article.link, this.state.article.source)
     .then(article =>{
       if(article.constructor == Object){
         this.state.article.body = article.body ? article.body : this.state.article.body;
         this.state.article.img  = article.img  ? article.img  : this.state.article.img;
         this.state.article.date = article.date ? article.date : this.state.article.date;
+        this.state.article.related = article.related ? article.related : this.state.article.related;
+        this.state.article.related_news = article.related_news ? article.related_news : this.state.article.related_news;
+
+        this.state.article.img = this.state.article.img==undefined && article.related_images && article.related_images.length>0 
+        ? article.related_images[0]["img_link"] : this.state.article.img;
 
       }else{
         this.state.article.body = article;
@@ -39,7 +50,63 @@ class ArticleScreen extends React.Component {
       API_.setTitleWeb(this.state.article.title_news);
     });
   }
+  onItemClicked = (item)=>{
+    if(item.related_news_id){
+      item.source = this.state.article.source;
+      item.link = "n="+item.related_news_id;
+      item.title_news = item.related_news_title;
+      item.img= item.related_images && item.related_images.length>0 ? item.article.related_images[0]["img_link"] : null;
+      this.props.navigation.push('Article', { article: item });
+    }else{
+      let attrs2post = {};
+      try {
+        const link_ = item.related_link.split("=");
+        if(link_[0]=="team"){
+          attrs2post.modalVisible_team = true;
+          attrs2post.team_id = parseInt(link_[1]);
+        }else if(link_[0]=="player"){
+          attrs2post.modalVisible_player = true;
+          attrs2post.player_id = parseInt(link_[1]);
+        }
+      } catch (error) {
+        
+      }
+      
+      this.setState(attrs2post)
+    }
+  }
   render() {
+    const related_news_header = <Text style={this.state.dynamic_style.article_date_t}>أخبار ذات صلة :</Text>;
+    const related_news = this.state.article && this.state.article.related_news && this.state.article.related_news.length>0 ?
+      <ItemsList 
+      ListHeaderComponent={related_news_header}
+      loading={false}
+      list={this.state.article.related_news} 
+      onclick={this.onItemClicked} 
+      key_={"related_news_title"} key_key={"related_news_id"}
+      />
+      :null;
+    const related_header = <Text style={this.state.dynamic_style.article_date_t}>ذات صلة :</Text>;
+    const related = this.state.article && this.state.article.related && this.state.article.related.length>0 ?
+      <ItemsList 
+      ListHeaderComponent={related_header}
+      loading={false}
+      list={this.state.article.related} 
+      onclick={this.onItemClicked} 
+      key_={"related_title"} key_key={"related_link"}
+      />
+      :null;
+    const related_ = this.state.article && this.state.article.related && this.state.article.related.length>0 ?
+    this.state.article.related.map(n=>{ return n && n.length==2 ?(
+      <ItemsList 
+      loading={false}
+      list={this.state.article.related} 
+      onclick={this.onItemClicked} 
+      key_={"related_link"} key_key={"related_title"}
+      />) : null;
+    })
+    :null;
+
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
         <View style={this.state.dynamic_style.channel_logo_v}>
@@ -58,7 +125,35 @@ class ArticleScreen extends React.Component {
             <Text style={this.state.dynamic_style.article_body_t}>{this.state.article && this.state.article.body? this.state.article.body : ""}</Text>  }
             
           </View>
-      
+
+         {related_news==null?related_news:
+          <View style={{width:"98%",flex:1}}>{related_news}</View>
+         }
+         {related==null?related_news:
+          <View style={{width:"98%",flex:1}}>{related}</View>
+         }
+
+
+        { this.state.modalVisible_player==true ?
+          <Player       
+          modal_visible={this.state.modalVisible_player}
+          dynamic_style={this.state.dynamic_style}
+          player_id = {this.state.player_id}
+          closeModal={()=>{
+          this.setState({modalVisible_player:false})}}></Player>
+
+          : null }
+        { this.state.modalVisible_team==true ?
+        <Team       
+          modal_visible={this.state.modalVisible_team}
+          team_id = {this.state.team_id}
+          get_player_info={this.get_player_info}
+          set_fav_p={this.set_fav_p}
+          favorite_p={this.state.favorite_p}
+          league_name={this.league_name}
+          league_id={this.real_id}
+          closeModal={()=>{this.setState({modalVisible_team:false});/*this.load_logos();*/}}></Team>
+          : null }
         </ScrollView >
     );
   }
@@ -66,3 +161,4 @@ class ArticleScreen extends React.Component {
 
 
 export default ArticleScreen;
+

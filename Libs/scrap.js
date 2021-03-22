@@ -10,14 +10,21 @@ class Scrap {
     this.img_q = "410w";
   }
   get_article(html){
+    const arr_end = '\\"\\"\\);';
     let patttern_body = /var\s*article_content\s*=\s*".*/gi;
     let m = html.match(patttern_body);
     let body = m && m.length>0 ? m[0].replace(/\\"/g,"'") : "";
     body = body.split('"').length>1 ? body.split('"')[1] : "Error";
     //body = body.replace("<p");
     const article = {};
-    article.related =this.get_var_array(html, "article_links");
-    article.related_news =this.get_var_array(html, "article_related");
+    article.related =this.get_var_array(html, "article_links",arr_end);
+    article.related_news =this.get_var_array(html, "article_related",arr_end);
+    article.related_images =this.get_var_array(html, "article_images",arr_end);
+    
+
+    article.related      = article.related    .map(n=> {return {related_link:n[0],related_title:n[1]} });
+    article.related_news = article.related_news.map(n=> {return {related_news_id:n[0],related_news_title:n[1]} });
+    article.related_images = article.related_images.map(n=> {return {img_link:n[0].replace(/^\/\//,"https://"),img_desc:n[1]} });
     //article.news =this.get_var_array(html, "news");
     article.body = this.decodeEntities(body);
     return article;
@@ -590,10 +597,10 @@ class Scrap {
 
     return body;
   }
-  get_var_array(html,var_name){
+  get_var_array(html,var_name,end="-1,0\\);"){
     //let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
     //const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gmi");
-    const patttern  = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\r\\n(((?!-1,0\\);).)*\\r\\n)*","gmi");
+    const patttern  = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\r\\n(((?!"+end+").)*\\r\\n)*","gmi");
     let m = html.match(patttern);
     if(m){
       let out = "[["+m[0].trim().replace("var "+var_name+" = new Array (","").replace(/(,\r\n)?\s*\-1,0\);/mi,"").replace(/,$/i,'').replace(/	/g,'').replace(/,\r\n/gi,"],[") + "]]";
@@ -754,7 +761,7 @@ class Scrap {
 
     for (let i=0;i<iframes.length;i++){
       const iframe_url = iframes[i].getAttribute("src") ;
-      if(iframe_url && iframe_url.match(/kora-live/i)){ console.log(iframe_url);
+      if(iframe_url && iframe_url.match(/kora-live/i)){
         return iframe_url;
       }
     }

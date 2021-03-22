@@ -187,9 +187,11 @@ class ItemsList extends React.Component {
         </View>
 
         );
+    }else if(col_key.includes("related_") ){
+      return (<Text style={this.state.dynamic_style.item} numberOfLines={1}>- {item[col_key]}</Text>);
     }else{
       return (
-        <Text style={this.state.dynamic_style.item}>- {item[col_key]}</Text>
+        <Text style={this.state.dynamic_style.item} numberOfLines={1}>- {item[col_key]}</Text>
         );
     }
   }
@@ -301,7 +303,6 @@ class ItemsList extends React.Component {
 
   }
   toTop = () => {
-    console.log(this.props.disable_toTop!=true);
     if(this.props.disable_toTop!=true && this.flatListRef && this.flatListRef && this.flatListRef.scrollToOffset){
       this.flatListRef.scrollToOffset({ animated: true, offset: 0 });
     }

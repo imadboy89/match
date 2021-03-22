@@ -30,7 +30,7 @@ class ChannelsScreen extends React.Component {
     this.category_name = this.props.route.params.category_name;
     this.props.navigation.setOptions({title: this.category_name})
     API_.get_channels(this.props.route.params.category_id).then(resp=>{
-      if(resp["data"].length>0){
+      if(resp && resp.data && resp["data"].length>0){
         for (let i=0;i<resp["data"].length;i++){
           API_.get_channel(resp["data"][i].channel_id).then(resp=>{
             this.chanels_data[i].en_name = resp["data"].en_name;

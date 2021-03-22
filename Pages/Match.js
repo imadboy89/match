@@ -3,10 +3,9 @@ import { View, TouchableHighlight, Modal, Button, Switch, Picker, TouchableOpaci
 import Loading from '../components/Loader';
 import {styles_match,getTheme,global_theme} from "../components/Themes";
 import IconButton from "../components/IconButton";
-import Player from "../components/Player";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Player from "../components/Player";
 import Team from "../components/Team";
-import BackUp from "../Libs/BackUp";
 let list = [
 
           ];
