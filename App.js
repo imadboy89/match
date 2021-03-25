@@ -18,6 +18,7 @@ import VideoScreen from './Pages/Video';
 import LeagueScreen from './Pages/League';
 import LeaguesScreen from './Pages/Leagues';
 import SettingsScreen from './Pages/Settings';
+import TVScreen from './Pages/TV';
 import Constants from 'expo-constants';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -30,6 +31,7 @@ import * as Permissions from 'expo-permissions';
 import backUp from "./Libs/BackUp";
 import ToastMsg from "./components/ToastMsg";
 import ClientInfo from "./Libs/ClientInfo";
+//--release-channel imad
 Text = TextF;
 global. API_ = new API();
 global. API_.appname = "AlMatch"
@@ -176,6 +178,8 @@ function MatchesStackScreen() {
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
       <MatchesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="TV" component={TVScreen} />
+      
       
     </MatchesStack.Navigator>
   );
@@ -198,6 +202,8 @@ function NewsStackScreen() {
     <NewsStack.Navigator>
       <NewsStack.Screen options={_app_styles.screenHeader} name="News" component={NewsScreen} />
       <NewsStack.Screen options={_app_styles.screenHeader} name="Article" component={ArticleScreen} />
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
     </NewsStack.Navigator>
   );
 }

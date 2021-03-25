@@ -67,6 +67,17 @@ class ArticleScreen extends React.Component {
         }else if(link_[0]=="player"){
           attrs2post.modalVisible_player = true;
           attrs2post.player_id = parseInt(link_[1]);
+        }else if(link_[0]=="m"){
+          let home_team_ar = undefined;
+          let away_team_ar = undefined;
+          if(item.related_title.split("-").length>2){
+            const teams = item.related_title.split("-")[2].split("ضد");
+            home_team_ar = teams.length>1 ? teams[0].trim() : undefined;
+            away_team_ar = teams.length>1 ? teams[1].trim() : undefined;
+          }
+          this.props.navigation.navigate('Match', { match_item: {id:link_[1],is_koora:true , home_team_ar:home_team_ar , away_team_ar:away_team_ar} });
+        }else if(link_[0]=="c"){
+          this.props.navigation.navigate('League',{ league_details: {league:item.related_title,league_img:undefined,id:link_[1]} });
         }
       } catch (error) {
         
@@ -74,6 +85,10 @@ class ArticleScreen extends React.Component {
       
       this.setState(attrs2post)
     }
+  }
+  onLeaguePressed = (league_name, league_img,league_id)=>{
+    league_img = ["https:/","http://"].includes(league_img.slice(0,7)) ? league_img : API_.domain_o+league_img;
+    this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:league_img,id:league_id} });
   }
   render() {
     const related_news_header = <Text style={this.state.dynamic_style.article_date_t}>أخبار ذات صلة :</Text>;

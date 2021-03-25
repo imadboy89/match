@@ -326,8 +326,16 @@ class SettingsScreen extends React.Component {
               <Button title="List" onPress={()=>this.setState({modalVisible_matchesNotif:true})}></Button>
             </View>
           </View>
+
           <View style={this.state.dynamic_style.settings_row}>
-          <Text style={this.state.dynamic_style.settings_row_label}> </Text> 
+            <Text style={this.state.dynamic_style.settings_row_label}>TEST TV </Text> 
+            <View style={this.state.dynamic_style.settings_row_input}>
+              <Button title="TV controller" onPress={()=>this.props.navigation.navigate('TV')}></Button>
+            </View>
+          </View>
+
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}> </Text> 
           </View>
           {this.render_modal_history()}
           {this.render_modal_login()}

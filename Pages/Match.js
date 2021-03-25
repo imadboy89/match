@@ -43,11 +43,13 @@ class Matchcreen extends React.Component {
     API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{this.setState({favorite_p:o});});
     API_.getConfig("favorite_teams_k",this.state.favorite_t).then(o=>{this.setState({favorite_t:o});});
     
+    this.set_title();
     
+  }
+  set_title(){
     this.home_name = this.state.matche_details && this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
     this.away_name = this.state.matche_details && this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;
     this.props.navigation.setOptions({title: <Text >{this.home_name +" - "+ this.away_name}</Text>});
-    
   }
   get_Match(id){
     //console.log("get_Match",id,this.state.matche_details);
@@ -64,7 +66,9 @@ class Matchcreen extends React.Component {
         this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
         this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
         API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
+        //this.set_title();
       }
+      
     });
   }
   load_logos(){

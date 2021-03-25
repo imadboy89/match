@@ -301,7 +301,7 @@ class HomeScreen extends React.Component {
               <IconButton 
                 name={ backup.is_auth ? "user" : "gears"}
                 size={iconsSize} style={this.state.dynamic_style.icons} onPress={()=>{
-                this.props.navigation.navigate('Settings');            
+                this.props.navigation.navigate('Settings');
               }}  />
           </View>
         )
