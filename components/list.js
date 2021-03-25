@@ -47,7 +47,7 @@ class ItemsList extends React.Component {
     const current_windowWidth= Dimensions.get('window').width<=1000 ? Dimensions.get('window').width : 1000;
     if(this.windowWidth == current_windowWidth){return ;}
     let margin2add = _isMobile(API_.isWeb) ? 15 : 40;
-    margin2add = parseInt(margin2add * (this.minWidth/300)); 
+    margin2add = this.minWidth<300 ? parseInt(margin2add * (this.minWidth/300)): margin2add;
     this.windowWidth = current_windowWidth;
     //this.setState({numColumns:this.windowWidth/500});
     this.state.numColumns = parseInt(this.windowWidth/this.minWidth);
