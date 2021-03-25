@@ -99,6 +99,7 @@ class ArticleScreen extends React.Component {
       list={this.state.article.related_news} 
       onclick={this.onItemClicked} 
       key_={"related_news_title"} key_key={"related_news_id"}
+      minWidth={800}
       />
       :null;
     const related_header = <Text style={this.state.dynamic_style.article_date_t}>ذات صلة :</Text>;
@@ -109,6 +110,7 @@ class ArticleScreen extends React.Component {
       list={this.state.article.related} 
       onclick={this.onItemClicked} 
       key_={"related_title"} key_key={"related_link"}
+      minWidth={800}
       />
       :null;
     const related_ = this.state.article && this.state.article.related && this.state.article.related.length>0 ?
