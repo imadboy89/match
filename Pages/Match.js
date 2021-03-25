@@ -62,6 +62,7 @@ class Matchcreen extends React.Component {
     }
     API_.get_match(id).then(resp=>{
       if(resp["data"] && resp["data"][0] ){
+        
         this.setState({matche_details:resp["data"][0],loading:false});
         this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
         this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
@@ -195,9 +196,11 @@ class Matchcreen extends React.Component {
     const team_badge_h= this.state.matche_details && this.state.matche_details.home_team_logo ? this.state.matche_details.home_team_logo : false;
     const team_badge_a= this.state.matche_details && this.state.matche_details.away_team_logo ? this.state.matche_details.away_team_logo : false;
     const style_team_name ={flexDirection:'row',flexWrap:'wrap',width:"100%",height:50,borderColor:global_theme.text_color_default,borderBottomWidth :1,borderRadius:40,justifyContent:"center"};
+
+    const live_style = this.state.matche_details.live ? {"color":global_theme.live_borderColor}:{};
     return (
       <View style={this.state.dynamic_style.view_tab}>
-        <Text style={this.state.dynamic_style.text_info}>{this.state.matche_details.date} { API_.convert_time(this.state.matche_details.time)} </Text>
+        <Text style={this.state.dynamic_style.text_info}>{this.state.matche_details.datetime ? this.state.matche_details.datetime : this.state.matche_details.date+" "+API_.convert_time(this.state.matche_details.time)} </Text>
         {1==2 && this.state.matche_details && this.home_name!="-" ?
           <TouchableOpacity 
             activeOpacity={0.7}
@@ -233,6 +236,9 @@ class Matchcreen extends React.Component {
         {this.state.matche_details.status!="-" ?
           <Text style={this.state.dynamic_style.text_info}>Status : {this.state.matche_details.status}</Text>
          : null}
+        {this.state.matche_details.time_played && this.state.matche_details.time_played!="-" ?
+          <Text style={[this.state.dynamic_style.text_info,live_style]}>Playing time : {this.state.matche_details.time_played}</Text>
+         : null}
         {this.state.matche_details.league!="-" ?
           <Text style={this.state.dynamic_style.text_info}>League : {this.state.matche_details.league}</Text>
          : null}
@@ -251,6 +257,7 @@ class Matchcreen extends React.Component {
         {this.state.matche_details.stadium!="-" ?
           <Text style={this.state.dynamic_style.text_info}>Staduim : {this.state.matche_details.stadium}</Text>
          : null}
+
         <View style={{flexDirection:'row', flexWrap:'wrap', flex:1}}>
           <Text style={this.state.dynamic_style.text_info}>Live match :</Text>
           <Switch
@@ -542,10 +549,11 @@ class Matchcreen extends React.Component {
       const fav_style_a = this.state.favorite_t.includes(this.state.matche_details.away_team_id ) ? {backgroundColor: global_theme.fav_background} : {};
       const away_logo = this.state.matche_details.away_team_badge ? this.state.matche_details.away_team_badge : this.state.matche_details.away_team_logo;
       const home_logo = this.state.matche_details.home_team_badge ? this.state.matche_details.home_team_badge : this.state.matche_details.home_team_logo;
+      const live_style = this.state.matche_details.live ? {"borderColor":global_theme.live_borderColor,"borderWidth":2}:{};
     return (
       <ScrollView style={this.state.dynamic_style.container}>
         <TouchableOpacity 
-          style={this.state.dynamic_style.header_container} 
+          style={[this.state.dynamic_style.header_container,live_style]} 
           onPress={()=>this.setState({show_res : this.state.show_res?false:true})}
           activeOpacity={0.7}
           >              

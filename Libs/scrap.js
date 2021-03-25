@@ -506,6 +506,14 @@ class Scrap {
             matche["home_team_score"] = score && score.length ==2 ? score[0] : "-";
             matche["away_team_score"] = score && score.length ==2 ? score[1] : "-";
             matche["league"] = league["title"];
+            matche["status"] = "-";
+            if(matche[ "time_old" ].includes("@")){
+              matche["status"]="Live" ;
+            }else if(matche[ "time_old" ].includes("$f")){
+              matche["status"]="Finished" ;
+            }else if(matche[ "time_old" ].includes("$n")){
+              matche["status"]="Not Started Yet" ;
+            }
             matche.is_koora = true;
             if(is_bl){
               matches_bl[ matche["league_id"] ]["data"].push(matche);
