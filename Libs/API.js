@@ -240,7 +240,19 @@ class API {
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return url.includes("kooora.com")?scrap.get_news(resp) : scrap.get_news_hp(resp);
+      let list = url.includes("kooora.com")?scrap.get_news(resp) : scrap.get_news_hp(resp)
+      if(url.includes("kooora.com")){
+        let exist_list = [];
+        list = list.filter(o=>{
+          if(exist_list.includes(o.link) ){
+            return false;
+          }
+          exist_list.push(o.link);
+          return true;
+        });
+        console.log(list);
+      }
+      return list;
     });
   }
   get_player(player_id){
