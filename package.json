@@ -6,6 +6,7 @@
     "predeploy": "expo build:web",
     "depl": "gh-pages -d web-build",
     "publish": "expo publish",
+    "publish2":"expo publish --release-channel almatch",
     "pubdep": "expo publish && npm run predeploy",
     "start_wp": "webpack-dev-server -d --config ./web/webpack.config.js --inline --hot --colors",
     "start": "expo start:web",
