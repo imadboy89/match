@@ -188,7 +188,13 @@ class ItemsList extends React.Component {
 
         );
     }else if(col_key.includes("related_") ){
-      return (<Text style={this.state.dynamic_style.item} numberOfLines={1}>- {item[col_key]}</Text>);
+      let text2show = item[col_key];
+      if(col_key=="related_title"){
+        if(text2show.split("-").length>2 && text2show.split("-")[2].split("ضد").length>1){
+          text2show = text2show.split("-")[2];
+        }
+      }
+      return (<Text style={this.state.dynamic_style.item} numberOfLines={1}>- {text2show}</Text>);
     }else{
       return (
         <Text style={this.state.dynamic_style.item} numberOfLines={1}>- {item[col_key]}</Text>

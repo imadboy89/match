@@ -91,6 +91,7 @@ class ArticleScreen extends React.Component {
     this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:league_img,id:league_id} });
   }
   render() {
+    
     const related_news_header = <Text style={this.state.dynamic_style.article_date_t}>أخبار ذات صلة :</Text>;
     const related_news = this.state.article && this.state.article.related_news && this.state.article.related_news.length>0 ?
       <ItemsList 
@@ -113,16 +114,6 @@ class ArticleScreen extends React.Component {
       minWidth={800}
       />
       :null;
-    const related_ = this.state.article && this.state.article.related && this.state.article.related.length>0 ?
-    this.state.article.related.map(n=>{ return n && n.length==2 ?(
-      <ItemsList 
-      loading={false}
-      list={this.state.article.related} 
-      onclick={this.onItemClicked} 
-      key_={"related_link"} key_key={"related_title"}
-      />) : null;
-    })
-    :null;
 
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
