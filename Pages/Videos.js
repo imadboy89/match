@@ -118,7 +118,9 @@ get_Videos = ()=>{
           list={this.state.list} 
           onclick={this.onItem_clicked} 
           key_="title_news" key_key="link"  
-          refresh_list={this.refresh_list} />
+          refresh_list={this.refresh_list} 
+          page={this.state.page}
+          />
         
 
       </View>

@@ -117,6 +117,7 @@ get_news =(loading=true,keep_list=false)=>{
           list={this.state.list} 
           onclick={this.onItem_clicked} 
           key_="title_news" key_key="title_news"  
+          page={this.state.page}
           />
         
       </View>

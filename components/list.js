@@ -22,7 +22,7 @@ class ItemsList extends React.Component {
 
     this.refs_list = [];
     this.refs_map = {};
-    
+    this.page = this.props.page;
   }
   componentDidMount=()=>{
     this._isMounted=true;
@@ -309,6 +309,10 @@ class ItemsList extends React.Component {
 
   }
   toTop = () => {
+    if(this.page == this.props.page){
+      return;
+    }
+    this.page = this.props.page;
     if(this.props.disable_toTop!=true && this.flatListRef && this.flatListRef && this.flatListRef.scrollToOffset){
       this.flatListRef.scrollToOffset({ animated: true, offset: 0 });
     }
@@ -322,6 +326,7 @@ class ItemsList extends React.Component {
     }
   }
   render_list() {
+    
     /*let is_new = JSON.stringify(this.list_origin) != JSON.stringify(this.props.list);
     is_new = is_new && (this.props.ListHeaderComponent!= this.ListHeaderComponent || this.props.ListFooterComponent!=this.ListFooterComponent);
     */
