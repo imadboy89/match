@@ -97,7 +97,7 @@ class ChannelScreen extends React.Component {
             onPress={()=>this.onch_clicked(serv)} title={serv.name} style={{margin:5}}></Button>
         </View>
       ):null);
-    let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER",];
+    let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER","inApp-IPTV"];
     const pickers = picker_options.map(o=><Picker.Item label={o} value={o} key={o}/>);
 
     return (

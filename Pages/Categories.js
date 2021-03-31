@@ -159,8 +159,9 @@ class CategoriesScreen extends React.Component {
       <Picker.Item label="Almtch" value={1} />
       <Picker.Item label="kora-live" value={2} />
       <Picker.Item label="inApp-IPTV" value={3} />
-      <Picker.Item label="local-IPTV" value={4} />
-      <Picker.Item label="IPTV" value={5} />
+      {(backup && backup.is_auth && backup.admin==true) ?  <Picker.Item label="local-IPTV" value={4} /> : null}
+      {(backup && backup.is_auth && backup.admin==true) ?  <Picker.Item label="IPTV" value={5} /> : null}
+      
   </Picker>);
     return (
       <View style={styles.container}>
