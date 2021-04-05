@@ -34,21 +34,8 @@ class Team extends React.Component{
       this.state.favorite_p = await API_.getConfig("favorite_players",this.state.favorite_p);
       
       API_.get_team(this.props.team_id).then(res=>{
-        let img_uri = res && res.team_group_photo ? res.team_group_photo : false;
-        let img_logo_uri = res && res.team_logo ? res.team_logo : false;
-        img_uri = img_uri && img_uri.slice(0,2)=="//" ? img_uri.replace("//","https://") : img_uri;
-        img_logo_uri = img_logo_uri && img_logo_uri.slice(0,2)=="//" ? img_logo_uri.replace("//","https://") : img_logo_uri;
-        img_logo_uri=res && res.team_type && res.team_type==2? API_.get_cc_img(res.team_flag) : img_logo_uri;
-        res.team_group_photo = img_uri;
-        res.team_logo = img_logo_uri;console.log(res);
-        res.team_country;
+        API_.setTeam_logo(res["team_name_ar"], res.team_logo, this.props.league_name, this.props.league_id,true,true);
         this.setState({team:res,loading:false});
-        if(res && res.team_name_ar && img_logo_uri && img_logo_uri!=""){
-          //console.log(this.props.league_id,this.props.league_name);
-          API_.setTeam_logo(res["team_name_ar"], img_logo_uri, this.props.league_name, this.props.league_id,true,true);
-        }
-
-        
       });
     }
     get_player_info=(p_id)=>{

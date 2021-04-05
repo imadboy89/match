@@ -24,6 +24,7 @@ class BackUp{
         this.last_notification_time = false;
         this.is_auth = false;
         this.is_settings_loaded = false;
+        this.teams_ready = false;
     }
     checkCnx = async(check_client=true,is_silent=false)=>{
       const state = await NetInfo.fetch();
@@ -54,6 +55,7 @@ class BackUp{
         this.db = mongoClient.db("ba9al");
         this.db_settings     = this.db.collection("settings");
         this.db_teams_info   = this.db.collection("teams_info");
+        this.db_teams   = this.db.collection("teams");
         this.db_IPTV         = this.db.collection("IPTV");
         this.db_live_matches = this.db.collection("live_matches");
         this.is_auth         = this.email!="" && this.email !=undefined;
@@ -313,12 +315,20 @@ class BackUp{
       if(!this.is_mdb_ok()){return false;}
 
       let teams_inf = await API_.getTeam_logo();
+      let teams_inf_k = await API_.getTeam_logo_k();
       const teams_name = Object.keys(teams_inf);
+      const teams_id = Object.keys(teams_inf_k);
       let teams2backup = [];
       for(let i=0;i<teams_name.length;i++){
         if(teams_inf[teams_name[i]].is_backedup == undefined){
           teams_inf[teams_name[i]].is_backedup = true;
           teams2backup.push(teams_inf[teams_name[i]]);
+        }
+      }
+      for(const team_id of teams_id){
+        if(teams_inf_k[team_id].is_backedup == undefined){
+          teams_inf_k[team_id].is_backedup = true;
+          teams2backup.push(teams_inf_k[team_id]);
         }
       }
       if(teams2backup.length==0){return true;}
@@ -332,11 +342,20 @@ class BackUp{
     load_teams= async()=>{
       if(!this.is_mdb_ok() || undefined == this.db_teams_info){return false;}
       const teams = await this.db_teams_info.find({},{"projection": { "_id": 0 },}).asArray();
+      const teams_k = await this.db_teams.find({},{"projection": { "_id": 0 },}).asArray();
       let teams_inf = {};
+      let teams_inf_k = {}; 
       for(let i=0;i<teams.length;i++){
         teams_inf[teams[i].team_name] = teams[i];
+        
       }
+      for(let i=0;i<teams_k.length;i++){
+        teams_inf_k[teams_k[i].team_id] = teams_k[i];
+        
+      }
+      this.teams_ready = true;
       await API_.setTeams(teams_inf);
+      await API_.setTeams_k(teams_inf_k);
       return true;
     }
     partnersManager = async(action,partner_username)=>{

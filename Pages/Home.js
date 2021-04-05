@@ -133,7 +133,6 @@ class HomeScreen extends React.Component {
             backup.savePushToken();
           }
           API_.notifications_matches = await get_notifications_matches();
-          console.log("API_.notifications_matches", API_.notifications_matches);
         }).catch(error=>{console.log(error)});
       }).catch(error=>{
         console.log(error);
