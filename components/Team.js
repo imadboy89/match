@@ -32,8 +32,7 @@ class Team extends React.Component{
         return;
       }
       this.state.favorite_p = await API_.getConfig("favorite_players",this.state.favorite_p);
-      
-      API_.get_team(this.props.team_id).then(res=>{
+      API_.get_team(this.props.team_id,true,undefined,true).then(res=>{
         API_.setTeam_logo(res["team_name_ar"], res.team_logo, this.props.league_name, this.props.league_id,true,true);
         this.setState({team:res,loading:false});
       });

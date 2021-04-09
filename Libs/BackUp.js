@@ -311,7 +311,7 @@ class BackUp{
       }
       
     }
-    save_teams= async()=>{
+    save_teams_o= async()=>{
       if(!this.is_mdb_ok()){return false;}
 
       let teams_inf = await API_.getTeam_logo();
@@ -335,27 +335,42 @@ class BackUp{
       const results = await this.client.callFunction("save_teams",[teams2backup]);
       if (results.inserted>0 || results.updated>0){
         await API_.setTeams(teams_inf);
+        console.log("["+teams2backup.length+"] Teams saved successfully!!");
+        API_.debugMsg("["+teams2backup.length+"] Teams saved successfully!!","success");
+      }
+    }
+    save_teams= async()=>{
+      if(!this.is_mdb_ok()){return false;}
+      let teams_inf_k = await API_.getTeam_logo_k();
+      const teams_id = Object.keys(teams_inf_k);
+      let teams2backup = [];
+
+      for(const team_id of teams_id){
+        if(teams_inf_k[team_id].is_backedup != true){
+          teams_inf_k[team_id].is_backedup = true;
+          teams2backup.push(teams_inf_k[team_id]);
+        }
+      }
+      if(teams2backup.length==0){return true;}
+      console.log("saving remotly [count="+teams2backup.length+"] bck");
+      const results = await this.client.callFunction("save_teams",[teams2backup]);
+      if (results.inserted>0 || results.updated>0){
+        API_.setTeams_k(teams_inf_k);
         console.log("["+teams2backup.length+"] Teams saved successfully!");
         API_.debugMsg("["+teams2backup.length+"] Teams saved successfully!","info");
       }
+      return results;
     }
     load_teams= async()=>{
       if(!this.is_mdb_ok() || undefined == this.db_teams_info){return false;}
-      const teams = await this.db_teams_info.find({},{"projection": { "_id": 0 },}).asArray();
-      const teams_k = await this.db_teams.find({},{"projection": { "_id": 0 },}).asArray();
-      let teams_inf = {};
+      const teams_k = await backup.client.callFunction("load_teams",[]);
       let teams_inf_k = {}; 
-      for(let i=0;i<teams.length;i++){
-        teams_inf[teams[i].team_name] = teams[i];
-        
-      }
       for(let i=0;i<teams_k.length;i++){
         teams_inf_k[teams_k[i].team_id] = teams_k[i];
-        
       }
       this.teams_ready = true;
-      await API_.setTeams(teams_inf);
       await API_.setTeams_k(teams_inf_k);
+      console.log("***************** loaded");
       return true;
     }
     partnersManager = async(action,partner_username)=>{

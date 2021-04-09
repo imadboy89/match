@@ -88,14 +88,14 @@ class Matchcreen extends React.Component {
   }
   get_Match_k(id){
       API_.get_match_k(id).then(resp=>{
-        //console.log("get_Match_k ",resp);
         if(resp ){
-          this.setState({matche_details: resp,loading:false});
+          this.state.matche_details = {...this.state.matche_details, ...resp};
+          this.setState({loading:false});
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
 
           API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
-          this.load_logos();
+          //this.load_logos();
         }
       });
   }

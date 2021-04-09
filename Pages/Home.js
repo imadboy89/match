@@ -100,6 +100,8 @@ class HomeScreen extends React.Component {
   }
   componentDidMount=async()=>{
     if(API_.isWeb){
+      API_.next = this.nextPage;
+      API_.setDate = this.onChange;
       this.promtInstallWPA();
       if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
         navigator.serviceWorker.removeEventListener('message',()=>{});
@@ -306,11 +308,11 @@ class HomeScreen extends React.Component {
         )
       });
   }
-  get_matches = (date_obj=null,setloading=true)=>{
+  get_matches = (date_obj=null,setloading=true,next=false)=>{
     //if(API_.is_auth==false){return false;}
     if(this.state.loading==false && setloading){this.setState({loading:true});}
     if(this.state.source_id!=0){
-      return this.get_matches_koora(date_obj);
+      return this.get_matches_koora(date_obj,next);
     }
     date_obj = date_obj==null ? this.state.matches_date :date_obj; 
 
@@ -410,14 +412,14 @@ async get_favs(data){
   data = fav_list.data.length>0 ? [fav_list,].concat(data) : data ;
   return data;
 }
-get_matches_koora = async(date_obj=null)=>{
+get_matches_koora = async(date_obj=null,next=false)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
   //API_.notifications_matches = await get_notifications_matches(date_obj);
   API_.load_leagues(this.refresh_leagues);
   
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
   let resp = [];
-  resp = await API_.get_matches_k(date_obj,this.state.is_only_live,this.state.source_id);
+  resp = await API_.get_matches_k(date_obj,this.state.is_only_live,this.state.source_id,next);
   let data = resp && resp.length>0 ? resp : [];
   
   data = await this.get_favs(data);
@@ -495,7 +497,7 @@ show_DateP(){
     this.end=false;
     this.state.matches_date .setDate(this.state.matches_date .getDate() + 1);
     this.setState({list:[],loading:true,page:1,is_only_live:false});
-    this.get_matches(this.state.matches_date);
+    this.get_matches(this.state.matches_date,true);
     this.render_header();
   }
   previousPage = ()=>{

@@ -256,7 +256,7 @@ class API {
     });
   }
   get_player(player_id){
-    https://m.kooora.com/?player=33085
+    "https://m.kooora.com/?player=33085"
     return this.http("https://m.kooora.com/?player="+player_id+"&arabic","GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -264,8 +264,81 @@ class API {
       return scrap.get_player(resp);
     }).catch(error=>API_.showMsg(error,"danger"));
   }
-  get_team(team_id,save_db=true){
-    https://m.kooora.com/?player=33085
+  queued_get_teams=async(queue,next=false)=>{
+    let queue_size = queue.length;
+    let queue_inprocess = 0;
+    const queue_maxInprocess=5;
+    console.log("queued_get_teams getting Teams: ",queue_size);
+    let teams_info = await this.getTeam_logo_k();
+    for(const team_id of queue){
+      while(queue_inprocess>=queue_maxInprocess){
+        await this.sleep(1000);
+      }
+      queue_inprocess+=1;
+      this.get_team(team_id, false,teams_info).then(r=>{
+        queue_inprocess-=1;
+        //console.log(" add 2 team "+r);
+        if(r && r.team_id>0 && (r.team_name_ar || r.team_name_en)){
+          //console.log(" add team "+r.team_name_ar);
+          teams_info[r.team_id] = r;
+        }
+        
+      });
+    }
+    while(queue_inprocess>0){
+      await this.sleep(200);
+    }
+    console.log("queued_get_teams getting Teams [Done]",queue_size);
+    await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams_info));
+    await backup.save_teams();
+    console.log("queued_get_teams saving [Done]",queue_size);
+    if(API_.next && next){
+      await this.sleep(1000);
+      API_.next();
+    }
+    return true;
+  }
+  save_teams_ls = async(teams_info)=>{
+    const chunk_size = 1000;
+    let teams_info_chunk = {};
+    const teams_info_v = Object.values(teams_info);
+    let count = 0;
+    let chunk_id = 0;
+    console.log("Start saving in chunks count="+teams_info_v.length);
+    for(let i=0;i< teams_info_v.length;i++){
+      const t = teams_info_v[i];
+      teams_info_chunk[t.team_id] = t;
+      count ++;
+      if(chunk_size <= count){
+        console.log("saving chunk "+chunk_id);
+        await AsyncStorage.setItem('teams_info_k_'+chunk_id, JSON.stringify(teams_info_chunk));
+        count = 0;
+        teams_info_chunk={};
+        chunk_id++;
+      }
+    }
+  }
+  load_teams_ls = async()=>{
+    let teams_info = {};
+    for(let i=0;i<100000;i++){
+      const teams_info_chunk = await AsyncStorage.getItem('teams_info_k_'+i);
+      if(teams_info_chunk){
+        teams_info_chunk = JSON.parse(teams_info_chunk);
+        teams_info = { ...teams_info, ...teams_info_chunk};
+      }else{
+        break;
+      }
+    }
+    return teams_info;
+  }
+  async get_team(team_id,save_db=true,teams_info=undefined,get_fresh=false){
+    "https://m.kooora.com/?player=33085"
+    if(teams_info==undefined){
+      teams_info = await this.getTeam_logo_k();
+    }
+    if(get_fresh==false && teams_info[team_id]){
+      return teams_info[team_id];
+    }
     return this.http("https://m.kooora.com/?team="+team_id+"&arabic","GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -279,9 +352,12 @@ class API {
       res.team_group_photo = img_uri;
       res.team_logo = img_logo_uri;
       res.team_country;
-      if(res && res.team_name_ar && img_logo_uri && img_logo_uri!=""){
+      if(res && (res.team_name_ar || res.team_name_en) ){
         //API_.setTeam_logo(res["team_name_ar"], img_logo_uri, this.props.league_name, this.props.league_id,true,true);
         this.setTeam_logo_k(res,save_db);
+        
+      }else{
+        console.log("not valide",res);
       }
       return res;
     }).catch(error=>API_.showMsg(error,"danger"));
@@ -624,7 +700,7 @@ class API {
         this.error = error;
       });
   }
-  get_matches_k(date_obj, is_only_live, source_id=1){
+  get_matches_k(date_obj, is_only_live, source_id=1,next=false){
     let url = "";
     if(source_id==1){
       url = "https://www.kooora.com/?region=-1&area=0&dd=";
@@ -645,20 +721,24 @@ class API {
         }else if(source_id==2){
           matches = scrap.get_matches_kora_star(resp,date_obj,false, is_only_live);
         }
+        /////////////////////////////////////////////
+        let queue_teams2upload=[];
         if(backup.teams_ready==true){
           this.getTeam_logo_k().then(teams_logo =>{
             matches.map(l=>{
               l.data.map(m=>{
                 const t_id = parseInt(m.home_team_id);
                 const t_id2 = parseInt(m.away_team_id);
-                if(teams_logo[t_id]==undefined){this.get_team(t_id, false);}
-                if(teams_logo[t_id2]==undefined){this.get_team(t_id2, false);}
+                //queued_get_teams
+                if(t_id>0 && teams_logo[t_id]==undefined){queue_teams2upload.push(t_id);}
+                if(t_id2>0 && teams_logo[t_id2]==undefined){queue_teams2upload.push(t_id2);}
               });
             });
-          }).then(res=>{
-            backup.save_teams();
+          }).then(async res=>{
+            this.queued_get_teams(queue_teams2upload,next);
           });
         }
+        /////////////////////////////////////////////////////////////////////////////
 
       } catch (e) { console.log(e);}
       return matches;//this.set_logos(matches);
@@ -716,15 +796,17 @@ class API {
     });
   }
   async set_logos(matches){
-    const teams = await this.getTeam_logo();
+    const teams = await this.getTeam_logo_k();
     for(let i=0;i<matches.length;i++){
       for(let j=0;j<matches[i]["data"].length;j++){
         if(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]){
-          const h_team = this.get_team_info(teams, matches[i]["data"][j]["home_team"]);
-          const a_team = this.get_team_info(teams, matches[i]["data"][j]["away_team"]);
+          //const h_team = this.get_team_info(teams, matches[i]["data"][j]["home_team"]);
+          //const a_team = this.get_team_info(teams, matches[i]["data"][j]["away_team"]);
+          const h_team = teams && teams[matches[i]["data"][j]["home_team_id"]] ? teams[matches[i]["data"][j]["home_team_id"]] : false;
+          const a_team = teams && teams[matches[i]["data"][j]["away_team_id"]] ? teams[matches[i]["data"][j]["away_team_id"]] : false;
 
-          matches[i]["data"][j]["home_team_badge"] = h_team && h_team["logo_url"] ? h_team["logo_url"] : "";
-          matches[i]["data"][j]["away_team_badge"] = a_team && a_team["logo_url"] ? a_team["logo_url"] : "";
+          matches[i]["data"][j]["home_team_badge"] = h_team && h_team["team_logo"] ? h_team["team_logo"] : "";
+          matches[i]["data"][j]["away_team_badge"] = a_team && a_team["team_logo"] ? a_team["team_logo"] : "";
         }
       }
     }
@@ -736,7 +818,7 @@ class API {
     return team_inf ;
   }
   async set_logos_standing(standing_steams,second_exec=false){
-    const teams = await this.getTeam_logo();
+    const teams = await this.getTeam_logo_k();
     for(let i=0;i<standing_steams.length;i++){
       if(Object.keys(standing_steams[i]).length==1 && second_exec==false){
         for(let key in standing_steams[i]){
@@ -744,8 +826,9 @@ class API {
         }
       }
       if(standing_steams[i]["team_name"] == undefined){ continue; }
-      const team_info = this.get_team_info(teams, standing_steams[i]["team_name"]);
-      standing_steams[i]["team_badge"] = team_info && team_info["logo_url"] ? team_info["logo_url"] : undefined;
+      
+      const team_id = standing_steams[i]["team"] && standing_steams[i]["team"]["id"]  ? standing_steams[i]["team"]["id"] : 0;
+      standing_steams[i]["team_badge"] = teams && teams[team_id] ? teams[team_id]["team_logo"] : undefined;
     }
 
     return standing_steams;
@@ -764,7 +847,7 @@ class API {
         await this.setTeam_logo(a_name,item.away_team_badge,item.league);
       }
     }
-    backup.save_teams();
+    //backup.save_teams();
   }
   get_matches(date_obj=null, page=1){
     if(this.token_tries<=0){return new Promise((resolve, reject)=>{return resolve([])});}
@@ -1117,20 +1200,30 @@ class API {
       await AsyncStorage.setItem('teams_info', JSON.stringify(teams_info));
     }
     if(save_db == true){
-      await backup.save_teams();
+      //await backup.save_teams();
     }
   };
-  setTeam_logo_k = async (team_o,save_db=true) => {
-    let teams_info = await this.getTeam_logo_k();
-    team_o.team_id = parseInt(team_o.team_id);
-    if(teams_info[team_o.team_id] == undefined && isNaN(team_o.team_id)==false ){
-      
-      teams_info[team_o.team_id] = team_o;
-      teams_info[team_o.team_id].is_koora = true; 
-      await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams_info));
-      if(save_db){
-        await backup.save_teams();
+  setTeam_logo_k = async (team_o=undefined,save_db=true,teams_info_=undefined) => {
+    let teams_info={};
+    if(team_o!=undefined){
+      teams_info = await this.getTeam_logo_k();
+      team_o.team_id = parseInt(team_o.team_id);
+      if(teams_info[team_o.team_id] == undefined && isNaN(team_o.team_id)==false ){
+        
+        teams_info[team_o.team_id] = team_o;
+        teams_info[team_o.team_id].is_koora = true; 
+
       }
+    }else if (teams_info_!=undefined){
+      console.log("save teams locally [count="+Object.keys(teams_info_).length+"]");
+      teams_info = teams_info_;
+      //teams_info = teams_info.filter(t=> t!=undefined && t.id>0 && i.name!=undefined);
+    }
+    return 
+    //await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams_info));
+    if(save_db){
+      console.log("save teams remotly [id="+team_o.team_id+"]");
+      //await backup.save_teams();
     }
   };
   getTeam_logo = async (team_name=undefined) => {
