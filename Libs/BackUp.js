@@ -340,7 +340,7 @@ class BackUp{
       }
     }
     save_teams= async()=>{
-      if(!this.is_mdb_ok()){return false;}
+      if(!this.is_mdb_ok() || ! API_.mdb_save_teams){return false;}
       let teams_inf_k = await API_.getTeam_logo_k();
       const teams_id = Object.keys(teams_inf_k);
       let teams2backup = [];
@@ -363,9 +363,10 @@ class BackUp{
     }
     load_teams= async()=>{
       if(!this.is_mdb_ok() || undefined == this.db_teams_info){return false;}
-      const teams_k = await backup.client.callFunction("load_teams",[]);
+      const teams_k = await backup.client.callFunction("load_teams",[{l:{$exists:true}}]);
       let teams_inf_k = {}; 
       for(let i=0;i<teams_k.length;i++){
+        teams_k[i].team_logo = teams_k[i].l && teams_k[i].l.slice(0,4)!="http"?  "https://img.kooora.com/" : teams_k[i].l;
         teams_inf_k[teams_k[i].team_id] = teams_k[i];
       }
       this.teams_ready = true;

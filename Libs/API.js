@@ -66,6 +66,8 @@ class API {
       2:"دفاع",
       3:"وسط",
       4:"هجوم"};
+
+    this.mdb_save_teams = false;
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;
@@ -722,21 +724,23 @@ class API {
           matches = scrap.get_matches_kora_star(resp,date_obj,false, is_only_live);
         }
         /////////////////////////////////////////////
-        let queue_teams2upload=[];
-        if(backup.teams_ready==true){
-          this.getTeam_logo_k().then(teams_logo =>{
-            matches.map(l=>{
-              l.data.map(m=>{
-                const t_id = parseInt(m.home_team_id);
-                const t_id2 = parseInt(m.away_team_id);
-                //queued_get_teams
-                if(t_id>0 && teams_logo[t_id]==undefined){queue_teams2upload.push(t_id);}
-                if(t_id2>0 && teams_logo[t_id2]==undefined){queue_teams2upload.push(t_id2);}
+        if(this.mdb_save_teams){
+          let queue_teams2upload=[];
+          if(backup.teams_ready==true){
+            this.getTeam_logo_k().then(teams_logo =>{
+              matches.map(l=>{
+                l.data.map(m=>{
+                  const t_id = parseInt(m.home_team_id);
+                  const t_id2 = parseInt(m.away_team_id);
+                  //queued_get_teams
+                  if(t_id>0 && teams_logo[t_id]==undefined){queue_teams2upload.push(t_id);}
+                  if(t_id2>0 && teams_logo[t_id2]==undefined){queue_teams2upload.push(t_id2);}
+                });
               });
+            }).then(async res=>{
+              this.queued_get_teams(queue_teams2upload,next);
             });
-          }).then(async res=>{
-            this.queued_get_teams(queue_teams2upload,next);
-          });
+          }
         }
         /////////////////////////////////////////////////////////////////////////////
 
