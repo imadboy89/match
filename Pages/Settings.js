@@ -43,6 +43,7 @@ class SettingsScreen extends React.Component {
     const fav_t = await API_.getConfig("favorite_teams",[]);
     const fav_c = await API_.getConfig("favorite_channels",[]);
     const fav_p = await API_.getConfig("favorite_players",[]);
+    const teams_inf_k = await API_.getTeam_logo_k();
     this.setState({
         fav_leagues_nbr  : fav_l.length  ? fav_l.length : 0,
         fav_teams_nbr    : fav_t.length  ? fav_t.length : 0,
@@ -51,6 +52,7 @@ class SettingsScreen extends React.Component {
         fav_players_nbr  : fav_p.length  ? fav_p.length : 0,
         is_debug         : API_.is_debug,
         filtering        : API_.filtering,
+        teams_inf_k      : teams_inf_k && Object.keys(teams_inf_k) && Object.keys(teams_inf_k).length ? Object.keys(teams_inf_k).length : 0,
       });
   }
   componentDidMount(){
@@ -202,6 +204,10 @@ class SettingsScreen extends React.Component {
               <View style={this.state.dynamic_style.settings_row_input}><Button title="Manage" onPress={()=>this.setState({modalVisible_users:true})}></Button></View>
             </View>
           }
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Loaded Teams Info </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>{this.state.teams_inf_k}</Text>
+          </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Favorite Leagues </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>{this.state.fav_leagues_nbr}</Text>
