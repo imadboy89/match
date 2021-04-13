@@ -68,6 +68,7 @@ class API {
       4:"هجوم"};
 
     this.mdb_save_teams = false;
+    this.time_offset = 0;
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;
@@ -543,7 +544,7 @@ class API {
     return isok ? diff : false;
   }
   convert_time_o(datetime_str,seconds=false){
-    const datetime_obj= new Date(datetime_str.replace(" ","T")+":00.000+01:00");
+    const datetime_obj= new Date(datetime_str.replace(" ","T")+":00.000+0"+this.time_offset+":00");
     return seconds==true ? datetime_obj.getTime() : datetime_obj;
   }
   convert_time(time, time_add=-1) {
@@ -834,10 +835,7 @@ class API {
     }
     for(let i=0;i<matches.length;i++){
       for(let j=0;j<matches[i]["data"].length;j++){
-        //console.log(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]!=undefined,matches[i]["data"][j]);
         if(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]!=undefined){
-          //const h_team = this.get_team_info(teams, matches[i]["data"][j]["home_team"]);
-          //const a_team = this.get_team_info(teams, matches[i]["data"][j]["away_team"]);
           const h_team_id = matches[i]["data"][j]["home_team_id"];
           const a_team_id = matches[i]["data"][j]["away_team_id"];
           const h_team = teams && teams[h_team_id] ? teams[h_team_id] : false;
@@ -868,7 +866,7 @@ class API {
         }
       }
       if(standing_steams[i]["team_name"] == undefined){ continue; }
-      
+      //console.log(standing_steams[i]);
       const team_id = standing_steams[i]["team"] && standing_steams[i]["team"]["id"]  ? standing_steams[i]["team"]["id"] : 0;
       
       standing_steams[i]["team_badge"] = teams && teams[team_id] ? this.get_team_logo(teams[team_id]) : undefined;
