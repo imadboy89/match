@@ -357,25 +357,27 @@ class BackUp{
       if (results.inserted>0 || results.updated>0){
         API_.setTeams_k(teams_inf_k);
         console.log("["+teams2backup.length+"] Teams saved successfully!");
-        API_.debugMsg("["+teams2backup.length+"] Teams saved successfully!","info");
+        API_.debugMsg("["+teams2backup.length+"] Teams saved successfully!","success");
       }
       return results;
     }
     load_teams= async()=>{
-      if(!this.is_mdb_ok() || undefined == this.db_teams_info ){return false;}
+      if(!this.is_mdb_ok() || undefined == this.db_settings ){
+        return false;}
       let teams_inf_k_local = await API_.getTeam_logo_k();
       teams_inf_k_local = teams_inf_k_local ? teams_inf_k_local : {} ;
-      if(await API_.get_teams_expired()==false && Object.keys(teams_inf_k_local).length>0){
+      const is_expired = await API_.get_teams_expired();
+      if(is_expired==false && Object.keys(teams_inf_k_local).length>0){
         return false;
       }
-      const teams_k = await backup.client.callFunction("load_teams",[{l:{$exists:true}}]);
+      const teams_k = await this.client.callFunction("load_teams",[{l:{$exists:true}}]);
       let teams_inf_k = {}; 
       for(let i=0;i<teams_k.length;i++){
         teams_inf_k[teams_k[i].team_id] = teams_k[i];
       }
       this.teams_ready = true;
       await API_.setTeams_k(teams_inf_k);
-      API_.debugMsg("Loaded ["+teams_k.length+"] Teams.");
+      API_.debugMsg("Loaded ["+teams_k.length+"] Teams.","success");
       return true;
     }
     partnersManager = async(action,partner_username)=>{

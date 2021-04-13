@@ -682,7 +682,8 @@ class API {
     let date_stored = teams_storage ? parseInt(teams_storage) : 0;
     const is_expired = (new Date()).getTime()- date_stored >= exp_t;
     if(is_expired){
-      await AsyncStorage.setItem('teams_storage',(new Date()).getTime());
+      const time = (new Date()).getTime() ;
+      await AsyncStorage.setItem('teams_storage',time.toString());
     }
     return is_expired;
   }
@@ -833,11 +834,14 @@ class API {
     }
     for(let i=0;i<matches.length;i++){
       for(let j=0;j<matches[i]["data"].length;j++){
-        if(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]){
+        //console.log(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]!=undefined,matches[i]["data"][j]);
+        if(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]!=undefined){
           //const h_team = this.get_team_info(teams, matches[i]["data"][j]["home_team"]);
           //const a_team = this.get_team_info(teams, matches[i]["data"][j]["away_team"]);
-          const h_team = teams && teams[matches[i]["data"][j]["home_team_id"]] ? teams[matches[i]["data"][j]["home_team_id"]] : false;
-          const a_team = teams && teams[matches[i]["data"][j]["away_team_id"]] ? teams[matches[i]["data"][j]["away_team_id"]] : false;
+          const h_team_id = matches[i]["data"][j]["home_team_id"];
+          const a_team_id = matches[i]["data"][j]["away_team_id"];
+          const h_team = teams && teams[h_team_id] ? teams[h_team_id] : false;
+          const a_team = teams && teams[a_team_id] ? teams[a_team_id] : false;
           matches[i]["data"][j]["home_team_badge"] = h_team ? this.get_team_logo(h_team) : "";
           matches[i]["data"][j]["away_team_badge"] = a_team ? this.get_team_logo(a_team) : "";
         }
@@ -847,6 +851,7 @@ class API {
     return matches;
   }
   get_team_logo(team){
+    console.log(team, team.l && team.l.slice(0,4)!="http"?  "https://img.kooora.com/"+team.l : team.l);
     return team.l && team.l.slice(0,4)!="http"?  "https://img.kooora.com/"+team.l : team.l ;
   }
   get_team_info(teams, team_name){

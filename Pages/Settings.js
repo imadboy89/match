@@ -321,9 +321,16 @@ class SettingsScreen extends React.Component {
             </View>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>load teams </Text> 
+            <View style={this.state.dynamic_style.settings_row_input}>
+              <Button title="load" onPress={()=>backup.load_teams().catch(err=>alert(err))}></Button>
+            </View>
+          </View>
+          
+          <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>logHistory </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
-              <Button title="logHistory" onPress={()=>this.setState({modalVisible_history:true})}></Button>
+              <Button color={'#2196F3'} title="logHistory" onPress={()=>this.setState({modalVisible_history:true})}></Button>
             </View>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
