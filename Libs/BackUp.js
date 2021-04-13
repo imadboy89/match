@@ -363,8 +363,9 @@ class BackUp{
     }
     load_teams= async()=>{
       if(!this.is_mdb_ok() || undefined == this.db_teams_info ){return false;}
-      //let teams_inf_k = await API_.getTeam_logo_k();
-      if(await API_.get_teams_expired()==false){
+      let teams_inf_k_local = await API_.getTeam_logo_k();
+      teams_inf_k_local = teams_inf_k_local ? teams_inf_k_local : {} ;
+      if(await API_.get_teams_expired()==false && Object.keys(teams_inf_k_local).length>0){
         return false;
       }
       const teams_k = await backup.client.callFunction("load_teams",[{l:{$exists:true}}]);
