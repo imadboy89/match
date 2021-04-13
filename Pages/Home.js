@@ -421,11 +421,11 @@ get_matches_koora = async(date_obj=null,next=false)=>{
   let resp = [];
   resp = await API_.get_matches_k(date_obj,this.state.is_only_live,this.state.source_id,next);
   let data = resp && resp.length>0 ? resp : [];
-  
+  //alert("HOME->get_matches_koora -> 1 "+data.length);
   data = await this.get_favs(data);
-  
+  //alert("HOME->get_matches_koora ->2"+data.length);
   data = await API_.set_logos(data);
-  
+  //alert("HOME->get_matches_koora ->3   "+data.length);
   if(this._isMounted){
     this.setState({list:data,loading:false});
   }

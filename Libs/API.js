@@ -252,7 +252,6 @@ class API {
           exist_list.push(o.link);
           return true;
         });
-        console.log(list);
       }
       return list;
     });
@@ -291,7 +290,8 @@ class API {
       await this.sleep(200);
     }
     console.log("queued_get_teams getting Teams [Done]",queue_size);
-    await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams_info));
+    //await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams_info));
+    await this.save_teams_ls(teams_info);
     await backup.save_teams();
     console.log("queued_get_teams saving [Done]",queue_size);
     if(API_.next && next){
@@ -319,6 +319,13 @@ class API {
         chunk_id++;
       }
     }
+    if(count >0){
+      console.log("saving chunk "+chunk_id);
+      await AsyncStorage.setItem('teams_info_k_'+chunk_id, JSON.stringify(teams_info_chunk));
+      count = 0;
+      teams_info_chunk={};
+      chunk_id++;
+    }
   }
   load_teams_ls = async()=>{
     let teams_info = {};
@@ -326,6 +333,13 @@ class API {
       const teams_info_chunk = await AsyncStorage.getItem('teams_info_k_'+i);
       if(teams_info_chunk){
         teams_info_chunk = JSON.parse(teams_info_chunk);
+        //teams_info_chunk = teams_info_chunk.map(t=> t.team_logo = t.l && t.l.slice(0,4)!="http"?  "https://img.kooora.com/" : t.l );
+        /*
+        for(let i =0; i< Object.keys(teams_info_chunk);i++){
+          const t = teams_info_chunk[i];
+          teams_info_chunk[i].team_logo = t.l && t.l.slice(0,4)!="http"?  "https://img.kooora.com/" : t.l 
+        }
+        */
         teams_info = { ...teams_info, ...teams_info_chunk};
       }else{
         break;
@@ -662,6 +676,16 @@ class API {
     this.load_external_channels();
     return false;
   }
+  async get_teams_expired(){
+    const exp_t = 1*24*60*60*1000;
+    let teams_storage = await AsyncStorage.getItem('teams_storage');
+    let date_stored = teams_storage ? parseInt(teams_storage) : 0;
+    const is_expired = (new Date()).getTime()- date_stored >= exp_t;
+    if(is_expired){
+      await AsyncStorage.setItem('teams_storage',(new Date()).getTime());
+    }
+    return is_expired;
+  }
   async save_leagues(date=false){
     let leagues = {};
     const leagues_ls = await AsyncStorage.getItem('leagues');
@@ -723,6 +747,7 @@ class API {
         }else if(source_id==2){
           matches = scrap.get_matches_kora_star(resp,date_obj,false, is_only_live);
         }
+        //alert("get_matches_k "+matches.length);
         /////////////////////////////////////////////
         if(this.mdb_save_teams){
           let queue_teams2upload=[];
@@ -800,7 +825,12 @@ class API {
     });
   }
   async set_logos(matches){
-    const teams = await this.getTeam_logo_k();
+    let teams = {}
+    try{
+      teams = await this.getTeam_logo_k();
+    }catch(err){
+      alert(err+"");
+    }
     for(let i=0;i<matches.length;i++){
       for(let j=0;j<matches[i]["data"].length;j++){
         if(matches[i]["data"][j] && matches[i]["data"][j]["home_team"]){
@@ -808,13 +838,16 @@ class API {
           //const a_team = this.get_team_info(teams, matches[i]["data"][j]["away_team"]);
           const h_team = teams && teams[matches[i]["data"][j]["home_team_id"]] ? teams[matches[i]["data"][j]["home_team_id"]] : false;
           const a_team = teams && teams[matches[i]["data"][j]["away_team_id"]] ? teams[matches[i]["data"][j]["away_team_id"]] : false;
-
-          matches[i]["data"][j]["home_team_badge"] = h_team && h_team["team_logo"] ? h_team["team_logo"] : "";
-          matches[i]["data"][j]["away_team_badge"] = a_team && a_team["team_logo"] ? a_team["team_logo"] : "";
+          matches[i]["data"][j]["home_team_badge"] = h_team ? this.get_team_logo(h_team) : "";
+          matches[i]["data"][j]["away_team_badge"] = a_team ? this.get_team_logo(a_team) : "";
         }
       }
     }
+
     return matches;
+  }
+  get_team_logo(team){
+    return team.l && team.l.slice(0,4)!="http"?  "https://img.kooora.com/"+team.l : team.l ;
   }
   get_team_info(teams, team_name){
     let team_inf = teams[this.fix_title(team_name)];
@@ -832,7 +865,8 @@ class API {
       if(standing_steams[i]["team_name"] == undefined){ continue; }
       
       const team_id = standing_steams[i]["team"] && standing_steams[i]["team"]["id"]  ? standing_steams[i]["team"]["id"] : 0;
-      standing_steams[i]["team_badge"] = teams && teams[team_id] ? teams[team_id]["team_logo"] : undefined;
+      
+      standing_steams[i]["team_badge"] = teams && teams[team_id] ? this.get_team_logo(teams[team_id]) : undefined;
     }
 
     return standing_steams;
@@ -1247,12 +1281,8 @@ class API {
     //return teams_info[team_name.trim()]==undefined ? false: teams_info[team_name.trim()];
   };
   getTeam_logo_k = async (team_id=undefined) => {
-    let teams_info = await AsyncStorage.getItem('teams_info_k');
-    if(teams_info){
-      teams_info = JSON.parse(teams_info);
-    }else{
-        teams_info = {} ;
-    }
+    //let teams_info = await AsyncStorage.getItem('teams_info_k');
+    let teams_info = await this.load_teams_ls();
     if(team_id==undefined){
       return teams_info;
     }
@@ -1262,7 +1292,8 @@ class API {
     await AsyncStorage.setItem('teams_info', JSON.stringify(teams));
   }
   setTeams_k =async (teams)=>{
-    await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams));
+    //await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams));
+    await this.save_teams_ls(teams);
   }
 
 

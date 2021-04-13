@@ -362,16 +362,19 @@ class BackUp{
       return results;
     }
     load_teams= async()=>{
-      if(!this.is_mdb_ok() || undefined == this.db_teams_info){return false;}
+      if(!this.is_mdb_ok() || undefined == this.db_teams_info ){return false;}
+      //let teams_inf_k = await API_.getTeam_logo_k();
+      if(await API_.get_teams_expired()==false){
+        return false;
+      }
       const teams_k = await backup.client.callFunction("load_teams",[{l:{$exists:true}}]);
       let teams_inf_k = {}; 
       for(let i=0;i<teams_k.length;i++){
-        teams_k[i].team_logo = teams_k[i].l && teams_k[i].l.slice(0,4)!="http"?  "https://img.kooora.com/" : teams_k[i].l;
         teams_inf_k[teams_k[i].team_id] = teams_k[i];
       }
       this.teams_ready = true;
       await API_.setTeams_k(teams_inf_k);
-      console.log("***************** loaded");
+      API_.debugMsg("Loaded ["+teams_k.length+"] Teams.");
       return true;
     }
     partnersManager = async(action,partner_username)=>{
