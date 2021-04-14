@@ -91,7 +91,7 @@ class HomeScreen extends React.Component {
             if(deferredPrompt && deferredPrompt.prompt){
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            console.log(`User response to the install prompt: ${outcome}`);
+            //console.log(`User response to the install prompt: ${outcome}`);
             }else{console.log(`not ok var`);}
           
           })
@@ -106,7 +106,7 @@ class HomeScreen extends React.Component {
       if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
         navigator.serviceWorker.removeEventListener('message',()=>{});
         navigator.serviceWorker.addEventListener('message', event => {
-          console.log(event.data);
+          //console.log(event.data);
           const match_data = event.data && event.data.data ? event.data.data : false;
           if(match_data){
             this.onMatch_clicked(match_data);
@@ -134,7 +134,6 @@ class HomeScreen extends React.Component {
           if(API_.isWeb==false){
             backup.savePushToken();
           }
-          API_.notifications_matches = await get_notifications_matches();
         }).catch(error=>{console.log(error)});
       }).catch(error=>{
         console.log(error);
@@ -233,7 +232,7 @@ class HomeScreen extends React.Component {
     }
 
   _handleNotification = notification => {
-    API_.showMsg("_handleNotification : "+JSON.stringify(notification.request.content.data.data) );
+    //API_.showMsg("_handleNotification : "+JSON.stringify(notification.request.content.data.data) );
     try{
       const data = notification.request.content.data.data;
       let item = typeof data == "string" ? JSON.parse(data) : data;
@@ -244,7 +243,7 @@ class HomeScreen extends React.Component {
   };
 
   _handleNotificationResponse = response => {
-    API_.showMsg("_handleNotificationResponse : "+ JSON.stringify(response.notification.request.content.data.data) );
+    //API_.showMsg("_handleNotificationResponse : "+ JSON.stringify(response.notification.request.content.data.data) );
     try{
       const data = response.notification.request.content.data.data;
       let item = typeof data == "string" ? JSON.parse(data) : data;
@@ -416,7 +415,10 @@ get_matches_koora = async(date_obj=null,next=false)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
   //API_.notifications_matches = await get_notifications_matches(date_obj);
   API_.load_leagues(this.refresh_leagues);
-  
+   get_notifications_matches().then(o=>{
+     API_.notifications_matches=o;
+     this.refresh_leagues();
+    });
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
   let resp = [];
   resp = await API_.get_matches_k(date_obj,this.state.is_only_live,this.state.source_id,next);
@@ -486,11 +488,11 @@ show_DateP(){
     this.props.navigation.navigate('Match', { match_item: item });
   }
   onSwipeRight = (stat)=>{
-    console.log(stat);
+    //console.log(stat);
     this.previousPage();
   }
   onSwipeLeft = (stat)=>{
-    console.log(stat);
+    //console.log(stat);
     this.nextPage();
   }
   nextPage = ()=>{

@@ -849,7 +849,6 @@ class API {
     return matches;
   }
   get_team_logo(team){
-    console.log(team, team.l && team.l.slice(0,4)!="http"?  "https://img.kooora.com/"+team.l : team.l);
     return team.l && team.l.slice(0,4)!="http"?  "https://img.kooora.com/"+team.l : team.l ;
   }
   get_team_info(teams, team_name){

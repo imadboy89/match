@@ -87,6 +87,9 @@ const save=(item, content, trigger)=>{
   if(API_.notifcation_type=="push"){
     return backup.save_live_match(item,content.title).then(o=>{
       if (o){
+        if(API_.notifications_matches == undefined){
+          API_.notifications_matches = {};
+        }
         API_.notifications_matches[item.id] = item;
       }
       return o;

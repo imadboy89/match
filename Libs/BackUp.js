@@ -518,6 +518,7 @@ class BackUp{
         live_match.match_details = match_details;
 
         live_match.isWeb        = API_.isWeb;
+        const o_ = await this.db_live_matches.deleteMany({match_id:match_details.id});
         const o = await this.db_live_matches.insertOne(live_match);
         const is_ok = o && o.insertedId ;
         if(is_ok){
@@ -535,7 +536,7 @@ class BackUp{
         live_match.user_id     = this.client.auth.activeUserAuthInfo.userId;
         live_match.user_email  = this.email;
         live_match.isWeb       = API_.isWeb;
-        const o = await this.db_live_matches.deleteOne(live_match);
+        const o = await this.db_live_matches.deleteMany(live_match);
         const is_ok = o && o.deletedCount ;
         if(is_ok){
           API_.showMsg("تمت إزالة مباراة  *"+match_title+"*","success");
