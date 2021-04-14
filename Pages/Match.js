@@ -624,7 +624,7 @@ class Matchcreen extends React.Component {
         
         <View style={this.state.dynamic_style.tabs_list}>
           <View style={{flex:1}}><Button title="General" onPress={()=>this.setState({visible_tab:"general"})} /></View>
-          <View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"})}/></View>
+          <View style={{flex:1}}><Button title="Stats" onPress={()=>this.setState({visible_tab:"stats"})}/></View>
           <View style={{flex:1}}><Button title="Line-up" onPress={()=>{
             this.setState({visible_tab:"lineup2",loading:true});
             if(this.state.matche_details.details && this.state.matche_details.home_lineup==undefined){
