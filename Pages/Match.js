@@ -362,10 +362,9 @@ class Matchcreen extends React.Component {
       let assist_a_count = this.assist_a.filter(function(item) {return item === away_p.lineup_player}).length;
       let assist_h = this.assist_h && home_p && this.assist_h.includes(home_p.lineup_player) ? "★".repeat(assist_h_count):"";
       let assist_a = this.assist_a && away_p && this.assist_a.includes(away_p.lineup_player) ? "★".repeat(assist_a_count):"";
-      "⭡"
       
-      let subout_h = this.sub_out["home"] && away_p && this.sub_out["home"].includes(home_p.lineup_player) ? "⮤":"";
-      let subout_a = this.sub_out["away"] && away_p && this.sub_out["away"].includes(away_p.lineup_player) ? "⮥":"";
+      let subout_h = this.sub_out["home"] && away_p && this.sub_out["home"].includes(home_p.lineup_player) ? "↕":"";
+      let subout_a = this.sub_out["away"] && away_p && this.sub_out["away"].includes(away_p.lineup_player) ? "↕":"";
       
 
       const style_sub_h = home_p.lineup_number && home_p.lineup_number.indexOf && home_p.lineup_number.indexOf('"')>=0 ? this.state.dynamic_style.lineup2_number_subs : {};
