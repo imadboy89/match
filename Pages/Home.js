@@ -39,10 +39,12 @@ class HomeScreen extends React.Component {
     this.didBlurSubscription = this.props.navigation.addListener(
       'focus',
       payload => {
+        /*
         if(this.state.is_auth!=backup.is_auth){
           this.state.is_auth=backup.is_auth;
           this.refresh_leagues();
-        }
+        }*/
+        this.refresh_leagues();
         this.render_header();
       }
     );
@@ -135,6 +137,10 @@ class HomeScreen extends React.Component {
             backup.savePushToken();
           }
         }).catch(error=>{console.log(error)});
+        get_notifications_matches().then(o=>{
+          API_.notifications_matches=o;
+          this.refresh_leagues();
+        });
       }).catch(error=>{
         console.log(error);
         API_.debugMsg(error,"danger");
@@ -415,10 +421,10 @@ get_matches_koora = async(date_obj=null,next=false)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
   //API_.notifications_matches = await get_notifications_matches(date_obj);
   API_.load_leagues(this.refresh_leagues);
-   get_notifications_matches().then(o=>{
-     API_.notifications_matches=o;
-     this.refresh_leagues();
-    });
+  get_notifications_matches().then(o=>{
+    API_.notifications_matches=o;
+    this.refresh_leagues();
+  });
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
   let resp = [];
   resp = await API_.get_matches_k(date_obj,this.state.is_only_live,this.state.source_id,next);

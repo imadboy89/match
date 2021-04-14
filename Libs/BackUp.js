@@ -522,6 +522,7 @@ class BackUp{
         const o = await this.db_live_matches.insertOne(live_match);
         const is_ok = o && o.insertedId ;
         if(is_ok){
+          API_.notifications_matches[live_match.match_id] = match_details;
           API_.showMsg("تمت إضافة مباراة  *"+match_title+"*","success");
         }else{
           API_.showMsg("Something wrong : "+JSON.stringify(o) ,"danger");
@@ -539,6 +540,7 @@ class BackUp{
         const o = await this.db_live_matches.deleteMany(live_match);
         const is_ok = o && o.deletedCount ;
         if(is_ok){
+          delete API_.notifications_matches[match_id];
           API_.showMsg("تمت إزالة مباراة  *"+match_title+"*","success");
         }
         return  is_ok ;

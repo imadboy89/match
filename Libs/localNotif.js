@@ -75,8 +75,10 @@ const  onMatch_LongPressed=async(item,notifications_matches)=>{
 
   if(action==1){
     //save(item, content, trigger2);
+    return  backup.save_live_match(item, content.title);
     return save(item, content, trigger);
   }else if(action==2){
+    return  backup.remove_live_match(item.id, content.title);
     return cancelNotif(item.id+"",content);
   }
   return new Promise((resolve, reject)=>{return resolve(false)});

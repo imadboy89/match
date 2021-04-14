@@ -33,7 +33,7 @@ class MatchesNotifs extends React.Component{
           }
           try {
             data = JSON.parse(data);
-          } catch (error) {data = JSON.parse(oo.content.data);}
+          } catch (error) {console.log(error, data);}
           return data;
          }) : [];
 
