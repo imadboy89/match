@@ -32,7 +32,7 @@ class Matchcreen extends React.Component {
         is_live_match:false,
 
     };
-
+    this.sub_out = {"home":[],"away":[]};
   }
   componentDidMount(){
     //console.log("componentDidMount",this.props.route.params.match_item.id);
@@ -301,6 +301,7 @@ class Matchcreen extends React.Component {
       if(el.time==""){
         continue;
       }
+
       subs.push({player_key:el.player_key,lineup_player:pp[1].trim(), player_out:pp[0].trim(),time:el.time ,lineup_number:el.time ? el.time.split("+")[0]+'"':""});
     }
     subs = subs.sort((a,b)=>{return a.time<b.time?-1:1;});
@@ -334,9 +335,21 @@ class Matchcreen extends React.Component {
     const subs_a = this.get_subs("away");
     h_lineup = h_lineup . concat(subs_h);
     a_lineup = a_lineup . concat(subs_a);
+    this.state.matche_details.home_lineup.map(p=>{
+      if(p.subs_out_time>0){
+        this.sub_out["home"] . push(p.lineup_player);
+      }
+    });
+    this.state.matche_details.away_lineup.map(p=>{
+      if(p.subs_out_time>0){
+        this.sub_out["away"] . push(p.lineup_player);
+      }
+    });
+
     this.state.matche_details.home_substitutions;
     let is_sub = false;
-    let stats = h_lineup.map(row=>{
+    const lineuptoloopover = h_lineup.length>=a_lineup  ? h_lineup : a_lineup;
+    let stats = lineuptoloopover.map(row=>{
       i++;
       let home_p = h_lineup[i]!=undefined ? h_lineup[i] : false;
       let away_p = a_lineup[i]!=undefined ? a_lineup[i] : false;
@@ -349,13 +362,19 @@ class Matchcreen extends React.Component {
       let assist_a_count = this.assist_a.filter(function(item) {return item === away_p.lineup_player}).length;
       let assist_h = this.assist_h && home_p && this.assist_h.includes(home_p.lineup_player) ? "★".repeat(assist_h_count):"";
       let assist_a = this.assist_a && away_p && this.assist_a.includes(away_p.lineup_player) ? "★".repeat(assist_a_count):"";
+      "⭡"
+      
+      let subout_h = this.sub_out["home"] && away_p && this.sub_out["home"].includes(home_p.lineup_player) ? "⮤":"";
+      let subout_a = this.sub_out["away"] && away_p && this.sub_out["away"].includes(away_p.lineup_player) ? "⮥":"";
+      
 
       const style_sub_h = home_p.lineup_number && home_p.lineup_number.indexOf && home_p.lineup_number.indexOf('"')>=0 ? this.state.dynamic_style.lineup2_number_subs : {};
       const style_sub_a = away_p.lineup_number && away_p.lineup_number.indexOf && away_p.lineup_number.indexOf('"')>=0 ? this.state.dynamic_style.lineup2_number_subs : {};
+      /*
       if(home_p==undefined || !home_p){
         return null;
       }
-      
+      */
       const home_pl_tyle = home_p.lineup_player && this.state.favorite_p.includes(home_p.lineup_player) ? {backgroundColor: global_theme.fav_background} : {};
       const away_pl_tyle = away_p.lineup_player && this.state.favorite_p.includes(away_p.lineup_player) ? {backgroundColor: global_theme.fav_background} : {};
       return (
@@ -369,7 +388,7 @@ class Matchcreen extends React.Component {
               onPress={()=>this.get_player_info(away_p.player_key)}
               style={[this.state.dynamic_style.lineup2_lr_container ]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_l, away_pl_tyle]} numberOfLines={1}>
-                {away_p && away_p.lineup_player? scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
+                {away_p && away_p.lineup_player? subout_a+" "+scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
               </Text>
             </TouchableOpacity>
 
@@ -380,7 +399,7 @@ class Matchcreen extends React.Component {
               onPress={()=>this.get_player_info(home_p.player_key)}
               style={[this.state.dynamic_style.lineup2_lr_container]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_r,home_pl_tyle]} numberOfLines={1}>
-                {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h : ""}
+                {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h+" "+subout_h : ""}
               </Text>
             </TouchableOpacity>
             <Text style={[this.state.dynamic_style.lineup2_number,style_sub_h,home_pl_tyle]}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
