@@ -65,8 +65,6 @@ class SettingsScreen extends React.Component {
     }).catch(error=>API_.showMsg(error+"","warning"));
 
     ScreenOrientation.getOrientationAsync().then(o=>{
-      //ScreenOrientation.OrientationLock
-      console.log(o,ScreenOrientation.Orientation);
       this.setState({ is_landScape : [3,4].includes(o) });
     }).catch(error=>API_.showMsg(error+"","warning"));
   }

@@ -477,7 +477,7 @@ class Scrap {
         const is_bl = compititions_bl[matche["league_id"]] && compititions[matche["league_id"]]==undefined ? true : false;
         const comp_match = is_bl ? compititions_bl[matche["league_id"]] : compititions[matche["league_id"]] ;
         if(is_only_live==false || (matche["live"]==1 && is_only_live) ){
-          if(comp_match!=undefined && (is_ok || comp_match["country"]=="MA") ){
+          if(comp_match!=undefined && is_ok ){
             let league = {
               "title": comp_match["comp_name"].trim(), 
               "id":matche["league_id"],
