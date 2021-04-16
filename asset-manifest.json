@@ -1,27 +1,27 @@
 {
   "files": {
-    "app.js": "/match/static/js/app.a6ebca98.chunk.js",
-    "app.js.map": "/match/static/js/app.a6ebca98.chunk.js.map",
-    "runtime~app.js": "/match/static/js/runtime~app.ade8d0e9.js",
-    "runtime~app.js.map": "/match/static/js/runtime~app.ade8d0e9.js.map",
-    "static/js/2.af01b8de.chunk.js": "/match/static/js/2.af01b8de.chunk.js",
-    "static/js/2.af01b8de.chunk.js.map": "/match/static/js/2.af01b8de.chunk.js.map",
-    "fonts/DroidKufi-Bold.ttf": "/match/./fonts/DroidKufi-Bold.ttf",
-    "fonts/DroidKufi-Regular.ttf": "/match/./fonts/DroidKufi-Regular.ttf",
-    "fonts/FontAwesome.ttf": "/match/./fonts/FontAwesome.ttf",
-    "fonts/Ionicons.ttf": "/match/./fonts/Ionicons.ttf",
-    "favicon-16.png": "/match/favicon-16.png",
-    "favicon-32.png": "/match/favicon-32.png",
-    "favicon.ico": "/match/favicon.ico",
-    "index.html": "/match/index.html",
-    "manifest.json": "/match/manifest.json",
-    "serve.json": "/match/serve.json",
-    "static/js/2.af01b8de.chunk.js.LICENSE.txt": "/match/static/js/2.af01b8de.chunk.js.LICENSE.txt",
-    "static/media/ptch.jpg": "/match/static/media/ptch.a355ccf1.jpg"
+    "app.js": "/static/js/app.98a3d124.chunk.js",
+    "app.js.map": "/static/js/app.98a3d124.chunk.js.map",
+    "runtime~app.js": "/static/js/runtime~app.2e9f1821.js",
+    "runtime~app.js.map": "/static/js/runtime~app.2e9f1821.js.map",
+    "static/js/2.70dcfaba.chunk.js": "/static/js/2.70dcfaba.chunk.js",
+    "static/js/2.70dcfaba.chunk.js.map": "/static/js/2.70dcfaba.chunk.js.map",
+    "fonts/DroidKufi-Bold.ttf": "/./fonts/DroidKufi-Bold.ttf",
+    "fonts/DroidKufi-Regular.ttf": "/./fonts/DroidKufi-Regular.ttf",
+    "fonts/FontAwesome.ttf": "/./fonts/FontAwesome.ttf",
+    "fonts/Ionicons.ttf": "/./fonts/Ionicons.ttf",
+    "favicon-16.png": "/favicon-16.png",
+    "favicon-32.png": "/favicon-32.png",
+    "favicon.ico": "/favicon.ico",
+    "index.html": "/index.html",
+    "manifest.json": "/manifest.json",
+    "serve.json": "/serve.json",
+    "static/js/2.70dcfaba.chunk.js.LICENSE.txt": "/static/js/2.70dcfaba.chunk.js.LICENSE.txt",
+    "static/media/ptch.jpg": "/static/media/ptch.a355ccf1.jpg"
   },
   "entrypoints": [
-    "static/js/runtime~app.ade8d0e9.js",
-    "static/js/2.af01b8de.chunk.js",
-    "static/js/app.a6ebca98.chunk.js"
+    "static/js/runtime~app.2e9f1821.js",
+    "static/js/2.70dcfaba.chunk.js",
+    "static/js/app.98a3d124.chunk.js"
   ]
 }
