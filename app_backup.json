@@ -34,17 +34,17 @@
         "backgroundColor": "#000"
       }
     },
-    "web": {  
+    "web": {
       "favicon": "./assets/favicon.png",
       "icon": "./assets/icon.png",
       "backgroundColor": "#000",
       "themeColor ":"#000",
       "lang": "en",
-      "startUrl": "/",
-      "homepage":"/",
+      "startUrl": "/match/",
+      "homepage":"/match/",
       "crossorigin": "no-referrer",
       "preferRelatedApplications":false,
-      "scope":"/",
+      "scope":"/match/",
       "orientation":"any",
       "config":{
         "firebase":{

@@ -74,6 +74,9 @@ class LeagueScreen extends React.Component {
     const favorite = await API_.getConfig("favorite_teams_k",this.state.favorite) ;
     let resp = await API_.get_standing_k(this.real_id);
     resp = await API_.set_logos_standing(resp);
+    if(resp.length == 0){
+      this.showMatchesTab();
+    }
     this.setState({league_details:resp,loading:false,favorite:favorite});
   }
   get_matches(league_id){
@@ -147,7 +150,8 @@ class LeagueScreen extends React.Component {
     data["data"];
     try{
       //let _data = data[0]["data"].map
-      data = data[0]["data"].map(row =>{
+      data = data && data.length>0 && data[0]["data"] ? data[0]["data"] : [];
+      data = data.map(row =>{
         const date_str = row.date;
         let dayname = "";
         try {
@@ -212,7 +216,7 @@ class LeagueScreen extends React.Component {
     this.setState({modalVisible_player:true,player_id:player.player_id});
   }
   render_scorers(){
-    if(this.state.league_details==undefined || this.state.league_details.length==0 || this.state.scorers.length==0){
+    if(this.state.league_details==undefined || this.state.scorers.length==0){
       return null;
     }
     const scorers = [{"player_name_ar":"Player name","player_id":1,"team_badge":"","overall_league_payed":"","goals":"Gls"}].concat(this.state.scorers);
@@ -330,21 +334,32 @@ class LeagueScreen extends React.Component {
     this.props.navigation.navigate('Channel', { channel_id: item.id,channel_photo:item.channel_photo });
   }
 
-
+  showMatchesTab=()=>{
+      if(this.state.visible_tab == "matches"){
+        this.state.matches_only_fav = !this.state.matches_only_fav;
+        this.state.matches = undefined;
+      }
+      if(this.state.matches == undefined){
+        this.setState({loading : true, matches:[]});
+        this.get_matches();
+      }else{
+        this.setState({visible_tab:"matches"});
+      }
+  }
   render() {
   
     return (
       <ScrollView style={this.state.dynamic_style.container}>
+        { this.league_img ?  
         <View style={this.state.dynamic_style.channel_logo_v}>
-          { this.league_img ?  
             <ImageBackground style={{flex:1,width:"100%"}} source={{uri: this.league_img}} >
               <View style={this.state.dynamic_style.news_img_v}></View>
               <View style={this.state.dynamic_style.news_title_v}>
                 <Text style={this.state.dynamic_style.news_title_t} numberOfLines={1}>{this.league_name}</Text>
               </View>
             </ImageBackground>
-          : null}
         </View> 
+        : null}
 
         <View style={this.state.dynamic_style.tabs_list}>
           <View style={{flex:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing"})}/></View>
@@ -357,18 +372,7 @@ class LeagueScreen extends React.Component {
             }
             this.setState({visible_tab:"scorers"});}}/></View>
           {/*<View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"}) }/></View> */}
-          <View style={{flex:1}}><Button title="Matches" onPress={()=>{
-            if(this.state.visible_tab == "matches"){
-              this.state.matches_only_fav = !this.state.matches_only_fav;
-              this.state.matches = undefined;
-            }
-            if(this.state.matches == undefined){
-              this.setState({loading : true, matches:[]});
-              this.get_matches();
-            }else{
-              this.setState({visible_tab:"matches"});
-            }
-            }}/></View>
+          <View style={{flex:1}}><Button title="Matches" onPress={this.showMatchesTab}/></View>
           {/* <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/> */}
         </View>
         {this.state.loading ? <Loading /> : 

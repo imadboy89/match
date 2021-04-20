@@ -334,7 +334,7 @@ class Scrap {
     }
     return Object.values(matches);
   }
-  get_matches_k(html,date,is_oneMatch=false,is_only_live=false){
+  get_matches_k(html,date,is_oneMatch=false,is_only_live=false, ignoreBL=false){
     API_.matches_bl = [];
     let json_={"matches_comps":[],"matches_list":[]};
     try{
@@ -342,18 +342,19 @@ class Scrap {
     }catch(err){console.log(err,html);return [];}
     const date_str = date ? API_.get_date2(date): false;
     //parse matches_comps
-    const blacklisted_comps = is_oneMatch || API_.filtering==false ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب",
+    const FILTERING = API_.filtering && ignoreBL==false;
+    const blacklisted_comps = is_oneMatch || FILTERING==false ? [] : ["الدرجة الثانية","الدرجة الثالثة","الهواة","سيدات","الدرجة الخامسة","الدرجة الرابعة","رديف","جنوب",
     " الثاني","تحت ","شمال","الثالث"," A ", " B ", " C "," D ","الدرجة D","الدرجة C","الدرجة B",
     "الدوري النرويجي الدرجة"
   ]
-    const blacklisted_countries = is_oneMatch || API_.filtering==false ? [] :  ["SA","BH","KW","IQ","PS","ND","AR","BR","CO","JO","SS","VN","ZA","TR","UZ"];
+    const blacklisted_countries = is_oneMatch || FILTERING==false ? [] :  ["SA","BH","KW","IQ","PS","ND","AR","BR","CO","JO","SS","VN","ZA","TR","UZ"];
     const exceptions = ["افريقيا","مباريات دولية ودية"];
     let compititions = {};
     let compititions_bl = {};
     let compitition = {"country":""};
     
     const comp_header = ["divider","league_id","comp_name","comp_logo","comp_id_news","options"];
-    const MIN_ALLOWED_OPTIONS = is_oneMatch || API_.filtering==false ? 1 : 3;
+    const MIN_ALLOWED_OPTIONS = is_oneMatch || FILTERING==false ? 1 : 3;
     let k = 0;
     for(let i=0;i< json_["matches_comps"].length;i++){
       compitition[ comp_header[k] ] = json_["matches_comps"][i];
@@ -532,10 +533,10 @@ class Scrap {
     }
     matches = Object.values(matches) ;
     matches_bl = Object.values(matches_bl) ;
+    API_.matches_bl = matches_bl;
     const periority_cc= ["NL","DE","ES","IT","EN","AFRICA","EURO","MA"];
     matches = matches.sort((a,b)=>{return periority_cc.indexOf(a["country"]) >= periority_cc.indexOf(b["country"])? -1 : 1;});
     //matches = matches.sort((a,b)=>{return a["country"]=="MA"? -1 : 1;});
-    API_.matches_bl = matches_bl;
     return matches;
   }
   get_scorers(html){
@@ -567,7 +568,7 @@ class Scrap {
       "info_10",
       "info_11",
     ];
-    
+
     if(m){
       let out = "[["+m[0].trim().replace(/var\s+scorers_details\s*=\s*new\s+Array\s*\(/i,"")
         .replace(/,\s*-1\s*\)$/mi,"")

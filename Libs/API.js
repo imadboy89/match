@@ -381,23 +381,22 @@ class API {
   }
   get_scorers(league_id){
     return this.http("https://m.kooora.com/?c="+league_id+"&scorers=true&arabic","GET",null,{})
-    .then(resp=>{
+    .then(async resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       let scorers = [];
       try {
         scorers = scrap.get_scorers(resp);
-      } catch (error) {}
-
-      return API_.getTeam_logo().then(teams=>{
-        return scorers.map(s => {
-          const team = teams[this.fix_title(s.team_name)];
-          if(team && team.logo_url){
-            s.team_badge = team.logo_url;
+      } catch (error) {console.log(error);}
+      const teams = await this.getTeam_logo_k();
+      
+      return scorers.map(s => {
+          const team = teams[s.team_id];
+          if(team){
+            s.team_badge = this.get_team_logo(team);
           }
           return s;
         });
-      });
     });
   }
   get_videos(page,q=""){
@@ -783,8 +782,8 @@ class API {
       scrap.isWeb = this.isWeb;
       let matches = [];
       try {
-        matches = scrap.get_matches_k(resp);
-      } catch (e) {}
+        matches = scrap.get_matches_k(resp,false,false,false, true);
+      } catch (e) {console.log(e);}
       return matches
     });
   }

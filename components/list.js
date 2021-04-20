@@ -190,7 +190,7 @@ class ItemsList extends React.Component {
     }else if(col_key.includes("related_") ){
       let text2show = item[col_key];
       if(col_key=="related_title"){
-        if(text2show.split("-").length>2 && text2show.split("-")[2].split("ضد").length>1){
+        if(text2show && text2show.split && text2show.split("-").length>2 && text2show.split("-")[2].split("ضد").length>1){
           text2show = text2show.split("-")[2];
         }
       }
