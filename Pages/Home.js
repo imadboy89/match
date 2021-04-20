@@ -285,7 +285,7 @@ class HomeScreen extends React.Component {
     }
     
     this.props.navigation.setOptions({
-        title:"المباريات",
+        title:"AlMatch-المباريات",
         "headerLeft":headerLeft,
         "headerRight":()=>(
           <View style={{flexDirection:"row",margin:5}}>
