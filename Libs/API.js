@@ -257,6 +257,14 @@ class API {
       return list;
     });
   }
+  get_leagues_k(region_id){
+    return this.http("https://m.kooora.com/?y="+region_id+"&arabic","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      return scrap.get_leagues(resp);
+    }).catch(error=>API_.showMsg(error,"danger"));
+  }
   get_player(player_id){
     "https://m.kooora.com/?player=33085"
     return this.http("https://m.kooora.com/?player="+player_id+"&arabic","GET",null,{})
@@ -1235,7 +1243,8 @@ class API {
     const league_id = _league_id==undefined ? this.common_league_id(league_name) : _league_id;
     let teams_info = await this.getTeam_logo();
     if(teams_info[team_name] == undefined){
-      teams_info[team_name] = {team_name:team_name, logo_url:logo_url.trim(),league_id:league_id, league_name:league_name,is_koora:is_koora};
+      logo_url = logo_url && logo_url.trim ? logo_url.trim() : "";
+      teams_info[team_name] = {team_name:team_name, logo_url:logo_url,league_id:league_id, league_name:league_name,is_koora:is_koora};
       await AsyncStorage.setItem('teams_info', JSON.stringify(teams_info));
     }
     if(save_db == true){

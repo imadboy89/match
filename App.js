@@ -49,7 +49,7 @@ if(API_.isWeb){
   if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
     navigator.serviceWorker.addEventListener('message', event => {
       console.log(event.data);
-      match_data = event.data ? event.data.data : false;
+      match_data = event.data && event.data.data ? event.data.data : false;
     });
 
     global.deferredPrompt=0;

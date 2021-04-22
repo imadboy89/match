@@ -606,7 +606,7 @@ class Scrap {
 
     return body;
   }
-  get_var_array(html,var_name,end="-1,0\\);"){
+  get_var_array(html,var_name,end="-1,0\\s*\\);"){
     //let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
     //const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gmi");
     const patttern  = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\r\\n(((?!"+end+").)*\\r\\n)*","gmi");
@@ -614,6 +614,7 @@ class Scrap {
     if(m){
       let out = "[["+m[0].trim().replace("var "+var_name+" = new Array (","").replace(/(,\r\n)?\s*\-1,0\);/mi,"").replace(/,$/i,'').replace(/	/g,'').replace(/,\r\n/gi,"],[") + "]]";
       let out_list = []; 
+      console.log(out);
       try{
         
         out = JSON.parse(out);
@@ -690,6 +691,21 @@ class Scrap {
       
       let img = this.isWeb==false ? line[3].replace("//","https://") : line[3];
       out_list.push({link:line[1], date:line[2], img:img, title_news:line[4], desc:line[5],});
+    }
+    return out_list;
+  }
+  get_leagues(html){
+    '6950,0,"نهائيات كأس العالم <span dir=ltr>2022</span>","",'
+    const comp_h = ["id","sport_id","name","info_1"]
+    let comps = this.get_var_array(html, "comps");
+    let out_list = []; 
+    
+    for (let i=0; i<comps.length;i++){
+      let line = comps[i];
+      if(line[0]==0 || line[1]!=0){
+        continue;
+      }
+      out_list.push({"img": "","league_name":line[2] , id:line[0],koora_id:line[0]});
     }
     return out_list;
   }

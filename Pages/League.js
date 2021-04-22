@@ -37,20 +37,23 @@ class LeagueScreen extends React.Component {
         matches_only_fav:false,
         modalVisible_team : false,
     };
+    console.log(this.props.route.params.league_details);
     this.league_name = this.props.route.params.league_details.league;
     this.league_img   = this.props.route.params.league_details.league_img;
     this.real_id = this.props.route.params.league_details.id;
-    this.league_id = API_.leagueId_byTitle(this.league_name)>0 ? API_.leagueId_byTitle(this.league_name) : 0;
+    this.league_id = this.props.route.params.league_details.id;
     //this.league_img = API_.leagueLogo_byTitle(this.league_name,this.league_img);
     if(API_.leagues_dict[this.league_name] && API_.leagues_dict[this.league_name].koora_id && api_type == 1){
       this.real_id = API_.leagues_dict[this.league_name].koora_id;
     }
   }
   componentDidMount(){
+    this.is_k = true;
     this._isMounted = true;
     getTheme("styles_league").then(theme=>this.setState({dynamic_style:theme}));
     this.props.navigation.setOptions({title: <Text>{this.league_name}</Text>});
-    this.get_standing(this.league_id);
+    this.get_standing_k(this.league_id);
+    API_.setTitleWeb(this.league_name);
   }
   async componentWillUnmount(){
     this._isMounted = false;

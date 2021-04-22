@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Modal, Button, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Modal, Button, Picker } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -15,6 +15,7 @@ class LeaguesScreen extends React.Component {
         loading:true,
         dynamic_style : styles_news,
         favorite:[],
+        region:0,
     };
 
     setTimeout(()=>{
@@ -59,8 +60,13 @@ class LeaguesScreen extends React.Component {
     });
     this.setState({});
   }
-  
+get_leagues_k=async()=>{
+  let favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
+  let leagues  = await API_.get_leagues_k(this.state.region);
+  this.setState({loading:false,list:leagues,favorite:favorite});
+}
 get_leagues(){
+  return this.get_leagues_k() ;
   API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
     API_.load_leagues().then(leagues_dict=>{
       if(leagues_dict==undefined || leagues_dict==null){
@@ -83,13 +89,30 @@ get_leagues(){
 }
 
   onItem_clicked =(item)=>{
-    this.props.navigation.navigate('League',{ league_details: {league:item.league_name,league_img:item.img} });
+    this.props.navigation.navigate('League',{ league_details: {league:item.league_name,league_img:item.img,id:item.id,koora_id:true} });
   }
   render() {
     return (
-      <View style={this.state.dynamic_style.container}>     
+      <View style={this.state.dynamic_style.container}>
+      <Picker
+          selectedValue={this.state.region}
+          style={{ height:"70",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:250}}
+          onValueChange={(itemValue, itemIndex)=>{
+            this.state.region = itemValue;
+            this.get_leagues_k();
+          }}
+        >
+          <Picker.Item label="world" value={0} />
+          <Picker.Item label="Maroc" value={"ma"} />
+          <Picker.Item label="Arab" value={2} />
+          <Picker.Item label="HP_mountakhab" value={2} />
+          <Picker.Item label="HP_professionnels" value={3} />
+          <Picker.Item label="HP_botola" value={4} />
+          <Picker.Item label="HP_mondial" value={5} />
+          
+      </Picker>   
         <ItemsList 
-          minWidth={160}
+          
           refresh_list={this.refresh_list}
           favorite={this.state.favorite}
           set_fav={this.set_fav}
