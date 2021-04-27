@@ -258,11 +258,20 @@ class API {
     });
   }
   get_leagues_k(region_id){
+    const leagues_dict = {};
+    for(let i =0;i<API_.leagues.length;i++){
+      leagues_dict[API_.leagues[i].koora_id] = API_.leagues[i];
+    }
     return this.http("https://m.kooora.com/?y="+region_id+"&arabic","GET",null,{})
-    .then(resp=>{
+    .then(async resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      return scrap.get_leagues(resp);
+      const leagues = scrap.get_leagues(resp)
+      for(let i =0;i<leagues.length;i++){
+        console.log(leagues[i], leagues_dict[leagues[i].koora_id]);
+        leagues[i].img = leagues[i].koora_id>0 && leagues_dict[leagues[i].koora_id] ? leagues_dict[leagues[i].koora_id].logo : "";
+      }
+      return leagues;
     }).catch(error=>API_.showMsg(error,"danger"));
   }
   get_player(player_id){
@@ -634,21 +643,16 @@ class API {
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }  
-  async load_leagues(refresh_leagues=false){
+  async load_channels__(){
     if(this.token_tries<=0){return false;}
     if(this.headers["device-token"]==""){
-      return await this.set_token().then(()=> { return this.load_leagues(refresh_leagues)});
+      return await this.set_token().then(()=> { return this.load_channels__()});
     }
     const exp_t = 3*24*60*60*1000;
 
-    let leagues = await AsyncStorage.getItem('leagues');
     let channels = await AsyncStorage.getItem('channels');
     let external_channels = await AsyncStorage.getItem('external_channels');
-    if(leagues ){
-      leagues = JSON.parse(leagues);
-    }else{
-      leagues = {"date":0,data:{}};
-    }
+
     if(channels ){
       channels = JSON.parse(channels);
     }else{
@@ -659,43 +663,32 @@ class API {
     }else{
       external_channels = {};
     }
-    let date_stored = leagues && leagues["date"] ? parseInt(leagues["date"]) : 0;
-    const is_expired = (new Date()).getTime()- date_stored >= exp_t;
-    if(Object.keys( leagues["data"] ).length>0 && is_expired==false){
-      console.log("leagues cache");
-      this.leagues_dict = leagues["data"];
+    const is_expired = await this.is_expired("channels",exp_t);
+    console.log("is_expired",is_expired , is_expired==false);
+    if(is_expired==false){
+      console.log("channels cache");
       this.channels_dict = channels;
       this.external_channels = external_channels;
-      return this.leagues_dict;
+      return ;
     }
     
-    await this.get_leagues(1)
-      .then(o=>{
-        if( Object.keys( this.leagues_dict ).length >0){
-          this.save_leagues((new Date()).getTime());
-          if(refresh_leagues!=false){
-            refresh_leagues();
-          }
-          return this.leagues_dict;
-        }
-        });
-    await this.sleep(1000);
     this.load_channels();
     this.load_external_channels();
     return false;
   }
-  async get_teams_expired(){
-    const exp_t = 1*24*60*60*1000;
-    let teams_storage = await AsyncStorage.getItem('teams_storage');
-    let date_stored = teams_storage ? parseInt(teams_storage) : 0;
+  async is_expired(key, ttl=undefined){
+    const exp_t = ttl ? ttl : 10*24*60*60*1000;
+    let data2check = await AsyncStorage.getItem("expired_"+key);
+    let date_stored = data2check ? parseInt(data2check) : 0;
+    console.log(key,ttl ,  date_stored , (new Date()).getTime()  , (new Date()).getTime()- date_stored >= exp_t);
     const is_expired = (new Date()).getTime()- date_stored >= exp_t;
     if(is_expired){
       const time = (new Date()).getTime() ;
-      await AsyncStorage.setItem('teams_storage',time.toString());
+      await AsyncStorage.setItem("expired_"+key,time.toString());
     }
     return is_expired;
   }
-  async save_leagues(date=false){
+  async save_leagues_(date=false){
     let leagues = {};
     const leagues_ls = await AsyncStorage.getItem('leagues');
     if(leagues_ls){
@@ -1300,6 +1293,18 @@ class API {
   };
   setTeams =async (teams)=>{
     await AsyncStorage.setItem('teams_info', JSON.stringify(teams));
+  }
+  setLeagues =async (leagues)=>{
+    await AsyncStorage.setItem('leagues', JSON.stringify(leagues));
+  }
+  getLeagues =async ()=>{
+    await AsyncStorage.setItem('leagues');
+    try{
+
+    }catch(error){
+      console.log(error);
+      API_.debugMsg(error,"danger")
+    }
   }
   setTeams_k =async (teams)=>{
     //await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams));

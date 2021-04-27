@@ -614,7 +614,6 @@ class Scrap {
     if(m){
       let out = "[["+m[0].trim().replace("var "+var_name+" = new Array (","").replace(/(,\r\n)?\s*\-1,0\);/mi,"").replace(/,$/i,'').replace(/	/g,'').replace(/,\r\n/gi,"],[") + "]]";
       let out_list = []; 
-      console.log(out);
       try{
         
         out = JSON.parse(out);

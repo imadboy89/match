@@ -132,6 +132,7 @@ class HomeScreen extends React.Component {
         backup.user_log();
         if(output==false){return false;}
         backup.load_teams();
+        backup.load_leagues();
         backup.load_settings().then(async o=>{
           if(API_.isWeb==false){
             backup.savePushToken();
@@ -174,6 +175,7 @@ class HomeScreen extends React.Component {
       }
       }, 50000);
 
+      API_.load_channels__();
   }
   checkUpdAvailability(){
     if(API_.isWeb){return;}
@@ -420,7 +422,7 @@ async get_favs(data){
 get_matches_koora = async(date_obj=null,next=false)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
   //API_.notifications_matches = await get_notifications_matches(date_obj);
-  API_.load_leagues(this.refresh_leagues);
+  //API_.load_leagues(this.refresh_leagues);
   get_notifications_matches().then(o=>{
     API_.notifications_matches=o;
     this.refresh_leagues();

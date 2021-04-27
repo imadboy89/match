@@ -58,6 +58,7 @@ class BackUp{
         this.db_teams   = this.db.collection("teams");
         this.db_IPTV         = this.db.collection("IPTV");
         this.db_live_matches = this.db.collection("live_matches");
+        this.db_leagues = this.db.collection("leagues");
         this.is_auth         = this.email!="" && this.email !=undefined;
         if(this.is_auth) {
           setTimeout(()=>API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success"),1000);
@@ -366,7 +367,7 @@ class BackUp{
         return false;}
       let teams_inf_k_local = await API_.getTeam_logo_k();
       teams_inf_k_local = teams_inf_k_local ? teams_inf_k_local : {} ;
-      const is_expired = await API_.get_teams_expired();
+      const is_expired = await API_.is_expired("teams");
       if(is_expired==false && Object.keys(teams_inf_k_local).length>0){
         return false;
       }
@@ -378,6 +379,23 @@ class BackUp{
       this.teams_ready = true;
       await API_.setTeams_k(teams_inf_k);
       API_.debugMsg("Loaded ["+teams_k.length+"] Teams.","success");
+      return true;
+    }
+    load_leagues= async()=>{
+      if(!this.is_mdb_ok() || undefined == this.db_settings ){
+        return false;}
+      let leagues_local = await API_.getTeam_logo_k();
+      leagues_local = leagues_local ? leagues_local : {} ;
+      const is_expired = await API_.is_expired("leagues");
+      if(is_expired==false && Object.keys(leagues_local).length>0){
+        API_.leagues = leagues_local;
+        return false;
+      }
+      const leagues = await this.db_leagues.find({}).asArray();
+      this.leagues_ready = true;
+      await API_.setLeagues(leagues);
+      API_.leagues = leagues;
+      API_.debugMsg("Loaded ["+leagues.length+"] Leagues..","success");
       return true;
     }
     partnersManager = async(action,partner_username)=>{
