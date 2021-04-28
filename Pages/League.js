@@ -88,6 +88,7 @@ class LeagueScreen extends React.Component {
           this.setState({notifications_matches:o});
         }
         });
+        return this.get_matches_k();
       if(this.real_id!=this.league_id && this.real_id!=undefined){
         return this.get_matches_k();
       }

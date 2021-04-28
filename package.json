@@ -3,7 +3,7 @@
   "homepage": "https://faithess.com",
   "scripts": {
     "deploy": "gh-pages -d web-build",
-    "predeploy": "expo build:web",
+    "predeploy": "expo build:web && echo faithess.com  > web-build/CNAME",
     "depl": "gh-pages -d web-build",
     "pub": "expo publish --release-channel almatch",
     "publish":"expo publish",
