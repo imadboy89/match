@@ -13,6 +13,7 @@ class API {
     this.error = null;
     this.data = null;
     this.domain_o = 'https://al-match.com/';
+    this.domain_ = 'https://al-match.com';
     this.domain = 'https://al-match.com/api/';
     this.configs = {};
     this.proxy = 'https://www.oxus.tj/sites/default/private/files/.proxy2.php?url=';
@@ -257,19 +258,14 @@ class API {
       return list;
     });
   }
-  get_leagues_k(region_id){
-    const leagues_dict = {};
-    for(let i =0;i<API_.leagues.length;i++){
-      leagues_dict[API_.leagues[i].koora_id] = API_.leagues[i];
-    }
+  async get_leagues_k(region_id){
     return this.http("https://m.kooora.com/?y="+region_id+"&arabic","GET",null,{})
     .then(async resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       const leagues = scrap.get_leagues(resp)
       for(let i =0;i<leagues.length;i++){
-        console.log(leagues[i], leagues_dict[leagues[i].koora_id]);
-        leagues[i].img = leagues[i].koora_id>0 && leagues_dict[leagues[i].koora_id] ? leagues_dict[leagues[i].koora_id].logo : "";
+        leagues[i].img = leagues[i].koora_id>0 && this.leagues_dict[leagues[i].koora_id] ? this.domain_+this.leagues_dict[leagues[i].koora_id].logo : "";
       }
       return leagues;
     }).catch(error=>API_.showMsg(error,"danger"));
@@ -1298,13 +1294,22 @@ class API {
     await AsyncStorage.setItem('leagues', JSON.stringify(leagues));
   }
   getLeagues =async ()=>{
-    await AsyncStorage.setItem('leagues');
+    let leagues = await AsyncStorage.getItem('leagues');
+    this.leagues_dict = {};
     try{
-
+      leagues=JSON.parse(leagues);
+      console.log("getLeagues",leagues);
+      for(let i =0;i<leagues.length;i++){
+        if(leagues[i].koora_id == undefined) continue;
+        this.leagues_dict[leagues[i].koora_id] = leagues[i];
+      }
+      console.log("getLeagues",this.leagues_dict);
     }catch(error){
       console.log(error);
       API_.debugMsg(error,"danger")
+      this.leagues_dict={};
     }
+    return this.leagues_dict;
   }
   setTeams_k =async (teams)=>{
     //await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams));

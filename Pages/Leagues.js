@@ -63,7 +63,6 @@ class LeaguesScreen extends React.Component {
 get_leagues_k=async()=>{
   let favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
   let leagues  = await API_.get_leagues_k(this.state.region);
-  console.log(leagues);
   this.setState({loading:false,list:leagues,favorite:favorite});
 }
 get_leagues(){

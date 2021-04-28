@@ -384,7 +384,7 @@ class BackUp{
     load_leagues= async()=>{
       if(!this.is_mdb_ok() || undefined == this.db_settings ){
         return false;}
-      let leagues_local = await API_.getTeam_logo_k();
+      let leagues_local = await API_.getLeagues();
       leagues_local = leagues_local ? leagues_local : {} ;
       const is_expired = await API_.is_expired("leagues");
       if(is_expired==false && Object.keys(leagues_local).length>0){

@@ -397,9 +397,13 @@ async get_favs(data){
     }
   }
   //////////////////////////////////////////////////////////////////
-
   try{
-    data = data.sort((a,b)=>{ return (API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined ?-1:0 );});
+    data = data.sort((a,b)=>{ 
+      //return API_.leagues_dict[API_.fix_title(a.title) ] != undefined && API_.leagues_dict[API_.fix_title(b.title) ] == undefined 
+      return API_.leagues_dict[a.id] != undefined && API_.leagues_dict[b.id] == undefined
+      ?-1:0 ;
+    
+    });
   }catch(e){console.log(e);}
   data = data.sort((a,b)=>{return (this.state.favorite.indexOf(a.id)>this.state.favorite.indexOf(b.id))?-1:0;});
   

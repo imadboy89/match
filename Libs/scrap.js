@@ -402,7 +402,7 @@ class Scrap {
         k=0;
       }
     }
-    API_.save_leagues();
+    //API_.save_leagues();
     // parse matches_list
     const mat_header = ["league_id",
 "com_id_page",
