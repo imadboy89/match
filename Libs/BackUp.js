@@ -3,7 +3,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { Stitch,RemoteMongoClient , AnonymousCredential,UserPasswordCredential,UserPasswordAuthProviderClient } from "mongodb-stitch-react-native-sdk";
 
 NetInfo.configure({
-  reachabilityUrl: 'https://imadboy89.github.io/match/',
+  reachabilityUrl: 'https://clients3.google.com/generate_204',
   reachabilityTest: async (response) => response.status === 204,
   reachabilityLongTimeout: 60 * 1000, // 60s
   reachabilityShortTimeout: 20 * 1000, // 5s
