@@ -10,6 +10,7 @@ class Scrap {
     this.img_q = "410w";
   }
   get_article(html){
+    //he_article_date 
     const arr_end = '\\"\\"\\);';
     let patttern_body = /var\s*article_content\s*=\s*".*/gi;
     let m = html.match(patttern_body);
@@ -27,6 +28,8 @@ class Scrap {
     article.related_images = article.related_images.map(n=> {return {img_link:n[0].replace(/^\/\//,"https://"),img_desc:n[1]} });
     //article.news =this.get_var_array(html, "news");
     article.body = this.decodeEntities(body);
+    article.date = this.get_var(html,"he_article_date");
+    article.date = article.date && article.date.slice && article.date.slice(0,1) =='#' ? API_.get_date2(new Date(article.date.replace("#","") * 1000)) : article.date ;
     return article;
   }
   parse_details(details){
@@ -810,7 +813,6 @@ class Scrap {
   }
   get_article_hp(html){
     if(html==""){return []}
-    
     let doc = new DomParser().parseFromString(html,'text/html');
     let body = doc.getElementsByClassName('article_body')[0];
     let article = {"body":"","date":""};

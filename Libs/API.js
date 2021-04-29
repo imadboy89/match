@@ -464,7 +464,6 @@ class API {
         let article  = {};
         try {
           article  = [1,6,7].includes(source_id)  ? scrap.get_article(html) : scrap.get_article_hp(html);
-          console.log(article);
         } catch (error) {console.log(error)}
         return article;
       }catch(err){console.log(err);}
@@ -1298,12 +1297,10 @@ class API {
     this.leagues_dict = {};
     try{
       leagues=JSON.parse(leagues);
-      console.log("getLeagues",leagues);
       for(let i =0;i<leagues.length;i++){
         if(leagues[i].koora_id == undefined) continue;
         this.leagues_dict[leagues[i].koora_id] = leagues[i];
       }
-      console.log("getLeagues",this.leagues_dict);
     }catch(error){
       console.log(error);
       API_.debugMsg(error,"danger")
