@@ -263,9 +263,14 @@ class API {
     .then(async resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      const leagues = scrap.get_leagues(resp)
+      let leagues = [];
+      try {
+        leagues = scrap.get_leagues(resp);
+      } catch (error) {
+        API_.debugMsg(error,"danger");
+      }
       for(let i =0;i<leagues.length;i++){
-        leagues[i].img = leagues[i].koora_id>0 && this.leagues_dict[leagues[i].koora_id] ? this.domain_+this.leagues_dict[leagues[i].koora_id].logo : "";
+        leagues[i].img = leagues[i] && leagues[i].koora_id && leagues[i].koora_id>0 && this.leagues_dict[leagues[i].koora_id] ? this.domain_+this.leagues_dict[leagues[i].koora_id].logo : "";
       }
       return leagues;
     }).catch(error=>API_.showMsg(error,"danger"));

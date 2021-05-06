@@ -63,12 +63,13 @@ class Matchcreen extends React.Component {
     API_.get_match(id).then(resp=>{
       if(resp["data"] && resp["data"][0] ){
         
-        
+        this.state.matche_details = resp["data"][0];
         this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
         this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
+        console.log(this.state.matche_details);
         API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
         //this.set_title();
-        this.setState({matche_details:resp["data"][0],loading:false});
+        this.setState({loading:false});
       }
       
     });
@@ -90,13 +91,12 @@ class Matchcreen extends React.Component {
   get_Match_k(id){
       API_.get_match_k(id).then(resp=>{
         if(resp ){
-          this.set_title();
           this.state.matche_details = {...this.state.matche_details, ...resp};
+          this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
+          this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
+          this.set_title();
           this.setState({loading:false});
-          this.home_team = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
-          this.away_team = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
-
-          API_.setTitleWeb(this.home_team +" - "+ this.away_team_ar);
+          API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
           //this.load_logos();
         }
       });

@@ -707,7 +707,8 @@ class Scrap {
       if(line[0]==0 || line[1]!=0){
         continue;
       }
-      out_list.push({"img": "","league_name":line[2] , id:line[0],koora_id:line[0]});
+      
+      out_list.push({"img": "","league_name": this.removeHtml(line[2]), id:line[0],koora_id:line[0]});
     }
     return out_list;
   }
@@ -889,6 +890,12 @@ class Scrap {
       str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
     }
 
+    return str;
+  }
+  removeHtml(str){
+    if(str && typeof str === 'string') {
+      str = str.replace(/<\/?span[^>]*>/gi,"-").replace(/&[^;]+;/gi,"");
+    }
     return str;
   }
 }
