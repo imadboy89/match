@@ -47,9 +47,9 @@ class Matchcreen extends React.Component {
     
   }
   set_title(){
-    this.home_name = this.state.matche_details && this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
-    this.away_name = this.state.matche_details && this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;
-    this.props.navigation.setOptions({title: <Text >{this.home_name +" - "+ this.away_name}</Text>});
+    this.home_team_ar = this.state.matche_details && this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
+    this.away_team_ar = this.state.matche_details && this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;
+    this.props.navigation.setOptions({title: <Text >{this.home_team_ar +" - "+ this.away_team_ar}</Text>});
   }
   get_Match(id){
     //console.log("get_Match",id,this.state.matche_details);
@@ -63,11 +63,12 @@ class Matchcreen extends React.Component {
     API_.get_match(id).then(resp=>{
       if(resp["data"] && resp["data"][0] ){
         
-        this.setState({matche_details:resp["data"][0],loading:false});
+        
         this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
         this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
         API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
         //this.set_title();
+        this.setState({matche_details:resp["data"][0],loading:false});
       }
       
     });
@@ -202,7 +203,7 @@ class Matchcreen extends React.Component {
     return (
       <View style={this.state.dynamic_style.view_tab}>
         <Text style={this.state.dynamic_style.text_info}>{this.state.matche_details.datetime ? this.state.matche_details.datetime : this.state.matche_details.date+" "+API_.convert_time(this.state.matche_details.time)} </Text>
-        {1==2 && this.state.matche_details && this.home_name!="-" ?
+        {1==2 && this.state.matche_details && this.home_team_ar!="-" ?
           <TouchableOpacity 
             activeOpacity={0.7}
             style={[fav_style, style_team_name]} 
@@ -214,11 +215,11 @@ class Matchcreen extends React.Component {
           <View style={{flex:2,padding:2}} >
             {team_badge_h ? <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge_h}} /> : null}
           </View>
-          <View style={{flex:7}}><Text style={this.state.dynamic_style.text_info} numberOfLines={1}> {this.home_name}</Text></View>
+          <View style={{flex:7}}><Text style={this.state.dynamic_style.text_info} numberOfLines={1}> {this.home_team_ar}</Text></View>
           <View style={{flex:1}}></View>
         </TouchableOpacity>
          : null}
-        {1==2 &&  this.state.matche_details && this.away_name!="-" ?
+        {1==2 &&  this.state.matche_details && this.away_team_ar!="-" ?
           <TouchableOpacity 
           activeOpacity={0.7}
           style={[fav_style, style_team_name]} 
@@ -230,7 +231,7 @@ class Matchcreen extends React.Component {
         <View style={{flex:2,padding:2}} >
           {team_badge_a ? <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge_a}} /> : null}
         </View>
-        <View style={{flex:7}}><Text style={this.state.dynamic_style.text_info} numberOfLines={1}> {this.away_name}</Text></View>
+        <View style={{flex:7}}><Text style={this.state.dynamic_style.text_info} numberOfLines={1}> {this.away_team_ar}</Text></View>
         <View style={{flex:1}}></View>
       </TouchableOpacity>
          : null}
@@ -268,9 +269,9 @@ class Matchcreen extends React.Component {
                     ios_backgroundColor="#3e3e3e"
                     onValueChange={async()=>{
                       if(this.state.is_live_match){
-                        this.state.is_live_match = !await backup.remove_live_match(this.state.matche_details.id, this.away_name + " VS " + this.home_name);
+                        this.state.is_live_match = !await backup.remove_live_match(this.state.matche_details.id, this.away_team_ar + " VS " + this.home_team_ar);
                       }else{
-                        this.state.is_live_match = await backup.save_live_match(this.state.matche_details, this.away_name + " VS " + this.home_name);
+                        this.state.is_live_match = await backup.save_live_match(this.state.matche_details, this.away_team_ar + " VS " + this.home_team_ar);
                       }
                       this.setState({ is_live_match : this.state.is_live_match ? true : false});
                     }}
@@ -584,7 +585,7 @@ class Matchcreen extends React.Component {
                 style={[this.state.dynamic_style.match_results_team_name,fav_style_a]} 
                 onPress={() => { if (this.state.matche_details.away_team_id)this.setState({modalVisible_team:true,team_id:this.state.matche_details.away_team_id}) } }
                 delayLongPress={300}
-              ><Text style={this.state.dynamic_style.match_results_team_name} numberOfLines={1}> {this.away_name}</Text>
+              ><Text style={this.state.dynamic_style.match_results_team_name} numberOfLines={1}> {this.away_team_ar}</Text>
             </TouchableHighlight>
 
               <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{away_sc}</Text>
@@ -608,7 +609,7 @@ class Matchcreen extends React.Component {
                 style={[this.state.dynamic_style.match_results_team_name,fav_style_h]} 
                 onPress={() => { if (this.state.matche_details.home_team_id)this.setState({modalVisible_team:true,team_id:this.state.matche_details.home_team_id}) } }
                 delayLongPress={300}
-              ><Text style={this.state.dynamic_style.match_results_team_name} numberOfLines={1}> {this.home_name}</Text>
+              ><Text style={this.state.dynamic_style.match_results_team_name} numberOfLines={1}> {this.home_team_ar}</Text>
             </TouchableHighlight>
               <Text style={[this.state.dynamic_style.match_results_team_scor_t]}>{home_sc}</Text>
               { this.state.matche_details.home_team_score_penalties==undefined ? null : 
