@@ -69,7 +69,7 @@ class API {
       4:"هجوم"};
 
     this.mdb_save_teams = false;
-    this.time_offset = 0;
+    this.time_offset = 1;
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;

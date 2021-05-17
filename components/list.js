@@ -63,7 +63,6 @@ class ItemsList extends React.Component {
   get_item(item,col_key){
     const shadow_style = API_.isWeb ? this.state.dynamic_style.shadow_3  : this.state.dynamic_style.shadow_1;
     if(col_key=="home_team"){
-
       const style_small = {}
       let home_team_name = item["home_team_ar"] ? item["home_team_ar"] : item["home_team"];
       let away_team_name = item["away_team_ar"] ? item["away_team_ar"] : item["away_team"];
@@ -94,6 +93,7 @@ class ItemsList extends React.Component {
       if(this.props.favorite_teams && this.props.favorite_teams.includes(item.away_team_id)){
         away_team_style["textDecorationLine"]='underline'; 
       }
+      const league_img = item.league_img ? item.league_img : null;
       //"#ffffff87"
       let time_style={};
       try {
@@ -134,10 +134,10 @@ class ItemsList extends React.Component {
             </View>
           : null }
 
-          <View style={this.state.dynamic_style.matche_team_names}>
+          <ImageBackground source={league_img}  style={this.state.dynamic_style.matche_team_names} resizeMode="stretch" imageStyle={{opacity: 0.3}}>
             <Text style={[this.state.dynamic_style.matche_team_name_text,home_team_style]} numberOfLines={1}>{home_team_name}</Text>
             <Text style={[this.state.dynamic_style.matche_team_name_text,away_team_style]} numberOfLines={1}>{away_team_name}</Text>
-          </View>
+          </ImageBackground >
           { item.home_team_score_penalties==undefined ? null : 
             <View style={this.state.dynamic_style.matche_team_score_penalties}>
               <Text style={this.state.dynamic_style.matche_team_score_text_penalties} noFonts={true}>{item.home_team_score_penalties ? item.home_team_score_penalties : "-"}</Text>
@@ -223,9 +223,10 @@ class ItemsList extends React.Component {
     if(this.props.favorite==undefined || this.props.set_fav==undefined || this.props.disableHide==true ){
       return ;
     }
+    /*
     if(this.windowHeight>=1000 || this.windowWidth>=1000){
       return ;
-    }
+    }*/
     this.state.header_to_hide = is_new ? [] : this.state.header_to_hide;
     for(let i=0;i<this.list.length;i++){
       let league_id =  id ? id : this.list[i]["id"] ;

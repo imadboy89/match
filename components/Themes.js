@@ -350,6 +350,9 @@ function generateTheme(theme_name=false){
     matche_team_names:{
       flex: 15 ,
       backgroundColor: theme.match_name_backgroundColor,
+      //resizeMode: "contain",
+      justifyContent: "center"
+      
     },
     matche_team_name_text:{
       flex:1,

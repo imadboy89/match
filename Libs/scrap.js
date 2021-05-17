@@ -178,7 +178,7 @@ class Scrap {
     }
     const standing_header_ = [
       "table_r",
-      "info_1",
+      "background_color",
       "position",
       "team",
       "played",
@@ -519,6 +519,8 @@ class Scrap {
               matche["status"]="Not Started Yet" ;
             }
             matche.is_koora = true;
+            matche.league_img = comp_match && comp_match["comp_logo"] ? comp_match["comp_logo"].replace("//","https://") : null;
+
             if(is_bl){
               matches_bl[ matche["league_id"] ]["data"].push(matche);
             }else{
