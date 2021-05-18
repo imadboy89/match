@@ -94,6 +94,7 @@ class ItemsList extends React.Component {
         away_team_style["textDecorationLine"]='underline'; 
       }
       const league_img = item.league_img ? item.league_img : null;
+      //API_.debugMsg(league_img);
       //"#ffffff87"
       let time_style={};
       try {
@@ -115,9 +116,9 @@ class ItemsList extends React.Component {
             <Text style={this.state.dynamic_style.matche_team_time_t} noFonts={true}>{item.time}</Text>
             {item.is_done==true ? 
               <Text style={time_style}>{"انتهت"}</Text> 
-            : null}            
+            : null}
             {item.live==1 ? 
-              <Text style={time_style}  noFonts={true}>{time_played}</Text> 
+              <Text style={time_style}  noFonts={true}>{time_played}</Text>
             : null}
             
           </View>
@@ -134,10 +135,12 @@ class ItemsList extends React.Component {
             </View>
           : null }
 
-          <ImageBackground source={league_img}  style={this.state.dynamic_style.matche_team_names} resizeMode="stretch" imageStyle={{opacity: 0.3}}>
-            <Text style={[this.state.dynamic_style.matche_team_name_text,home_team_style]} numberOfLines={1}>{home_team_name}</Text>
-            <Text style={[this.state.dynamic_style.matche_team_name_text,away_team_style]} numberOfLines={1}>{away_team_name}</Text>
-          </ImageBackground >
+          <View style={this.state.dynamic_style.matche_team_names}>
+            <ImageBackground source={{uri: league_img}} style={{height:"100%",width:"100%"}}  resizeMode="stretch" imageStyle={{opacity: 0.3}}>
+              <Text style={[this.state.dynamic_style.matche_team_name_text,home_team_style]} numberOfLines={1}>{home_team_name}</Text>
+              <Text style={[this.state.dynamic_style.matche_team_name_text,away_team_style]} numberOfLines={1}>{away_team_name}</Text>
+            </ImageBackground>
+          </View >
           { item.home_team_score_penalties==undefined ? null : 
             <View style={this.state.dynamic_style.matche_team_score_penalties}>
               <Text style={this.state.dynamic_style.matche_team_score_text_penalties} noFonts={true}>{item.home_team_score_penalties ? item.home_team_score_penalties : "-"}</Text>

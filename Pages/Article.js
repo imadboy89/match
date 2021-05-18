@@ -21,6 +21,9 @@ class ArticleScreen extends React.Component {
         modalVisible_team:false,
         
     };
+    if(this.state.article && this.state.article.img){
+      this.state.article.img = this.state.article.img.split("&")[0];
+    }
     this.get_article();
 
   }
@@ -120,7 +123,7 @@ class ArticleScreen extends React.Component {
         <View style={this.state.dynamic_style.channel_logo_v}>
         
           { this.state.article.img ?  
-            <ImageBackground style={{flex:1,width:"100%"}} source={{uri: this.state.article.img}} >
+            <ImageBackground style={{flex:1,width:"100%"}} source={{uri: this.state.article.img}} resizeMode="stretch">
             </ImageBackground>
           : null}
         </View>
