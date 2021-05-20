@@ -70,7 +70,6 @@ class API {
 
     this.mdb_save_teams = false;
     this.time_offset = (new Date()).getTimezoneOffset()/60;
-    alert(this.time_offset);
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;

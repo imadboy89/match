@@ -203,6 +203,10 @@ class SettingsScreen extends React.Component {
             </View>
           }
           <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Offset Time: </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>{API_.time_offset}</Text>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Loaded Teams Info </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>{this.state.teams_inf_k}</Text>
           </View>
