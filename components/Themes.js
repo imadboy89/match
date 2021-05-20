@@ -365,6 +365,8 @@ function generateTheme(theme_name=false){
       fontSize:22,
       lineHeight:25,
       textAlign:"right",
+      //backgroundColor : theme.background_color_default
+
     },
     matche_team_name_text_fav:{
       textDecorationLine: 'underline',

@@ -69,7 +69,8 @@ class API {
       4:"هجوم"};
 
     this.mdb_save_teams = false;
-    this.time_offset = 1;
+    this.time_offset = (new Date()).getTimezoneOffset()/60;
+    alert(this.time_offset);
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;
@@ -560,7 +561,12 @@ class API {
     return isok ? diff : false;
   }
   convert_time_o(datetime_str,seconds=false){
-    const datetime_obj= new Date(datetime_str.replace(" ","T")+":00.000+0"+this.time_offset+":00");
+    let time_offset = Math.abs(this.time_offset);
+    time_offset = `0${time_offset}`.slice(-2);
+    time_offset = this.time_offset<=0 ?`+${time_offset}`:`-${time_offset}`;
+
+    let datetime_obj= new Date(datetime_str.replace(" ","T")+":00.000"+time_offset+":00");
+    datetime_obj == datetime_obj.getTime && datetime_obj.getTime()>0 ? datetime_obj: new Date(datetime_str.replace("T"," ")+":00.000"+time_offset+":00");
     return seconds==true ? datetime_obj.getTime() : datetime_obj;
   }
   convert_time(time, time_add=-1) {
