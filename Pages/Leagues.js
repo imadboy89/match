@@ -96,7 +96,7 @@ get_leagues(){
       <View style={this.state.dynamic_style.container}>
       <Picker
           selectedValue={this.state.region}
-          style={{ height:"70",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:250}}
+          style={{ height:70,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:250}}
           onValueChange={(itemValue, itemIndex)=>{
             this.state.region = itemValue;
             this.get_leagues_k();
@@ -105,10 +105,10 @@ get_leagues(){
           <Picker.Item label="world" value={0} />
           <Picker.Item label="Maroc" value={"ma"} />
           <Picker.Item label="Arab" value={2} />
-          <Picker.Item label="HP_mountakhab" value={2} />
-          <Picker.Item label="HP_professionnels" value={3} />
-          <Picker.Item label="HP_botola" value={4} />
-          <Picker.Item label="HP_mondial" value={5} />
+          <Picker.Item label="Africa" value={4} />
+          <Picker.Item label="Europ" value={1} />
+          <Picker.Item label="Spain" value={"ES"} />
+          
           
       </Picker>   
         <ItemsList 
