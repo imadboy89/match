@@ -1,7 +1,7 @@
 self.__precacheManifest = [
   {
-    "revision": "be911d7f8c266302f063",
-    "url": "/static/js/app.1c7190cd.chunk.js"
+    "revision": "573446376e33dfd38ade",
+    "url": "/static/js/app.20ca4b8d.chunk.js"
   },
   {
     "revision": "66090dc4495d4ce3dfb9",
@@ -32,7 +32,7 @@ self.__precacheManifest = [
     "url": "/./fonts/Ionicons.ttf"
   },
   {
-    "revision": "e84012f7734da6d4aa4bcf255df41b00",
+    "revision": "a1888e0658012169280322650fdb49bc",
     "url": "/index.html"
   },
   {
@@ -40,7 +40,7 @@ self.__precacheManifest = [
     "url": "/serve.json"
   },
   {
-    "revision": "005d05cea4796855285dbc2a5d27aa3a",
+    "revision": "9f0d929505b36095c5238958e2af611b",
     "url": "/expo-service-worker.js"
   },
   {
