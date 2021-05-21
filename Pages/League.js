@@ -306,8 +306,12 @@ class LeagueScreen extends React.Component {
         let goals     = row && row.overall_league_GF>=0 ? row.overall_league_GF : 0 ;
         goals = row && row.overall_league_GA ? goals-row.overall_league_GA : goals;
         goals = row && row.goals=="Gls" ? row.goals : goals;
-        const fav_style = row.team && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
+        let fav_style = row.team && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
         const cc_flag = row && row.c_code && row.c_code.split("~").length>=2 ? row.c_code.split("~")[2] : false;
+        if (Object.keys().length==0){
+          fav_style = {backgroundColor:row.backgroundColor}
+        }
+        
         return (
         <TouchableOpacity 
           activeOpacity={0.7}
