@@ -195,7 +195,7 @@ class Scrap {
     ];
     const standing_header_cc = [
       "table_r",
-      "info_1",
+      "backgroundColor",
       "position",
       "team",
       "c_code",
@@ -245,6 +245,7 @@ class Scrap {
           team_st["overall_league_GF"]       = parseInt(team_st["goals_scored"])     >0 ? parseInt(team_st["goals_scored"])     : 0 ;
           team_st["overall_league_GA"]       = parseInt(team_st["goals_received"])   >0 ? parseInt(team_st["goals_received"])   : 0 ;
           team_st["overall_league_GD"]       = parseInt(team_st["goals_difference"]) >0 ? parseInt(team_st["goals_difference"]) : 0 ;
+          team_st["backgroundColor"] = API_.isWeb ? team_st["backgroundColor"]+"66" : team_st["backgroundColor"].replace("#","#66");
           if(group_name){
             if(standing.length>0 && Object.keys(standing[standing.length-1])[0] == group_name){
               standing[standing.length-1][group_name].push(team_st);
