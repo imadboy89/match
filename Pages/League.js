@@ -308,10 +308,10 @@ class LeagueScreen extends React.Component {
         goals = row && row.goals=="Gls" ? row.goals : goals;
         let fav_style = row.team && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
         const cc_flag = row && row.c_code && row.c_code.split("~").length>=2 ? row.c_code.split("~")[2] : false;
-        if (Object.keys().length==0){
+        if (Object.keys(fav_style).length==0 && row.backgroundColor){
           fav_style = {backgroundColor:row.backgroundColor}
         }
-        
+        console.log(fav_style);
         return (
         <TouchableOpacity 
           activeOpacity={0.7}
