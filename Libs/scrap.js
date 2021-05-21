@@ -247,7 +247,8 @@ class Scrap {
           team_st["overall_league_GA"]       = parseInt(team_st["goals_received"])   >0 ? parseInt(team_st["goals_received"])   : 0 ;
           team_st["overall_league_GD"]       = parseInt(team_st["goals_difference"]) >0 ? parseInt(team_st["goals_difference"]) : 0 ;
           if(team_st["backgroundColor"]){
-            team_st["backgroundColor"] = API_.isWeb ? team_st["backgroundColor"]+backgrounColor_alpha : team_st["backgroundColor"].replace("#","#"+backgrounColor_alpha);
+            //team_st["backgroundColor"] = API_.isWeb  ? team_st["backgroundColor"]+backgrounColor_alpha : team_st["backgroundColor"].replace("#","#"+backgrounColor_alpha);
+            team_st["backgroundColor"] = team_st["backgroundColor"]+backgrounColor_alpha;
           }
           console.log(team_st)
           if(group_name){
