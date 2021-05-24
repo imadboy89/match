@@ -250,7 +250,6 @@ class Scrap {
             //team_st["backgroundColor"] = API_.isWeb  ? team_st["backgroundColor"]+backgrounColor_alpha : team_st["backgroundColor"].replace("#","#"+backgrounColor_alpha);
             team_st["backgroundColor"] = team_st["backgroundColor"]+backgrounColor_alpha;
           }
-          console.log(team_st)
           if(group_name){
             if(standing.length>0 && Object.keys(standing[standing.length-1])[0] == group_name){
               standing[standing.length-1][group_name].push(team_st);

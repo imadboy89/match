@@ -81,6 +81,7 @@ class LeagueScreen extends React.Component {
       this.showMatchesTab();
     }
     this.setState({league_details:resp,loading:false,favorite:favorite});
+    API_.setTitleWeb(this.league_name);
   }
   get_matches(league_id){
       get_notifications_matches().then(o=>{
@@ -311,7 +312,6 @@ class LeagueScreen extends React.Component {
         if (Object.keys(fav_style).length==0 && row.backgroundColor){
           fav_style = {backgroundColor:row.backgroundColor}
         }
-        console.log(fav_style);
         return (
         <TouchableOpacity 
           activeOpacity={0.7}
