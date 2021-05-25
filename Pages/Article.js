@@ -32,6 +32,19 @@ class ArticleScreen extends React.Component {
     let short_title = this.state.article.title_news.length > 0 ? this.state.article.title_news.slice(0,30)+"..." : this.state.article.title_news;
     this.props.navigation.setOptions({title: <Text>{short_title}</Text>})
   }
+  isVideo = async (id)=>{
+    const v_details = await API_.get_video_k(id);
+    console.log(v_details);
+    const v_item = {};
+    v_item.url = v_details.Embed.slice(0,2) == "//" ? "https:"+v_details.Embed : v_details.Embed;
+    v_item.category_name = v_details.Title;
+    v_item.name = v_details.Title;
+    v_item.category_photo = v_details.Image;
+    v_item.title_news = v_details.Title;
+    v_item.is_external = true;
+
+    this.props.navigation.navigate('Video', { item: v_item });
+  }
   get_article(){
     this.state.article.date =  this.state.article && this.state.article.date ? API_.get_date2(new Date(this.state.article.date.replace("#","") * 1000)) : "";
     API_.get_article(this.props.route.params.article.link, this.state.article.source)
@@ -43,9 +56,11 @@ class ArticleScreen extends React.Component {
         this.state.article.related = article.related ? article.related : this.state.article.related;
         this.state.article.related_news = article.related_news ? article.related_news : this.state.article.related_news;
 
-        this.state.article.img = this.state.article.img==undefined && article.related_images && article.related_images.length>0 
+        this.state.article.img = (this.state.article.img=="" || this.state.article.img==undefined) && article.related_images && article.related_images.length>0 
         ? article.related_images[0]["img_link"] : this.state.article.img;
-
+        if( article.related_images[1] && parseInt(article.related_images[1]["img_link"])>0){
+          this.isVideo(parseInt(article.related_images[1]["img_link"]));
+        }
       }else{
         this.state.article.body = article;
       }

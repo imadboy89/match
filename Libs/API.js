@@ -284,6 +284,19 @@ class API {
       return scrap.get_player(resp);
     }).catch(error=>API_.showMsg(error,"danger"));
   }
+  get_video_k(vid){
+    const url = "https://ktv.kooora.ws/GetData.ashx?id="+vid+"&arabic";
+    return this.http(url,"GET",null,{})
+    .then(resp=>{
+      let out = {};
+      try {
+        out = JSON.parse(resp);
+      } catch (error) {}
+
+      return {"Category":"بلا تعليق","CatId":212213,"Embed":"//player.octivid.com/v1/video?id=27970994&user_id=167&countries=Q0M=&w=100%25&h=100%25&filter=DENY&signature=8e3de25e0f4a4f940927b0bc19ae07b2","Id":27970994,"Image":"https://ktv.kooora.ws/images/167/thumb_1621843431.jpg","PublishDate":"2021-05-24","Subcategory":"Blank","SubId":212214,"Tags":"","Title":"جوارديولا يودع أجويرو بالدموع.. شاهد كيف وصفه!","VideoTime":"1:1"};
+      return out;
+    }).catch(error=>API_.showMsg(error,"danger"));
+  }
   queued_get_teams=async(queue,next=false)=>{
     let queue_size = queue.length;
     let queue_inprocess = 0;
