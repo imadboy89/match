@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableHighlight, Modal, Button, Switch, Picker, TouchableOpacity,Image, ImageBackground, ScrollView, Dimensions} from 'react-native';
+import { View, TouchableHighlight, Modal, Button, Switch, Picker, TouchableOpacity,Image, ImageBackground, ScrollView, RefreshControl} from 'react-native';
 import Loading from '../components/Loader';
 import {styles_match,getTheme,global_theme} from "../components/Themes";
 import IconButton from "../components/IconButton";
@@ -571,7 +571,13 @@ class Matchcreen extends React.Component {
       const home_logo = this.state.matche_details.home_team_badge ? this.state.matche_details.home_team_badge : this.state.matche_details.home_team_logo;
       const live_style = this.state.matche_details.live ? {"borderColor":global_theme.live_borderColor,"borderWidth":2}:{};
     return (
-      <ScrollView style={this.state.dynamic_style.container}>
+      <ScrollView style={this.state.dynamic_style.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={this.state.loading}
+          onRefresh={()=>this.get_Match(this.props.route.params.match_item.id)}
+        />}
+      >
         <TouchableOpacity 
           style={[this.state.dynamic_style.header_container,live_style]} 
           onPress={()=>this.setState({show_res : this.state.show_res?false:true})}
