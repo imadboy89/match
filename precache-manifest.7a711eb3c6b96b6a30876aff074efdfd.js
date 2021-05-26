@@ -40,7 +40,7 @@ self.__precacheManifest = [
     "url": "/serve.json"
   },
   {
-    "revision": "d79a525624daeafb91f370d2df829529",
+    "revision": "64f17e78760788cfc16787c1045b1c31",
     "url": "/expo-service-worker.js"
   },
   {
