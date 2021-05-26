@@ -34,9 +34,11 @@ class ArticleScreen extends React.Component {
   }
   isVideo = async (id)=>{
     const v_details = await API_.get_video_k(id);
-    console.log(v_details);
+    if(Object.keys(v_details).length==0 || v_details.Embed==undefined){
+      return;
+    }
     const v_item = {};
-    v_item.url = v_details.Embed.slice(0,2) == "//" ? "https:"+v_details.Embed : v_details.Embed;
+    v_item.url = v_details.Embed && v_details.Embed.slice(0,2) == "//" ? "https:"+v_details.Embed : v_details.Embed;
     v_item.category_name = v_details.Title;
     v_item.name = v_details.Title;
     v_item.category_photo = v_details.Image;
