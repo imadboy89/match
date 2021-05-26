@@ -290,7 +290,7 @@ class API {
       let out = {};
       try {
         out = JSON.parse(resp);
-      } catch (error) {}
+      } catch (error) {API_.debugMsg("get_video_k: Cannot parse JSON!","warning")}
 
       //return {"Category":"بلا تعليق","CatId":212213,"Embed":"//player.octivid.com/v1/video?id=27970994&user_id=167&countries=Q0M=&w=100%25&h=100%25&filter=DENY&signature=8e3de25e0f4a4f940927b0bc19ae07b2","Id":27970994,"Image":"https://ktv.kooora.ws/images/167/thumb_1621843431.jpg","PublishDate":"2021-05-24","Subcategory":"Blank","SubId":212214,"Tags":"","Title":"جوارديولا يودع أجويرو بالدموع.. شاهد كيف وصفه!","VideoTime":"1:1"};
       return out;
