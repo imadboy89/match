@@ -276,7 +276,6 @@ class API {
     }).catch(error=>API_.showMsg(error,"danger"));
   }
   get_player(player_id){
-    "https://m.kooora.com/?player=33085"
     return this.http("https://m.kooora.com/?player="+player_id+"&arabic","GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -293,7 +292,7 @@ class API {
         out = JSON.parse(resp);
       } catch (error) {}
 
-      return {"Category":"بلا تعليق","CatId":212213,"Embed":"//player.octivid.com/v1/video?id=27970994&user_id=167&countries=Q0M=&w=100%25&h=100%25&filter=DENY&signature=8e3de25e0f4a4f940927b0bc19ae07b2","Id":27970994,"Image":"https://ktv.kooora.ws/images/167/thumb_1621843431.jpg","PublishDate":"2021-05-24","Subcategory":"Blank","SubId":212214,"Tags":"","Title":"جوارديولا يودع أجويرو بالدموع.. شاهد كيف وصفه!","VideoTime":"1:1"};
+      //return {"Category":"بلا تعليق","CatId":212213,"Embed":"//player.octivid.com/v1/video?id=27970994&user_id=167&countries=Q0M=&w=100%25&h=100%25&filter=DENY&signature=8e3de25e0f4a4f940927b0bc19ae07b2","Id":27970994,"Image":"https://ktv.kooora.ws/images/167/thumb_1621843431.jpg","PublishDate":"2021-05-24","Subcategory":"Blank","SubId":212214,"Tags":"","Title":"جوارديولا يودع أجويرو بالدموع.. شاهد كيف وصفه!","VideoTime":"1:1"};
       return out;
     }).catch(error=>API_.showMsg(error,"danger"));
   }

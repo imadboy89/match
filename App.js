@@ -204,6 +204,7 @@ function NewsStackScreen() {
       <NewsStack.Screen options={_app_styles.screenHeader} name="Article" component={ArticleScreen} />
       <LeaguesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
       <LeaguesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
+      <VideosStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
     </NewsStack.Navigator>
   );
 }
