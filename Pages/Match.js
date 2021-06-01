@@ -309,8 +309,8 @@ class Matchcreen extends React.Component {
     subs = subs.sort((a,b)=>{return a.time<b.time?-1:1;});
     return subs;
   }
-  get_player_info=(player_id)=>{
-    this.setState({modalVisible_player:true,player_id:player_id});
+  get_player_info=(player)=>{
+    this.setState({modalVisible_player:true,player_id:player.player_id});
   }
   get_View_lineup_2(){
 
@@ -386,7 +386,7 @@ class Matchcreen extends React.Component {
               delayLongPress={300}
               activeOpacity={0.7}
               onLongPress={()=>this.set_fav_p(away_p.lineup_player)}
-              onPress={()=>this.get_player_info(away_p.player_key)}
+              onPress={()=>this.get_player_info({player_id:away_p.player_key})}
               style={[this.state.dynamic_style.lineup2_lr_container ]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_l, away_pl_tyle]} numberOfLines={1}>
                 {away_p && away_p.lineup_player? subout_a+" "+scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
@@ -397,7 +397,7 @@ class Matchcreen extends React.Component {
               delayLongPress={300}
               activeOpacity={0.7}
               onLongPress={()=>this.set_fav_p(home_p.lineup_player)}
-              onPress={()=>this.get_player_info(home_p.player_key)}
+              onPress={()=>this.get_player_info({player_id:home_p.player_key})}
               style={[this.state.dynamic_style.lineup2_lr_container]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_r,home_pl_tyle]} numberOfLines={1}>
                 {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h+" "+subout_h : ""}

@@ -110,6 +110,9 @@ class ArticleScreen extends React.Component {
     league_img = ["https:/","http://"].includes(league_img.slice(0,7)) ? league_img : API_.domain_o+league_img;
     this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:league_img,id:league_id} });
   }
+  get_player_info=(player)=>{
+    this.setState({modalVisible_player:true,player_id:player.player_id});
+  }
   render() {
     
     const related_news_header = <Text style={this.state.dynamic_style.article_date_t}>أخبار ذات صلة :</Text>;

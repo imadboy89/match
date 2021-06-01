@@ -37,8 +37,8 @@ class Team extends React.Component{
         this.setState({team:res,loading:false});
       });
     }
-    get_player_info=(p_id)=>{
-      this.setState({modalVisible_player:true,player_id:p_id});
+    get_player_info=(player)=>{
+      this.setState({modalVisible_player:true,player_id:player.player_id});
     }
     set_fav_p=(p_id)=>{
       this.setState({modalVisible_player:true,player_id:p_id});
