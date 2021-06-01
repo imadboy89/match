@@ -79,6 +79,7 @@ class Team extends React.Component{
         const p_name = row[4] && row[4].trim ? row[4].trim() : "";
         const fav_style = this.state.favorite_p.includes(p_name) ? {backgroundColor: global_theme.fav_background} : {};
         const ma_style = p_ccode && p_ccode.trim && p_ccode.toLocaleLowerCase().trim() == "ma" ? {borderWidth:1}: {};
+        const cc_flag = p_ccode && p_ccode.trim && p_ccode.toLocaleLowerCase().trim()!="" ?  p_ccode.toLocaleLowerCase().trim() : false;
         return  <TouchableOpacity key={p_id+"-"+p_pos}
         delayLongPress={300}
         activeOpacity={0.7}
@@ -88,7 +89,10 @@ class Team extends React.Component{
           <View style={{flex:1}}><Text style={this.state.dynamic_style_league.team_name_t}></Text></View>
           <View style={{flex:3}}><Text style={this.state.dynamic_style_league.team_name_t}>{p_nbr}</Text></View>
           <View style={{flex:20}}><Text style={this.state.dynamic_style_league.team_name_t}>{p_name}</Text></View>
-          
+          {cc_flag!=false ? 
+          <View style={{flex:3,padding:5}} >
+            <Image style={{height:"99%",width:"99%"}}  imageStyle={{borderRadius:  20,height:"99%",width:"99%"}} source={{uri: API_.get_cc_img(cc_flag, true)}} />
+          </View> : null }
           </TouchableOpacity>;
 
         return <View key={p_id} styles={this.state.dynamic_style.info_row}>

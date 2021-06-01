@@ -19,6 +19,7 @@ class API {
     this.proxy = 'https://www.oxus.tj/sites/default/private/files/.proxy2.php?url=';
     this.proxy1 = 'https://www.oxus.tj/sites/default/private/files/.proxy.php?url=';
     this.cc_url = "https://o.kooora.com/f/big/[cc].png";
+    this.cc_url_small = "https://o.kooora.com/f/[cc].png";
     this.IPTV_json = "https://www.oxus.tj/sites/default/private/files/.index.php?action=json"
     this.method = "POST";
     this.usingproxy = Platform.OS == 'web';
@@ -155,8 +156,8 @@ class API {
     const final_url = scrap.get_iframe_url(html2,2);
     return final_url;
   }
-  get_cc_img(flag){
-    return this.cc_url.replace("[cc]",flag) ; 
+  get_cc_img(flag,small=false){
+    return small ? this.cc_url_small.replace("[cc]",flag) : this.cc_url.replace("[cc]",flag) ; 
   }
   _isBigScreen(){
     return Dimensions.get('window').width>900 || Dimensions.get('window').height>900
