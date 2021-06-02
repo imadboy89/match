@@ -552,7 +552,7 @@ class Scrap {
   get_scorers(html){
     //let patttern = /var\s+scorers_details\s*=\s*new\s+Array\s*\((([^;]*\r\n[^;]*)*)/gmi;
     let patttern = /var\s+scorers_details\s*=\s*new\s+Array\s*\(\r\n([^0][^;\r\n]*\r\n)*/gim;
-    let m = html.match(patttern);
+    const scorers_details = this.get_var_array(html,"scorers_details", '-1,-1\\s*\\);');
     const header = [
       "goals",
       "goals_pn",
@@ -578,31 +578,19 @@ class Scrap {
       "info_10",
       "info_11",
     ];
-
-    if(m){
-      let out = "[["+m[0].trim().replace(/var\s+scorers_details\s*=\s*new\s+Array\s*\(/i,"")
-        .replace(/,\s*-1\s*\)$/mi,"")
-        .replace(/,\s*$/gi,"")
-        .replace(/,\r\n/gi,"],[") + "]]";
-      let out_list = []; 
-      let final_out = [];
-      try{
-        out = JSON.parse(out);
-        out = out ? out : [];
-        for (let i=0; i<out.length;i++){
-          if(out[i][0]==-1){continue;}
-          let row = {};
-          //continue;
-          for (let h=0; h<out[i].length;h++){
-            row[header[h]] = out[i][h];
-          }
-          final_out.push(row);
+    let final_out = [];
+    try{
+      for (let i=0; i<scorers_details.length;i++){
+        if(scorers_details[i][0]==-1){continue;}
+        let row = {};
+        //continue;
+        for (let h=0; h<scorers_details[i].length;h++){
+          row[header[h]] = scorers_details[i][h];
         }
-      }catch (e){console.log(e);}
-
-      return final_out;
-    } 
-    return [];
+        final_out.push(row);
+      }
+    }catch (e){console.log(e);}
+    return final_out.slice(0,50);
   }
   get_var(html,var_name, is_array=false){
     const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gi");
@@ -622,7 +610,7 @@ class Scrap {
     const patttern  = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\r\\n(((?!"+end+").)*\\r\\n)*","gmi");
     let m = html.match(patttern);
     if(m){
-      let out = "[["+m[0].trim().replace("var "+var_name+" = new Array (","").replace(/(,\r\n)?\s*\-1,0\);/mi,"").replace(/,$/i,'').replace(/	/g,'').replace(/,\r\n/gi,"],[") + "]]";
+      let out = "[["+m[0].trim().replace("var "+var_name+" = new Array (","").replace("var "+var_name+" = new Array(","").replace(/(,\r\n)?\s*\-1,0\);/mi,"").replace(/,$/i,'').replace(/	/g,'').replace(/,\r\n/gi,"],[") + "]]";
       let out_list = []; 
       try{
         
