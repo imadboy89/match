@@ -596,6 +596,7 @@ function generateTheme(theme_name=false){
       padding: 5,
       fontSize: 18,
       backgroundColor: theme.background_color_default,
+      
       //backgroundColor: '#8e5858',
     },
     article_body_t:{
@@ -639,7 +640,7 @@ function generateTheme(theme_name=false){
       alignItems:"center",
       alignSelf:"center",
       backgroundColor:theme.article_photo_background,
-    }
+    },
   });
 
   var styles_news = StyleSheet.create({

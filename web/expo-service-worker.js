@@ -4,7 +4,7 @@
  * Store notification icon string in service worker.
  * Ref: https://stackoverflow.com/a/35729334/2603230
  */
-const version = 16;
+const version = 17;
 self.addEventListener('message', event => {
   let data;
   if (typeof event.data === 'string') {

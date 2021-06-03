@@ -1,5 +1,5 @@
 import React from "react";
-import {  View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image , ImageBackground} from 'react-native';
+import {  View, Dimensions, Modal, Button, Linking, Picker,ScrollView, Image , ImageBackground} from 'react-native';
 import Constants from 'expo-constants';
 import Loader from "../components/Loader";
 import {styles_article,getTheme} from "../components/Themes";
@@ -137,7 +137,21 @@ class ArticleScreen extends React.Component {
       minWidth={800}
       />
       :null;
-
+    const article_body = this.state.article && this.state.article.body ? this.state.article.body : "";
+    const body_composed = article_body.split("IMG**").map(o=>{
+      let dom2retrurn=null;
+      if(o[0]=="*"){
+        const width = Dimensions.get('window').width<=400 ? "99%" : "70%";
+        let img_src = o.replace(/\*/gi,"").trim();
+        img_src = img_src && img_src.slice(0,2) == "//" ? "https:"+img_src : img_src;
+        dom2retrurn = <View style={{flexDirection: 'row',height:300,width:width,alignSelf:"center",marginVertical:10}}>
+        <ImageBackground key={img_src} source={{uri:img_src}} style={{aspectRatio: 1,resizeMode: 'contain',flex: 1,}} resizeMode={'contain'}/>
+        </View>;
+      }else{
+        dom2retrurn = <Text key={o} style={this.state.dynamic_style.article_body_t}>{o}</Text>
+      }
+      return dom2retrurn;
+    });
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
         <View style={this.state.dynamic_style.channel_logo_v}>
@@ -152,8 +166,7 @@ class ArticleScreen extends React.Component {
             <Text style={this.state.dynamic_style.article_date_t}>{this.state.article.date}</Text>
             <Text style={this.state.dynamic_style.article_title_t}>{this.state.article && this.state.article.title_news ? this.state.article.title_news : ""}</Text>
             
-            {this.state.loading ? <Loader/> : 
-            <Text style={this.state.dynamic_style.article_body_t}>{this.state.article && this.state.article.body? this.state.article.body : ""}</Text>  }
+            {this.state.loading ? <Loader/> : body_composed  }
             
           </View>
 

@@ -878,6 +878,7 @@ class Scrap {
   decodeEntities(str) {
     if(str && typeof str === 'string') {
       // strip script/html tags
+      str = str.replace(/<img\s*src\s*=\s*("|')\s*([^'"]+)\s*("|')\s\/>/gi,"IMG***$2***");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&quot;/gi," ' ");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&nbsp;/gi," ");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&[^;]+;/gi,"");

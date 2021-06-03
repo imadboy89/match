@@ -301,7 +301,6 @@ class API {
     let queue_size = queue.length;
     let queue_inprocess = 0;
     const queue_maxInprocess=5;
-    console.log("queued_get_teams getting Teams: ",queue_size);
     let teams_info = await this.getTeam_logo_k();
     for(const team_id of queue){
       while(queue_inprocess>=queue_maxInprocess){
@@ -310,9 +309,7 @@ class API {
       queue_inprocess+=1;
       this.get_team(team_id, false,teams_info).then(r=>{
         queue_inprocess-=1;
-        //console.log(" add 2 team "+r);
         if(r && r.team_id>0 && (r.team_name_ar || r.team_name_en)){
-          //console.log(" add team "+r.team_name_ar);
           teams_info[r.team_id] = r;
         }
         
@@ -338,13 +335,11 @@ class API {
     const teams_info_v = Object.values(teams_info);
     let count = 0;
     let chunk_id = 0;
-    console.log("Start saving in chunks count="+teams_info_v.length);
     for(let i=0;i< teams_info_v.length;i++){
       const t = teams_info_v[i];
       teams_info_chunk[t.team_id] = t;
       count ++;
       if(chunk_size <= count){
-        console.log("saving chunk "+chunk_id);
         await AsyncStorage.setItem('teams_info_k_'+chunk_id, JSON.stringify(teams_info_chunk));
         count = 0;
         teams_info_chunk={};
@@ -352,7 +347,6 @@ class API {
       }
     }
     if(count >0){
-      console.log("saving chunk "+chunk_id);
       await AsyncStorage.setItem('teams_info_k_'+chunk_id, JSON.stringify(teams_info_chunk));
       count = 0;
       teams_info_chunk={};
@@ -698,7 +692,6 @@ class API {
     const exp_t = ttl ? ttl : 10*24*60*60*1000;
     let data2check = await AsyncStorage.getItem("expired_"+key);
     let date_stored = data2check ? parseInt(data2check) : 0;
-    console.log(key,ttl ,  date_stored , (new Date()).getTime()  , (new Date()).getTime()- date_stored >= exp_t);
     const is_expired = (new Date()).getTime()- date_stored >= exp_t;
     if(is_expired){
       const time = (new Date()).getTime() ;
@@ -721,7 +714,6 @@ class API {
     await AsyncStorage.setItem('leagues', JSON.stringify(leagues) );
   }
   get_leagues(page){
-      console.log("leagues loading pg="+page);
       const url = this.domain+"leagues?page="+page;
       return this.fetch(url, {
         method: 'GET',
