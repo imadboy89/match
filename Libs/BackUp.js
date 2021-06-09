@@ -540,6 +540,7 @@ class BackUp{
         const o = await this.db_live_matches.insertOne(live_match);
         const is_ok = o && o.insertedId ;
         if(is_ok){
+          API_.notifications_matches = API_.notifications_matches ? API_.notifications_matches : {} ;
           API_.notifications_matches[live_match.match_id] = match_details;
           API_.showMsg("تمت إضافة مباراة  *"+match_title+"*","success");
         }else{
