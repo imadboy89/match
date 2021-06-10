@@ -139,13 +139,16 @@ class ArticleScreen extends React.Component {
       :null;
     const article_body = this.state.article && this.state.article.body ? this.state.article.body : "";
     const body_composed = article_body.split("IMG**").map(o=>{
+      if(o.trim()==""){
+        return null;
+      }
       let dom2retrurn=null;
       if(o[0]=="*"){
         const width = Dimensions.get('window').width<=400 ? "99%" : "70%";
         let img_src = o.replace(/\*/gi,"").trim();
         img_src = img_src && img_src.slice(0,2) == "//" ? "https:"+img_src : img_src;
-        dom2retrurn = <View style={{flexDirection: 'row',height:300,width:width,alignSelf:"center",marginVertical:10}}>
-        <ImageBackground key={img_src} source={{uri:img_src}} style={{aspectRatio: 1,resizeMode: 'contain',flex: 1,}} resizeMode={'contain'}/>
+        dom2retrurn = <View key={o} style={{flexDirection: 'row',height:300,width:width,alignSelf:"center",marginVertical:10}}>
+        <ImageBackground source={{uri:img_src}} style={{aspectRatio: 1,resizeMode: 'contain',flex: 1,}} resizeMode={'contain'}/>
         </View>;
       }else{
         dom2retrurn = <Text key={o} style={this.state.dynamic_style.article_body_t}>{o}</Text>
@@ -157,7 +160,7 @@ class ArticleScreen extends React.Component {
         <View style={this.state.dynamic_style.channel_logo_v}>
         
           { this.state.article.img ?  
-            <ImageBackground style={{flex:1,width:"100%"}} source={{uri: this.state.article.img}} resizeMode="stretch">
+            <ImageBackground key={"article_backgrnd"} style={{flex:1,width:"100%"}} source={{uri: this.state.article.img}} resizeMode="stretch">
             </ImageBackground>
           : null}
         </View>
