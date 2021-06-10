@@ -58,6 +58,7 @@ class Matchcreen extends React.Component {
       return ;
     }
     if(this.state.matche_details.is_koora){
+      this.is_k = true;
       return this.get_Match_k(id);
     }
     API_.get_match(id).then(resp=>{
@@ -119,7 +120,24 @@ class Matchcreen extends React.Component {
     }
   }
 
-
+  set_fav_team=async(id,team_name)=>{
+    id= parseInt(id);
+    let msg_action = "";
+    if(id==0){return "";}
+    const localS_fav_key = this.is_k ? "favorite_teams_k" : "favorite_teams";
+    let o = await API_.getConfig(localS_fav_key,this.state.favorite_t)
+    if( o.includes(id) ){
+      o = o.filter(o=>{if(o!=id)return o;});
+      msg_action = "تمت إزالته من";
+    }else{
+      o.push(id);
+      msg_action = "تمت إضافته إلى";
+    }
+    this.setState({favorite_t:o});
+    await API_.setConfig(localS_fav_key,o);
+    this.setState({});
+    API_.showMsg(`الفريق ٭${team_name}٭ ${msg_action} المفضلة!`);
+  }
   set_fav=(ch_name)=>{
     let msg_action = '';
     API_.getConfig("favorite_channels",this.state.favorite).then(o=>{
@@ -590,6 +608,7 @@ class Matchcreen extends React.Component {
                 activeOpacity={0.4}
                 style={[this.state.dynamic_style.match_results_team_name,fav_style_a]} 
                 onPress={() => { if (this.state.matche_details.away_team_id)this.setState({modalVisible_team:true,team_id:this.state.matche_details.away_team_id}) } }
+                onLongPress={()=>this.set_fav_team(this.state.matche_details.away_team_id,this.away_team_ar)}
                 delayLongPress={300}
               ><Text style={this.state.dynamic_style.match_results_team_name} numberOfLines={1}> {this.away_team_ar}</Text>
             </TouchableHighlight>
@@ -614,6 +633,7 @@ class Matchcreen extends React.Component {
                 activeOpacity={0.4}
                 style={[this.state.dynamic_style.match_results_team_name,fav_style_h]} 
                 onPress={() => { if (this.state.matche_details.home_team_id)this.setState({modalVisible_team:true,team_id:this.state.matche_details.home_team_id}) } }
+                onLongPress={()=>this.set_fav_team(this.state.matche_details.home_team_id,this.home_team_ar)}
                 delayLongPress={300}
               ><Text style={this.state.dynamic_style.match_results_team_name} numberOfLines={1}> {this.home_team_ar}</Text>
             </TouchableHighlight>

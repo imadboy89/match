@@ -397,7 +397,7 @@ class Scrap {
         if(blacklisted_countries.includes(compitition["country"]) || compitition["options"].includes("h")){
           is_allowed = false;
         }
-        if(is_allowed || "MA"==compitition["country"] || 214241111 == compitition["league_id"]){
+        if(is_allowed || "MA"==compitition["country"] || 214241111 == compitition["league_id"] || FILTERING==false){
           compititions[compitition["league_id"]] = compitition;
 
           API_.set_common_league_id({id:compitition["league_id"],title:compitition["comp_name"]});

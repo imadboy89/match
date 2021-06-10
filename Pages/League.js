@@ -37,7 +37,6 @@ class LeagueScreen extends React.Component {
         matches_only_fav:false,
         modalVisible_team : false,
     };
-    console.log(this.props.route.params.league_details);
     this.league_name = this.props.route.params.league_details.league;
     this.league_img   = this.props.route.params.league_details.league_img;
     this.real_id = this.props.route.params.league_details.id;

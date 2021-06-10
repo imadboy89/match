@@ -96,7 +96,7 @@ get_leagues(){
       <View style={this.state.dynamic_style.container}>
       <Picker
           selectedValue={this.state.region}
-          style={{ height:70,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:250}}
+          style={{ height:API_.isWeb? 50 : 70,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:250}}
           onValueChange={(itemValue, itemIndex)=>{
             this.state.region = itemValue;
             this.get_leagues_k();
