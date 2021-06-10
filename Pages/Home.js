@@ -497,7 +497,7 @@ show_DateP(){
     this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:league_img,id:league_id} });
   }
   onMatch_clicked =(item)=>{
-    this.props.navigation.navigate('Match', { match_item: item });
+    this.props.navigation.navigate('Match', { match_item: item,id:item.id });
   }
   onSwipeRight = (stat)=>{
     //console.log(stat);

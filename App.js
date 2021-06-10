@@ -43,6 +43,7 @@ global.backup.executingQueued();
 global.api_type=0;
 global._ClientInfo = new ClientInfo();
 global.match_data = false;
+global.open_page={};
 if(API_.isWeb){
   global. Global_theme_name = window.matchMedia  && window.matchMedia('(prefers-color-scheme: dark)').matches===true?"dark violet" :"light" ;
 
@@ -64,6 +65,9 @@ if(API_.isWeb){
     
   }
 
+  const pathname = window.location.pathname.slice(1);
+  open_page.path = pathname.split("@")[0];
+  open_page.id   = pathname.split("@")[1]?pathname.split("@")[1]:null;
 }
 
 
@@ -228,9 +232,7 @@ function MyTabs(){
             let iconName;
 
             if (route.name === 'Home') {
-              iconName = focused
-                ? 'home'
-                : 'home';
+              iconName = focused ? 'home' : 'home';
             } else if (route.name === 'Channels') {
               iconName = focused ? 'tv' : 'tv';
             } else if (route.name === 'News') {
@@ -290,6 +292,32 @@ class APP extends React.Component {
       _app_styles=theme;
       this.setState({style_loaded:true});
     });
+
+    this.linking = {
+      prefixes: ['https://faithess.com', 'almatch://'],
+      config: {
+        screens: {
+          Home: {
+            initialRouteName: 'Home',
+            screens:{
+              Home     : "Home",
+              Settings : "Settings",
+              Match    : {
+                path: 'Match/:id',
+                parse:{ id: Number }
+              },
+              Channel  : "Channel",
+              League   : "League",
+              Video    : "Video",
+            }
+          },
+          Leagues: 'Leagues',
+          Videos: 'Videos',
+          Channels: 'Channels',
+          News: 'News',
+        },
+      },
+    };
   }
   componentDidMount(){
     this.mounted = true;
@@ -333,7 +361,7 @@ class APP extends React.Component {
       return null;
     }
     return (
-      <NavigationContainer>
+      <NavigationContainer linking={this.linking}>
         {this.state.showMsg===true ? 
         <ToastMsg 
           dynamic_style={this.state.notif_dynamic_style}

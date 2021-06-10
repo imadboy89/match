@@ -33,12 +33,16 @@ class Matchcreen extends React.Component {
 
     };
     this.sub_out = {"home":[],"away":[]};
+    this.id = 0;
   }
   componentDidMount(){
     //console.log("componentDidMount",this.props.route.params.match_item.id);
-    this.get_Match(this.props.route.params.match_item.id);
+    this.id = this.props.route.params.match_item && this.props.route.params.match_item.id ? this.props.route.params.match_item.id : this.props.route.params.id ;
+    console.log(this.props.route.params.match_item,this.props.route.params.id)
+
+    this.get_Match(this.id);
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
-    backup.check_live_match(this.props.route.params.match_item.id).then(o=>this.setState({is_live_match:o?true:false}));
+    backup.check_live_match(this.id).then(o=>this.setState({is_live_match:o?true:false}));
     API_.getConfig("favorite_channels",this.state.favorite).then(o=>{this.setState({favorite:o});});
     API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{this.setState({favorite_p:o});});
     API_.getConfig("favorite_teams_k",this.state.favorite_t).then(o=>{this.setState({favorite_t:o});});
@@ -47,17 +51,20 @@ class Matchcreen extends React.Component {
     
   }
   set_title(){
+    if(this.state.matche_details==undefined){
+      return false;
+    }
     this.home_team_ar = this.state.matche_details && this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
     this.away_team_ar = this.state.matche_details && this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;
     this.props.navigation.setOptions({title: <Text >{this.home_team_ar +" - "+ this.away_team_ar}</Text>});
   }
   get_Match(id){
     //console.log("get_Match",id,this.state.matche_details);
-    if(this.props.route.params.match_item.is_kora_star){
+    if(this.props.route.params.match_item && this.props.route.params.match_item.is_kora_star){
       this.setState({matche_details:this.props.route.params.match_item,loading:false});
       return ;
     }
-    if(this.state.matche_details.is_koora){
+    if(this.state.matche_details==undefined || this.state.matche_details.is_koora){
       this.is_k = true;
       return this.get_Match_k(id);
     }
@@ -92,13 +99,14 @@ class Matchcreen extends React.Component {
   get_Match_k(id){
       API_.get_match_k(id).then(resp=>{
         if(resp ){
-          this.state.matche_details = {...this.state.matche_details, ...resp};
+          this.state.matche_details = this.state.matche_details ? {...this.state.matche_details, ...resp} : resp;
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
           this.set_title();
           this.setState({loading:false});
           API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
           //this.load_logos();
+          console.log(this.state.matche_details, resp);
         }
       });
   }
@@ -549,7 +557,9 @@ class Matchcreen extends React.Component {
     }
   }
   render() {
-    
+    if (this.state.matche_details == undefined ||this.state.matche_details.id ==undefined){
+      return <Loading/>;
+    }
     let home_sc="";
     let away_sc="";
     let home_style=this.state.dynamic_style.match_results_drawer;
@@ -593,7 +603,7 @@ class Matchcreen extends React.Component {
       refreshControl={
         <RefreshControl
           refreshing={this.state.loading}
-          onRefresh={()=>this.get_Match(this.props.route.params.match_item.id)}
+          onRefresh={()=>this.get_Match(this.id)}
         />}
       >
         <TouchableOpacity 
