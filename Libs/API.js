@@ -948,7 +948,7 @@ class API {
   get_match(match_id){
     if(this.token_tries<=0){return new Promise((resolve, reject)=>{return resolve([])});}
     if(this.headers["device-token"]==""){
-      return this.set_token().then(()=> { return this.get_matches(match_id)});
+      return this.set_token().then(()=> { return this.get_match(match_id)});
     }
     if(match_id==undefined){
       notifyMessage("match id invalid");
@@ -1098,16 +1098,16 @@ class API {
     if (configs && configs!="null" && configs!=null && JSON.parse(configs) != null) {
       configs = JSON.parse(configs);
 
-      if ( configs[key] ){
+      if ( configs[key]!=undefined ){
         return configs[key];
       }else{
         if (defualt_val==undefined){return false;}
-        await this.setConfig(key, defualt_val, true);
+        await this.setConfig(key, defualt_val);
         return defualt_val;
       }
     }else {
       if (defualt_val==undefined){return false;}
-      await this.setConfig(key, defualt_val, true);
+      await this.setConfig(key, defualt_val);
       return defualt_val;
     }
   };

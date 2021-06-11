@@ -154,7 +154,6 @@ global.notifyMessage = function(msg,title, buttons,speed=1000,delay=1000) {
 
 var is_materialTopTab = false;
 
-const StackNav = is_materialTopTab ? createMaterialTopTabNavigator() : createBottomTabNavigator();
 const ChannelsStack = createStackNavigator();
 const MatchesStack = createStackNavigator();
 const NewsStack = createStackNavigator();
@@ -192,7 +191,7 @@ function LeaguesStackScreen() {
   return (
     <LeaguesStack.Navigator>
     <LeaguesStack.Screen options={_app_styles.screenHeader} name="Leagues" component={LeaguesScreen} />
-      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Home" component={HomeScreen} />
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Home" component={LeaguesScreen} />
       <LeaguesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
       <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
       <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
@@ -205,10 +204,11 @@ function NewsStackScreen() {
   return (
     <NewsStack.Navigator>
       <NewsStack.Screen options={_app_styles.screenHeader} name="News" component={NewsScreen} />
+      <NewsStack.Screen options={_app_styles.screenHeader} name="Home" component={NewsScreen} />
       <NewsStack.Screen options={_app_styles.screenHeader} name="Article" component={ArticleScreen} />
-      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
-      <LeaguesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
-      <VideosStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
+      <NewsStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
+      <NewsStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
+      <NewsStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
     </NewsStack.Navigator>
   );
 }
@@ -222,8 +222,9 @@ function VideosStackScreen() {
 }
 
 
-function MyTabs(){
+function MyTabs(props){
   //let tabBarOptions_ = this.state.tabBarOptions_;
+  const StackNav = props.is_materialTopTab ? createMaterialTopTabNavigator() : createBottomTabNavigator();
   return (
     <StackNav.Navigator
       barStyle={{ backgroundColor: '#000' }}
@@ -252,7 +253,7 @@ function MyTabs(){
           tabBarPosition:"bottom",
           //tabBarLabel :  ({ focused, color }) => focused ? <Text style={{ color,fontSize:10 }}>{route.name}</Text> : null,
         })}
-      tabBarOptions={is_materialTopTab ? _app_styles.tabBarOptions_mat : _app_styles.tabBarOptions}
+      tabBarOptions={props.is_materialTopTab ? _app_styles.tabBarOptions_mat : _app_styles.tabBarOptions}
       tabBarPosition="bottom"
     >
       <StackNav.Screen name="Home" component={MatchesStackScreen} />
@@ -286,7 +287,11 @@ class APP extends React.Component {
         notif_dynamic_style:false,
         showMsg:false,
         showMsg_2:false,
+        is_materialTopTab:false,
     };
+    API_.getConfig("is_materialTopTab",false).then(v=>{
+      this.setState({is_materialTopTab:v});
+    });
     getTheme("app_styles").then(theme=>{
       if(_app_styles==theme){return true;}
       _app_styles=theme;
@@ -303,18 +308,124 @@ class APP extends React.Component {
               Home     : "Home",
               Settings : "Settings",
               Match    : {
-                path: 'Match/:id',
-                parse:{ id: Number }
+                path: 'Match/:id/:match_item',
+                parse:{ 
+                  id: (id) => id,
+                  match_item: (match_item) => '-',
+                 },
+                stringify: {
+                  id: (id) => `${id}`,
+                  match_item: (match_item) => `-`,
+                },
               },
-              Channel  : "Channel",
-              League   : "League",
+              Channel  : {
+                path: 'Channel/:channel_id/:channel_photo',
+                parse:{ 
+                  channel_id: (channel_id) => channel_id,
+                  channel_photo: (channel_photo) => '-',
+                 },
+                stringify: {
+                  channel_id: (channel_id) => `${channel_id}`,
+                  channel_photo: (channel_photo) => `-`,
+                },
+              },
+              League   : {
+                path: 'League/:id/:league_details',
+                parse:{ 
+                  id: (id) => id,
+                  league_details: (league_details) => '-',
+                 },
+                stringify: {
+                  id: (id) => `${id}`,
+                  league_details: (league_details) => `-`,
+                },
+              },
               Video    : "Video",
             }
           },
-          Leagues: 'Leagues',
+          Leagues: {
+            initialRouteName: 'Leagues',
+            screens:{
+              Leagues     : "Leagues",
+              Match    : {
+                path: 'Leagues/Match/:id/:match_item',
+                parse:{ 
+                  id: (id) => id,
+                  match_item: (match_item) => '-',
+                 },
+                stringify: {
+                  id: (id) => `${id}`,
+                  match_item: (match_item) => `-`,
+                },
+              },
+              League   : {
+                path: 'Leagues/League/:id/:league_details',
+                parse:{ 
+                  id: (id) => id,
+                  league_details: (league_details) => '-',
+                 },
+                stringify: {
+                  id: (id) => `${id}`,
+                  league_details: (league_details) => `-`,
+                },
+              },
+              Video    : "Leagues/Video",
+            }
+          },
           Videos: 'Videos',
           Channels: 'Channels',
-          News: 'News',
+          News: {
+            initialRouteName: 'News',
+            screens:{
+              News     : "News",
+              Article    : {
+                path: 'News/Article/:id/:article',
+                parse:{ 
+                  id: (id) => id,
+                  article: (article) => '-',
+                 },
+                stringify: {
+                  id: (id) => `${id}`,
+                  article: (article) => `-`,
+                },
+              },
+              Match    : {
+                path: 'News/Match/:id/:match_item',
+                parse:{ 
+                  id: (id) => id,
+                  match_item: (match_item) => '-',
+                 },
+                stringify: {
+                  id: (id) => `${id}`,
+                  match_item: (match_item) => `-`,
+                },
+              },
+              League   : {
+                path: 'News/League/:id/:league_details',
+                parse:{ 
+                  id: (id) => id,
+                  league_details: (league_details) => '-',
+                 },
+                stringify: {
+                  id: (id) => `${id}`,
+                  league_details: (league_details) => `-`,
+                },
+              },
+              Channel  : {
+                path: 'News/Channel/:channel_id/:channel_photo',
+                parse:{ 
+                  channel_id: (channel_id) => channel_id,
+                  channel_photo: (channel_photo) => '-',
+                 },
+                stringify: {
+                  channel_id: (channel_id) => `${channel_id}`,
+                  channel_photo: (channel_photo) => `-`,
+                },
+              },
+              Video    : "News/Video",
+              Channels    : "News/Channels",
+            }
+          },
         },
       },
     };
@@ -388,7 +499,7 @@ class APP extends React.Component {
           onCLicked={this.state.onCLicked2}
           />
         : null }
-        <MyTabs showMsg={this.showMsg}/>
+        <MyTabs showMsg={this.showMsg} is_materialTopTab={this.state.is_materialTopTab} />
       </NavigationContainer>
     );
   }

@@ -36,9 +36,10 @@ class Matchcreen extends React.Component {
     this.id = 0;
   }
   componentDidMount(){
+    this.state.matche_details = this.state.matche_details && this.state.matche_details!="-" ? this.state.matche_details : undefined;
     //console.log("componentDidMount",this.props.route.params.match_item.id);
-    this.id = this.props.route.params.match_item && this.props.route.params.match_item.id ? this.props.route.params.match_item.id : this.props.route.params.id ;
-    console.log(this.props.route.params.match_item,this.props.route.params.id)
+    this.id = this.state.matche_details && this.state.matche_details.id ? this.state.matche_details.id : this.props.route.params.id ;
+    console.log(this.state.matche_details,this.props.route.params.id)
 
     this.get_Match(this.id);
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
@@ -69,7 +70,7 @@ class Matchcreen extends React.Component {
       return this.get_Match_k(id);
     }
     API_.get_match(id).then(resp=>{
-      if(resp["data"] && resp["data"][0] ){
+      if(resp && resp["data"] && resp["data"][0] ){
         
         this.state.matche_details = resp["data"][0];
         this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;

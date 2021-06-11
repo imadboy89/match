@@ -65,7 +65,7 @@ get_news =(loading=true,keep_list=false)=>{
 
   onItem_clicked =(item)=>{
     item.source = this.state.source_id;
-    this.props.navigation.navigate('Article', { article: item });
+    this.props.navigation.navigate('Article', { article: item, id:item.link.replace("n=","") });
   }
   changesource = (itemValue, itemIndex)=>{
     this.state.source_id = parseInt(itemValue);

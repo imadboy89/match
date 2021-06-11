@@ -494,7 +494,7 @@ show_DateP(){
 
   onLeaguePressed = (league_name, league_img,league_id)=>{
     league_img = ["https:/","http://"].includes(league_img.slice(0,7)) ? league_img : API_.domain_o+league_img;
-    this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:league_img,id:league_id} });
+    this.props.navigation.navigate('League',{ id:league_id, league_details: {league:league_name,league_img:league_img,id:league_id} });
   }
   onMatch_clicked =(item)=>{
     this.props.navigation.navigate('Match', { match_item: item,id:item.id });

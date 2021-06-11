@@ -15,7 +15,7 @@ class ArticleScreen extends React.Component {
         list:[],
         modalVisible_match:false,
         loading:true,
-        article:this.props.route.params.article,
+        article:this.props.route.params.article && this.props.route.params.article!="-" ? this.props.route.params.article : undefined,
         dynamic_style:styles_article,
         modalVisible_player:false,
         modalVisible_team:false,
@@ -24,12 +24,15 @@ class ArticleScreen extends React.Component {
     if(this.state.article && this.state.article.img){
       this.state.article.img = this.state.article.img.split("&")[0];
     }
+    this.id = this.state.article && this.state.article.link ? this.state.article.link : "n="+this.props.route.params.id;
+    this.source = this.state.article && this.state.article.source ? this.state.article.source : 1;
     this.get_article();
 
   }
   componentDidMount(){
     getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme}));
-    let short_title = this.state.article.title_news.length > 0 ? this.state.article.title_news.slice(0,30)+"..." : this.state.article.title_news;
+    let short_title = this.state.article && this.state.article.title_news ? "this.state.article.title_news":"-";
+    short_title = short_title.length > 0 ? short_title.slice(0,30)+"..." : short_title;
     this.props.navigation.setOptions({title: <Text>{short_title}</Text>})
   }
   isVideo = async (id)=>{
@@ -48,10 +51,13 @@ class ArticleScreen extends React.Component {
     this.props.navigation.navigate('Video', { item: v_item });
   }
   get_article(){
-    this.state.article.date =  this.state.article && this.state.article.date ? API_.get_date2(new Date(this.state.article.date.replace("#","") * 1000)) : "";
-    API_.get_article(this.props.route.params.article.link, this.state.article.source)
+    //this.state.article.date =  this.state.article && this.state.article.date ? API_.get_date2(new Date(this.state.article.date.replace("#","") * 1000)) : "";
+    API_.get_article(this.id, this.source)
     .then(article =>{
       if(article.constructor == Object){
+        console.log(article);
+        this.state.article = this.state.article?this.state.article:{};
+        this.state.article.title_news = article.title_news ? article.title_news : this.state.article.title_news;
         this.state.article.body = article.body ? article.body : this.state.article.body;
         this.state.article.img  = article.img  ? article.img  : this.state.article.img;
         this.state.article.date = article.date ? article.date : this.state.article.date;
@@ -72,7 +78,7 @@ class ArticleScreen extends React.Component {
   }
   onItemClicked = (item)=>{
     if(item.related_news_id){
-      item.source = this.state.article.source;
+      item.source = this.source;
       item.link = "n="+item.related_news_id;
       item.title_news = item.related_news_title;
       item.img= item.related_images && item.related_images.length>0 ? item.article.related_images[0]["img_link"] : null;
@@ -95,9 +101,9 @@ class ArticleScreen extends React.Component {
             home_team_ar = teams.length>1 ? teams[0].trim() : undefined;
             away_team_ar = teams.length>1 ? teams[1].trim() : undefined;
           }
-          this.props.navigation.navigate('Match', { match_item: {id:link_[1],is_koora:true , home_team_ar:home_team_ar , away_team_ar:away_team_ar} });
+          this.props.navigation.navigate('Match', { id:link_[1], match_item: {id:link_[1],is_koora:true , home_team_ar:home_team_ar , away_team_ar:away_team_ar} });
         }else if(link_[0]=="c"){
-          this.props.navigation.navigate('League',{ league_details: {league:item.related_title,league_img:undefined,id:link_[1]} });
+          this.props.navigation.navigate('League',{ id:link_[1], league_details: {league:item.related_title,league_img:undefined,id:link_[1]} });
         }
       } catch (error) {
         
@@ -159,14 +165,14 @@ class ArticleScreen extends React.Component {
       <ScrollView  style={this.state.dynamic_style.container}>
         <View style={this.state.dynamic_style.channel_logo_v}>
         
-          { this.state.article.img ?  
+          { this.state.article && this.state.article.img ?  
             <ImageBackground key={"article_backgrnd"} style={{flex:1,width:"100%"}} source={{uri: this.state.article.img}} resizeMode="stretch">
             </ImageBackground>
           : null}
         </View>
         
           <View style={this.state.dynamic_style.article_v}>
-            <Text style={this.state.dynamic_style.article_date_t}>{this.state.article.date}</Text>
+            <Text style={this.state.dynamic_style.article_date_t}>{this.state.article && this.state.article.date?this.state.article.date:"-"}</Text>
             <Text style={this.state.dynamic_style.article_title_t}>{this.state.article && this.state.article.title_news ? this.state.article.title_news : ""}</Text>
             
             {this.state.loading ? <Loader/> : body_composed  }

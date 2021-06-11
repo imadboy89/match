@@ -30,6 +30,8 @@ class Scrap {
     article.body = this.decodeEntities(body);
     article.date = this.get_var(html,"he_article_date");
     article.date = article.date && article.date.slice && article.date.slice(0,1) =='#' ? API_.get_date2(new Date(article.date.replace("#","") * 1000)) : article.date ;
+
+    article.title_news = this.get_var(html,"he_article_title");
     return article;
   }
   parse_details(details){

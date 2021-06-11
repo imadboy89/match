@@ -31,6 +31,7 @@ class SettingsScreen extends React.Component {
         is_debug:API_.is_debug,
         filtering:API_.filtering,
         is_landScape:false,
+        is_materialTopTab:false,
         
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
@@ -43,6 +44,7 @@ class SettingsScreen extends React.Component {
     const fav_t = await API_.getConfig("favorite_teams",[]);
     const fav_c = await API_.getConfig("favorite_channels",[]);
     const fav_p = await API_.getConfig("favorite_players",[]);
+    const is_materialTopTab = await API_.getConfig("is_materialTopTab",false);
     const teams_inf_k = await API_.getTeam_logo_k();
     this.setState({
         fav_leagues_nbr  : fav_l.length  ? fav_l.length : 0,
@@ -52,6 +54,7 @@ class SettingsScreen extends React.Component {
         fav_players_nbr  : fav_p.length  ? fav_p.length : 0,
         is_debug         : API_.is_debug,
         filtering        : API_.filtering,
+        is_materialTopTab: is_materialTopTab,
         teams_inf_k      : teams_inf_k && Object.keys(teams_inf_k) && Object.keys(teams_inf_k).length ? Object.keys(teams_inf_k).length : 0,
       });
   }
@@ -174,6 +177,22 @@ class SettingsScreen extends React.Component {
             <View style={this.state.dynamic_style.settings_row_input}>{this.picker_themes()}</View>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>is_materialTopTab </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={(is_materialTopTab__v)=>{
+                  API_.setConfig("is_materialTopTab",is_materialTopTab__v);
+                  this.setState({is_materialTopTab:is_materialTopTab__v});
+                }}
+                value={this.state.is_materialTopTab}
+              />
+            </Text>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Clean cache </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>clean</Text>
           </View>
@@ -195,7 +214,6 @@ class SettingsScreen extends React.Component {
               />
             </Text>
           </View>
-
           { backup.admin!=true ? null : 
             <View style={this.state.dynamic_style.settings_row}>
               <Text style={this.state.dynamic_style.settings_row_label}>Users </Text> 

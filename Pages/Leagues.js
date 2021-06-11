@@ -89,7 +89,7 @@ get_leagues(){
 }
 
   onItem_clicked =(item)=>{
-    this.props.navigation.navigate('League',{ league_details: {league:item.league_name,league_img:item.img,id:item.id,koora_id:true} });
+    this.props.navigation.navigate('League',{ id:item.id,league_details: {league:item.league_name,league_img:item.img,id:item.id,koora_id:true} });
   }
   render() {
     return (
