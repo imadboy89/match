@@ -380,6 +380,7 @@ async get_favs(data){
   this.state.favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
   let fav_list = {"id":1,"title":"الفرق المفضلة","img":"",data:[]};
   ////////////////////////////////  Black listed matches 
+  const already_existed_leagues = data.map(o=>o.id);
   for(let j=0;j<API_.matches_bl.length;j++){
     let is_league_has_fav = false;
     for(let m=0;m<API_.matches_bl[j]["data"].length;m++){
@@ -392,7 +393,7 @@ async get_favs(data){
         is_league_has_fav = true;
       }
     }
-    if( (is_league_has_fav  || this.state.favorite.includes(API_.matches_bl[j].id)) && data.includes(API_.matches_bl[j])==false){
+    if( (is_league_has_fav  || this.state.favorite.includes(API_.matches_bl[j].id)) && already_existed_leagues.includes(API_.matches_bl[j].id)==false){
       data.push(API_.matches_bl[j]);
     }
   }
@@ -406,15 +407,20 @@ async get_favs(data){
     });
   }catch(e){console.log(e);}
   data = data.sort((a,b)=>{return (this.state.favorite.indexOf(a.id)>this.state.favorite.indexOf(b.id))?-1:0;});
-  
+  let added_fav_matches = [];
   for(let j=0;j<data.length;j++){
     for(let m=0;m<data[j]["data"].length;m++){
       const matche_f = JSON.parse(JSON.stringify(data[j]["data"][m]));
       const home_team_id = parseInt(matche_f["home_team_id"]) ? parseInt(matche_f["home_team_id"]) : 0 ;
       const away_team_id = parseInt(matche_f["away_team_id"]) ? parseInt(matche_f["away_team_id"]) : 0 ;
+      if(added_fav_matches.includes(matche_f["id"])){
+        continue;
+      }
       if(API_.notifications_matches && API_.notifications_matches[matche_f.id]!=undefined){
+        added_fav_matches.push(matche_f["id"]);
         fav_list.data.push(matche_f);
       }else if(this.state.favorite_teams.includes(home_team_id) || this.state.favorite_teams.includes(away_team_id)){
+        added_fav_matches.push(matche_f["id"]);
         fav_list.data.push(matche_f);
       }
     }

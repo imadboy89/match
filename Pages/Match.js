@@ -39,7 +39,6 @@ class Matchcreen extends React.Component {
     this.state.matche_details = this.state.matche_details && this.state.matche_details!="-" ? this.state.matche_details : undefined;
     //console.log("componentDidMount",this.props.route.params.match_item.id);
     this.id = this.state.matche_details && this.state.matche_details.id ? this.state.matche_details.id : this.props.route.params.id ;
-    console.log(this.state.matche_details,this.props.route.params.id)
 
     this.get_Match(this.id);
     getTheme("styles_match").then(theme=>this.setState({dynamic_style:theme}));
@@ -75,7 +74,6 @@ class Matchcreen extends React.Component {
         this.state.matche_details = resp["data"][0];
         this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
         this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
-        console.log(this.state.matche_details);
         API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
         //this.set_title();
         this.setState({loading:false});
@@ -107,7 +105,6 @@ class Matchcreen extends React.Component {
           this.setState({loading:false});
           API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
           //this.load_logos();
-          console.log(this.state.matche_details, resp);
         }
       });
   }
