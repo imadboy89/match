@@ -535,7 +535,7 @@ class BackUp{
 
         live_match.match_details = match_details;
 
-        live_match.isWeb        = API_.isWeb;
+        live_match.isWeb        = API_.notify_isWeb;
         const o_ = await this.db_live_matches.deleteMany({match_id:match_details.id});
         const o = await this.db_live_matches.insertOne(live_match);
         const is_ok = o && o.insertedId ;
@@ -555,7 +555,7 @@ class BackUp{
         const live_match       = {match_id:match_id,};
         live_match.user_id     = this.client.auth.activeUserAuthInfo.userId;
         live_match.user_email  = this.email;
-        live_match.isWeb       = API_.isWeb;
+        live_match.isWeb       = API_.notify_isWeb;
         const o = await this.db_live_matches.deleteMany(live_match);
         const is_ok = o && o.deletedCount ;
         if(is_ok){
@@ -570,7 +570,7 @@ class BackUp{
       try {
         const live_match       = {match_id:match_id,};
         live_match.user_id     = this.client.auth.activeUserAuthInfo.userId;
-        live_match.isWeb        = API_.isWeb;
+        live_match.isWeb        = API_.notify_isWeb;
         const o = await this.db_live_matches.find(live_match).asArray();
         const is_ok = o && o.length ;
         return  is_ok ;
@@ -581,7 +581,7 @@ class BackUp{
       if(!this.is_mdb_ok()){
         return false;
       }
-      const query = {active:true, isWeb:API_.isWeb} ;
+      const query = {active:true, isWeb:API_.notify_isWeb} ;
       if(date_obj){
         let dateTime_s =new Date(date_obj);
         let dateTime_e =new Date(date_obj);

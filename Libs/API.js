@@ -24,6 +24,7 @@ class API {
     this.method = "POST";
     this.usingproxy = Platform.OS == 'web';
     this.isWeb = Platform.OS == 'web';
+    this.notify_isWeb = Platform.OS == 'web';
     this.load_channels_running = false;
     this.notifcation_type ="push";
     this.notifications_matches = {};

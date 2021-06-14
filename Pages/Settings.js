@@ -32,6 +32,7 @@ class SettingsScreen extends React.Component {
         filtering:API_.filtering,
         is_landScape:false,
         is_materialTopTab:false,
+        notify_isWeb : API_.notify_isWeb,
         
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
@@ -267,7 +268,22 @@ class SettingsScreen extends React.Component {
               }}></Button>
             </View>
           </View>
-
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Notify ISweb </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={()=>{
+                  API_.notify_isWeb = !this.state.notify_isWeb;
+                  this.setState({is_debug:API_.notify_isWeb});
+                }}
+                value={this.state.notify_isWeb}
+              />
+            </Text>
+          </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Debug mode </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>
@@ -285,6 +301,7 @@ class SettingsScreen extends React.Component {
               />
             </Text>
           </View>
+          
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>landScape mode : </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>
