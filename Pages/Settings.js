@@ -274,11 +274,11 @@ class SettingsScreen extends React.Component {
               <Switch
                 style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                thumbColor={this.state.notify_isWeb ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={()=>{
-                  API_.notify_isWeb = !this.state.notify_isWeb;
-                  this.setState({is_debug:API_.notify_isWeb});
+                  API_.notify_isWeb = !API_.notify_isWeb;
+                  this.setState({notify_isWeb:API_.notify_isWeb});
                 }}
                 value={this.state.notify_isWeb}
               />

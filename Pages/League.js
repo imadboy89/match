@@ -283,6 +283,7 @@ class LeagueScreen extends React.Component {
       standing_before = this.state.league_details;
     }
     standing_before.sort? standing_before.sort((a,b)=> (Object.keys(a)[0] > Object.keys(b)[0]) ? 1 : -1  ) : null;
+    this.table_x = [];
     for(let index in standing_before){
       let rows = standing_before[index];
       if(index!=""){
@@ -293,7 +294,17 @@ class LeagueScreen extends React.Component {
       rows = [{"team_name":"Team name","team_badge":"","overall_league_payed":"Pld","overall_league_PTS":"Pts","goals":"Gls","id":"h_"+index}].concat(rows);
       
       standing_ = standing_.concat( rows.map(row=>{
-        
+        if (row.table_r=="x"){
+          if(row.background_8 && row.desc_8)this.table_x[row.background_8] = row.desc_8;
+          if(row.background_7 && row.desc_7)this.table_x[row.background_7] = row.desc_7;
+          if(row.background_6 && row.desc_6)this.table_x[row.background_6] = row.desc_6;
+          if(row.background_5 && row.desc_5)this.table_x[row.background_5] = row.desc_5;
+          if(row.background_4 && row.desc_4)this.table_x[row.background_4] = row.desc_4;
+          if(row.background_3 && row.desc_3)this.table_x[row.background_3] = row.desc_3;
+          if(row.background_2 && row.desc_2)this.table_x[row.background_2] = row.desc_2;
+          if(row.background_1 && row.desc_1)this.table_x[row.background_1] = row.desc_1;
+          return null;
+        }
         const fav_icon = row.team ? this.get_fav_icon(row.team.id) : "";
         let team_name ="";
         if(row && row.team_name){
@@ -334,7 +345,20 @@ class LeagueScreen extends React.Component {
         </TouchableOpacity>);
       }) );
     }
-    
+    if(this.table_x && Object.keys(this.table_x).length>0){
+      standing_.push(<View key="separator_1"style={{flex:1,marginVertical:10}}></View>);
+      for(let backg of Object.keys(this.table_x)){
+        standing_.push(<View 
+          activeOpacity={0.7}
+          style={[this.state.dynamic_style.team_view,{backgroundColor:backg,marginVertical:2}]} 
+          key={backg}
+          onPress={() => { if (row && row.team && row.team.id)this.setState({modalVisible_team:true,team_id:row.team.id}) } }
+          delayLongPress={300}
+          >
+          <View style={{flex:6}}><Text style={{paddingHorizontal:20}} numberOfLines={1}>{this.table_x[backg]}</Text></View>
+        </View>);
+      }
+    }
     return standing_;
   }
   onmt_clicked(item){

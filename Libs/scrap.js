@@ -214,6 +214,19 @@ class Scrap {
       "i",
       "last_matches_res"
     ];
+    const standing_info_header=[
+      "table_r",
+      "background_1",
+      "desc_1",
+      "background_2",
+      "desc_2",
+      "background_3",
+      "desc_3",
+      "background_4",
+      "desc_4",
+      "background_5",
+      "desc_5",
+    ]
     let h =0;
     let team_st = {};
     let group_name=false;
@@ -229,14 +242,26 @@ class Scrap {
           group_name = json_["ranks_table"][i];
           continue;
         }
-        if(h==0 && json_["ranks_table"][i]!="r"){
+        if(team_st["table_r"]=="x" &&  (["o","l","e"].includes(json_["ranks_table"][i]) || json_["ranks_table"].length-1 == i)  ){
+          standing.push(team_st);
+          h=0;
+          team_st={};
+        }
+        if(team_st["table_r"]=="x"){
+          team_st [ standing_info_header[h] ] = json_["ranks_table"][i];
+          h++;
+          continue
+        }
+        if(h==0 && ["r","x"].includes(json_["ranks_table"][i])==false){
           continue;
         }
+
         team_st [ standing_header[h] ] = json_["ranks_table"][i];
         h++;
         if(h==standing_header.length){
           //team_st["subs_in_time"] = team_st["subs_in_time"]+""
-          const team = team_st["team"].split("~");
+          let team = team_st["team"].split("~");
+          team = team.length>=4 ? team : ["","",team.join(""),team.join("")];
           team_st["played"] = team_st["played"].includes("~") ? team_st["info_2"] : team_st["played"];
 
           team_st["team"] = {"id":team[2],"team_name":team[3],"team_badge":""};
