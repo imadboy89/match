@@ -31,7 +31,7 @@ class ArticleScreen extends React.Component {
   }
   componentDidMount(){
     getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme}));
-    let short_title = this.state.article && this.state.article.title_news ? "this.state.article.title_news":"-";
+    let short_title = this.state.article && this.state.article.title_news ? this.state.article.title_news:"-";
     short_title = short_title.length > 0 ? short_title.slice(0,30)+"..." : short_title;
     this.props.navigation.setOptions({title: <Text>{short_title}</Text>})
   }
