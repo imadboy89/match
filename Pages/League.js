@@ -277,32 +277,42 @@ class LeagueScreen extends React.Component {
     if(this.state.league_details==undefined || this.state.league_details.length==0){
       return null;
     }
+    this.table_x = [];
     let standing_ = [];
     let standing_before = {"":this.state.league_details};
     if(Object.keys(this.state.league_details[0]).length==1){
-      standing_before = this.state.league_details;
+      standing_before = this.state.league_details.slice();
     }
     standing_before.sort? standing_before.sort((a,b)=> (Object.keys(a)[0] > Object.keys(b)[0]) ? 1 : -1  ) : null;
-    this.table_x = [];
+    const copy_check = standing_before[""] && standing_before[""].length>0 ? standing_before[""] : Object.values(standing_before);
+    copy_check.map(row=>{ 
+      if(row.table_r){
+        if(row.background_8 && row.desc_8)this.table_x[row.background_8] = row.desc_8;
+        if(row.background_7 && row.desc_7)this.table_x[row.background_7] = row.desc_7;
+        if(row.background_6 && row.desc_6)this.table_x[row.background_6] = row.desc_6;
+        if(row.background_5 && row.desc_5)this.table_x[row.background_5] = row.desc_5;
+        if(row.background_4 && row.desc_4)this.table_x[row.background_4] = row.desc_4;
+        if(row.background_3 && row.desc_3)this.table_x[row.background_3] = row.desc_3;
+        if(row.background_2 && row.desc_2)this.table_x[row.background_2] = row.desc_2;
+        if(row.background_1 && row.desc_1)this.table_x[row.background_1] = row.desc_1;
+
+        return false;
+      }
+      return true;});
+
     for(let index in standing_before){
       let rows = standing_before[index];
       if(index!=""){
         let key = Object.keys(rows)[0];
-        rows = rows[key];
+        rows = rows[key].slice();
+        if(rows=="x"){
+          continue;
+        }
         standing_ = standing_.concat(<View style={{flex:1,alignItems:"center"}} key={key}><Text style={this.state.dynamic_style.group_name_t}>{key}</Text></View>);
       }
       rows = [{"team_name":"Team name","team_badge":"","overall_league_payed":"Pld","overall_league_PTS":"Pts","goals":"Gls","id":"h_"+index}].concat(rows);
-      
       standing_ = standing_.concat( rows.map(row=>{
-        if (row.table_r=="x"){
-          if(row.background_8 && row.desc_8)this.table_x[row.background_8] = row.desc_8;
-          if(row.background_7 && row.desc_7)this.table_x[row.background_7] = row.desc_7;
-          if(row.background_6 && row.desc_6)this.table_x[row.background_6] = row.desc_6;
-          if(row.background_5 && row.desc_5)this.table_x[row.background_5] = row.desc_5;
-          if(row.background_4 && row.desc_4)this.table_x[row.background_4] = row.desc_4;
-          if(row.background_3 && row.desc_3)this.table_x[row.background_3] = row.desc_3;
-          if(row.background_2 && row.desc_2)this.table_x[row.background_2] = row.desc_2;
-          if(row.background_1 && row.desc_1)this.table_x[row.background_1] = row.desc_1;
+        if(row.table_r=="x"){
           return null;
         }
         const fav_icon = row.team ? this.get_fav_icon(row.team.id) : "";
