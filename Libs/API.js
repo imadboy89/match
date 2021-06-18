@@ -290,8 +290,9 @@ class API {
   }
   get_video_k(vid){
     const url = "https://ktv.kooora.ws/GetData.ashx?id="+vid+"&arabic";
-    alert(url);
-    return this.http(url,"GET",null,{})
+    API_.showMsg(url);
+    //http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true){
+    return this.http(url,"GET",null,this.headers,false,false)
     .then(resp=>{
       let out = {};
       try {
