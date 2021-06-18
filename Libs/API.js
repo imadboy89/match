@@ -290,14 +290,14 @@ class API {
   }
   get_video_k(vid){
     const url = "https://ktv.kooora.ws/GetData.ashx?id="+vid+"&arabic";
-    API_.showMsg(url);
+    //API_.showMsg(url);
     //http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true){
     return this.http(url,"GET",null,this.headers,false,false)
     .then(resp=>{
       let out = {};
       try {
         out = JSON.parse(resp);
-      } catch (error) {API_.debugMsg("get_video_k: Cannot parse JSON! "+resp,"warning")}
+      } catch (error) {/*API_.debugMsg("get_video_k: Cannot parse JSON! "+resp,"warning")*/}
 
       //return {"Category":"بلا تعليق","CatId":212213,"Embed":"//player.octivid.com/v1/video?id=27970994&user_id=167&countries=Q0M=&w=100%25&h=100%25&filter=DENY&signature=8e3de25e0f4a4f940927b0bc19ae07b2","Id":27970994,"Image":"https://ktv.kooora.ws/images/167/thumb_1621843431.jpg","PublishDate":"2021-05-24","Subcategory":"Blank","SubId":212214,"Tags":"","Title":"جوارديولا يودع أجويرو بالدموع.. شاهد كيف وصفه!","VideoTime":"1:1"};
       return out;
