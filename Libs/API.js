@@ -4,6 +4,7 @@ import Scrap from "./scrap";
 import Base64 from "./Base64";
 import { Linking } from 'react-native';
 
+
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
@@ -42,6 +43,7 @@ class API {
       "iPhone":"Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.77 Mobile/15E148 Safari/604.1",
       "iPad" : "Mozilla/5.0 (iPad; CPU OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.77 Mobile/15E148 Safari",
     }
+    this.headers["User-Agent"] = this.user_agents["Windows 10"];
     this.headers2 = {
       'Accept': 'application/json',
       'Content-Type': 'application/json; charset=utf-8',
@@ -94,19 +96,20 @@ class API {
     //console.log("async fetch : ",resource);
     return response;
   }
-  http(url,method="GET",data=null,headers=null,is_json=false){
+  http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true){
     let configs = {method: method,headers: headers ? headers : this.headers,}
     if (data!=null){
       configs["body"] = data;
     }
-    if(this.isWeb || 1==1){
+    if(this.isWeb || use_proxy){
       url = method=="GET" ? this.proxy1+url : this.proxy+url; 
     }
     //url = "https://developers.facebook.com/tools/debug/echo/?q="+url;
     return this.fetch(url, configs)
       .then(response => {
         try {
-          return is_json ? response.json() : response.text();
+          const out = is_json ? response.json() : response.text()
+          return out;
         } catch (error) {
           API_.showMsg((error.message ? error.message : error)+"","warning");
           return is_json ? [] : "" ;
@@ -287,12 +290,13 @@ class API {
   }
   get_video_k(vid){
     const url = "https://ktv.kooora.ws/GetData.ashx?id="+vid+"&arabic";
+    alert(url);
     return this.http(url,"GET",null,{})
     .then(resp=>{
       let out = {};
       try {
         out = JSON.parse(resp);
-      } catch (error) {/*API_.debugMsg("get_video_k: Cannot parse JSON!","warning")*/}
+      } catch (error) {API_.debugMsg("get_video_k: Cannot parse JSON! "+resp,"warning")}
 
       //return {"Category":"بلا تعليق","CatId":212213,"Embed":"//player.octivid.com/v1/video?id=27970994&user_id=167&countries=Q0M=&w=100%25&h=100%25&filter=DENY&signature=8e3de25e0f4a4f940927b0bc19ae07b2","Id":27970994,"Image":"https://ktv.kooora.ws/images/167/thumb_1621843431.jpg","PublishDate":"2021-05-24","Subcategory":"Blank","SubId":212214,"Tags":"","Title":"جوارديولا يودع أجويرو بالدموع.. شاهد كيف وصفه!","VideoTime":"1:1"};
       return out;
@@ -748,7 +752,7 @@ class API {
     }else if(source_id==2){
       url = "https://table.super-kora.tv/";
     }
-    return this.http(url,"GET",null,{})
+    return this.http(url,"GET",null,null)
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
