@@ -37,6 +37,7 @@ class ArticleScreen extends React.Component {
   }
   isVideo = async (id)=>{
     const v_details = await API_.get_video_k(id);
+    alert(v_details);
     if(Object.keys(v_details).length==0 || v_details.Embed==undefined){
       return;
     }
