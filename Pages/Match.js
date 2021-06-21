@@ -216,6 +216,7 @@ class Matchcreen extends React.Component {
     this.state.matche_details.round        = this.state.matche_details.round ? this.state.matche_details.round : "-";
     this.state.matche_details.retour_score = this.state.matche_details.retour_score ? this.state.matche_details.retour_score : "-";
     this.state.matche_details.stadium      = this.state.matche_details.stadium ? this.state.matche_details.stadium : "-";
+    this.state.matche_details.desc         = this.state.matche_details.desc ? this.state.matche_details.desc : "-";
     //const fav_style_h = this.state.matche_details && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
     //const fav_style_a = this.state.matche_details && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
     const fav_style={};
@@ -283,7 +284,9 @@ class Matchcreen extends React.Component {
         {this.state.matche_details.stadium!="-" ?
           <Text style={this.state.dynamic_style.text_info}>Staduim : {this.state.matche_details.stadium}</Text>
          : null}
-
+        {this.state.matche_details.desc!="-" ?
+          <Text style={[this.state.dynamic_style.text_info,{color:"red"}]}>Description : {this.state.matche_details.desc}</Text>
+         : null}
         <View style={{flexDirection:'row', flexWrap:'wrap', flex:1}}>
           <Text style={this.state.dynamic_style.text_info}>Live match :</Text>
           <Switch

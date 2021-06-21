@@ -106,7 +106,9 @@ class Scrap {
 
     match_details["retour_score"] = details_dict["sl"] && details_dict["sl"].length>0 ? 
     match_details["away_team"]+" "+details_dict["sl"][0][2] + " - " +details_dict["sl"][0][1]+" "+match_details["home_team"] : "-" ;
-
+    if(details_dict["no"] && details_dict["no"][0] && details_dict["no"][0][1]){
+      match_details["desc"] = details_dict["no"][0][1];
+    }
     return match_details;
   }
   get_lineup(html){
