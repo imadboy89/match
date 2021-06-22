@@ -68,7 +68,8 @@ class Users extends React.Component{
       return this.state.users.map( (value,i) =>{
         const user = value.email ;
         const is_tmp_admin = value.is_tmp_adm ? value.is_tmp_adm : false ;
-        const lastLogin  = value.lastLogin ? API_.get_date_time(value.lastLogin) : "-";
+        //const lastLogin  = value.lastLogin ? API_.get_date_time(value.lastLogin) : "-";
+        const online_at =  value.online_at ? API_.get_date_time(value.online_at) : "-";
         //return (<View></View>);
         return (
           <View style={{flexDirection:"row",width:"95%",height:40,borderStyle:"solid",borderWidth:1,margin:3,alignItems: 'center'}} key={user+i}>
@@ -78,7 +79,7 @@ class Users extends React.Component{
             <View style={{flex:1,justifyContent:"center",width:"100%",height:"100%"}}>
               <Text style={{color: value.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',justifyContent:"center",width:"100%"}}> {user} </Text>
               {this.state.focused_user == user ? 
-                <Text style={{color: value.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',flex:50,fontSize:8,marginHorizontal:1,width:"100%"}} >{lastLogin}</Text>
+                <Text style={{color: value.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',flex:50,fontSize:8,marginHorizontal:1,width:"100%"}} >{online_at}</Text>
               : null}
             </View>
             </TouchableHighlight>
