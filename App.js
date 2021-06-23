@@ -308,7 +308,7 @@ class APP extends React.Component {
               Home     : "Home",
               Settings : "Settings",
               Match    : {
-                path: 'Match/:id/:match_item',
+                path: 'Match/:match_item/:id',
                 parse:{ 
                   id: (id) => id,
                   match_item: (match_item) => '-',
@@ -319,7 +319,7 @@ class APP extends React.Component {
                 },
               },
               Channel  : {
-                path: 'Channel/:channel_id/:channel_photo',
+                path: 'Channel/:channel_photo/:channel_id',
                 parse:{ 
                   channel_id: (channel_id) => channel_id,
                   channel_photo: (channel_photo) => '-',
@@ -330,7 +330,7 @@ class APP extends React.Component {
                 },
               },
               League   : {
-                path: 'League/:id/:league_details',
+                path: 'League/:league_details/:id',
                 parse:{ 
                   id: (id) => id,
                   league_details: (league_details) => '-',
@@ -348,7 +348,7 @@ class APP extends React.Component {
             screens:{
               Leagues     : "Leagues",
               Match    : {
-                path: 'Leagues/Match/:id/:match_item',
+                path: 'Leagues/Match/:match_item/:id',
                 parse:{ 
                   id: (id) => id,
                   match_item: (match_item) => '-',
@@ -359,7 +359,7 @@ class APP extends React.Component {
                 },
               },
               League   : {
-                path: 'Leagues/League/:id/:league_details',
+                path: 'Leagues/League/:league_details/:id',
                 parse:{ 
                   id: (id) => id,
                   league_details: (league_details) => '-',
@@ -379,7 +379,7 @@ class APP extends React.Component {
             screens:{
               News     : "News",
               Article    : {
-                path: 'News/Article/:id/:article',
+                path: 'News/Article/:article/:id',
                 parse:{ 
                   id: (id) => id,
                   article: (article) => '-',
@@ -390,7 +390,7 @@ class APP extends React.Component {
                 },
               },
               Match    : {
-                path: 'News/Match/:id/:match_item',
+                path: 'News/Match/:match_item/:id',
                 parse:{ 
                   id: (id) => id,
                   match_item: (match_item) => '-',
@@ -401,7 +401,7 @@ class APP extends React.Component {
                 },
               },
               League   : {
-                path: 'News/League/:id/:league_details',
+                path: 'News/League/:league_details/:id',
                 parse:{ 
                   id: (id) => id,
                   league_details: (league_details) => '-',
@@ -412,7 +412,7 @@ class APP extends React.Component {
                 },
               },
               Channel  : {
-                path: 'News/Channel/:channel_id/:channel_photo',
+                path: 'News/Channel/:channel_photo/:channel_id',
                 parse:{ 
                   channel_id: (channel_id) => channel_id,
                   channel_photo: (channel_photo) => '-',
