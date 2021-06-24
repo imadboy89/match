@@ -61,6 +61,12 @@ class ArticleScreen extends React.Component {
         this.state.article.body = article.body ? article.body : this.state.article.body;
         this.state.article.img  = article.img  ? article.img  : this.state.article.img;
         this.state.article.date = article.date ? article.date : this.state.article.date;
+        article.related = article.related.map(r=>{
+          if(r.related_link && r.related_link.slice(0,1)=="m" && r.related_title.includes(":") ){
+            r.related_title = r.related_title.split(":").slice(1).join(":").replace("ضد", "Vs");
+          }
+          return r;
+        });
         this.state.article.related = article.related ? article.related : this.state.article.related;
         this.state.article.related_news = article.related_news ? article.related_news : this.state.article.related_news;
 
