@@ -1,7 +1,7 @@
 {
   "files": {
-    "app.js": "/static/js/app.382d98c0.chunk.js",
-    "app.js.map": "/static/js/app.382d98c0.chunk.js.map",
+    "app.js": "/static/js/app.e05748f4.chunk.js",
+    "app.js.map": "/static/js/app.e05748f4.chunk.js.map",
     "runtime~app.js": "/static/js/runtime~app.2e9f1821.js",
     "runtime~app.js.map": "/static/js/runtime~app.2e9f1821.js.map",
     "static/js/2.6c7cfb21.chunk.js": "/static/js/2.6c7cfb21.chunk.js",
@@ -10,6 +10,8 @@
     "fonts/DroidKufi-Regular.ttf": "/./fonts/DroidKufi-Regular.ttf",
     "fonts/FontAwesome.ttf": "/./fonts/FontAwesome.ttf",
     "fonts/Ionicons.ttf": "/./fonts/Ionicons.ttf",
+    "404.html": "/404.html",
+    "CNAME": "/CNAME",
     "favicon-16.png": "/favicon-16.png",
     "favicon-32.png": "/favicon-32.png",
     "favicon.ico": "/favicon.ico",
@@ -22,6 +24,6 @@
   "entrypoints": [
     "static/js/runtime~app.2e9f1821.js",
     "static/js/2.6c7cfb21.chunk.js",
-    "static/js/app.382d98c0.chunk.js"
+    "static/js/app.e05748f4.chunk.js"
   ]
 }
