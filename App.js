@@ -45,6 +45,14 @@ global._ClientInfo = new ClientInfo();
 global.match_data = false;
 global.open_page={};
 if(API_.isWeb){
+  if(API_.isIOS){
+    API_.getConfig("force_open_expo",false).then(force_open_expo=>{
+      if(force_open_expo){
+        API_.open_ext_url("exp://exp.host/@imadboss/almatch").then(()=>window.close('','_parent',''));
+      }
+    });
+    
+  }
   global. Global_theme_name = window.matchMedia  && window.matchMedia('(prefers-color-scheme: dark)').matches===true?"dark violet" :"light" ;
 
   if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){

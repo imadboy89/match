@@ -33,6 +33,7 @@ class SettingsScreen extends React.Component {
         is_landScape:false,
         is_materialTopTab:false,
         notify_isWeb : API_.notify_isWeb,
+        force_open_expo :false,
         
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
@@ -46,6 +47,7 @@ class SettingsScreen extends React.Component {
     const fav_c = await API_.getConfig("favorite_channels",[]);
     const fav_p = await API_.getConfig("favorite_players",[]);
     const is_materialTopTab = await API_.getConfig("is_materialTopTab",false);
+    const _force_open_expo = await API_.getConfig("force_open_expo",false);
     const teams_inf_k = await API_.getTeam_logo_k();
     this.setState({
         fav_leagues_nbr  : fav_l.length  ? fav_l.length : 0,
@@ -57,6 +59,7 @@ class SettingsScreen extends React.Component {
         filtering        : API_.filtering,
         is_materialTopTab: is_materialTopTab,
         teams_inf_k      : teams_inf_k && Object.keys(teams_inf_k) && Object.keys(teams_inf_k).length ? Object.keys(teams_inf_k).length : 0,
+        force_open_expo : _force_open_expo,
       });
   }
   componentDidMount(){
@@ -86,7 +89,7 @@ class SettingsScreen extends React.Component {
     return (<Picker
             selectedValue={this.state.theme}
             style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+            itemStyle={{height:40,backgroundColor:"#2d3436",color:"#dfe6e9" }}
             onValueChange={(itemValue, itemIndex)=>{
               //this.setState({theme : itemValue});
               API_.setConfig("theme",itemValue).then(o=>{
@@ -333,7 +336,22 @@ class SettingsScreen extends React.Component {
               />
             </Text>
           </View>
-
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>ISO open expo </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.force_open_expo ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={()=>{
+                  this.setState({force_open_expo:!this.state.force_open_expo});
+                  API_.setConfig("force_open_expo",API_.is_debug);
+                }}
+                value={this.state.force_open_expo}
+              />
+            </Text>
+          </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Testing notifff </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>

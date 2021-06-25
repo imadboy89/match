@@ -26,6 +26,8 @@ class API {
     this.usingproxy = Platform.OS == 'web';
     this.isWeb = Platform.OS == 'web';
     this.notify_isWeb = Platform.OS == 'web';
+    this.OS = Platform.OS;
+    this.isIOS = Platform.OS.toLocaleLowerCase() === "ios";
     this.load_channels_running = false;
     this.notifcation_type ="push";
     this.notifications_matches = {};
@@ -124,7 +126,7 @@ class API {
       });
   }
   open_ext_url(url){
-    Linking.canOpenURL(url).then(supported=>{
+    return Linking.canOpenURL(url).then(supported=>{
       if(supported){
         if(API_.isWeb){
           //const lk = Linking.openURL(url, '_blank');

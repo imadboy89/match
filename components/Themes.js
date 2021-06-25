@@ -1246,7 +1246,7 @@ function generateTheme(theme_name=false){
       flex:3,
       backgroundColor: theme.background_color_default,
       color : theme.text_color_default,
-      height:30,
+      height:40,
       borderRadius: isWeb ? 10 : 8,
       paddingHorizontal : 3,
     },
