@@ -538,7 +538,8 @@ show_DateP(){
       setTimeout(() =>this.setState({}), 100);
       return <Loader/>; 
     }
-    const ListHeaderComponent = (        <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
+    const ListHeaderComponent = (        
+    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center",height:40}} >
     <IconButton 
       disabled={this.state.loading}
       name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.previousPage()}  />
