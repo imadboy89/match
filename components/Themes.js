@@ -82,7 +82,7 @@ var Themes = {
       match_results_loser_background  : "#c0392b",
       match_results_drawer_background : "#7f8c8d",
       match_results_scorer_color :"#dbd9ff",
-      
+      link_text_color : "#3498db",
     },
     "dark blue":{
       /// most valuable
@@ -135,7 +135,7 @@ var Themes = {
       match_results_loser_background  : "#c0392b",
       match_results_drawer_background : "#7f8c8d",
       match_results_scorer_color :"#dbd9ff",
-      
+      link_text_color : "#2980b9",
     },
     "light":{
       /// most valuable
@@ -188,7 +188,7 @@ var Themes = {
       match_results_loser_background  : "#ff7f50",
       match_results_drawer_background : "#95afc0",
       match_results_scorer_color :"#5352ed",
-      
+      link_text_color : "#3498db",
     }
   }
 var themes_list = Object.keys(Themes);
@@ -250,6 +250,13 @@ function generateTheme(theme_name=false){
       //height: 50,
       flex:1,
       color:theme.text_color_default,
+    },
+    item_related: {
+      padding: 2,
+      fontSize: 18,
+      //height: 50,
+      flex:1,
+      color:theme.link_text_color,
     },
     header_container: {
       //backgroundColor: theme.list_header_backgroundColor,

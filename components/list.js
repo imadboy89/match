@@ -197,7 +197,7 @@ class ItemsList extends React.Component {
           text2show = text2show.split("-")[2];
         }
       }
-      return (<Text style={this.state.dynamic_style.item} numberOfLines={1}>- {text2show}</Text>);
+      return (<Text style={this.state.dynamic_style.item_related} numberOfLines={1}>- {text2show}</Text>);
     }else{
       return (
         <Text style={this.state.dynamic_style.item} numberOfLines={1}>- {item[col_key]}</Text>

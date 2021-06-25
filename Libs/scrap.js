@@ -180,7 +180,7 @@ class Scrap {
       notifyMessage("empty");
       return standing;
     }
-    const backgrounColor_alpha = "35";
+    const backgrounColor_alpha = "80";
     const standing_header_ = [
       "table_r",
       "backgroundColor",
