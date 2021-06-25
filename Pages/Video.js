@@ -145,6 +145,7 @@ class VideoScreen extends React.Component {
         <Picker
           selectedValue={this.state.videoQuality}
           style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
           onValueChange={(itemValue, itemIndex)=>{
             this.setState({videoQuality : itemValue});
           }}

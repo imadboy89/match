@@ -97,6 +97,7 @@ get_leagues(){
       <Picker
           selectedValue={this.state.region}
           style={{ height:API_.isWeb? 50 : 70,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:250}}
+          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
           onValueChange={(itemValue, itemIndex)=>{
             this.state.region = itemValue;
             this.get_leagues_k();

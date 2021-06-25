@@ -97,6 +97,7 @@ get_Videos = ()=>{
       <Picker
           selectedValue={this.state.source_id}
           style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:80}}
+          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
           onValueChange={this.changesource}
         >
           <Picker.Item label="BeIn" value={0} />

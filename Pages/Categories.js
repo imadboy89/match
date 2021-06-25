@@ -154,6 +154,7 @@ class CategoriesScreen extends React.Component {
     const sources = (      <Picker
       selectedValue={this.state.source_id}
       style={{ height:40,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
+      itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
       onValueChange={this.changesource}
     >
       <Picker.Item label="Almtch" value={1} />

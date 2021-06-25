@@ -539,7 +539,7 @@ show_DateP(){
       return <Loader/>; 
     }
     const ListHeaderComponent = (        
-    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center",height:40}} >
+    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
     <IconButton 
       disabled={this.state.loading}
       name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.previousPage()}  />
@@ -556,6 +556,7 @@ show_DateP(){
     <Picker
         selectedValue={this.state.source_id}
         style={{ height:"90%",width:80,backgroundColor:"#000",color:"#fff" }}
+        itemStyle={{height:70,backgroundColor:"#000",color:"#fff" }}
         onValueChange={this.changesource}
       >
         <Picker.Item label="AL match" value={0} />

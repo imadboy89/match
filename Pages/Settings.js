@@ -86,6 +86,7 @@ class SettingsScreen extends React.Component {
     return (<Picker
             selectedValue={this.state.theme}
             style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
             onValueChange={(itemValue, itemIndex)=>{
               //this.setState({theme : itemValue});
               API_.setConfig("theme",itemValue).then(o=>{

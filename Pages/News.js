@@ -93,6 +93,7 @@ get_news =(loading=true,keep_list=false)=>{
       <Picker
           selectedValue={this.state.source_id}
           style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
+          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
           onValueChange={this.changesource}
         >
           <Picker.Item label="Kr_MA" value={1} />
