@@ -115,6 +115,7 @@ class ChannelScreen extends React.Component {
           <Picker
                 selectedValue={this.state.actionType}
                 style={{ height: 50, width: 150,backgroundColor:"#2c3e50",color:"#fff" }}
+                itemStyle={{height:70,backgroundColor:"#2c3e50",color:"#fff" }}
                 onValueChange={(itemValue, itemIndex) => this.setState({actionType:itemValue})}
               >
                 {pickers}

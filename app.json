@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "AlMatch",
-    "slug": "AlMatch",
+    "name": "AlMatch-i",
+    "slug": "almatch-i",
     "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "privacy": "public",
-    "primaryColor":"#000",
+    "primaryColor": "#000",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -22,32 +22,32 @@
       "icon": "./assets/icon_ios.png",
       "bundleIdentifier": "com.imados.almatch",
       "supportsTablet": true,
-      "googleServicesFile": "./GoogleService-Info.plist"      
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "package": "com.imados.almatch",
       "googleServicesFile": "./google-services.json",
       "useNextNotificationsApi": true,
-      "enableDangerousExperimentalLeanBuilds":true,
+      "enableDangerousExperimentalLeanBuilds": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000"
       }
     },
-    "web": {  
+    "web": {
       "favicon": "./assets/favicon.png",
       "icon": "./assets/icon.png",
       "backgroundColor": "#000",
-      "themeColor ":"#000",
+      "themeColor ": "#000",
       "lang": "en",
       "startUrl": "/",
-      "homepage":"/",
+      "homepage": "/",
       "crossorigin": "no-referrer",
-      "preferRelatedApplications":false,
-      "scope":"/",
-      "orientation":"any",
-      "config":{
-        "firebase":{
+      "preferRelatedApplications": false,
+      "scope": "/",
+      "orientation": "any",
+      "config": {
+        "firebase": {
           "apiKey": "AIzaSyCeFIS-SVWZtguMdcvJ9FcLqaoihd69BKM",
           "authDomain": "almatch-8bdbf.firebaseapp.com",
           "projectId": "almatch-8bdbf",
