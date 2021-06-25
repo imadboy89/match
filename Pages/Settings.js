@@ -345,8 +345,8 @@ class SettingsScreen extends React.Component {
                 thumbColor={this.state.force_open_expo ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={()=>{
+                  API_.setConfig("force_open_expo",!this.state.force_open_expo);
                   this.setState({force_open_expo:!this.state.force_open_expo});
-                  API_.setConfig("force_open_expo",API_.is_debug);
                 }}
                 value={this.state.force_open_expo}
               />

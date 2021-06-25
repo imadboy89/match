@@ -130,6 +130,7 @@ class API {
       if(supported){
         if(API_.isWeb){
           //const lk = Linking.openURL(url, '_blank');
+          alert("openning url :"+url);
           window.open(url,"_blank");
         }else{
           Linking.openURL(url).then(out=>{API_.showMsg("Opening channel.");});;
