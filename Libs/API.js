@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Scrap from "./scrap";
 import Base64 from "./Base64";
 import { Linking } from 'react-native';
-
+import * as DeviceInfo from 'expo-device';
 
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
@@ -26,8 +26,8 @@ class API {
     this.usingproxy = Platform.OS == 'web';
     this.isWeb = Platform.OS == 'web';
     this.notify_isWeb = Platform.OS == 'web';
-    this.OS = Platform.OS;
-    this.isIOS = Platform.OS.toLocaleLowerCase() === "ios";
+    this.OS = DeviceInfo.osName.toLocaleLowerCase();
+    this.isIOS = this.OS.toLocaleLowerCase() === "ios";
     this.load_channels_running = false;
     this.notifcation_type ="push";
     this.notifications_matches = {};
@@ -130,7 +130,6 @@ class API {
       if(supported){
         if(API_.isWeb){
           //const lk = Linking.openURL(url, '_blank');
-          alert("openning url :"+url);
           window.open(url,"_blank");
         }else{
           Linking.openURL(url).then(out=>{API_.showMsg("Opening channel.");});;
