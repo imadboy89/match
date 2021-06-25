@@ -46,8 +46,10 @@ global.match_data = false;
 global.open_page={};
 if(API_.isWeb){
   if(API_.isIOS){
+    var windowReference = window.open();
     API_.getConfig("force_open_expo",false).then(force_open_expo=>{
       if(force_open_expo){
+        windowReference.location = url;
         API_.open_ext_url("exp://exp.host/@imadboss/almatch").then(()=>window.close('','_parent',''));
       }
     });
