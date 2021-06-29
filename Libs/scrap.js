@@ -699,7 +699,7 @@ class Scrap {
       "team_dress_away":"",
       "team_info":"",
       "team_info2":"",
-
+      "comps":"array",
       "squad_club":"array",
       //"squad_club":"array",
     }

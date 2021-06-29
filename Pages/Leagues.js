@@ -15,7 +15,7 @@ class LeaguesScreen extends React.Component {
         loading:true,
         dynamic_style : styles_news,
         favorite:[],
-        region:0,
+        region:"ma",
     };
 
     setTimeout(()=>{

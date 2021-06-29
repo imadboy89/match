@@ -100,11 +100,22 @@ class HomeScreen extends React.Component {
         }
       },15000);
   }
+  promtSignUp(){
+    const _this = this;
+    setTimeout( async function(){
+      if(backup.is_auth == false){
+        API_.showMsg("انقر هنا للتسجيل أو تسجيل الدخول!","info", undefined, 7000, async()=>{
+          _this.props.navigation.navigate('Settings',{"action":"signup"});
+        })
+      }
+      },50000);
+  }
   componentDidMount=async()=>{
     if(API_.isWeb){
       API_.next = this.nextPage;
       API_.setDate = this.onChange;
       this.promtInstallWPA();
+      this.promtSignUp();
       if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
         navigator.serviceWorker.removeEventListener('message',()=>{});
         navigator.serviceWorker.addEventListener('message', event => {

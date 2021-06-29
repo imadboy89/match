@@ -444,6 +444,7 @@ class LeagueScreen extends React.Component {
           favorite_p={this.state.favorite_p}
           league_name={this.league_name}
           league_id={this.real_id}
+          navigation={this.props.navigation}
           closeModal={()=>{this.setState({modalVisible_team:false})}}></Team>
           : null }
 

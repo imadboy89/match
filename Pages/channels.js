@@ -16,7 +16,7 @@ class ChannelsScreen extends React.Component {
         list:list,
         modalVisible_match:false,
         player_type:1,
-        key_:"en_name",
+        key_:"name",
         key_key:"channel_id",
         url:'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
         category_name:"",
@@ -31,7 +31,9 @@ class ChannelsScreen extends React.Component {
     this.props.navigation.setOptions({title: this.category_name})
     API_.get_channels(this.props.route.params.category_id).then(resp=>{
       if(resp && resp.data && resp["data"].length>0){
+        /*
         for (let i=0;i<resp["data"].length;i++){
+          resp["data"]
           API_.get_channel(resp["data"][i].channel_id).then(resp=>{
             this.chanels_data[i].en_name = resp["data"].en_name;
             //this.setState({list:[]});
@@ -42,6 +44,7 @@ class ChannelsScreen extends React.Component {
             this.setState({list:this.chanels_data});
           });
         }
+        */
         let list = [];
         this.chanels_data = resp["data"];
         this.setState({list:this.chanels_data,loading:false});

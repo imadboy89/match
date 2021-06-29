@@ -63,17 +63,19 @@ class SettingsScreen extends React.Component {
       });
   }
   componentDidMount(){
+    if(this.props.route.params.action=="signup"){
+      this.setState({modalVisible_login:true});
+    }
     this.load_favs();
     let short_title = "Settings" ;
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style:theme})); 
-    //this.props.navigation.setOptions({title: <Text >{short_title}</Text>});
     ScreenOrientation.getOrientationLockAsync().then(o=>{
       //console.log(o,ScreenOrientation.OrientationLock,);
-    }).catch(error=>API_.showMsg(error+"","warning"));
+    }).catch(error=>API_.debugMsg(error+"","warning"));
 
     ScreenOrientation.getOrientationAsync().then(o=>{
       this.setState({ is_landScape : [3,4].includes(o) });
-    }).catch(error=>API_.showMsg(error+"","warning"));
+    }).catch(error=>API_.debugMsg(error+"","warning"));
   }
   componentWillUnmount(){
   }

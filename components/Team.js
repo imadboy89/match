@@ -3,6 +3,7 @@ import {  View, Button,Image, Modal, TouchableOpacity,ScrollView ,TouchableHighl
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Loading from "../components/Loader";
 import {styles_modal,getTheme,global_theme} from "../components/Themes";
+import ItemsList from '../components/list';
 
 
 
@@ -14,6 +15,7 @@ class Team extends React.Component{
         modalVisible_msg : false,
         loading : true,
         dynamic_style:styles_modal,
+        view_mod:1,
       };
       
     } 
@@ -26,13 +28,15 @@ class Team extends React.Component{
         this.state.dynamic_style_league = this.props.dynamic_style;
       }
     }
-
     async loadTeam(){
       if(this.props.team_id==undefined){
         return;
       }
       this.state.favorite_p = await API_.getConfig("favorite_players",this.state.favorite_p);
       API_.get_team(this.props.team_id,true,undefined,true).then(res=>{
+        res.comps = res && res.comps ? res.comps.filter(c => c[0]>0) : [];
+        res.comps = res && res.comps ? res.comps.map(c=>{ return c[0]>0?{id:c[0],comp_name:c[2], info_1:c[1], info_2:c[3]}:false;}) : {};
+
         API_.setTeam_logo(res["team_name_ar"], res.team_logo, this.props.league_name, this.props.league_id,true,true);
         this.setState({team:res,loading:false});
       });
@@ -42,6 +46,13 @@ class Team extends React.Component{
     }
     set_fav_p=(p_id)=>{
       this.setState({modalVisible_player:true,player_id:p_id});
+    }
+    onLeaguePressed = (item)=>{
+      if(this.props==undefined || this.props.navigation==undefined || this.props.navigation.navigate==undefined){
+        return false;
+      }
+      this.props.navigation.navigate('League',{ league_details: {league:item.comp_name,league_img:"",id:item.id} });
+      this.props.closeModal();
     }
     render(){
       
@@ -61,9 +72,11 @@ class Team extends React.Component{
       if(this.state.team && this.state.team.team_info && this.state.team.team_info.split){
         this.state.team.team_info = this.state.team.team_info.split("\n").filter(r=>r.trim()!="");
       }
+      let ind = 0;
       const career = this.state.team && this.state.team.team_info && this.state.team.team_info.map
       ? this.state.team.team_info.map(row=>{
-        return <View key={row} styles={this.state.dynamic_style.info_row}>
+        ind+=1;
+        return <View key={row+ind} styles={this.state.dynamic_style.info_row}>
                   <Text style={this.state.dynamic_style.text_carrier}>{row}</Text>
                 </View>
       }) : null;
@@ -114,7 +127,18 @@ class Team extends React.Component{
                   <Text style={this.state.dynamic_style.text_info}>{allowed_infs[k]} : {this.state.team[k]}</Text>
                 </View>
       }) : null;
-      
+
+      const comps = this.state.team && this.state.team.comps ?
+        <ItemsList 
+        ListHeaderComponent={<Text style={this.state.dynamic_style.article_date_t}>ذات صلة :</Text>}
+        loading={false}
+        list={this.state.team.comps} 
+        onclick={this.onLeaguePressed} 
+        key_={"comp_name"} key_key={"id"}
+        minWidth={"98%"}
+        disable_auto_scal = {true}
+        />
+        : null;
       return (
         <MModal 
         animationType="slide"
@@ -135,9 +159,21 @@ class Team extends React.Component{
                   <Image style={{height:"100%",width:"100%",resizeMode:"contain"}} source={{uri: this.state.team.team_group_photo}} />
                 </View>
                : null}
-              {team_inf}
-              {players}
-              {career}
+
+              <View style={{flexDirection:'row',flexWrap:'wrap',width:"100%"}}>
+                <View style={{flex:1}}><Button title="Info" onPress={()=>this.setState({view_mod:1})}/></View>
+                <View style={{flex:1}}><Button title="Comps" onPress={()=>this.setState({view_mod:2})}/></View>
+              </View>
+               { this.state.view_mod==1 ?
+              <View style={{flex:1,width:"99%"}}>
+                {team_inf}
+                {players}
+                {career}
+              </View> : null}
+              { this.state.view_mod==2 ?
+              <View style={{flex:1,width:"99%"}}>
+                {comps}
+              </View> : null}
             </ScrollView> 
           }
         </View>

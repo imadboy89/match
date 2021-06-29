@@ -1394,7 +1394,7 @@ function generateTheme(theme_name=false){
     },
     modal_body: {
       backgroundColor:"#646c78",
-      width:"98%",
+      width:"100%",
       flex:1,
       justifyContent:"center",
       alignItems:"center",

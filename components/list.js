@@ -16,6 +16,7 @@ class ItemsList extends React.Component {
     }
     this.minWidth = this.props.minWidth ? this.props.minWidth : 300; 
     this.list = [];
+    this.elem_width = this.minWidth;
     this.check_width(false);
     this.flatListRef = false;
     this.windowHeight = Dimensions.get('window').height ;
@@ -45,7 +46,7 @@ class ItemsList extends React.Component {
   }
   check_width=(render=true)=>{
     const current_windowWidth= Dimensions.get('window').width<=1000 ? Dimensions.get('window').width : 1000;
-    if(this.windowWidth == current_windowWidth){return ;}
+    if(this.windowWidth == current_windowWidth || this.props.disable_auto_scal==true){return ;}
     let margin2add = _isMobile(API_.isWeb) ? 15 : 40;
     margin2add = this.minWidth<300 ? parseInt(margin2add * (this.minWidth/300)): margin2add;
     this.windowWidth = current_windowWidth;
