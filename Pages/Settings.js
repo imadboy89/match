@@ -63,7 +63,7 @@ class SettingsScreen extends React.Component {
       });
   }
   componentDidMount(){
-    if(this.props.route.params.action=="signup"){
+    if(this.props.route && this.props.route.params && this.props.route.params.action=="signup"){
       this.setState({modalVisible_login:true});
     }
     this.load_favs();
