@@ -119,25 +119,6 @@ get_leagues(){
           set_fav={this.set_fav}
           loading={this.state.loading} list={this.state.list} 
           onclick={this.onItem_clicked} key_={this.state.key} key_key="id"  />
-        
-        {/*
-        <View style={this.state.dynamic_style.nav_container}>
-          <IconButton
-            disabled={this.state.loading}
-           title="arrow-back-circle"  name="chevron-left" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-            if(this.state.page==1){return false;}
-            this.state.page--;
-            this.get_news();
-          }}  />
-          <Text style={this.state.dynamic_style.text}>{this.state.page}</Text>
-          <IconButton 
-            disabled={this.state.loading}
-           title="forward"  name="chevron-right" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-            this.state.page++;
-            this.get_news();
-          }}  />
-        </View>
-        */}
       </View>
     );
   }
