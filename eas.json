@@ -6,7 +6,7 @@
       },
       "development": {
         "workflow": "managed",
-        "buildType": "development-client",
+        "buildType": "production-client",
         "distribution": "internal"
       }
     }
