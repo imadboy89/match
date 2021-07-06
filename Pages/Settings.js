@@ -1,5 +1,5 @@
 import React from "react";
-import {  View, Dimensions, Modal, Button, Linking, ScrollView, Picker , ImageBackground, ActivityIndicator, Switch} from 'react-native';
+import {  View, Dimensions, Modal, Button, Linking, ScrollView , ImageBackground, ActivityIndicator, Switch} from 'react-native';
 import {styles_settings,getTheme, themes_list} from "../components/Themes";
 import Credentials from "../components/Credentials";
 import AppLogHistory from "../components/AppLogHistory";
@@ -7,7 +7,7 @@ import MatchesNotifs from "../components/MatchesNotifs";
 import Users from "../components/Users";
 import * as Updates from 'expo-updates';
 import * as ScreenOrientation from 'expo-screen-orientation';
-
+import {Picker} from '@react-native-picker/picker';
 
 class SettingsScreen extends React.Component {
   constructor(props) {
@@ -37,6 +37,7 @@ class SettingsScreen extends React.Component {
         
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
+    //this.apk_url = "https://exp-shell-app-assets.s3.us-west-1.amazonaws.com/android/%40imadboss/almatch-2dc6b0c7a3da47819e4245d25dd4221a-signed.apk";
 
 
   }
@@ -256,7 +257,7 @@ class SettingsScreen extends React.Component {
             <Text style={this.state.dynamic_style.settings_row_input}>{this.state.window_height} X {this.state.window_width}</Text>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>Download APK </Text> 
+            <Text style={this.state.dynamic_style.settings_row_label}>Download APK ..</Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
               <Button title="Download" onPress={()=>{
                 if(API_.isWeb){
@@ -405,6 +406,17 @@ class SettingsScreen extends React.Component {
             </View>
           </View>
 
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}> </Text> 
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Update Channel </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>{Updates.releaseChannel}</Text>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Update Id </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>{Updates.updateId}</Text>
+          </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}> </Text> 
           </View>

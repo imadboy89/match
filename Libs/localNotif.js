@@ -1,5 +1,4 @@
 import * as Notifications from 'expo-notifications'; 
-import * as Permissions from 'expo-permissions';
 import {  Alert } from 'react-native';
 
 async function  ask_permission_web(){
@@ -98,7 +97,7 @@ const save=(item, content, trigger)=>{
     });
     
   }
-  return Permissions.askAsync(Permissions.NOTIFICATIONS).then(o=>{
+  return Notifications.getPermissionsAsync().then(o=>{
     if(o.status=="granted"){
       return Notifications.getAllScheduledNotificationsAsync().then(o=>{
         let is_exist = false;

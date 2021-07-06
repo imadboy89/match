@@ -27,11 +27,13 @@ import TextF from "./components/TextF";
 import {app_styles,getTheme} from "./components/Themes";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import * as Notifications from 'expo-notifications';
-import * as Permissions from 'expo-permissions';
 import backUp from "./Libs/BackUp";
 import ToastMsg from "./components/ToastMsg";
 import ClientInfo from "./Libs/ClientInfo";
-//--release-channel imad
+
+//--release-channel imad | default
+// cmd to add google firebase server key 
+// expo push:android:upload --api-key AAAAFPoWn8w:APA91bHJ8F9ueKj_gaHXlqpJ-Ba2OIpwvI-GecDdfIWzCYLt0dVrJBmTZ6P1UmcezWjubrOqlZADJcNRdNldTcMsuhnTOJ7IpXvon_kJyHM0Rh9KT-5cr04FKd30-VeEAipDggMVKKbS
 Text = TextF;
 global. API_ = new API();
 global. API_.appname = "AlMatch"
@@ -116,17 +118,18 @@ async function registerForPushNotificationsAsync() {
     return new Promise(function(){return []});
   }
   if (Constants.isDevice) {
-    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
       alert('Failed to get push token for push notification!');
       return;
     }
-    backup.PushToken = (await Notifications.getExpoPushTokenAsync()).data;
+    backup.PushToken = await Notifications.getExpoPushTokenAsync({experienceId: '@imadboss/almatch',});
+    backup.PushToken = backup.PushToken.data;
     
   } else {
     alert('Must use physical device for Push Notifications');
@@ -445,6 +448,7 @@ class APP extends React.Component {
     API_.showMsg = this.showMsg;
     API_.debugMsg= this.debugMsg;
     getTheme("styles_notif").then(theme=>this.setState({notif_dynamic_style:theme}) );
+    this.MyTabs = <MyTabs showMsg={this.showMsg} is_materialTopTab={this.state.is_materialTopTab} /> ;
   }
   componentWillUnmount(){
     this.mounted = false;
@@ -509,7 +513,8 @@ class APP extends React.Component {
           onCLicked={this.state.onCLicked2}
           />
         : null }
-        <MyTabs showMsg={this.showMsg} is_materialTopTab={this.state.is_materialTopTab} />
+        
+        {this.MyTabs}
       </NavigationContainer>
     );
   }

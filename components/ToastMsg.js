@@ -1,6 +1,8 @@
 import Animated, { Easing } from 'react-native-reanimated';
 import React from 'react';
 import {  View,Pressable,TouchableOpacity } from 'react-native';
+import AnimatedStyleUpdateExample from "./ToastMsg2";
+
 import {styles_home,getTheme,themes_list} from "../components/Themes";
 
 const {
@@ -99,9 +101,9 @@ export class ToastMsg extends React.Component {
   }
   closing_im=()=>{
     if(this.mounted==false){return}
-    this.setState({transY : runTiming(new Clock(), this.state.transofr_y, -1*this.state.transofr_y,this.state.speed/2, this.setend)});
+    //this.setState({transY : runTiming(new Clock(), this.state.transofr_y, -1*this.state.transofr_y,this.state.speed/2, this.setend)});
     clearTimeout(this.timeout_closing);
-    setTimeout(this.setend,this.state.speed+100);
+    //setTimeout(this.setend,this.state.speed+100);
   }
   start=async()=>{
     if(this.mounted==false){return}
@@ -174,24 +176,20 @@ export class ToastMsg extends React.Component {
     const text_style= this.props.dynamic_style["txt_"+style_k];
     return (
       <View style={this.props.is_second ? this.props.dynamic_style.container_2 : this.props.dynamic_style.container}>
-        <Animated.View
-          style={[this.props.dynamic_style.box, {height:this.state.height,transform: [{ translateY: this.state.transY }] }]}
-        >
-          <Pressable
-            hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}
-            style={this.props.dynamic_style.box_inside}
-            activeOpacity={0.7}
-            onPress={()=>{
-              this.closing_im();
-              if(this.props.onCLicked){
-                this.props.onCLicked();
-              }
-            }}
-          >
-            <Text style={[this.props.dynamic_style.body, text_style ]}>{this.state.body}</Text>
-            <View style={[this.props.dynamic_style.indecator,indecator_style]}></View>
-          </Pressable>
-          </Animated.View>
+        <AnimatedStyleUpdateExample 
+          dynamic_style={this.props.dynamic_style} 
+          height={this.state.height} 
+          body={this.state.body}
+          transofr_y={this.transofr_y}
+          indecator_style={indecator_style}
+          text_style={text_style}
+          closeModal={()=>{
+            this.closing_im();
+            if(this.props.onCLicked){
+              this.props.onCLicked();
+            }
+          }}
+          />
       </View>
     );
   }

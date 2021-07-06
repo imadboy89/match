@@ -11,7 +11,7 @@ class ClientInfo {
         let infos = {};
         infos.device_type       = DeviceInfo.DeviceType[await DeviceInfo.getDeviceTypeAsync()];
         infos.osName            = DeviceInfo.osName;
-        //infos.osName            = DeviceInfo.DeviceType;
+        infos.osVersion         = DeviceInfo.osVersion;
         infos.osInternalBuildId = DeviceInfo.osInternalBuildId;
         infos.manufacturer      = DeviceInfo.manufacturer;
         infos.brand             = DeviceInfo.brand;
@@ -20,6 +20,7 @@ class ClientInfo {
         infos.designName        = DeviceInfo.designName;
         infos.productName       = DeviceInfo.productName;
         infos.platformApiLevel  = DeviceInfo.platformApiLevel;
+        infos.totalMemory       = DeviceInfo.totalMemory
         
         
         infos.navigator          = this.getinfoBrowser();
@@ -33,21 +34,26 @@ class ClientInfo {
 
     _getInfo = async()=>{
         let infos = {};
-        
+
+        infos.device_name = DeviceInfo.deviceName;
+        infos.osBuildId   =Device.osBuildId
+        /*
+        removed from expo-device
         infos.base_od            = await DeviceInfo.getBaseOs();
         infos.brand              = await DeviceInfo.getBrand();
         infos.device             = await DeviceInfo.getDevice();
         infos.device_id          = await DeviceInfo.getDeviceId();
         infos.device_name        = await DeviceInfo.getDeviceName();
-        infos.mac_adress         = await DeviceInfo.getMacAddress();
-        infos.build_id           = await DeviceInfo.getBuildId();
         infos.first_install_time = await DeviceInfo.getFirstInstallTime();
         infos.readable_version   = await DeviceInfo.getReadableVersion();
         infos.system_version     = await DeviceInfo.getSystemVersion();
         infos.unique_id          = await DeviceInfo.getUniqueId();
         infos.user_agent         = await DeviceInfo.getUserAgent();
-        infos.navigator          = this.getinfoBrowser();
+        infos.mac_adress         = await DeviceInfo.getMacAddress();
         infos.available_location_providers = await DeviceInfo.getAvailableLocationProviders();
+        infos.build_id           = await DeviceInfo.getBuildId();
+        */
+        infos.navigator          = this.getinfoBrowser();
         const _keys= Object.keys(infos);
         for(let i=0;i<_keys.length;i++){
             infos[_keys[i]] = infos[_keys[i]] == null ? "-" : infos[_keys[i]];

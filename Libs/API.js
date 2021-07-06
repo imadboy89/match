@@ -1,5 +1,6 @@
 import { Platform, Dimensions } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
+//import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Scrap from "./scrap";
 import Base64 from "./Base64";
 import { Linking } from 'react-native';
