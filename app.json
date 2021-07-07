@@ -28,6 +28,7 @@
       "package": "com.imados.almatch",
       "googleServicesFile": "./google-services.json",
       "useNextNotificationsApi": true,
+      "versionCode":2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000"

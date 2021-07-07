@@ -2,13 +2,11 @@
   "builds": {
     "android": {
       "release": {
-        "workflow": "managed"
-      },
-      "development": {
         "workflow": "managed",
-        "buildType": "production-client",
-        "distribution": "internal"
+        "distribution": "internal",
+        "buildType": "apk"
       }
+      
     }
   }
 }
