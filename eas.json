@@ -2,7 +2,7 @@
   "builds": {
     "android": {
       "release": {
-        "workflow": "managed",
+        "workflow": "generic",
         "distribution": "internal",
         "buildType": "apk"
       }
