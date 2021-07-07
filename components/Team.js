@@ -16,10 +16,16 @@ class Team extends React.Component{
         loading : true,
         dynamic_style:styles_modal,
         view_mod:1,
+        is_fav:false
       };
-      
+      this.localS_fav_key = "favorite_teams_k";
     } 
     componentDidMount(){
+      API_.getConfig(this.localS_fav_key,[]).then(o=>{
+        if(o && o.includes && o.includes(parseInt(this.props.team_id))){
+          this.setState({is_fav:true});
+        }
+      })
       getTheme("styles_modal").then(theme=>this.setState({dynamic_style:theme}));
       this.loadTeam();
       if(this.props.dynamic_style==undefined){
@@ -43,6 +49,23 @@ class Team extends React.Component{
     }
     get_player_info=(player)=>{
       this.setState({modalVisible_player:true,player_id:player.player_id});
+    }
+    set_fav=async(id,team_name)=>{
+      id= parseInt(id);
+      let msg_action = "";
+      if(id==0){return "";}
+      let o = await API_.getConfig(this.localS_fav_key,[]);
+      if( o.includes(id) ){
+        o = o.filter(o=>{if(o!=id)return o;});
+        msg_action = "تمت إزالته من";
+      }else{
+        o.push(id);
+        msg_action = "تمت إضافته إلى";
+      }
+      
+      await API_.setConfig(this.localS_fav_key,o);
+      this.setState({is_fav:o.includes(id)});
+      API_.showMsg(`الفريق ٭${team_name}٭ ${msg_action} المفضلة!`);
     }
     set_fav_p=(p_id)=>{
       this.setState({modalVisible_player:true,player_id:p_id});
@@ -163,6 +186,9 @@ class Team extends React.Component{
               <View style={{flexDirection:'row',flexWrap:'wrap',width:"100%"}}>
                 <View style={{flex:1}}><Button title="Info" onPress={()=>this.setState({view_mod:1})}/></View>
                 <View style={{flex:1}}><Button title="Comps" onPress={()=>this.setState({view_mod:2})}/></View>
+                <View style={{flex:1}}><Button title="Fav" color={this.state.is_fav?"green":"grey"} onPress={()=>{
+                  this.set_fav(this.props.team_id,this.state.team.team_name_ar);
+                }}/></View>
               </View>
                { this.state.view_mod==1 ?
               <View style={{flex:1,width:"99%"}}>
