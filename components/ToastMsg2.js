@@ -6,7 +6,7 @@ import Animated, {
 import { View, Pressable } from 'react-native';
 import React from 'react';
 
-export default function AnimatedStyleUpdateExample(props) {
+export default function AnimatedToastMsg(props) {
   const offset = useSharedValue(0);
 
   const customSpringStyles = useAnimatedStyle(() => {
@@ -32,9 +32,7 @@ export default function AnimatedStyleUpdateExample(props) {
             activeOpacity={0.7}
             onPress={()=>{
               offset.value = 0 ;
-              setTimeout(() => {
-                props.closeModal();
-              }, 1000);
+              props.closeModal();
             }}
           >
             <Text style={[props.dynamic_style.body, props.text_style]}>{props.body}</Text>

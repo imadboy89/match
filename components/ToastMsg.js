@@ -1,73 +1,9 @@
-import Animated, { Easing } from 'react-native-reanimated';
 import React from 'react';
 import {  View,Pressable,TouchableOpacity } from 'react-native';
-import AnimatedStyleUpdateExample from "./ToastMsg2";
-
-import {styles_home,getTheme,themes_list} from "../components/Themes";
-
-const {
-  Clock,
-  Value,
-  set,
-  cond,
-  startClock,
-  clockRunning,
-  timing,
-  debug,
-  stopClock,
-  block,
-  call,
-} = Animated;
-
-function runTiming(clock, value, dest,speed, func_end=()=>{}) {
-  const state = {
-    finished: new Value(0),
-    position: new Value(0),
-    time: new Value(0),
-    frameTime: new Value(0),
-  };
-
-  const config = {
-    duration: speed,
-    toValue: new Value(0),
-    easing: Easing.inOut(Easing.ease),
-  };
-    try {
-      
-    return block([
-      cond(
-        clockRunning(clock),
-        [
-          // if the clock is already running we update the toValue, in case a new dest has been passed in
-          set(config.toValue, dest),
-        ],
-        [
-          // if the clock isn't running we reset all the animation params and start the clock
-          set(state.finished, 0),
-          set(state.time, 0),
-          set(state.position, value),
-          set(state.frameTime, 0),
-          set(config.toValue, dest),
-          startClock(clock),
-        ]
-      ),
-      // we run the step here that is going to update position
-      timing(clock, state, config),
-      // if the animation is over we stop the clock
-      cond(state.finished,debug('stop clock', stopClock(clock))),
-      // we made the block return the updated position
-      state.position,
-    ]);
-  } catch (error) {
-      console.log(error);
-  }
-}
+import AnimatedToastMsg from "./ToastMsg2";
 
 export class ToastMsg extends React.Component {
-  // we create a clock node
-  clock = new Clock();
-  // and use runTiming method defined above to create a node that is going to be mapped
-  // to the translateX transform.
+
   height = 70;
   transofr_y = 70;
   transofr_y_2 = 150;
@@ -88,7 +24,7 @@ export class ToastMsg extends React.Component {
       type   : this.props.type ? this.props.type : this.type,
     }
     this.transofr_y = this.props.is_second ? this.transofr_y_2 : this.transofr_y;
-    this.state.transY = new Value(this.state.transofr_y*-1)
+    ///this.state.transY = new Value(this.state.transofr_y*-1)
     this.timeout_closing = 0;
     this.previous_body = "";
     console.log("TM constructor",this.props.body);
@@ -96,18 +32,15 @@ export class ToastMsg extends React.Component {
   }
   closing=()=>{
     if(this.mounted==false){return}
-    this.setState({transY : runTiming(new Clock(), this.state.transofr_y, -1*this.state.transofr_y,this.state.speed, this.setend)});
     setTimeout(this.setend,this.state.speed+100);
   }
   closing_im=()=>{
     if(this.mounted==false){return}
-    //this.setState({transY : runTiming(new Clock(), this.state.transofr_y, -1*this.state.transofr_y,this.state.speed/2, this.setend)});
     clearTimeout(this.timeout_closing);
-    //setTimeout(this.setend,this.state.speed+100);
+    setTimeout(this.setend,this.state.speed+100);
   }
   start=async()=>{
     if(this.mounted==false){return}
-    //await API_.getConfig("is_debug",this.debug).then(o=>API_.is_debug=o);
     API_.messages_history.push({body:this.state.body,type:this.state.type,time:API_.get_date_timeS(new Date()),is_debug:this.state.is_debug});
     if(this.state.debug && API_.is_debug==false){
       this.empty_stats();
@@ -115,13 +48,10 @@ export class ToastMsg extends React.Component {
       return ;
     }
     console.log(this.notif_end , API_.is_debug==false);
-    //this.setState({transY : runTiming(new Clock(), -1*this.state.height, 0)});
-    this.state.transY = runTiming(new Clock(), -1*this.state.transofr_y, this.state.transofr_y,this.state.speed,()=>{});
     this.timeout_closing = setTimeout(this.closing, this.state.delay+this.state.speed);
   }
   componentDidMount(){
     this.mounted=true;
-    //getTheme("styles_notif").then(theme=>this.setState({dynamic_style:theme}) );
   }
   componentWillUnmount(){
     this.mounted=false;
@@ -135,7 +65,6 @@ export class ToastMsg extends React.Component {
     this.state.debug  = this.debug ;
     this.previous_body = "";
     this.timeout_closing = 0;
-    //this.notif_end = true;
   }
   setend = ()=>{
     if(this.mounted==false){return}
@@ -146,7 +75,6 @@ export class ToastMsg extends React.Component {
     return true;
   }
   fill_stats(){
-    //if(this.notif_end==false)return false;
     if(this.state.debug){
       this.state.body = this.props.body && this.props.body.message ? this.props.body.message : this.props.body;
       console.log(this.state.body);
@@ -176,7 +104,7 @@ export class ToastMsg extends React.Component {
     const text_style= this.props.dynamic_style["txt_"+style_k];
     return (
       <View style={this.props.is_second ? this.props.dynamic_style.container_2 : this.props.dynamic_style.container}>
-        <AnimatedStyleUpdateExample 
+        <AnimatedToastMsg 
           dynamic_style={this.props.dynamic_style} 
           height={this.state.height} 
           body={this.state.body}
@@ -184,7 +112,7 @@ export class ToastMsg extends React.Component {
           indecator_style={indecator_style}
           text_style={text_style}
           closeModal={()=>{
-            this.closing_im();
+            this.closing();
             if(this.props.onCLicked){
               this.props.onCLicked();
             }
