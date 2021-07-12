@@ -30,6 +30,13 @@ import * as Notifications from 'expo-notifications';
 import backUp from "./Libs/BackUp";
 import ToastMsg from "./components/ToastMsg";
 import ClientInfo from "./Libs/ClientInfo";
+import { useHistory } from "react-router-dom";
+
+function navigate_to_page(page) {
+  let history = useHistory();
+  history.push(page);
+  // use history.push('/some/path') here
+};
 
 global.main_domain = location.origin.split("//")[1].trim();
 //--release-channel imad | default
@@ -48,6 +55,10 @@ global._ClientInfo = new ClientInfo();
 global.match_data = false;
 global.open_page={};
 if(API_.isWeb){
+  if(location.search && location.search!="" && location.href.includes("/?/") ){
+    //location.href = location.href.replace("/?/","/");
+    navigate_to_page(location.search.replace("?/","/"));
+  }
   if(API_.isIOS){
     var windowReference = window.open();
     API_.getConfig("force_open_expo",false).then(force_open_expo=>{
