@@ -1,23 +1,16 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Picker, Button, Linking } from 'react-native';
-import { CommonActions } from '@react-navigation/native';
+import {  View, StyleSheet } from 'react-native';
 
-import Constants from 'expo-constants';
+import {Picker} from '@react-native-picker/picker';
 import ItemsList from '../components/list';
-import ReactHlsPlayer from "react-hls-player";
-import Video from 'expo';
 import IconButton from "../components/IconButton";
 import {styles_home} from "../components/Themes";
-import BackUp from '../Libs/BackUp';
 
-let list = [
-
-          ];
 class CategoriesScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        list:list,
+        list:[],
         modalVisible_match:false,
         player_type:1,
         key_:"category_name",
@@ -56,7 +49,10 @@ class CategoriesScreen extends React.Component {
       return this.get_local_saved_chs();
     }else if(this.state.source_id == 5){
       return this.get_IPTV();
+    }else if(this.state.source_id == 6){
+      return this.get_IPRD();
     }
+    
     if(this.end==true){return false;}
     API_.get_categories(page).then(resp=>{
       if(resp && resp.data && resp["data"].length>0){
@@ -118,6 +114,29 @@ class CategoriesScreen extends React.Component {
     }
     this.setState({list:chs_list, key_:"category_name",key_key:"category_id",loading:false});
   }
+
+  get_IPRD=async()=>{
+    let chs = await backup.load_IPRD();
+    let chs_list = [];
+    for(let i=0;i<chs.length;i++){
+      const ch = {"channel_photo":"","name":"", "url":"","id":"","is_external":false,"category_name":"","category_photo":"","category_id":""};
+      ch.name = chs[i].name;
+      ch.channel_photo = chs[i].photo;
+      ch.category_photo = ch.channel_photo;
+      ch.quality = chs[i].quality;
+      ch.id = chs[i].name+"-"+chs[i].quality;
+      ch.category_id = chs[i].name+"-"+chs[i].quality;
+      ch.category_name = chs[i].name;
+      ch.ch_item = chs[i];
+      ch.is_radio = true;
+      ch.url = chs[i].url;
+      ch.is_external = true;
+      ch.is_html = chs[i].is_html;
+      chs_list.push(ch);
+    }
+    this.setState({list:chs_list, key_:"category_name",key_key:"category_id",loading:false});
+  }
+
   async get_externa_ch(){
     if(API_.external_channels==undefined){
       await API_.load_external_channels();
@@ -138,6 +157,8 @@ class CategoriesScreen extends React.Component {
         //API_.channels_dict[API_.fix_channel_name(ch_ob.en_name)]
         console.log(item);
         this.props.navigation.navigate('Channel', { channel_id: item.channel_id,channel_photo:item.channel_photo,ch_item : item });
+      }else if(this.state.source_id==6){
+        this.props.navigation.navigate('Radio', { channel_id: item.channel_id,channel_photo:item.channel_photo,ch_item : item });
       }else{
         this.props.navigation.navigate('Channels',{category_id:item.category_id,category_name: item.category_name});
       }
@@ -162,6 +183,7 @@ class CategoriesScreen extends React.Component {
       <Picker.Item label="inApp-IPTV" value={3} />
       {(backup && backup.is_auth && backup.admin==true) ?  <Picker.Item label="local-IPTV" value={4} /> : null}
       {(backup && backup.is_auth && backup.admin==true) ?  <Picker.Item label="IPTV" value={5} /> : null}
+      <Picker.Item label="Radio" value={6} />
       
   </Picker>);
     return (

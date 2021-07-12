@@ -166,7 +166,7 @@ global.notifyMessage = function(msg,title, buttons,speed=1000,delay=1000) {
 }
 
 var is_materialTopTab = false;
-
+var is_animationEnabled = true;
 const ChannelsStack = createStackNavigator();
 const MatchesStack = createStackNavigator();
 const NewsStack = createStackNavigator();
@@ -177,24 +177,24 @@ function ChannelsStackScreen() {
   return (
     <ChannelsStack.Navigator>
     
-      <ChannelsStack.Screen options={_app_styles.screenHeader} name="ChannelsCat" component={CategoriesScreen} />
-      <ChannelsStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
-      <ChannelsStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
-      <ChannelsStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
+      <ChannelsStack.Screen options={_app_styles.screenHeader} name="ChannelsCat" component={CategoriesScreen} animationEnabled={is_animationEnabled}/>
+      <ChannelsStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} animationEnabled={is_animationEnabled}/>
+      <ChannelsStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} animationEnabled={is_animationEnabled}/>
+      <ChannelsStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} animationEnabled={is_animationEnabled}/>
     </ChannelsStack.Navigator>
   );
 }
 function MatchesStackScreen() {
   return (
     <MatchesStack.Navigator>
-      <MatchesStack.Screen options={_app_styles.screenHeader} name="Home" component={HomeScreen} />
-      <MatchesStack.Screen options={_app_styles.screenHeader} name="Settings" component={SettingsScreen} />
-      <MatchesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
-      <MatchesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
-      <MatchesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
-      <MatchesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
-      <MatchesStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
-      <MatchesStack.Screen options={_app_styles.screenHeader} name="TV" component={TVScreen} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Home" component={HomeScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Settings" component={SettingsScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen}animationEnabled={is_animationEnabled} />
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="TV" component={TVScreen} animationEnabled={is_animationEnabled}/>
       
       
     </MatchesStack.Navigator>
@@ -203,12 +203,12 @@ function MatchesStackScreen() {
 function LeaguesStackScreen() {
   return (
     <LeaguesStack.Navigator>
-    <LeaguesStack.Screen options={_app_styles.screenHeader} name="Leagues" component={LeaguesScreen} />
-      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Home" component={LeaguesScreen} />
-      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
-      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} />
-      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} />
-      <LeaguesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
+    <LeaguesStack.Screen options={_app_styles.screenHeader} name="Leagues" component={LeaguesScreen} animationEnabled={is_animationEnabled}/>
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Home" component={LeaguesScreen} animationEnabled={is_animationEnabled}/>
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} animationEnabled={is_animationEnabled}/>
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} animationEnabled={is_animationEnabled}/>
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} animationEnabled={is_animationEnabled}/>
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} animationEnabled={is_animationEnabled}/>
       
     </LeaguesStack.Navigator>
   );
@@ -216,20 +216,20 @@ function LeaguesStackScreen() {
 function NewsStackScreen() {
   return (
     <NewsStack.Navigator>
-      <NewsStack.Screen options={_app_styles.screenHeader} name="News" component={NewsScreen} />
-      <NewsStack.Screen options={_app_styles.screenHeader} name="Home" component={NewsScreen} />
-      <NewsStack.Screen options={_app_styles.screenHeader} name="Article" component={ArticleScreen} />
-      <NewsStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} />
-      <NewsStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} />
-      <NewsStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
+      <NewsStack.Screen options={_app_styles.screenHeader} name="News" component={NewsScreen} animationEnabled={is_animationEnabled}/>
+      <NewsStack.Screen options={_app_styles.screenHeader} name="Home" component={NewsScreen} animationEnabled={is_animationEnabled}/>
+      <NewsStack.Screen options={_app_styles.screenHeader} name="Article" component={ArticleScreen} animationEnabled={is_animationEnabled}/>
+      <NewsStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen} animationEnabled={is_animationEnabled}/>
+      <NewsStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} animationEnabled={is_animationEnabled}/>
+      <NewsStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} animationEnabled={is_animationEnabled}/>
     </NewsStack.Navigator>
   );
 }
 function VideosStackScreen() {
   return (
     <VideosStack.Navigator>
-      <VideosStack.Screen options={_app_styles.screenHeader} name="Videos" component={VideosScreen} />
-      <VideosStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} />
+      <VideosStack.Screen options={_app_styles.screenHeader} name="Videos" component={VideosScreen} animationEnabled={is_animationEnabled}/>
+      <VideosStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} animationEnabled={is_animationEnabled}/>
     </VideosStack.Navigator>
   );
 }
@@ -269,11 +269,11 @@ function MyTabs(props){
       tabBarOptions={props.is_materialTopTab ? _app_styles.tabBarOptions_mat : _app_styles.tabBarOptions}
       tabBarPosition="bottom"
     >
-      <StackNav.Screen name="Home" component={MatchesStackScreen} />
-      <StackNav.Screen name="Leagues" component={LeaguesStackScreen} />
-      <StackNav.Screen name="Videos" component={VideosStackScreen} />
-      <StackNav.Screen name="Channels" component={ChannelsStackScreen} />
-      <StackNav.Screen name="News" component={NewsStackScreen} />
+      <StackNav.Screen name="Home" component={MatchesStackScreen} animationEnabled={is_animationEnabled}/>
+      <StackNav.Screen name="Leagues" component={LeaguesStackScreen} animationEnabled={is_animationEnabled}/>
+      <StackNav.Screen name="Videos" component={VideosStackScreen} animationEnabled={is_animationEnabled}/>
+      <StackNav.Screen name="Channels" component={ChannelsStackScreen} animationEnabled={is_animationEnabled}/>
+      <StackNav.Screen name="News" component={NewsStackScreen} animationEnabled={is_animationEnabled}/>
       
     </StackNav.Navigator>
   );

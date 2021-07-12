@@ -110,7 +110,7 @@ class Team extends React.Component{
       ? this.state.team.squad_club.map(row=>{
         const p_id = row[0];
         const p_pos = row[1];
-        const p_nbr = row[3];
+        const p_nbr = p_pos>0 ? row[3] : "🗣️";
         const p_ccode = row[7];
         const p_name = row[4] && row[4].trim ? row[4].trim() : "";
         const fav_style = this.state.favorite_p.includes(p_name) ? {backgroundColor: global_theme.fav_background} : {};

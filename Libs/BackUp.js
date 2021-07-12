@@ -57,6 +57,7 @@ class BackUp{
         this.db_teams_info   = this.db.collection("teams_info");
         this.db_teams   = this.db.collection("teams");
         this.db_IPTV         = this.db.collection("IPTV");
+        this.db_IPRD         = this.db.collection("IPRD");
         this.db_live_matches = this.db.collection("live_matches");
         this.db_leagues = this.db.collection("leagues");
         this.is_auth         = this.email!="" && this.email !=undefined;
@@ -517,6 +518,29 @@ class BackUp{
         }
       } catch (error) {API_.showMsg(error,"danger");}
     }
+    load_IPRD = async()=>{
+      try {
+        
+        const channels = await this.db_IPRD.find({}, { sort: { datetime: -1 } }).asArray();
+        return channels; 
+      } catch (error) {
+        console.log(error.message);
+        API_.showMsg(error,"danger");
+        return [];
+      }
+    }
+    save_IPRD = async(ch)=>{
+      try {
+        ch.user_id = this.client.auth.activeUserAuthInfo.userId;
+        const o = await this.db_IPRD.insertOne(ch);
+        if(o && o.insertedId){
+          API_.showMsg("تمت إضافة القناة  *"+ch.name+"*","success");
+        }else{
+          API_.showMsg("Something wrong : "+JSON.stringify(o) ,"danger");
+        }
+      } catch (error) {API_.showMsg(error,"danger");}
+    }
+
     save_live_match = async(match_details,match_title)=>{
       try {
         match_details = JSON.parse(JSON.stringify(match_details));

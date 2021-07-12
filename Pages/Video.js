@@ -44,10 +44,12 @@ class VideoScreen extends React.Component {
                   onPress={()=>{ API_.open_ext_url(this.state.video.url); }}  />
         )
       });
-      try {
-        const final_url = await API_.get_iframe(this.state.video.url); 
-        this.state.video.url = final_url && final_url.length>0 ? final_url : this.state.video.url;
-      } catch (error) {API_.showMsg(error,"danger");}
+      if(this.state.video.is_radio!=true){
+        try {
+          const final_url = await API_.get_iframe(this.state.video.url); 
+          this.state.video.url = final_url && final_url.length>0 ? final_url : this.state.video.url;
+        } catch (error) {API_.showMsg(error,"danger");}
+      }
       this.is_external_loaded = true;
       this.state.video.desc = this.state.video.url;
       this.setState({});
@@ -87,12 +89,13 @@ class VideoScreen extends React.Component {
     return <ActivityIndicator color='#009b88' size='large' />
   }
   render_wv(){
-    
+    let html = false;
     if(this.state.video.videoId===false ){return null}
     let uri_ = "";
     if(this.state.video.is_external){
       uri_ = this.state.video.url;
       if(this.is_external_loaded==false) return;
+      html = this.state.video.is_radio && this.state.video.is_html  ? '<audio id="audio" loop> <source src="'+uri_+'"  type="audio/mp3" /> </audio>' : false;
     }else{
       const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality='+this.state.videoQuality+'&info=0&logo=0&autoplay=false';
       const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq='+this.state.videoQuality+'&color='+global_theme.text_color_default;
@@ -103,6 +106,7 @@ class VideoScreen extends React.Component {
     if (API_.isWeb) {
       return <iframe src={uri_} style={{flex:1,backgroundColor: "#353b48",borderWidth:0,height:"100%",width:"100%"}} seamless/>;
     }
+    const source = html ? {html:html} : {uri:uri_};
     return  <WebView 
               allowsFullscreenVideo={true}
               style={{flex:1,backgroundColor: "#353b48"}}
@@ -117,12 +121,13 @@ class VideoScreen extends React.Component {
                 }
                 return true;
               }}
-              source={{ uri: uri_ }}
+              source={ source }
               userAgent={this.state.video.is_external ? API_.user_agents["Android 10"] : API_.user_agents["Windows 10"] }
               />;
   }
   render() {
-    const height = this.state.video && this.state.video.url ? 500 : 300 ;
+    let height = this.state.video && this.state.video.url ? 500 : 300 ;
+    height = this.state.video && this.state.video.is_radio ? 200 : height;
     let style = {height: height,width:"100%",position:'absolute'};
     style = this.state.video && (this.state.video.videoId || this.state.video.url) ? style : {width:1,height:1};
     return (
