@@ -68,6 +68,7 @@ class Matchcreen extends React.Component {
       this.is_k = true;
       return this.get_Match_k(id);
     }
+    this.state.matche_details
     API_.get_match(id).then(resp=>{
       if(resp && resp["data"] && resp["data"][0] ){
         
@@ -78,10 +79,21 @@ class Matchcreen extends React.Component {
         //this.set_title();
         this.setState({loading:false});
       }
-      
+      //this.state.matche_details.away_team_badge ? this.state.matche_details.away_team_badge : this.state.matche_details.away_team_logo
+      /*API_.getTeam_logo_k().then(teams_logo =>{
+        matches.map(l=>{
+          l.data.map(m=>{
+            const t_id = parseInt(m.home_team_id);
+            const t_id2 = parseInt(m.away_team_id);
+            //queued_get_teams
+            if(t_id>0 && teams_logo[t_id]==undefined){queue_teams2upload.push(t_id);}
+            if(t_id2>0 && teams_logo[t_id2]==undefined){queue_teams2upload.push(t_id2);}
+          });
+        });
+      })*/
     });
   }
-  load_logos(){
+  load_logos_old(){
     if(this.state.matche_details.home_team_logo && this.state.matche_details.away_team_logo)return true;
     if(this.home_team_ar){
       API_.getTeam_logo(this.home_team_ar).then(lo=>{
@@ -95,16 +107,28 @@ class Matchcreen extends React.Component {
       });
     }
   }
+  async load_logos(){
+    if(this.state.matche_details.home_team_logo || this.state.matche_details.away_team_badge)return true;
+    const h_team_info = await API_.getTeam_logo_k(this.state.matche_details.home_team_id);
+    const a_team_info = await API_.getTeam_logo_k(this.state.matche_details.away_team_id);
+    
+    this.state.matche_details.home_team_logo = h_team_info ? API_.get_team_logo(h_team_info) : undefined;
+    this.state.matche_details.away_team_logo = a_team_info ? API_.get_team_logo(a_team_info) : undefined;
+    this.setState({});
+  }
   get_Match_k(id){
       API_.get_match_k(id).then(resp=>{
         if(resp ){
+          const is_linked = this.state.matche_details==undefined;
           this.state.matche_details = this.state.matche_details ? {...this.state.matche_details, ...resp} : resp;
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
           this.set_title();
           this.setState({loading:false});
           API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
-          //this.load_logos();
+          if(is_linked){
+            this.load_logos();
+          }
         }
       });
   }
@@ -712,7 +736,7 @@ class Matchcreen extends React.Component {
           league_name={this.league_name}
           league_id={this.real_id}
           navigation={this.props.navigation}
-          closeModal={()=>{this.setState({modalVisible_team:false});this.load_logos();}}></Team>
+          closeModal={()=>{this.setState({modalVisible_team:false})/*;this.load_logos();*/}}></Team>
           : null }
       </ScrollView>
     );
