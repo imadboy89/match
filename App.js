@@ -1,7 +1,9 @@
 import * as React from 'react';
+import { useState } from 'react';
+
 import {  View, StyleSheet, ToastAndroid,Platform,Alert  , I18nManager } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer  } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import API from './Libs/API';
@@ -30,14 +32,18 @@ import * as Notifications from 'expo-notifications';
 import backUp from "./Libs/BackUp";
 import ToastMsg from "./components/ToastMsg";
 import ClientInfo from "./Libs/ClientInfo";
-import { useHistory } from "react-router-dom";
 
+global.navigationRef = React.createRef();
+
+/*
+import { useHistory } from "react-router-dom";
 function navigate_to_page(page) {
   let history = useHistory();
   history.push(page);
+  return <TextF>redirect</TextF>;
   // use history.push('/some/path') here
 };
-
+*/
 global.main_domain = location.origin.split("//")[1].trim();
 //--release-channel imad | default
 // cmd to add google firebase server key 
@@ -55,10 +61,6 @@ global._ClientInfo = new ClientInfo();
 global.match_data = false;
 global.open_page={};
 if(API_.isWeb){
-  if(location.search && location.search!="" && location.href.includes("/?/") ){
-    //location.href = location.href.replace("/?/","/");
-    navigate_to_page(location.search.replace("?/","/"));
-  }
   if(API_.isIOS){
     var windowReference = window.open();
     API_.getConfig("force_open_expo",false).then(force_open_expo=>{
@@ -456,16 +458,19 @@ class APP extends React.Component {
     };
   }
   componentDidMount(){
+    //navigate('/News');
+    
     this.mounted = true;
     API_.showMsg = this.showMsg;
     API_.debugMsg= this.debugMsg;
     getTheme("styles_notif").then(theme=>this.setState({notif_dynamic_style:theme}) );
-    this.MyTabs = <MyTabs showMsg={this.showMsg} is_materialTopTab={this.state.is_materialTopTab} /> ;
+    this.MyTabs = <MyTabs showMsg={this.showMsg} is_materialTopTab={this.state.is_materialTopTab}/> ;
   }
   componentWillUnmount(){
     this.mounted = false;
   }
   showMsg = (body,type, speed, delay, onCLicked)=>{
+    if(!body || body.trim()==""){return false;}
     console.log("msg1:",this.state.showMsg,"msg2:",this.state.showMsg);
     if(this.state.showMsg==false){
       this.setState({body:body,type:type, speed:speed, delay:delay,debug:false,showMsg:true,onCLicked:onCLicked});
@@ -474,6 +479,7 @@ class APP extends React.Component {
     }
   }
   debugMsg = (body,type, speed, delay)=>{
+    if(!body || body.trim()==""){return false;}
     if(this.state.showMsg==false){
       this.setState({body:body,type:type, speed:speed, delay:delay,debug:true,showMsg:true});
     }else if(this.state.showMsg==true && this.state.showMsg_2==false){
@@ -493,12 +499,50 @@ class APP extends React.Component {
       }, 1);
     }
   }
+  redirect=()=>{
+    if(location.search && location.search!="" && location.href.includes("/?/") ){
+        //location.href = location.href.replace("/?/","/");
+        const pages_sep = {
+            Channel : "channel_photo",
+            League  : "league_details",
+            Match   : "match_item",
+            Article : "article",
+          };
+        const full_path = location.search.replace("?/","");
+        const main_screen = full_path.split("/")[0];
+        const path__id = full_path.split("/-/");
+        const screens = path__id[0].split("/");
+        let params = {};
+        if(screens.length==1){
+          params.id = path__id[1]
+          if( pages_sep[main_screen]){
+            params[pages_sep[main_screen]] = "-";
+          }
+        }else if(screens.length==2){
+          params.screen = screens[1];
+          params.params = {id:path__id[1]};
+          if( pages_sep[params.screen]){
+            params.params[ pages_sep[params.screen] ] = "-";
+          }
+        }
+        setTimeout(() => {
+          if(navigationRef.current){
+            navigationRef.current?.navigate(main_screen,params);
+          }
+        }, 200);
+      }
+
+  }
+  redirect_deep=()=>{
+
+  }
   render(){
     if(this.state.style_loaded==false){
       return null;
     }
+
     return (
-      <NavigationContainer linking={this.linking}>
+      <NavigationContainer linking={this.linking} ref={navigationRef} >
         {this.state.showMsg===true ? 
         <ToastMsg 
           dynamic_style={this.state.notif_dynamic_style}
@@ -527,6 +571,7 @@ class APP extends React.Component {
         : null }
         
         {this.MyTabs}
+        {this.redirect("News")}
       </NavigationContainer>
     );
   }

@@ -593,7 +593,11 @@ class BackUp{
     check_live_match = async(match_id)=>{
       try {
         const live_match       = {match_id:match_id,};
-        live_match.user_id     = this.client.auth.activeUserAuthInfo.userId;
+        try {
+          live_match.user_id     = this.client.auth.activeUserAuthInfo.userId;
+        } catch (error) {
+            return false;
+        }
         live_match.isWeb        = API_.notify_isWeb;
         const o = await this.db_live_matches.find(live_match).asArray();
         const is_ok = o && o.length ;

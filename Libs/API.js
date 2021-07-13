@@ -9,6 +9,7 @@ import * as DeviceInfo from 'expo-device';
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
+    this.showMsg = function(msg){console.log("showMsg : ",msg)}
     this.channels = {1:"UCBaD-tLomo_JgH66CuSFWAQ" , 2:"UCRN5ho3UGhUi7ZCBe2G2f2w",4:"UC7FGo_bQUVxVxVsiHAQxSOQ"}
     this.pageTokens = {};
     //alert(Base64.btoa("aW1hZA=="));

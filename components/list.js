@@ -50,7 +50,6 @@ class ItemsList extends React.Component {
     let margin2add = _isMobile(API_.isWeb) ? 15 : 40;
     margin2add = this.minWidth<300 ? parseInt(margin2add * (this.minWidth/300)): margin2add;
     this.windowWidth = current_windowWidth;
-    //this.setState({numColumns:this.windowWidth/500});
     this.state.numColumns = parseInt(this.windowWidth/this.minWidth);
     this.state.numColumns = this.state.numColumns>=1 ? this.state.numColumns : 1;
     this.elem_width = this.props.fixedWidth ? this.minWidth : parseInt((this.windowWidth-margin2add)/this.state.numColumns);
@@ -287,7 +286,6 @@ class ItemsList extends React.Component {
             this.state.header_to_hide.push(id_);
           }
           this.props.refresh_list();
-          //this.setState({list:l});
           }}
       >
         <View style={[{paddingLeft:3,paddingRight:1,flexDirection:'row', flexWrap:'wrap'},this.state.dynamic_style.header]}>

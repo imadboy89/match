@@ -39,7 +39,7 @@ class LeagueScreen extends React.Component {
     };
     this.league_name = this.props.route.params.league_details && this.props.route.params.league_details.league ? this.props.route.params.league_details.league : "-";
     this.league_img   = this.props.route.params.league_details && this.props.route.params.league_details.league_img ? this.props.route.params.league_details.league_img : "";
-    this.real_id = this.props.route.params.league_details.id?this.props.route.params.league_details.id:this.props.route.params.id;
+    this.real_id = this.props.route.params.league_details && this.props.route.params.league_details.id?this.props.route.params.league_details.id:this.props.route.params.id;
     this.league_id = this.real_id;
     //this.league_img = API_.leagueLogo_byTitle(this.league_name,this.league_img);
     if(API_.leagues_dict[this.league_name] && API_.leagues_dict[this.league_name].koora_id && api_type == 1){
