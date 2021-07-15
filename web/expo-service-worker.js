@@ -4,7 +4,7 @@
  * Store notification icon string in service worker.
  * Ref: https://stackoverflow.com/a/35729334/2603230
  */
-const version = 38.1;
+const version = 50;
 self.addEventListener('message', event => {
   let data;
   if (typeof event.data === 'string') {
@@ -64,18 +64,17 @@ self.addEventListener('notificationclick', event => {
       });
 
       let appClient;
-
+      console.log(event, location.pathname.replace("expo-service-worker.js",""));
       const path = event.notification.data._webPath || location.pathname.replace("expo-service-worker.js","");
 
       // If we already have a window open, use it.
       for (const client of allClients) {
         const url = new URL(client.url);
-
-        if (url.pathname === path) {
+        //if (url.pathname === path) {
           client.focus();
           appClient = client;
           break;
-        }
+        //}
       }
 
       // If there is no existing window, open a new one.

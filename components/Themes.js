@@ -1264,6 +1264,27 @@ function generateTheme(theme_name=false){
       borderRadius: isWeb ? 10 : 8,
       paddingHorizontal : 3,
     },
+    user_log_key:{
+      flex:1,
+      backgroundColor: theme.background_color_default,
+      color : theme.text_color_default,
+      fontSize:15,
+    },
+    user_log_value:{
+      flex:3,
+      backgroundColor: theme.background_color_default,
+      color : theme.text_color_default,
+      fontSize:15,
+    },
+    user_log_sep:{
+      width:20,
+      marginHorizontal:1,
+      backgroundColor: theme.background_color_default,
+      color : theme.text_color_default,
+      fontSize:10,
+      textAlign:'center',
+    },
+
     log_time_text:{
       width:40,
       backgroundColor: theme.background_color_default,

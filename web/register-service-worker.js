@@ -7,6 +7,14 @@ if ('serviceWorker' in navigator) {
         console.info('Registered service-worker', info);
         serviceWorker = info;
         try { backup.savePushToken(); } catch (error) { console.log(error);}
+        let interval = setInterval(() => {
+          console.log("try savePushToken ...");
+          try {
+            backup.savePushToken().then(is_ok => {if(is_ok){clearInterval(interval);console.log("try savePushToken [OK]");}});
+          } catch (error) {
+            console.log("try savePushToken [ERROR]");
+          }
+        }, 2000);
 
         serviceWorker.addEventListener('installed', (event) => {
           console.log(event.isUpdate);

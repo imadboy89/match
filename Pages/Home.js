@@ -10,7 +10,7 @@ import * as Notifications from 'expo-notifications';
 import Loader from "../components/Loader";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
-
+import User_log from "../components/User_log";
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -30,7 +30,9 @@ class HomeScreen extends React.Component {
         source_id:1,
         is_only_live : false,
         is_upd_available:-1,
-        is_auth:false
+        is_auth:false, 
+        show_user_log:false,
+        user_log:false,
         //dynamic_style_list:styles_list,
     };
 
@@ -119,19 +121,18 @@ class HomeScreen extends React.Component {
       if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
         navigator.serviceWorker.removeEventListener('message',()=>{});
         navigator.serviceWorker.addEventListener('message', event => {
-          //console.log(event.data);
-          const match_data = event.data && event.data.data ? event.data.data : false;
-          if(match_data){
+          console.log(event);
+          const data = event.data && event.data.data ? event.data.data : false;
+          if (data && data.is_user_log){
+            console.log("1here log");
+            this.setState({show_user_log:true,user_log:data});
+          }else if(data){
+            console.log("1here match");
             this.onMatch_clicked(match_data);
           }
         });
       }
       document.addEventListener("keydown", this.escFunction, false);
-
-      if(match_data){
-        this.onMatch_clicked(match_data);
-        match_id = false ;
-      }
     }
 
     this.get_matches(this.state.matches_date);
@@ -146,7 +147,10 @@ class HomeScreen extends React.Component {
         backup.load_leagues();
         backup.load_settings().then(async o=>{
           if(API_.isWeb==false){
-            backup.savePushToken();
+            let interval = setInterval(() => {
+              console.log("try savePushToken ...");
+              backup.savePushToken().then(is_ok => {if(is_ok){clearInterval(interval);console.log("try savePushToken [OK]");}});
+            }, 2000);
           }
         }).catch(error=>{console.log(error)});
         get_notifications_matches().then(o=>{
@@ -255,8 +259,13 @@ class HomeScreen extends React.Component {
     try{
       const data = notification.request.content.data.data;
       let item = typeof data == "string" ? JSON.parse(data) : data;
+      console.log("notif 1 ",item);
       if(item){
-        this.onMatch_clicked(item);
+        if(item.is_user_log){
+          this.setState({show_user_log:true,user_log:data});
+        }else{
+          this.onMatch_clicked(item);
+        }
       }
     }catch(error){API_.debugMsg(error,"danger")}
   };
@@ -266,8 +275,13 @@ class HomeScreen extends React.Component {
     try{
       const data = response.notification.request.content.data.data;
       let item = typeof data == "string" ? JSON.parse(data) : data;
+      console.log("notif 1 ",item);
       if(item){
-        this.onMatch_clicked(item);
+        if(item.is_user_log){
+          this.setState({show_user_log:true,user_log:data});
+        }else{
+          this.onMatch_clicked(item);
+        }
       }
     }catch(error){API_.debugMsg(error,"danger")}
   };
@@ -600,6 +614,12 @@ show_DateP(){
         {this.state.modalVisible_match==true ? this.render_modal_credentials() : null}
 
       { this.state.show_datPicker===true ? this.show_DateP() : null }
+
+      <User_log 
+          user_log={this.state.user_log} 
+          modal_visible={this.state.show_user_log && this.state.user_log} 
+          closeModal={()=>{this.setState({show_user_log:false})}} /> 
+
       </GestureRecognizer>
     );
   }

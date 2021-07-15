@@ -128,7 +128,7 @@ class BackUp{
           this.PushToken = JSON.stringify(this.PushToken);
           console.log("savePushToken END");
         } catch (error) {
-          API_.showMsg(error,"danger");
+          API_.debugMsg(error,"danger");
           return false;
         }
       }

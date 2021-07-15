@@ -34,7 +34,6 @@ import ToastMsg from "./components/ToastMsg";
 import ClientInfo from "./Libs/ClientInfo";
 
 global.navigationRef = React.createRef();
-
 /*
 import { useHistory } from "react-router-dom";
 function navigate_to_page(page) {
@@ -59,6 +58,7 @@ global.backup.executingQueued();
 global.api_type=0;
 global._ClientInfo = new ClientInfo();
 global.match_data = false;
+global.user_log_data = false;
 global.open_page={};
 if(API_.isWeb){
   if(API_.isIOS){
@@ -74,10 +74,19 @@ if(API_.isWeb){
   global. Global_theme_name = window.matchMedia  && window.matchMedia('(prefers-color-scheme: dark)').matches===true?"dark violet" :"light" ;
 
   if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
+    /*
     navigator.serviceWorker.addEventListener('message', event => {
-      console.log(event.data);
-      match_data = event.data && event.data.data ? event.data.data : false;
+      const data = event.data && event.data.data ? event.data.data : false;
+      console.log(data,data.is_user_log);
+      if (data && data.is_user_log){
+        console.log("here log");
+        user_log_data = data;
+      }else if(data){
+        console.log("here match");
+        match_data = data;
+      }
     });
+    */
 
     global.deferredPrompt=0;
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -315,6 +324,8 @@ class APP extends React.Component {
         showMsg:false,
         showMsg_2:false,
         is_materialTopTab:false,
+        show_user_log : user_log_data!=false,
+        user_log : user_log_data,
     };
     API_.getConfig("is_materialTopTab",false).then(v=>{
       this.setState({is_materialTopTab:v});
@@ -324,7 +335,7 @@ class APP extends React.Component {
       _app_styles=theme;
       this.setState({style_loaded:true});
     });
-
+    this.firstRender = true;
     this.linking = {
       prefixes: ['https://'+main_domain, 'almatch://'],
       config: {
@@ -470,7 +481,7 @@ class APP extends React.Component {
     this.mounted = false;
   }
   showMsg = (body,type, speed, delay, onCLicked)=>{
-    if(!body || body.trim()==""){return false;}
+    if(!body || (body.trim && body.trim()=="")){return false;}
     console.log("msg1:",this.state.showMsg,"msg2:",this.state.showMsg);
     if(this.state.showMsg==false){
       this.setState({body:body,type:type, speed:speed, delay:delay,debug:false,showMsg:true,onCLicked:onCLicked});
@@ -479,7 +490,7 @@ class APP extends React.Component {
     }
   }
   debugMsg = (body,type, speed, delay)=>{
-    if(!body || body.trim()==""){return false;}
+    if(!body || (body.trim && body.trim()=="") ){return false;}
     if(this.state.showMsg==false){
       this.setState({body:body,type:type, speed:speed, delay:delay,debug:true,showMsg:true});
     }else if(this.state.showMsg==true && this.state.showMsg_2==false){
@@ -500,38 +511,46 @@ class APP extends React.Component {
     }
   }
   redirect=()=>{
-    if(location.search && location.search!="" && location.href.includes("/?/") ){
-        //location.href = location.href.replace("/?/","/");
-        const pages_sep = {
-            Channel : "channel_photo",
-            League  : "league_details",
-            Match   : "match_item",
-            Article : "article",
-          };
-        const full_path = location.search.replace("?/","");
-        const main_screen = full_path.split("/")[0];
-        const path__id = full_path.split("/-/");
-        const screens = path__id[0].split("/");
-        let params = {};
-        if(screens.length==1){
-          params.id = path__id[1]
-          if( pages_sep[main_screen]){
-            params[pages_sep[main_screen]] = "-";
-          }
-        }else if(screens.length==2){
-          params.screen = screens[1];
-          params.params = {id:path__id[1]};
-          if( pages_sep[params.screen]){
-            params.params[ pages_sep[params.screen] ] = "-";
-          }
-        }
-        setTimeout(() => {
-          if(navigationRef.current){
-            navigationRef.current?.navigate(main_screen,params);
-          }
-        }, 200);
-      }
 
+    try{
+      if(this.firstRender && API_.isWeb && location.search && location.search!="" && location.href.includes("/?/") ){
+          //location.href = location.href.replace("/?/","/");
+          const pages_sep = {
+              Channel : "channel_photo",
+              League  : "league_details",
+              Match   : "match_item",
+              Article : "article",
+            };
+          const full_path = location.search.replace("?/","");
+          const main_screen = full_path.split("/")[0];
+          const path__id = full_path.split("/-/");
+          const screens = path__id[0].split("/");
+          let params = {};
+          if(screens.length==1){
+            params.id = path__id[1]
+            if( pages_sep[main_screen]){
+              params[pages_sep[main_screen]] = "-";
+            }
+          }else if(screens.length==2){
+            params.screen = screens[1];
+            params.params = {id:path__id[1]};
+            if( pages_sep[params.screen]){
+              params.params[ pages_sep[params.screen] ] = "-";
+            }
+          }
+          setTimeout(() => {
+            if(navigationRef.current){
+              navigationRef.current?.navigate(main_screen,params);
+            }
+          }, 200);
+        }
+    }catch(e){
+      API_.showMsg(e,"danger");
+    }
+
+    if(this.firstRender){
+      this.firstRender = false;
+    }
   }
   redirect_deep=()=>{
 
@@ -540,7 +559,6 @@ class APP extends React.Component {
     if(this.state.style_loaded==false){
       return null;
     }
-
     return (
       <NavigationContainer linking={this.linking} ref={navigationRef} >
         {this.state.showMsg===true ? 
@@ -571,7 +589,7 @@ class APP extends React.Component {
         : null }
         
         {this.MyTabs}
-        {this.redirect("News")}
+        {this.redirect()}
       </NavigationContainer>
     );
   }

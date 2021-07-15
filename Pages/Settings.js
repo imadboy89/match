@@ -113,8 +113,7 @@ class SettingsScreen extends React.Component {
     return (<AppLogHistory
       modal_visible={this.state.modalVisible_history}
       dynamic_style={this.state.dynamic_style}
-      closeModal={()=>{
-        this.setState({modalVisible_history:false})}}
+      closeModal={()=>{this.setState({modalVisible_history:false})}}
       ></AppLogHistory>);
   }
   render_modal_matchesNotifs(){
