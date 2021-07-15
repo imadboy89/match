@@ -1,7 +1,7 @@
 self.__precacheManifest = [
   {
-    "revision": "4f0126d5ed8d8d4f7df9",
-    "url": "/static/js/app.b92b3fd7.chunk.js"
+    "revision": "d85fec2a873980b6c59d",
+    "url": "/static/js/app.2b412438.chunk.js"
   },
   {
     "revision": "66090dc4495d4ce3dfb9",
@@ -40,7 +40,7 @@ self.__precacheManifest = [
     "url": "/CNAME"
   },
   {
-    "revision": "4c1ccbd754eaf4273be81c942af51391",
+    "revision": "22781aaecd93223f87afb56d7e7122e7",
     "url": "/index.html"
   },
   {
@@ -48,7 +48,7 @@ self.__precacheManifest = [
     "url": "/serve.json"
   },
   {
-    "revision": "c73c1bcbeb0ef397ec78f255d8bc0dde",
+    "revision": "53301b578386ee620d1afb365a610576",
     "url": "/expo-service-worker.js"
   },
   {
