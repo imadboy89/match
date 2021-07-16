@@ -65,19 +65,6 @@ if(API_.isWeb){
   global. Global_theme_name = window.matchMedia  && window.matchMedia('(prefers-color-scheme: dark)').matches===true?"dark violet" :"light" ;
 
   if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
-    /*
-    navigator.serviceWorker.addEventListener('message', event => {
-      const data = event.data && event.data.data ? event.data.data : false;
-      console.log(data,data.is_user_log);
-      if (data && data.is_user_log){
-        console.log("here log");
-        user_log_data = data;
-      }else if(data){
-        console.log("here match");
-        match_data = data;
-      }
-    });
-    */
 
     global.deferredPrompt=0;
     window.addEventListener('beforeinstallprompt', (e) => {
