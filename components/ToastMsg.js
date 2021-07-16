@@ -75,12 +75,7 @@ export class ToastMsg extends React.Component {
     return true;
   }
   fill_stats(){
-    if(this.state.debug){
-      this.state.body = this.props.body && this.props.body.message ? this.props.body.message : this.props.body;
-      console.log(this.state.body);
-    }else{
-      this.state.body   = this.props.body ? this.props.body : "";
-    }
+    this.state.body = this.props.body && this.props.body.message ? this.props.body.message : this.props.body;
     this.state.body = this.state.body && this.state.body.charAt ? this.state.body.charAt(0).toUpperCase() + this.state.body.slice(1) : "";
     this.state.delay  = this.props.delay ? this.props.delay : this.delay;
     this.state.height = this.props.height ? this.props.height : this.height;
@@ -88,6 +83,10 @@ export class ToastMsg extends React.Component {
     this.state.speed  = this.props.speed ? this.props.speed : this.speed;
     this.state.type   = this.props.type ? this.props.type : this.type;
     this.state.debug  = this.props.debug ? this.props.debug : this.debug;
+    if(this.state.body==""){
+      console.log("----Modal Cancelled , empty body");
+      setend();
+    }
   }
   render() {
     this.fill_stats();

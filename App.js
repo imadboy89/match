@@ -43,7 +43,6 @@ function navigate_to_page(page) {
   // use history.push('/some/path') here
 };
 */
-global.main_domain = location.origin.split("//")[1].trim();
 //--release-channel imad | default
 // cmd to add google firebase server key 
 // expo push:android:upload --api-key AAAAFPoWn8w:APA91bHJ8F9ueKj_gaHXlqpJ-Ba2OIpwvI-GecDdfIWzCYLt0dVrJBmTZ6P1UmcezWjubrOqlZADJcNRdNldTcMsuhnTOJ7IpXvon_kJyHM0Rh9KT-5cr04FKd30-VeEAipDggMVKKbS
@@ -337,7 +336,7 @@ class APP extends React.Component {
     });
     this.firstRender = true;
     this.linking = {
-      prefixes: ['https://'+main_domain, 'almatch://'],
+      prefixes: ['https://'+API_.main_domain, 'almatch://'],
       config: {
         screens: {
           Home: {

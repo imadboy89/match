@@ -30,6 +30,7 @@ class API {
     this.notify_isWeb = Platform.OS == 'web';
     this.OS = DeviceInfo.osName.toLocaleLowerCase();
     this.isIOS = this.OS.toLocaleLowerCase() === "ios";
+    this.main_domain = this.isWeb?location.host:"almatch";
     this.load_channels_running = false;
     this.notifcation_type ="push";
     this.notifications_matches = {};
