@@ -146,10 +146,21 @@ class HomeScreen extends React.Component {
         backup.load_teams();
         backup.load_leagues();
         backup.load_settings().then(async o=>{
+          let tries = 5;
           if(API_.isWeb==false){
             let interval = setInterval(() => {
-              console.log("try savePushToken ...");
-              backup.savePushToken().then(is_ok => {if(is_ok){clearInterval(interval);console.log("try savePushToken [OK]");}});
+              tries-=1;
+              console.log("try savePushToken ["+tries+"] ...");
+              if(tries<=0){
+                clearInterval(interval);
+                console.log("try savePushToken [FAILED]");
+              }
+              backup.savePushToken().then(is_ok => {
+                if(is_ok){
+                  clearInterval(interval);
+                  console.log("try savePushToken [OK]");
+                }
+              });
             }, 2000);
           }
         }).catch(error=>{console.log(error)});
