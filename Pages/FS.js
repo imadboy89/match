@@ -63,7 +63,7 @@ get_url_content(date_obj=null){
               let url_enc = encodeURIComponent(this.state.input_val);
               url_enc = "https://developers.facebook.com/tools/debug/echo/?q="+url_enc
               
-              this.setState({ url_wv :"https://developers.facebook.com/tools/debug/echo/?q="+url_enc});
+              this.setState({ url_wv : url_enc});
             }}/>
           </View>
           <View style={{flex:20}}>

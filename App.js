@@ -196,6 +196,7 @@ function MatchesStackScreen() {
       <MatchesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="TV" component={TVScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="FS" component={FSScreen} animationEnabled={is_animationEnabled}/>
       
       
     </MatchesStack.Navigator>
