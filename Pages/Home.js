@@ -124,11 +124,9 @@ class HomeScreen extends React.Component {
           console.log(event);
           const data = event.data && event.data.data ? event.data.data : false;
           if (data && data.is_user_log){
-            console.log("1here log");
             this.setState({show_user_log:true,user_log:data});
           }else if(data){
-            console.log("1here match");
-            this.onMatch_clicked(match_data);
+            this.onMatch_clicked(data);
           }
         });
       }

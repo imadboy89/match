@@ -129,6 +129,7 @@ class CategoriesScreen extends React.Component {
       ch.category_name = chs[i].name;
       ch.ch_item = chs[i];
       ch.is_radio = true;
+      ch.is_hls = chs[i].is_hls
       ch.url = chs[i].url;
       ch.is_external = true;
       ch.is_html = chs[i].is_html;

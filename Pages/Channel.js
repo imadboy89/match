@@ -11,7 +11,7 @@ class ChannelScreen extends React.Component {
     super(props);
     this.state = {
         list:[],
-        modalVisible_match:false,
+        modalVisible_hlsp:false,
         player_type:1,
         key_:"en_name",
         key_key:"channel_id",
@@ -47,16 +47,16 @@ class ChannelScreen extends React.Component {
   }
 
   render_modal_HLSP(){
-    if(this.state.modalVisible_match==false){
+    if(this.state.modalVisible_hlsp==false){
       return null;
     }
     return (    
       <HLSP 
-        modalVisible_match={this.state.modalVisible_match}
+      modalVisible_hlsp={this.state.modalVisible_hlsp}
         dynamic_style={this.state.dynamic_style_modals}
         p_url={this.state.p_url}
         player_type={this.state.player_type}
-        closeM={()=>{this.setState({modalVisible_match:false})}}
+        closeM={()=>{this.setState({modalVisible_hlsp:false})}}
       />
         );
   }
@@ -71,7 +71,7 @@ class ChannelScreen extends React.Component {
       
     }else if (this.state.actionType=="PLAYER"){
       if(API_.isWeb){
-        this.setState({p_url:serv.SecureUrl,modalVisible_match:true});
+        this.setState({p_url:serv.SecureUrl,modalVisible_hlsp:true});
         return;
       }
       API_.open_ext_url(serv.SecureUrl);

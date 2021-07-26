@@ -6,6 +6,7 @@ import Loader from "../components/Loader";
 import {styles_article,getTheme, global_theme} from "../components/Themes";
 import { WebView } from 'react-native-webview';
 import IconButton from "../components/IconButton";
+import HLSP from "../components/HSL_player";
 
 class VideoScreen extends React.Component {
   constructor(props) {
@@ -17,6 +18,8 @@ class VideoScreen extends React.Component {
         video:this.props.route.params.item,
         dynamic_style:styles_article,
         videoQuality:"380",
+        modalVisible_hlsp : false,
+        player_type : 1,
         
     };
     this.is_external_loaded = false;
@@ -85,17 +88,36 @@ class VideoScreen extends React.Component {
       });
     });
   }
- LoadingIndicatorView() {
+  LoadingIndicatorView() {
     return <ActivityIndicator color='#009b88' size='large' />
+  }
+  render_modal_HLSP(){
+    console.log("modalVisible_hlsp",this.state.modalVisible_hlsp);
+    if(this.state.modalVisible_hlsp==false){
+      return null;
+    }
+    return (    
+      <HLSP 
+        modalVisible_hlsp={this.state.modalVisible_hlsp}
+        dynamic_style={this.state.dynamic_style_modals}
+        p_url={this.state.video.url}
+        player_type={this.state.player_type}
+        closeM={()=>{this.setState({modalVisible_hlsp:false, ignore : true})}}
+      />
+        );
   }
   render_wv(){
     let html = false;
-    if(this.state.video.videoId===false ){return null}
+    if(this.state.video==undefined || this.state.video.videoId===false ){return null}
     let uri_ = "";
     if(this.state.video.is_external){
       uri_ = this.state.video.url;
       if(this.is_external_loaded==false) return;
       html = this.state.video.is_radio && this.state.video.is_html  ? '<audio id="audio" loop> <source src="'+uri_+'"  type="audio/mp3" /> </audio>' : false;
+      if (this.state.video.is_hls ){
+        this.state.modalVisible_hlsp = this.state.ignore ? false : true;
+        return null;
+      }
     }else{
       const uri_dailyMotion = 'https://www.dailymotion.com/embed/video/'+this.state.video.videoId+'?quality='+this.state.videoQuality+'&info=0&logo=0&autoplay=false';
       const uri_youtube = 'https://www.youtube.com/embed/'+this.state.video.videoId+'?autoplay=0&&vq='+this.state.videoQuality+'&color='+global_theme.text_color_default;
@@ -162,6 +184,7 @@ class VideoScreen extends React.Component {
           <Picker.Item label={"720"} value={"hd720&hd=1"} key={"720"} />
           <Picker.Item label={"1080"} value={"hd1080&hd=1"} key={"1080"} />
         </Picker>
+        {this.render_modal_HLSP()}
         </ScrollView >
     );
   }
