@@ -1,11 +1,11 @@
 {
   "files": {
-    "app.js": "/static/js/app.a73530f6.chunk.js",
-    "app.js.map": "/static/js/app.a73530f6.chunk.js.map",
+    "app.js": "/static/js/app.3dad23de.chunk.js",
+    "app.js.map": "/static/js/app.3dad23de.chunk.js.map",
     "runtime~app.js": "/static/js/runtime~app.2e9f1821.js",
     "runtime~app.js.map": "/static/js/runtime~app.2e9f1821.js.map",
-    "static/js/2.1fff6ade.chunk.js": "/static/js/2.1fff6ade.chunk.js",
-    "static/js/2.1fff6ade.chunk.js.map": "/static/js/2.1fff6ade.chunk.js.map",
+    "static/js/2.113731cd.chunk.js": "/static/js/2.113731cd.chunk.js",
+    "static/js/2.113731cd.chunk.js.map": "/static/js/2.113731cd.chunk.js.map",
     "fonts/DroidKufi-Bold.ttf": "/./fonts/DroidKufi-Bold.ttf",
     "fonts/DroidKufi-Regular.ttf": "/./fonts/DroidKufi-Regular.ttf",
     "fonts/FontAwesome.ttf": "/./fonts/FontAwesome.ttf",
@@ -18,12 +18,12 @@
     "index.html": "/index.html",
     "manifest.json": "/manifest.json",
     "serve.json": "/serve.json",
-    "static/js/2.1fff6ade.chunk.js.LICENSE.txt": "/static/js/2.1fff6ade.chunk.js.LICENSE.txt",
+    "static/js/2.113731cd.chunk.js.LICENSE.txt": "/static/js/2.113731cd.chunk.js.LICENSE.txt",
     "static/media/ptch.jpg": "/static/media/ptch.a355ccf1.jpg"
   },
   "entrypoints": [
     "static/js/runtime~app.2e9f1821.js",
-    "static/js/2.1fff6ade.chunk.js",
-    "static/js/app.a73530f6.chunk.js"
+    "static/js/2.113731cd.chunk.js",
+    "static/js/app.3dad23de.chunk.js"
   ]
 }
