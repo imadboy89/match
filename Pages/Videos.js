@@ -34,6 +34,10 @@ class VideosScreen extends React.Component {
   changesource = (itemValue, itemIndex)=>{
     this.state.source_id = parseInt(itemValue);
     this.state.page=1;
+    if(this.state.source_id==5){
+      this.props.navigation.navigate('Movies');
+      return;
+    }
     this.get_Videos();
   }
 
@@ -105,6 +109,7 @@ get_Videos = ()=>{
           <Picker.Item label="arriadia" value={2} />
           <Picker.Item label="Mtkhb" value={3} />
           <Picker.Item label="heSport" value={4} />
+          <Picker.Item label="Movies" value={5} />
           
       </Picker>
     </View>);

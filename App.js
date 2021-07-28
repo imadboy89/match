@@ -21,6 +21,8 @@ import LeagueScreen from './Pages/League';
 import LeaguesScreen from './Pages/Leagues';
 import SettingsScreen from './Pages/Settings';
 import TVScreen from './Pages/TV';
+import MoviesScreen from './Pages/Movies';
+import MovieScreen from './Pages/Movie';
 import Constants from 'expo-constants';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -232,6 +234,9 @@ function VideosStackScreen() {
     <VideosStack.Navigator>
       <VideosStack.Screen options={_app_styles.screenHeader} name="Videos" component={VideosScreen} animationEnabled={is_animationEnabled}/>
       <VideosStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} animationEnabled={is_animationEnabled}/>
+      <VideosStack.Screen options={_app_styles.screenHeader} name="Movies" component={MoviesScreen} animationEnabled={is_animationEnabled}/>
+      <VideosStack.Screen options={_app_styles.screenHeader} name="Movie" component={MovieScreen} animationEnabled={is_animationEnabled}/>
+      
     </VideosStack.Navigator>
   );
 }
@@ -389,7 +394,35 @@ class APP extends React.Component {
               Video    : "Leagues/Video",
             }
           },
-          Videos: 'Videos',
+          Videos : {
+            initialRouteName: 'Videos',
+            screens:{
+              Videos     : "Videos",
+              Movies     : "Videos/Movies",
+              Video    : {
+                path: 'Videos/Video/:item/:id',
+                parse:{ 
+                  id: (id) => id,
+                  item: (item) => '-',
+                 },
+                stringify: {
+                  id: (id) => `${id}`,
+                  item: (item) => `-`,
+                },
+              },
+              Movie    : {
+                path: 'Videos/Movies/Movie/:item/:id',
+                parse:{ 
+                  id: (id) => id,
+                  item: (item) => '-',
+                 },
+                stringify: {
+                  id: (id) => `${id}`,
+                  item: (item) => `-`,
+                },
+              },
+            }
+          },
           Channels: 'Channels',
           News: {
             initialRouteName: 'News',

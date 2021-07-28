@@ -1368,6 +1368,16 @@ class API {
         this.error = error;
       });
   };
+
+  get_yify_movies = (options)=>{
+    const params = Object.keys(options).map(k=>k+"="+options[k]).join("&"); 
+    const url = "https://yts.mx/api/v2/list_movies.json?"+params;
+    return this.http(url,"GET",null,null,true)
+  }
+  get_yify_movie = (id)=>{
+    const url = "https://yts.mx/api/v2/movie_details.json?movie_id="+id;
+    return this.http(url,"GET",null,null,true)
+  }
 }
 
 export default API;

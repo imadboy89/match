@@ -153,15 +153,22 @@ class ItemsList extends React.Component {
           </View>
         </View>
         );
-    }else if(col_key=="title_news" || col_key=="league_name"){
+    }else if(["league_name","title_news","title_long"].includes(col_key)){
       const fav_icon = this.get_fav_icon(item[col_key],col_key=="league_name"? item.id : 0,true);
       const koora_icon = this.get_common_icon(item["title"],item["koora_id"],true,"flag");
       let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
       const resizemode = col_key=="title_news" ? "stretch" : "center";
+      let _img = item.img;
+      let _date = date;
+      if(col_key=="title_long"){
+        const genres = item.genres.join(" | ");
+        _img  = item.medium_cover_image ? item.medium_cover_image : _img;
+        _date = item.rating ? item.rating+"/10" : _date;
+      }
       return (
         <View style={[this.state.dynamic_style.news_container,shadow_style]}>
-          <ImageBackground style={{flex:1,width:"100%"}} source={{uri: item.img}} imageStyle={{resizeMode:resizemode}}>
-          { item.date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,textAlign:"center",}}>{date}</Text> : null}
+          <ImageBackground style={{flex:1,width:"100%"}} source={{uri: _img}} imageStyle={{resizeMode:resizemode}}>
+          { _date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,textAlign:"center",}}>{_date}</Text> : null}
 
             <View style={this.state.dynamic_style.news_img_v}>
               <View style={this.state.dynamic_style.league_header}>
@@ -353,7 +360,7 @@ class ItemsList extends React.Component {
     if(is_new){
       this.setHidden(false,is_new);
     }
-    if(this.list.length>0 && this.list[0]["title"]!=""){
+    if(this.list.length>0 && this.list[0]["title"]!="" && this.list[0]["torrents"]==undefined){
       this.create_refs();
       const list_lists = this.list.map(k=>{
       return (
@@ -406,7 +413,9 @@ class ItemsList extends React.Component {
         delete header["data"];
         header["is_header"] = true;
         //final_list = final_list.concat([header]);
-        final_list = final_list.concat(this.list[i] ? this.list[i]["data"]: []);
+        let _items = this.list[i] ? this.list[i].data : [];
+        _items = _items==undefined ? [this.list[i],] : _items;
+        final_list = final_list.concat(_items);
       }
       
       //to avoid 'FlatList : Invariant Violation: Changing numColumns on the fly is not supported' error
