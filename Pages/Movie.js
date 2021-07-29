@@ -24,6 +24,7 @@ class ChannelScreen extends React.Component {
         movie_id : this.props.route.params.id
         
     };
+    this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
     this.playerRef = React.createRef();
   }
   componentDidMount(){
@@ -65,7 +66,9 @@ class ChannelScreen extends React.Component {
     }
   }
   on_clicked(t){
-    API_.open_ext_url(t.url);
+    this.magnet_link
+    const url = this.state.actionType=="Torrent File" ? t.url : this.magnet_link.replace("[[torrent_hash]]",t.hash).replace("[[torrent_name]]",this.state.movie.title_long) ;
+    API_.open_ext_url(url);
 
   }
   render() {
@@ -76,7 +79,8 @@ class ChannelScreen extends React.Component {
             onPress={()=>this.on_clicked(t)} title={t.type +" - "+ t.quality+" - "+t.size+" *"+t.seeds+"*"} style={{margin:5}}></Button>
         </View>
       ):null) : null;
-    let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER","inApp-IPTV"];
+    //let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER","inApp-IPTV"];
+    const picker_options = ["Torrent File","Magnet Link"]
     const pickers = picker_options.map(o=><Picker.Item label={o} value={o} key={o}/>);
 
     return (
