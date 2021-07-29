@@ -21,7 +21,8 @@ class ChannelScreen extends React.Component {
         dynamic_style:styles_channel,
         p_url:"",
         movie : this.props.route.params.item,
-        movie_id : this.props.route.params.id
+        movie_id : this.props.route.params.id,
+        actionType:"Torrent File",
         
     };
     this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
