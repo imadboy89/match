@@ -481,16 +481,20 @@ function generateTheme(theme_name=false){
       justifyContent: 'center',
     },
     news_container:{
-      //padding:5,
       marginVertical:7,
       marginHorizontal:3,
-      //marginBottom:5,
       height:200,
       width:"98%",
-      //width:200,
-      //backgroundColor: "#00000005",//theme.news_cont_backgroundColor,
       backgroundColor: theme.news_cont_backgroundColor,
-      //borderRadius: 10,
+      justifyContent: 'center',
+      
+    },
+    movies_container:{
+      marginVertical:7,
+      marginHorizontal:3,
+      height:400,
+      width:"98%",
+      backgroundColor: theme.news_cont_backgroundColor,
       justifyContent: 'center',
       
     },
@@ -664,6 +668,7 @@ function generateTheme(theme_name=false){
       justifyContent: 'center',
       backgroundColor: theme.background_color_default,
       color : "#fff",
+      paddingHorizontal:10,
     },
     text: {
       color : theme.text_color_default,

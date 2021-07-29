@@ -157,17 +157,25 @@ class ItemsList extends React.Component {
       const fav_icon = this.get_fav_icon(item[col_key],col_key=="league_name"? item.id : 0,true);
       const koora_icon = this.get_common_icon(item["title"],item["koora_id"],true,"flag");
       let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
-      const resizemode = col_key=="title_news" ? "stretch" : "center";
+      let image_style = {resizeMode:"center",width:"100%"};
+      image_style.resizeMode = col_key=="title_news" ? "stretch" : image_style.resizeMode;
       let _img = item.img;
       let _date = date;
+      let item_container = this.state.dynamic_style.news_container;
+      let imageBackground_style={flex:1,width:"100%"};
       if(col_key=="title_long"){
         const genres = item.genres.join(" | ");
         _img  = item.medium_cover_image ? item.medium_cover_image : _img;
         _date = item.rating ? item.rating+"/10" : _date;
+        item_container = this.state.dynamic_style.movies_container;
+        image_style.resizeMode = "cover";
+        image_style.width = "80%";
+        image_style.marginLeft = "10%";
       }
+      
       return (
-        <View style={[this.state.dynamic_style.news_container,shadow_style]}>
-          <ImageBackground style={{flex:1,width:"100%"}} source={{uri: _img}} imageStyle={{resizeMode:resizemode}}>
+        <View style={[item_container,shadow_style]}>
+          <ImageBackground style={imageBackground_style} source={{uri: _img}} imageStyle={image_style}>
           { _date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,textAlign:"center",}}>{_date}</Text> : null}
 
             <View style={this.state.dynamic_style.news_img_v}>

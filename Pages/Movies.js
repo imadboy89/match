@@ -21,7 +21,7 @@ class MoviesScreen extends React.Component {
     };
     this.rates=[0,1,2,3,4,5,6,7,8,9];
     this.genres = [
-    "",
+    "all",
     "comedy",
   "sci-fi",
   "horror",
@@ -108,6 +108,7 @@ get_movies =(loading=true,keep_list=false)=>{
     this.get_movies();
   }
   render() {
+    const picker_style = {height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,borderColor:"white",borderWidth:1};
     const ListHeaderComponent = (        <View style={this.state.dynamic_style.nav_container}>
       <IconButton
         disabled={this.state.loading}
@@ -127,7 +128,7 @@ get_movies =(loading=true,keep_list=false)=>{
       }}  />
       <Picker
           selectedValue={this.state.genre}
-          style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:100}}
+          style={[picker_style,{flex:3}]}
           itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
           onValueChange={this.change_genre}
         >
@@ -135,7 +136,7 @@ get_movies =(loading=true,keep_list=false)=>{
       </Picker>
       <Picker
           selectedValue={this.state.rate}
-          style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:50}}
+          style={[picker_style,{flex:1}]}
           itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
           onValueChange={this.change_rate}
         >
@@ -143,7 +144,7 @@ get_movies =(loading=true,keep_list=false)=>{
       </Picker>
       <Picker
           selectedValue={this.state.sortby}
-          style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:100}}
+          style={[picker_style,{flex:3}]}
           itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
           onValueChange={this.change_sortby}
         >
