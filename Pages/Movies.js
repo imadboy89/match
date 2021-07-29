@@ -43,7 +43,7 @@ class MoviesScreen extends React.Component {
   componentDidMount(){
     this._isMounted=true;
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
-    this.props.navigation.setOptions({title: "News",
+    this.props.navigation.setOptions({title: "Movies",
     "headerRight":()=>(
           <IconButton 
             name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{

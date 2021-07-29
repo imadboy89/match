@@ -246,9 +246,10 @@ function MyTabs(props){
   //let tabBarOptions_ = this.state.tabBarOptions_;
   const StackNav = props.is_materialTopTab ? createMaterialTopTabNavigator() : createBottomTabNavigator();
   return (
-    <StackNav.Navigator
+    <StackNav.Navigator 
       barStyle={{ backgroundColor: '#000' }}
       screenOptions={({ route }) => ({
+          cardStyle: {backgroundColor: '#000000'},
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 

@@ -2,7 +2,7 @@ import React from "react";
 import {  View, Dimensions, Modal, Button, Linking, Picker,ScrollView, Image , ImageBackground} from 'react-native';
 import Constants from 'expo-constants';
 import Loader from "../components/Loader";
-import {styles_article,getTheme} from "../components/Themes";
+import {styles_article,getTheme, globalView_style} from "../components/Themes";
 import { TouchableHighlight } from "react-native-gesture-handler";
 import ItemsList from '../components/list';
 import Player from "../components/Player";
@@ -169,6 +169,8 @@ class ArticleScreen extends React.Component {
     });
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
+        <View style={globalView_style}>
+
         <View style={this.state.dynamic_style.channel_logo_v}>
         
           { this.state.article && this.state.article.img ?  
@@ -214,6 +216,8 @@ class ArticleScreen extends React.Component {
           navigation={this.props.navigation}
           closeModal={()=>{this.setState({modalVisible_team:false});/*this.load_logos();*/}}></Team>
           : null }
+
+        </View>
         </ScrollView >
     );
   }

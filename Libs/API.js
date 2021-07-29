@@ -1158,7 +1158,7 @@ class API {
   get_yt_vids(channel_id){
     return this.get_channel_info(channel_id).then(o=>{
       let playlist_id = "";
-      if(Object.keys(o).length==0){
+      if(!o || Object.keys(o).length==0){
         return [];
       }
       try{playlist_id=o["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"];}catch(err){console.log(o);return[];}

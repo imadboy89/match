@@ -3,7 +3,7 @@ import {  View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image , I
 import Constants from 'expo-constants';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import Loader from "../components/Loader";
-import {styles_article,getTheme, global_theme} from "../components/Themes";
+import {styles_article,getTheme, global_theme,globalView_style} from "../components/Themes";
 import { WebView } from 'react-native-webview';
 import IconButton from "../components/IconButton";
 import HLSP from "../components/HSL_player";
@@ -154,6 +154,7 @@ class VideoScreen extends React.Component {
     style = this.state.video && (this.state.video.videoId || this.state.video.url) ? style : {width:1,height:1};
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
+        <View style={globalView_style}>
         <ImageBackground style={{height:height,width:"100%"}} source={{uri: this.state.video.img}} >
         </ImageBackground>
         <View style={style} source={{uri: this.state.video.img}} >
@@ -185,6 +186,8 @@ class VideoScreen extends React.Component {
           <Picker.Item label={"1080"} value={"hd1080&hd=1"} key={"1080"} />
         </Picker>
         {this.render_modal_HLSP()}
+
+        </View>
         </ScrollView >
     );
   }

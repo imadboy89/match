@@ -210,7 +210,7 @@ function generateTheme(theme_name=false){
   const header_height = isWeb ? 40 : 70;
   const __isMobile = _isMobile(isWeb);
   const maxWidth = window_width<1000 ? "100%" : 1000;
-  
+  var globalView_style = {width:maxWidth, alignSelf:"center"};
   var styles_list = {
     list_container: {
       marginRight: "1%",
@@ -645,7 +645,8 @@ function generateTheme(theme_name=false){
     },
     channel_logo_v:{
       width: "100%",
-      height:300,
+      //height : window_width/2,
+      height: window_height>800 ? 400 : 300,
       padding:5,
       alignContent:"center",
       alignItems:"center",
@@ -731,15 +732,20 @@ function generateTheme(theme_name=false){
       fontSize: 18,
       color : theme.text_color_default,
     },
+    info_text_small:{
+      fontSize: 15,
+      color : theme.text_color_default,
+    },
     channel_logo:{
       aspectRatio: 1,
       width: "100%",
       height: "100%",
-      resizeMode: 'cover',
+      resizeMode: 'center',
     },
     channel_logo_v:{
       width: "100%",
-      height:300,
+      //height : window_width/2,
+      height: window_height>800 ? 500 : 400,
       padding:5,
       alignContent:"center",
       alignItems:"center",
@@ -1507,7 +1513,7 @@ function generateTheme(theme_name=false){
       paddingHorizontal : 8,
     },
   });
-  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles,styles_league,styles_settings,theme,styles_notif,styles_modal};
+  return {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,app_styles,styles_league,styles_settings,theme,styles_notif,styles_modal,globalView_style};
 }
 var themes = generateTheme("dark blue");
 var styles_list    = themes["styles_list"];
@@ -1522,10 +1528,12 @@ var styles_settings= themes["styles_settings"];
 var global_theme   = themes["theme"];
 var styles_notif   = themes["styles_notif"];
 var styles_modal   = themes["styles_modal"];
+var globalView_style   = themes["globalView_style"];
 
 
 
-export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme,_isMobile,styles_settings,styles_notif, styles_modal};
+
+export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme,_isMobile,styles_settings,styles_notif, styles_modal, globalView_style};
 
 
 

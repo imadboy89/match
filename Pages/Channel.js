@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Button, Picker,ScrollView, Image } from 'react-native';
 import Loading from "../components/Loader";
-import {styles_channel,getTheme} from "../components/Themes";
+import {styles_channel,getTheme,globalView_style} from "../components/Themes";
 import * as ScreenOrientation from 'expo-screen-orientation';
 import HLSP from "../components/HSL_player";
 
@@ -29,7 +29,7 @@ class ChannelScreen extends React.Component {
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style_modals:theme}) );
     this.get_channel();
-    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> API_.debugMsg(error+"","warning") );
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> {/*API_.debugMsg(error+"","warning")*/} );
   }
   get_channel(){
       this.channel_photo = this.props.route.params.channel_photo;
@@ -102,6 +102,7 @@ class ChannelScreen extends React.Component {
 
     return (
       <ScrollView style={this.state.dynamic_style.container}>
+        <View style={globalView_style}>
       <View style={this.state.dynamic_style.channel_logo_v}>
         { this.channel_photo ?  <Image style={this.state.dynamic_style.channel_logo} source={{uri: this.channel_photo.slice(0,4)!="http"?API_.domain_o+this.channel_photo:this.channel_photo}} />: null}
          </View>
@@ -126,6 +127,7 @@ class ChannelScreen extends React.Component {
         }
         </View>
         {this.render_modal_HLSP()}
+        </View>
         </ScrollView >
     );
   }
