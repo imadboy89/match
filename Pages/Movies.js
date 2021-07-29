@@ -118,7 +118,7 @@ get_movies =(loading=true,keep_list=false)=>{
         this.state.page--;
         this.get_movies();
       }}  />
-      <Text style={this.state.dynamic_style.text}>{this.state.page}</Text>
+      <Text style={this.state.dynamic_style.text_small}>{this.state.page}</Text>
       <IconButton 
         disabled={this.state.loading}
        title="forward"  name="chevron-right" 
@@ -126,30 +126,35 @@ get_movies =(loading=true,keep_list=false)=>{
         this.state.page++;
         this.get_movies();
       }}  />
-      <Picker
-          selectedValue={this.state.genre}
-          style={[picker_style,{flex:3}]}
-          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-          onValueChange={this.change_genre}
-        >
-          {this.genres.map(g=><Picker.Item label={g} value={g} key={g} />)}
-      </Picker>
-      <Picker
-          selectedValue={this.state.rate}
-          style={[picker_style,{flex:1}]}
-          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-          onValueChange={this.change_rate}
-        >
-          {this.rates.map(g=><Picker.Item label={"+"+g} value={g} key={g} />)}
-      </Picker>
-      <Picker
-          selectedValue={this.state.sortby}
-          style={[picker_style,{flex:3}]}
-          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-          onValueChange={this.change_sortby}
-        >
-          {this.sortby.map(g=><Picker.Item label={g} value={g} key={g} />)}
-      </Picker>
+      <View style={{flex:1,flexDirection:"row"}}>
+      <Text style={this.state.dynamic_style.text_small}>⌖</Text>
+        <Picker
+            selectedValue={this.state.genre}
+            style={[picker_style,{width:"40%"}]}
+            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+            onValueChange={this.change_genre}
+          >
+            {this.genres.map(g=><Picker.Item label={g} value={g} key={g} />)}
+        </Picker>
+        <Text style={this.state.dynamic_style.text_small}>＃</Text>
+        <Picker
+            selectedValue={this.state.rate}
+            style={[picker_style,{width:"19%"}]}
+            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+            onValueChange={this.change_rate}
+          >
+            {this.rates.map(g=><Picker.Item label={"+"+g} value={g} key={g} />)}
+        </Picker>
+        <Text style={this.state.dynamic_style.text_small}>⇅</Text>
+        <Picker
+            selectedValue={this.state.sortby}
+            style={[picker_style,{width:"40%"}]}
+            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+            onValueChange={this.change_sortby}
+          >
+            {this.sortby.map(g=><Picker.Item label={g} value={g} key={g} />)}
+        </Picker>
+      </View>
     </View>);
     return (
       <View style={this.state.dynamic_style.container}>     

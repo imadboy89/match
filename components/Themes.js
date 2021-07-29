@@ -679,7 +679,14 @@ function generateTheme(theme_name=false){
       textAlign:"center",
       width:20,
     },
-
+    text_small: {
+      color : theme.text_color_default,
+      fontSize: 20,
+      marginRight:2,
+      marginLeft:5,
+      justifyContent: 'center',
+      textAlign:"center",
+    },
     title: {
       fontSize: 20,
       fontWeight: 'bold',
