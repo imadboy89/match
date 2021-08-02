@@ -33,13 +33,22 @@ class ChannelScreen extends React.Component {
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style_modals:theme}) );
     if(this.state.movie=="-"){
       this.get_Movie();
+    }else{
+      this.get_subs();
     }
+
   ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> {/*API_.debugMsg(error+"","warning")*/} );
+  }
+  get_subs(){
+    API_.get_yify_subs(this.state.movie.imdb_code).then(subs=>{
+      this.setState({subs:subs});
+    });
   }
   get_Movie(){
       API_.get_yify_movie(this.state.movie_id).then(resp=>{
         if(resp && resp["data"] && resp["data"]["movie"] ){
           this.setState({movie:resp["data"]["movie"],loading:false});
+          this.get_subs();
         }
       }).catch(err=>API_.showMsg(err,"danger"));
   }
@@ -67,9 +76,15 @@ class ChannelScreen extends React.Component {
     }
   }
   on_clicked(t){
-    this.magnet_link
-    const url = this.state.actionType=="Torrent File" ? t.url : this.magnet_link.replace("[[torrent_hash]]",t.hash).replace("[[torrent_name]]",this.state.movie.title_long) ;
-    API_.open_ext_url(url);
+    let url = false;
+    if(t.lang){
+      url = API_.get_yify_sub_dl(t.url);
+    }else{
+      url = this.state.actionType=="Torrent File" ? t.url : this.magnet_link.replace("[[torrent_hash]]",t.hash).replace("[[torrent_name]]",this.state.movie.title_long) ;
+    }
+    if(url){
+      API_.open_ext_url(url);
+    }
 
   }
   render() {
@@ -80,6 +95,13 @@ class ChannelScreen extends React.Component {
             onPress={()=>this.on_clicked(t)} title={t.type +" - "+ t.quality+" - "+t.size+" *"+t.seeds+"*"} style={{margin:5}}></Button>
         </View>
       ):null) : null;
+    let DL_subs = this.state.subs && this.state.subs.length>0 ? this.state.subs.map(s => s && s.url && s.name && s.lang && s.lang.toLocaleLowerCase()=="arabic" ? (
+      <View style={{margin:8}} key={s.url}>
+        <Button 
+          color={"#f39c12"}
+          onPress={()=>this.on_clicked(s)} title={s.name} style={{margin:5}}></Button>
+      </View>
+    ):null) : null;
     //let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER","inApp-IPTV"];
     const picker_options = ["Torrent File","Magnet Link"]
     const pickers = picker_options.map(o=><Picker.Item label={o} value={o} key={o}/>);
@@ -119,6 +141,9 @@ class ChannelScreen extends React.Component {
           </Picker>
 
           {DL_links}
+
+          <Text style={this.state.dynamic_style.info_text}      > Subtitles (ar): </Text>
+          {DL_subs}
         </View>
         }
         </View>

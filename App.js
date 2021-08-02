@@ -36,7 +36,7 @@ import ToastMsg from "./components/ToastMsg";
 import ClientInfo from "./Libs/ClientInfo";
 
 global.navigationRef = React.createRef();
-
+global.g = null;
 //--release-channel imad | default
 // cmd to add google firebase server key 
 // expo push:android:upload --api-key AAAAFPoWn8w:APA91bHJ8F9ueKj_gaHXlqpJ-Ba2OIpwvI-GecDdfIWzCYLt0dVrJBmTZ6P1UmcezWjubrOqlZADJcNRdNldTcMsuhnTOJ7IpXvon_kJyHM0Rh9KT-5cr04FKd30-VeEAipDggMVKKbS

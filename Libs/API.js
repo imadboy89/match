@@ -9,6 +9,8 @@ import * as DeviceInfo from 'expo-device';
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
+    this.yify_movies_url = "https://yts.mx/api/v2/";
+    this.yify_subs_url = "https://yifysubtitles.org/";
     this.showMsg = function(msg){console.log("showMsg : ",msg)}
     this.channels = {1:"UCBaD-tLomo_JgH66CuSFWAQ" , 2:"UCRN5ho3UGhUi7ZCBe2G2f2w",4:"UC7FGo_bQUVxVxVsiHAQxSOQ"}
     this.pageTokens = {};
@@ -1371,12 +1373,32 @@ class API {
 
   get_yify_movies = (options)=>{
     const params = Object.keys(options).map(k=>k+"="+options[k]).join("&"); 
-    const url = "https://yts.mx/api/v2/list_movies.json?"+params;
+    const url = this.yify_movies_url+"list_movies.json?"+params;
     return this.http(url,"GET",null,null,true)
   }
   get_yify_movie = (id)=>{
-    const url = "https://yts.mx/api/v2/movie_details.json?movie_id="+id;
+    const url = this.yify_movies_url+"movie_details.json?movie_id="+id;
     return this.http(url,"GET",null,null,true)
+  }
+  get_yify_subs = (id)=>{
+    const url = this.yify_subs_url+"movie-imdb/"+id;
+    return this.http(url,"GET",null,null,false)
+    .then(async resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      let subs = [];
+      try {
+        subs = scrap.get_yify_subs(resp);
+      } catch (error) {
+        API_.debugMsg(error,"danger");
+      }
+      return subs;
+    }).catch(error=>API_.showMsg(error,"danger"));
+  }
+  get_yify_sub_dl = (s_url)=>{
+    const url = this.yify_subs_url+"subtitle/"+s_url.replace(/^\/subtitles\//,"")+".zip";
+    //const url = this.yify_subs_url+""+s_url+".zip";
+    return url;
   }
 }
 
