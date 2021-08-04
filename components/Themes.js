@@ -745,10 +745,10 @@ function generateTheme(theme_name=false){
     },
     channel_logo:{
       aspectRatio: 1,
-      width: "80%",
+      width: "64%",
       height: "100%",
       resizeMode: 'cover',
-      marginLeft:"10%",
+      marginLeft:"18%",
     },
     channel_logo_v:{
       width: "100%",

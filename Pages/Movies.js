@@ -108,9 +108,9 @@ get_movies =(loading=true,keep_list=false)=>{
     this.props.navigation.setOptions({
       title:"Movies",
       "headerRight":()=>(
-        <View style={{flexDirection:"row",margin:5,padding:5,flex:1}}>
+        <View style={{flexDirection:"row",margin:5,padding:5,width:"90%"}}>
             <TextInput 
-              style={{flex:1,backgroundColor:"black",color:"white",marginLeft:20,marginVertical:5,borderWidth:1,borderColor:"white",borderRadius:5}}
+              style={{flex:1,backgroundColor:"black",color:"white",marginLeft:10,marginVertical:5,borderWidth:1,borderColor:"white",borderRadius:5}}
               onChangeText={(val)=>{this.setState({search_qeury:val});this.render_header();}}
               value={this.state.search_qeury}
               />
