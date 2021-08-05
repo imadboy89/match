@@ -748,7 +748,6 @@ function generateTheme(theme_name=false){
       width: "64%",
       height: "100%",
       resizeMode: 'cover',
-      marginLeft:"18%",
     },
     channel_logo_v:{
       width: "100%",
