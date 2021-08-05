@@ -188,10 +188,10 @@ class ArticleScreen extends React.Component {
           </View>
 
          {related_news==null?related_news:
-          <View style={{width:"98%",flex:1}}>{related_news}</View>
+          <View style={{width:"98%"}}>{related_news}</View>
          }
          {related==null?related_news:
-          <View style={{width:"98%",flex:1}}>{related}</View>
+          <View style={{width:"98%" }}>{related}</View>
          }
 
 
