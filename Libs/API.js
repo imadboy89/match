@@ -11,6 +11,9 @@ class API {
   constructor() {
     this.yify_movies_url = "https://yts.mx/api/v2/";
     this.yify_subs_url = "https://yifysubtitles.org/";
+    this.PB_movies_url = "https://tpb.party/";
+    this.PB_sections = {205:"TV shows",201:"Movies"}
+    //https://tpb.party/search/peaky%20blinders/1/99/205
     this.showMsg = function(msg){console.log("showMsg : ",msg)}
     this.channels = {1:"UCBaD-tLomo_JgH66CuSFWAQ" , 2:"UCRN5ho3UGhUi7ZCBe2G2f2w",4:"UC7FGo_bQUVxVxVsiHAQxSOQ"}
     this.pageTokens = {};
@@ -1370,7 +1373,7 @@ class API {
         this.error = error;
       });
   };
-
+  //////////// YIFY
   get_yify_movies = (options)=>{
     const params = Object.keys(options).map(k=>k+"="+options[k]).join("&"); 
     const url = this.yify_movies_url+"list_movies.json?"+params;
@@ -1380,6 +1383,35 @@ class API {
     const url = this.yify_movies_url+"movie_details.json?movie_id="+id;
     return this.http(url,"GET",null,null,true)
   }
+  ////////////// PB
+  get_PB_movies = (options)=>{
+    let params = "";
+    if (options.action == "list" && options.section && options.section!=""){
+      params = `browse/${options.section}/${options.page}/3`;
+    }else if (options.action == "search" && options.section && options.section!="" && options.search_qeury){
+      params = `search/${options.search_qeury}/${options.page}/99/${options.section}`;
+    }
+    const url = this.PB_movies_url+params;
+    return this.http(url,"GET",null,null,false)
+    .then(async resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      let movies = [];
+      try {
+        movies = scrap.get_PB_movies(resp);
+      } catch (error) {
+        API_.debugMsg(error,"danger");
+      }
+      return movies;
+    }).catch(error=>API_.showMsg(error,"danger"));
+
+  }
+  get_PB_movie = (id)=>{
+    const url = this.yify_movies_url+"movie_details.json?movie_id="+id;
+    return this.http(url,"GET",null,null,true)
+  }
+
+  /////// YIFY SUBs
   get_yify_subs = (id)=>{
     const url = this.yify_subs_url+"movie-imdb/"+id;
     return this.http(url,"GET",null,null,false)

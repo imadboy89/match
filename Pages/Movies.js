@@ -13,11 +13,12 @@ class MoviesScreen extends React.Component {
         page : 1,
         loading:true,
         dynamic_style : styles_news,
-        source_id:1 ,
+        source_id: this.props.route && this.props.route.params && this.props.route.params.source_id ? this.props.route.params.source_id-4 : 1 ,
         genre:"",
         rate:0,
         sortby:"date_added",
         search_qeury:"",
+        section : 205,
 
     };
     this.rates=[0,1,2,3,4,5,6,7,8,9];
@@ -60,29 +61,47 @@ class MoviesScreen extends React.Component {
     clearInterval(this.interval_refresh);
   }
   
-get_movies =(loading=true,keep_list=false)=>{
-  if(this.state.loading==false && loading){
-    this.setState({loading:true});
-  }
-  const options = {};
-  options.page           = this.state.page;
-  options.genre          = this.state.genre;
-  options.sort_by        = this.state.sortby;
-  options.minimum_rating = this.state.rate;
-  options.query_term = this.state.search_qeury;
-  
-  API_.get_yify_movies(options).then(data=>{
-    if(this._isMounted){
-      if(keep_list){
-        data = this.state.list.concat(data.data.movies);
-      }
+  get_movies =(loading=true,keep_list=false)=>{
+    if(this.state.loading==false && loading){
+      this.setState({loading:true});
+    }
+    if (this.state.source_id==2){
+      return this.get_movies_PB(loading,keep_list);
+    }
+    const options = {};
+    options.page           = this.state.page;
+    options.genre          = this.state.genre;
+    options.sort_by        = this.state.sortby;
+    options.minimum_rating = this.state.rate;
+    options.query_term = this.state.search_qeury;
+    
+    API_.get_yify_movies(options).then(data=>{
       if(loading){
         this.state.loading = false;
       }
-      this.setState({list:data.data.movies});
-    }
-  });
-}
+      if(this._isMounted && data && data.data && data.data.movies){
+        if(keep_list){
+          data = this.state.list.concat(data.data.movies);
+        }
+        this.setState({list:data.data.movies});
+      }
+    });
+  }
+  get_movies_PB = (loading=true,keep_list=false)=>{
+    const options = {action:"list", section:this.state.section, page:this.state.page,search_qeury:this.state.search_qeury};
+    options.action = this.state.search_qeury=="" ? options.action : "search";
+    API_.get_PB_movies(options).then(data=>{
+      if(loading){
+        this.state.loading = false;
+      }
+      if(this._isMounted && data){
+        if(keep_list){
+          data = this.state.list.concat(data);
+        }
+        this.setState({list:data});
+      }
+    });
+  }
 
   onItem_clicked =(item)=>{
     item.source = this.state.source_id;
@@ -140,35 +159,37 @@ get_movies =(loading=true,keep_list=false)=>{
         this.state.page++;
         this.get_movies();
       }}  />
-      <View style={{flex:1,flexDirection:"row"}}>
-      <Text style={this.state.dynamic_style.text_small}>⌖</Text>
-        <Picker
-            selectedValue={this.state.genre}
-            style={[picker_style,{width:"40%"}]}
-            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-            onValueChange={this.change_genre}
-          >
-            {this.genres.map(g=><Picker.Item label={g} value={g} key={g} />)}
-        </Picker>
-        <Text style={this.state.dynamic_style.text_small}>＃</Text>
-        <Picker
-            selectedValue={this.state.rate}
-            style={[picker_style,{width:"19%"}]}
-            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-            onValueChange={this.change_rate}
-          >
-            {this.rates.map(g=><Picker.Item label={"+"+g} value={g} key={g} />)}
-        </Picker>
-        <Text style={this.state.dynamic_style.text_small}>⇅</Text>
-        <Picker
-            selectedValue={this.state.sortby}
-            style={[picker_style,{width:"40%"}]}
-            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-            onValueChange={this.change_sortby}
-          >
-            {this.sortby.map(g=><Picker.Item label={g} value={g} key={g} />)}
-        </Picker>
-      </View>
+      {this.state.source_id==1 ? 
+        <View style={{flex:1,flexDirection:"row"}}>
+        <Text style={this.state.dynamic_style.text_small}>⌖</Text>
+          <Picker
+              selectedValue={this.state.genre}
+              style={[picker_style,{width:"40%"}]}
+              itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+              onValueChange={this.change_genre}
+            >
+              {this.genres.map(g=><Picker.Item label={g} value={g} key={g} />)}
+          </Picker>
+          <Text style={this.state.dynamic_style.text_small}>＃</Text>
+          <Picker
+              selectedValue={this.state.rate}
+              style={[picker_style,{width:"19%"}]}
+              itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+              onValueChange={this.change_rate}
+            >
+              {this.rates.map(g=><Picker.Item label={"+"+g} value={g} key={g} />)}
+          </Picker>
+          <Text style={this.state.dynamic_style.text_small}>⇅</Text>
+          <Picker
+              selectedValue={this.state.sortby}
+              style={[picker_style,{width:"40%"}]}
+              itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+              onValueChange={this.change_sortby}
+            >
+              {this.sortby.map(g=><Picker.Item label={g} value={g} key={g} />)}
+          </Picker>
+        </View>
+      : null}
     </View>);
     return (
       <View style={this.state.dynamic_style.container}>     

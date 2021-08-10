@@ -927,6 +927,35 @@ class Scrap {
     }
     return subs;
   }
+  get_PB_movies(html){
+    if(html==""){return []}
+    const doc = new DomParser().parseFromString(html,'text/html');
+    let table_trs = doc.querySelect('#searchResult tr');
+    let movies = [];
+    for (let i=0;i<table_trs.length;i++){
+      try {
+        table_trs[i].querySelect(".detName");
+        const name = table_trs[i].querySelect(".detLink")[0].getAttribute("title").replace(/Details\s*for/gi,"").trim();
+        const url  = table_trs[i].querySelect(".detLink")[0].getAttribute("href");
+        const movie = {
+          id:url,
+          url:url,
+          lang:"eng",
+          name:name,
+          title_long:name,
+        };
+        try {
+          const magnet_link = table_trs[i].querySelect("a")[3].getAttribute("href");
+          movie.magnet_link = magnet_link;
+          const size = table_trs[i].querySelect(".detDesc")[0].childNodes[2].data.split(", ")[1];
+          movie.size = size;
+        } catch (error) { }
+        movies.push(movie);
+      } catch (error) {}
+
+    }
+    return movies;
+  }
   decodeEntities(str) {
     if(str && typeof str === 'string') {
       // strip script/html tags

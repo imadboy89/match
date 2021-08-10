@@ -55,7 +55,6 @@ class ArticleScreen extends React.Component {
     API_.get_article(this.id, this.source)
     .then(article =>{
       if(article.constructor == Object){
-        console.log(article);
         this.state.article = this.state.article?this.state.article:{};
         this.state.article.title_news = article.title_news ? article.title_news : this.state.article.title_news;
         this.state.article.body = article.body ? article.body : this.state.article.body;

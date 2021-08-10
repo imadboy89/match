@@ -139,7 +139,13 @@ class ChannelScreen extends React.Component {
               >
                 {pickers}
           </Picker>
-
+          {this.state.movie.magnet_link ?  
+            <View style={{margin:8}}>
+              <Button 
+                color={"#006266"}
+                onPress={()=>this.on_clicked({url:this.state.movie.magnet_link,is_magnet_link:true})} title="download magnet" style={{margin:5}}></Button>
+              </View>
+            : null}
           {DL_links}
 
           <Text style={this.state.dynamic_style.info_text}      > Subtitles (ar): </Text>

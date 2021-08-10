@@ -1,6 +1,8 @@
 {
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
+
+    
     "deploy": "gh-pages -d web-build",
     "predeploy": "expo build:web && echo LIO0.COM  > web-build/CNAME",
     "depl": "gh-pages -d web-build",
@@ -12,7 +14,7 @@
     "ios": "expo start --ios",
     "web": "expo start:web",
     "eject": "expo eject",
-    "doall": "expo publish && npm run deploy && git add . && git commit -a -m \"fix bugs and more ..DOALL\" && git push origin",
+    "doall": "git add . && git commit -a -m \"fix bugs and more ..DOALL\" && git push origin && expo publish && npm run deploy",
     "git": "git commit -a -m \"fix bugs and more ..DOALL\" && git push origin"
   },
   "dependencies": {
