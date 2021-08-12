@@ -143,7 +143,9 @@ class ChannelScreen extends React.Component {
             <View style={{margin:8}}>
               <Button 
                 color={"#006266"}
-                onPress={()=>this.on_clicked({url:this.state.movie.magnet_link,is_magnet_link:true})} title="download magnet" style={{margin:5}}></Button>
+                onPress={()=>this.on_clicked({url:this.state.movie.magnet_link,is_magnet_link:true})} 
+                title={"Magnet Link - "+(this.state.movie.size?this.state.movie.size:".")}
+                style={{margin:5}}></Button>
               </View>
             : null}
           {DL_links}

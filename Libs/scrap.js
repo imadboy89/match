@@ -701,6 +701,9 @@ class Scrap {
       "team_info2":"",
       "comps":"array",
       "squad_club":"array",
+      "news":"array",
+      "transfers":"array",
+      
       //"squad_club":"array",
     }
     for(let i=0;i<Object.keys(infos).length;i++){

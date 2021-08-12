@@ -77,6 +77,34 @@ class Team extends React.Component{
       this.props.navigation.navigate('League',{ league_details: {league:item.comp_name,league_img:"",id:item.id} });
       this.props.closeModal();
     }
+    render_transfers=()=>{
+      return this.state.team && this.state.team.transfers ? this.state.team.transfers.map(t=>{
+        const player_id     = t[1];
+        const player_name   = t[2];
+        let   date          = t[3];
+        const transfer_type = t[4];
+        const TFrom_id      = t[6];
+        const TFrom_name    = t[7];
+        const TFrom_cc      = t[8];
+        const TTo_id        = t[9];
+        const TTo_name      = t[10];
+        const TTo_cc        = t[11];
+        date = date && date.slice && date.slice(0,1) =='#' ? API_.get_date2(new Date(date.replace("#","") * 1000)) : date ;
+        date = date && date.split && date.includes("-") ? date.split("-").slice(0,-1).join("-") : date;
+        const style_text_tr ={fontSize:10,color:global_theme.text_color_default,borderColor:"grey",borderWidth:1, paddingHorizontal:1};
+        return <View key={`${player_id}-${date}`}>
+          <View style={{flex:1}}>
+            <View style={{flex:1,flexDirection:"row"}}>
+              <Text style={[{flex:1},style_text_tr]}>{date}</Text>
+              <Text style={[{flex:2},style_text_tr]}>{TTo_name}</Text>
+              <Text style={[{flex:2},style_text_tr]}>{TFrom_name}</Text>
+              <Text style={[{flex:1},style_text_tr]}>{transfer_type}</Text>
+              <Text style={[{flex:2},style_text_tr]}>{player_name}</Text>
+            </View>
+          </View>
+        </View>
+      }) : null;
+    }
     render(){
       
       const allowed_infs = {
@@ -184,8 +212,9 @@ class Team extends React.Component{
                : null}
 
               <View style={{flexDirection:'row',flexWrap:'wrap',width:"100%"}}>
-                <View style={{flex:1}}><Button title="Info" onPress={()=>this.setState({view_mod:1})}/></View>
-                <View style={{flex:1}}><Button title="Comps" onPress={()=>this.setState({view_mod:2})}/></View>
+                <View style={{flex:2}}><Button title="Info" onPress={()=>this.setState({view_mod:1})}/></View>
+                <View style={{flex:2}}><Button title="Comps" onPress={()=>this.setState({view_mod:2})}/></View>
+                <View style={{flex:2}}><Button title="Trans" onPress={()=>this.setState({view_mod:3})}/></View>
                 <View style={{flex:1}}><Button title="Fav" color={this.state.is_fav?"green":"grey"} onPress={()=>{
                   this.set_fav(this.props.team_id,this.state.team.team_name_ar);
                 }}/></View>
@@ -199,6 +228,10 @@ class Team extends React.Component{
               { this.state.view_mod==2 ?
               <View style={{flex:1,width:"99%"}}>
                 {comps}
+              </View> : null}
+              { this.state.view_mod==3 ?
+              <View style={{flex:1,width:"99%",marginVertical:10}}>
+                {this.render_transfers()}
               </View> : null}
             </ScrollView> 
           }
