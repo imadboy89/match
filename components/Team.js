@@ -19,6 +19,11 @@ class Team extends React.Component{
         is_fav:false
       };
       this.localS_fav_key = "favorite_teams_k";
+      this.team_types= [
+        " - ",
+        "نادي",
+        "منتخب",
+      ]
     } 
     componentDidMount(){
       API_.getConfig(this.localS_fav_key,[]).then(o=>{
@@ -78,6 +83,7 @@ class Team extends React.Component{
       this.props.closeModal();
     }
     render_transfers=()=>{
+      const style_text_tr ={fontSize:10,color:global_theme.text_color_default,borderColor:"grey",borderWidth:1, paddingHorizontal:1};
       return this.state.team && this.state.team.transfers ? this.state.team.transfers.map(t=>{
         const player_id     = t[1];
         const player_name   = t[2];
@@ -91,7 +97,6 @@ class Team extends React.Component{
         const TTo_cc        = t[11];
         date = date && date.slice && date.slice(0,1) =='#' ? API_.get_date2(new Date(date.replace("#","") * 1000)) : date ;
         date = date && date.split && date.includes("-") ? date.split("-").slice(0,-1).join("-") : date;
-        const style_text_tr ={fontSize:10,color:global_theme.text_color_default,borderColor:"grey",borderWidth:1, paddingHorizontal:1};
         return <View key={`${player_id}-${date}`}>
           <View style={{flex:1}}>
             <View style={{flex:1,flexDirection:"row"}}>
@@ -173,9 +178,12 @@ class Team extends React.Component{
         if (allowed_infs[k]==undefined) return null;
         if(k=="player_birthdate"){
           this.state.team[k] = this.state.team[k] && this.state.team[k].slice && this.state.team[k].slice(0,1) =='#' ? API_.get_date2(new Date(parseInt(this.state.team[k].replace("#","")) * 1000)) : this.state.team[k] ;
+        }else if(k=="team_type"){
+          this.state.team[k] = this.state.team[k] && this.state.team[k] && this.team_types[this.state.team[k]] ? this.team_types[this.state.team[k]] : this.state.team[k] ;
         }
-        return <View key={k} styles={this.state.dynamic_style.info_row}>
-                  <Text style={this.state.dynamic_style.text_info}>{allowed_infs[k]} : {this.state.team[k]}</Text>
+        return <View key={k} style={{flexDirection:"row",flex:1}}>
+                  <Text style={[this.state.dynamic_style.text_info,{flex:4,textAlign:"right"}]}>{this.state.team[k]}</Text>
+                  <Text style={[this.state.dynamic_style.text_info,{flex:3,borderColor:global_theme.text_color_default,borderLeftWidth:1}]}>{allowed_infs[k]}</Text>
                 </View>
       }) : null;
 
