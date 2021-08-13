@@ -210,6 +210,7 @@ function generateTheme(theme_name=false){
   const header_height = isWeb ? 40 : 70;
   const __isMobile = _isMobile(isWeb);
   const maxWidth = window_width<1000 ? "100%" : 1000;
+  const modal_maxWidth = window_width<1000 ? window_width*0.9 : 1000;
   var globalView_style = {width:maxWidth, alignSelf:"center"};
   var styles_list = {
     list_container: {
@@ -1411,9 +1412,18 @@ function generateTheme(theme_name=false){
     icons:styles_home.icons,
   });
   const styles_modal= StyleSheet.create({
+    modal_view_container:{
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      width:"100%",
+      height:"100%",
+      paddingTop: 22,
+      //backgroundColor:"red"
+    },
     modal_view: {
       margin: 10,
-      width: __isMobile ? "90%" : "80%",
+      width: modal_maxWidth,
       backgroundColor: theme.background_color_default,
       borderRadius: 10,
       padding: 10,
@@ -1439,7 +1449,7 @@ function generateTheme(theme_name=false){
       height : 350,
     },
     modal_view_fill_width: {
-      width : window_width-50,
+      width : window_width<1000 ? window_width-50 : 1000,
     },
     modal_view_fill: {
       height : window_height-100,
@@ -1479,6 +1489,14 @@ function generateTheme(theme_name=false){
       lineHeight:26,
       marginHorizontal:5,
       flex:1
+    },
+    trans_txt:{
+      fontSize:10,
+      color:theme.text_color_default,
+      borderColor:"grey",
+      borderWidth:1, 
+      paddingHorizontal:1, 
+      textAlign:"right"
     },
     text_carrier: {
       lineHeight:22,

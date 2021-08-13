@@ -83,7 +83,6 @@ class Team extends React.Component{
       this.props.closeModal();
     }
     render_transfers=()=>{
-      const style_text_tr ={fontSize:10,color:global_theme.text_color_default,borderColor:"grey",borderWidth:1, paddingHorizontal:1};
       return this.state.team && this.state.team.transfers ? this.state.team.transfers.map(t=>{
         const player_id     = t[1];
         const player_name   = t[2];
@@ -100,11 +99,11 @@ class Team extends React.Component{
         return <View key={`${player_id}-${date}`}>
           <View style={{flex:1}}>
             <View style={{flex:1,flexDirection:"row"}}>
-              <Text style={[{flex:1},style_text_tr]}>{date}</Text>
-              <Text style={[{flex:2},style_text_tr]}>{TTo_name}</Text>
-              <Text style={[{flex:2},style_text_tr]}>{TFrom_name}</Text>
-              <Text style={[{flex:1},style_text_tr]}>{transfer_type}</Text>
-              <Text style={[{flex:2},style_text_tr]}>{player_name}</Text>
+              <Text style={[{flex:1}, this.state.dynamic_style.trans_txt]}>{date}</Text>
+              <Text style={[{flex:2}, this.state.dynamic_style.trans_txt]}>{TTo_name}</Text>
+              <Text style={[{flex:2}, this.state.dynamic_style.trans_txt]}>{TFrom_name}</Text>
+              <Text style={[{flex:1}, this.state.dynamic_style.trans_txt]}>{transfer_type}</Text>
+              <Text style={[{flex:2}, this.state.dynamic_style.trans_txt]}>{player_name}</Text>
             </View>
           </View>
         </View>
@@ -206,7 +205,7 @@ class Team extends React.Component{
         onRequestClose={() => {Keyboard.dismiss();this.props.closeModal();} }
       > 
       <View style={this.state.dynamic_style.modal_view_container}>
-      <View style={[this.state.dynamic_style.modal_view,this.state.dynamic_style.modal_view_large]}>
+      <View style={[this.state.dynamic_style.modal_view,this.state.dynamic_style.modal_view_large, this.state.dynamic_style.modal_view_fill_width]}>
         <View style={this.state.dynamic_style.modal_body}>
           { this.state.loading ? <Loading /> : 
             <ScrollView style={{width:"100%",backgroundColor:"#646c78"}}>
