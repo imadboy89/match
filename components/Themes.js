@@ -1116,6 +1116,9 @@ function generateTheme(theme_name=false){
           size : 30,
           swipeEnabled :true,
           showLabel:true,
+          style: { 
+            backgroundColor: theme.inactiveBackgroundColor,
+          },
           //labelPosition:"below-icon",
           //tabStyle:{color:"red"}
         },
