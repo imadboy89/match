@@ -79,6 +79,7 @@ class Credentials extends React.Component{
                 secureTextEntry={true}
                 autoCorrect={false}
                 autoCapitalize="none"
+                onSubmitEditing={ () => this.saveCredentials() } 
             />
             </View>
   
@@ -89,10 +90,7 @@ class Credentials extends React.Component{
                     title={"Sign in"}
                     disabled={this.state.savingCredents || this.state.email=="" || this.state.password=="" }
                     color= "#2ecc71"
-                    onPress={()=>{
-                      this.saveCredentials();
-                    }
-                    }
+                    onPress={()=> this.saveCredentials() }
                 ></Button>
               </View>
               <View style={this.state.dynamic_style.settings_row_input}>
