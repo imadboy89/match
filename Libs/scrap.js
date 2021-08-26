@@ -967,6 +967,9 @@ class Scrap {
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&nbsp;/gi," ");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&[^;]+;/gi,"");
       str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+
+      str = str.replace(/<tr\s*\/>/gi,"\r\n").replace(/<td\s*[^>]*>/gi," ");
+
       str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
     }
 
