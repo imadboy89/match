@@ -26,10 +26,10 @@ class VideoScreen extends React.Component {
     this.js_setIframeWidth = "(function() { const iframes = document.getElementsByTagName('iframe');for(let i = 0; i<iframes.length;i++ )iframes[0].width = '100%';})();";
   }
   componentDidMount(){
-    this.state.video.title_news = this.state.video.name ? this.state.video.name : this.state.video.title_news
+    this.state.video.title_news = this.state.video && this.state.video.name ? this.state.video.name : this.state.video.title_news
     this.get_video();
     activateKeepAwake();
-    let short_title = this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : 
+    let short_title = this.state.video && this.state.video.title_news && this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : "-";
     getTheme("styles_article").then(theme=>this.setState({dynamic_style:theme})); 
     this.props.navigation.setOptions({title: <Text >{short_title}</Text>});
   }
@@ -65,7 +65,7 @@ class VideoScreen extends React.Component {
       },500);
       return true;
     }
-    let short_title = this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : this.state.video.title_news;
+    let short_title = this.state.video.title_news && this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : this.state.video.title_news;
     
     //this.state.video.date = API_.get_date2(new Date(this.state.video.date.replace("#","") * 1000));
     this.props.navigation.setOptions({title: short_title})
