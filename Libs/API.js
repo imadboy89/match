@@ -53,11 +53,12 @@ class API {
       "iPhone":"Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.77 Mobile/15E148 Safari/604.1",
       "iPad" : "Mozilla/5.0 (iPad; CPU OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.77 Mobile/15E148 Safari",
     }
-    this.headers["User-Agent"] = this.user_agents["Windows 10"];
+    const default_ua = this.user_agents["Linux"];
+    this.headers["User-Agent"] = default_ua;
     this.headers2 = {
       'Accept': 'application/json',
       'Content-Type': 'application/json; charset=utf-8',
-      'User-Agent': this.user_agents["Windows 10"]
+      'User-Agent': default_ua
     }
 
     this.token_tries = 2;
