@@ -26,7 +26,10 @@ class VideoScreen extends React.Component {
     this.js_setIframeWidth = "(function() { const iframes = document.getElementsByTagName('iframe');for(let i = 0; i<iframes.length;i++ )iframes[0].width = '100%';})();";
   }
   componentDidMount(){
-    this.state.video.title_news = this.state.video && this.state.video.name ? this.state.video.name : this.state.video.title_news
+    this.state.video = this.state.video && this.state.video != "-" ? this.state.video : {};
+    const title_news = this.state.video && this.state.video.title_news ? this.state.video.title_news : "-";
+    this.state.video.title_news = this.state.video && this.state.video.name ? this.state.video.name : "-";
+    this.state.video.title_news = this.state.video.title_news ? this.state.video.title_news : title_news;
     this.get_video();
     activateKeepAwake();
     let short_title = this.state.video && this.state.video.title_news && this.state.video.title_news.length > 0 ? this.state.video.title_news.slice(0,30)+"..." : "-";
@@ -36,17 +39,20 @@ class VideoScreen extends React.Component {
   componentWillUnmount(){
     deactivateKeepAwake();
   }
+  set_extrenal_url = (uri_)=>{
+    this.props.navigation.setOptions({
+      "headerRight":()=>(
+              <IconButton 
+                name="chrome" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
+                onPress={()=>{ API_.open_ext_url(uri_ ? uri_ : this.state.video.url); }}  />
+      )
+    });
+  }
   get_video = async()=>{
     if(this.state.loading==false){this.setState({loading:true});}
 
     if(this.state.video.is_external){
-      this.props.navigation.setOptions({
-        "headerRight":()=>(
-                <IconButton 
-                  name="chrome" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
-                  onPress={()=>{ API_.open_ext_url(this.state.video.url); }}  />
-        )
-      });
+      this.set_extrenal_url();
       if(this.state.video.is_radio!=true){
         try {
           const final_url = await API_.get_iframe(this.state.video.url); 
@@ -124,6 +130,10 @@ class VideoScreen extends React.Component {
       const uri_direct = this.state.video.videoId && this.state.video.videoId.slice(0,4)=="http" ? this.state.video.videoId : "";
       uri_ = this.state.video.is_yt ? uri_youtube : uri_dailyMotion;
       uri_ = this.state.video.source_id==3 ? uri_direct :  uri_;
+      const url_ytb = "https://www.youtube.com/watch?v="+this.state.video.videoId;
+      setTimeout(() => {
+        this.set_extrenal_url(this.state.video.is_yt ? url_ytb : uri_);
+      }, 100);
     }
     if (API_.isWeb) {
       return <iframe src={uri_} style={{flex:1,backgroundColor: "#353b48",borderWidth:0,height:"100%",width:"100%"}} seamless/>;
