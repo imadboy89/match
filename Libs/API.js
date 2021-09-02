@@ -15,7 +15,14 @@ class API {
     this.PB_sections = {205:"TV shows",201:"Movies"}
     //https://tpb.party/search/peaky%20blinders/1/99/205
     this.showMsg = function(msg){console.log("showMsg : ",msg)}
-    this.channels = {1:"UCBaD-tLomo_JgH66CuSFWAQ" , 2:"UCRN5ho3UGhUi7ZCBe2G2f2w",4:"UC7FGo_bQUVxVxVsiHAQxSOQ"}
+
+    // get channel id from $("link[rel=canonical]").href in channel page console
+    this.channels = {
+      1:"UCBaD-tLomo_JgH66CuSFWAQ", 
+      2:"UCRN5ho3UGhUi7ZCBe2G2f2w",
+      4:"UC7FGo_bQUVxVxVsiHAQxSOQ",
+      7:"UCpcTrCXblq78GZrTUTLWeBw",
+    }
     this.pageTokens = {};
     //alert(Base64.btoa("aW1hZA=="));
     this.error = null;
@@ -1134,7 +1141,7 @@ class API {
   get_channel_info(channel_id){
     channel_id = this.channels[channel_id] ;
     
-    const url = 'https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id='+channel_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0';
+    const url = 'https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0&id='+channel_id+'';
     return this.fetch(url, {
           method: 'GET',
           headers: this.headers2,
