@@ -9,6 +9,7 @@ import * as DeviceInfo from 'expo-device';
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
+    this.server_url = "http://107.152.39.225/imad/";
     this.yify_movies_url = "https://yts.mx/api/v2/";
     this.yify_subs_url = "https://yifysubtitles.org/";
     this.PB_movies_url = "https://tpb.party/";
@@ -31,11 +32,11 @@ class API {
     this.domain_ = 'https://al-match.com';
     this.domain = 'https://al-match.com/api/';
     this.configs = {};
-    this.proxy = 'https://www.oxus.tj/sites/default/private/files/.proxy2.php?url=';
-    this.proxy1 = 'https://www.oxus.tj/sites/default/private/files/.proxy.php?url=';
+    this.proxy = `${this.server_url}.proxy2.php?url=`;
+    this.proxy1 = `${this.server_url}.proxy.php?url=`;
     this.cc_url = "https://o.kooora.com/f/big/[cc].png";
     this.cc_url_small = "https://o.kooora.com/f/[cc].png";
-    this.IPTV_json = "https://www.oxus.tj/sites/default/private/files/.index.php?action=json"
+    this.IPTV_json = `${this.server_url}.index.php?action=json`;
     this.method = "POST";
     this.usingproxy = Platform.OS == 'web';
     this.isWeb = Platform.OS == 'web';
@@ -1357,7 +1358,7 @@ class API {
     link = Base64.btoa(link);
     img  = Base64.btoa(img);
     //name = Base64.btoa(name);
-    const links_manager = 'https://www.oxus.tj/sites/default/private/files/.index.php';
+    const links_manager = `${this.server_url}.index.php`;
     link = links_manager + '?action=save&is_b64=1&link=' + link + '&name=' + name + "&img="+img;
     return this.fetch(link, {
       method: 'GET',
