@@ -94,7 +94,9 @@ class API {
     this.mdb_save_teams = false;
     this.time_offset = (new Date()).getTimezoneOffset()/60;
 
-    this.use_mdb_proxy = this.isWeb;
+
+    this.use_mdb_proxy = this.isWeb;/* ok */
+
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;

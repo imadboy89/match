@@ -630,6 +630,9 @@ class BackUp{
       let results = "";
       try {
         args.use_proxy_utf = args.use_proxy_utf ? args.use_proxy_utf : true;
+        if( !this.client ||  !this.client.callFunction){
+          await API_.sleep(2000);
+        }
         results = await this.client.callFunction("proxy",[args,]);
       } catch (error) {console.log(error);}
       return results["output"];
