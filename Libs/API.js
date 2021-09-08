@@ -93,6 +93,8 @@ class API {
 
     this.mdb_save_teams = false;
     this.time_offset = (new Date()).getTimezoneOffset()/60;
+
+    this.use_mdb_proxy = API_.isWeb;
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;
@@ -117,6 +119,13 @@ class API {
   }
   http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true){
     let configs = {method: method,headers: headers ? headers : this.headers,}
+    if (this.use_mdb_proxy){
+      const args = {};
+      args.url = url;
+      args.body = data;
+      args.is_post = method == "POST";
+      return backup.proxy(args);
+    }
     if (data!=null){
       configs["body"] = data;
     }
@@ -124,6 +133,7 @@ class API {
       url = method=="GET" ? this.proxy1+url : this.proxy+url; 
     }
     //url = "https://developers.facebook.com/tools/debug/echo/?q="+url;
+
     return this.fetch(url, configs)
       .then(response => {
         try {

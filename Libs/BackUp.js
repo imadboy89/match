@@ -625,6 +625,15 @@ class BackUp{
       const o = await this.db_live_matches.find(query).asArray();
       return o;
     }
+
+    proxy = async(args)=>{
+      let results = "";
+      try {
+        args.use_proxy_utf = args.use_proxy_utf ? args.use_proxy_utf : true;
+        results = await this.client.callFunction("proxy",[args,]);
+      } catch (error) {console.log(error);}
+      return results["output"];
+    }
 }
 
 export default BackUp ;
