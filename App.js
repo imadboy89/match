@@ -489,6 +489,14 @@ class APP extends React.Component {
     API_.debugMsg= this.debugMsg;
     getTheme("styles_notif").then(theme=>this.setState({notif_dynamic_style:theme}) );
     this.MyTabs = <MyTabs showMsg={this.showMsg} is_materialTopTab={this.state.is_materialTopTab}/> ;
+
+    document.addEventListener("keydown", this.escFunction, false);
+  }
+  escFunction = (event)=>{
+    if(event.keyCode === 27 || event.keyCode === 8) {
+      //this.props.navigation.goBack(null);
+      window.history.back();
+    }
   }
   componentWillUnmount(){
     this.mounted = false;

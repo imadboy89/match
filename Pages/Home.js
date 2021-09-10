@@ -130,7 +130,7 @@ class HomeScreen extends React.Component {
           }
         });
       }
-      document.addEventListener("keydown", this.escFunction, false);
+      //document.addEventListener("keydown", this.escFunction, false);
     }
 
     this.get_matches(this.state.matches_date);
