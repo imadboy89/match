@@ -494,7 +494,7 @@ class APP extends React.Component {
     }
   }
   escFunction = (event)=>{
-    if(event.keyCode === 27 || event.keyCode === 8) {
+    if(event.keyCode === 27/* || event.keyCode === 8*/) {
       //this.props.navigation.goBack(null);
       window.history.back();
     }
