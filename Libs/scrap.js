@@ -731,7 +731,7 @@ class Scrap {
     
     for (let i=0; i<comps.length;i++){
       let line = comps[i];
-      if(line[0]==0 || line[1]!=0){
+      if(line[0]==0 || [0,8].includes(line[1])==false){
         continue;
       }
       
