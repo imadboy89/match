@@ -5,7 +5,7 @@ import Scrap from "./scrap";
 import Base64 from "./Base64";
 import { Linking } from 'react-native';
 import * as DeviceInfo from 'expo-device';
-
+import teams_en from "./teams_en";
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
@@ -119,13 +119,14 @@ class API {
     //console.log("async fetch : ",resource);
     return response;
   }
-  http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true){
+  http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true, use_proxy_utf=true){
     let configs = {method: method,headers: headers ? headers : this.headers,}
     if (this.use_mdb_proxy){
       const args = {};
       args.url = url;
       args.body = data;
       args.is_post = method == "POST";
+      args.use_proxy_utf = use_proxy_utf ? true : false;
       return backup.proxy(args);
     }
     if (data!=null){
@@ -278,6 +279,9 @@ class API {
     const url = news_links[source_id] ? news_links[source_id] : news_links[1];
     return this.http(url,"GET",null,{})
     .then(resp=>{
+      if(resp==undefined || !resp){
+        return [];
+      }
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       let list = url.includes("kooora.com")?scrap.get_news(resp) : scrap.get_news_hp(resp)
@@ -1452,6 +1456,16 @@ class API {
     const url = this.yify_subs_url+"subtitle/"+s_url.replace(/^\/subtitles\//,"")+".zip";
     //const url = this.yify_subs_url+""+s_url+".zip";
     return url;
+  }
+
+
+
+
+  get_players_ratings = async(team_h, team_a, date)=>{
+    const url_matches = "https://www.whoscored.com/matchesfeed/?d="+date.replace(/-/g,"");
+    "https://sport360.whoscored.com/Matches/1560148/Live/";
+    const resp = this.http(url_matches,"GET",null,null,false,false);
+    console.log(resp);
   }
 }
 

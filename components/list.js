@@ -154,12 +154,13 @@ class ItemsList extends React.Component {
         </View>
         );
     }else if(["league_name","title_news","title_long"].includes(col_key)){
+      this.props.hide_images;
       const fav_icon = this.get_fav_icon(item[col_key],col_key=="league_name"? item.id : 0,true);
       const koora_icon = this.get_common_icon(item["title"],item["koora_id"],true,"flag");
       let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
       let image_style = {resizeMode:"center",width:"100%"};
       image_style.resizeMode = col_key=="title_news" ? "stretch" : image_style.resizeMode;
-      let _img = item.img;
+      let _img = this.props.hide_images ? null : item.img;
       let _date = date;
       let item_container = this.state.dynamic_style.news_container;
       let imageBackground_style={flex:1,width:"100%"};

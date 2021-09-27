@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Picker, Modal, Button, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Picker, Modal, Button, Switch, RefreshControl } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -14,8 +14,9 @@ class NewsScreen extends React.Component {
         loading:true,
         dynamic_style : styles_news,
         source_id:1 ,
+        hide_images:false,
     };
-  this.get_news();
+  
   this.interval_refresh = setInterval(()=>{
     if(this.state.page==1){this.get_news(false);}
     }, 80000);
@@ -23,16 +24,33 @@ class NewsScreen extends React.Component {
   componentDidMount(){
     this._isMounted=true;
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
+    this.get_news();
+    this.render_header();
+  }
+  render_header=()=>{
     this.props.navigation.setOptions({title: "News",
     "headerRight":()=>(
+      <View style={{flexDirection:"row",margin:5}}>
+      <Switch
+        style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+        trackColor={{ false: "#767577", true: "#81b0ff" }}
+        thumbColor={this.state.hide_images ? "#f5dd4b" : "#f4f3f4"}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={this.update_is_hide_images}
+        value={this.state.hide_images}
+      />
           <IconButton 
             name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
             this.get_news();
           }}  />
-  )
-});
+    </View>
+    )
+    });
   }
-
+  update_is_hide_images=(k,v)=>{
+    this.setState({hide_images:k});
+    this.render_header();
+    }
   refresh_list=()=>{
     const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
     if(this._isMounted){
@@ -119,6 +137,7 @@ get_news =(loading=true,keep_list=false)=>{
           onclick={this.onItem_clicked} 
           key_="title_news" key_key="title_news"  
           page={this.state.page}
+          hide_images={this.state.hide_images}
           />
         
       </View>

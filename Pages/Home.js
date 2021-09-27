@@ -134,43 +134,6 @@ class HomeScreen extends React.Component {
     }
 
     this.get_matches(this.state.matches_date);
-    if(this.is_authenting==false){
-      this.is_authenting = true;
-      backup._loadClient().then(output=>{
-        this.setState({is_auth:backup.is_auth });
-        this.render_header();
-        backup.user_log();
-        if(output==false){return false;}
-        backup.load_teams();
-        backup.load_leagues();
-        backup.load_settings().then(async o=>{
-          let tries = 5;
-          if(API_.isWeb==false){
-            let interval = setInterval(() => {
-              tries-=1;
-              console.log("try savePushToken ["+tries+"] ...");
-              if(tries<=0){
-                clearInterval(interval);
-                console.log("try savePushToken [FAILED]");
-              }
-              backup.savePushToken().then(is_ok => {
-                if(is_ok){
-                  clearInterval(interval);
-                  console.log("try savePushToken [OK]");
-                }
-              });
-            }, 2000);
-          }
-        }).catch(error=>{console.log(error)});
-        get_notifications_matches().then(o=>{
-          API_.notifications_matches=o;
-          this.refresh_leagues();
-        });
-      }).catch(error=>{
-        console.log(error);
-        API_.debugMsg(error,"danger");
-      });
-    }
     this.checkUpdAvailability();
     //handle notification
     Notifications.addNotificationReceivedListener(this._handleNotification);
@@ -187,6 +150,7 @@ class HomeScreen extends React.Component {
       });
 
     this.interval_refresh = setInterval(()=>{
+      this.setState({is_auth:backup.is_auth });
       if(backup.is_auth){
         backup.load_settings().then(o=>{
           if(o){

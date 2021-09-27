@@ -311,7 +311,10 @@ class APP extends React.Component {
         is_materialTopTab:false,
         show_user_log : user_log_data!=false,
         user_log : user_log_data,
+
+        is_auth :false,
     };
+    this.is_authenting = false;
     API_.getConfig("is_materialTopTab",false).then(v=>{
       this.setState({is_materialTopTab:v});
     });
@@ -481,9 +484,48 @@ class APP extends React.Component {
       },
     };
   }
+  init_mdb=()=>{
+    if(this.is_authenting==false){
+      this.is_authenting = true;
+      backup._loadClient().then(output=>{
+        this.setState({is_auth:backup.is_auth });
+        this.render_header();
+        backup.user_log();
+        if(output==false){return false;}
+        backup.load_teams();
+        backup.load_leagues();
+        backup.load_settings().then(async o=>{
+          let tries = 5;
+          if(API_.isWeb==false){
+            let interval = setInterval(() => {
+              tries-=1;
+              console.log("try savePushToken ["+tries+"] ...");
+              if(tries<=0){
+                clearInterval(interval);
+                console.log("try savePushToken [FAILED]");
+              }
+              backup.savePushToken().then(is_ok => {
+                if(is_ok){
+                  clearInterval(interval);
+                  console.log("try savePushToken [OK]");
+                }
+              });
+            }, 2000);
+          }
+        }).catch(error=>{console.log(error)});
+        get_notifications_matches().then(o=>{
+          API_.notifications_matches=o;
+          this.refresh_leagues();
+        });
+      }).catch(error=>{
+        console.log(error);
+        API_.debugMsg(error,"danger");
+      });
+    }
+  }
   componentDidMount(){
     //navigate('/News');
-    
+    this.init_mdb();
     this.mounted = true;
     API_.showMsg = this.showMsg;
     API_.debugMsg= this.debugMsg;
