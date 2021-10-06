@@ -299,8 +299,12 @@ class Scrap {
   }
   get_matches_kora_star(html,date,is_oneMatch=false,is_only_live=false){
     if(html==""){return []}
-    
-    let doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
+
     let matches_ = doc.querySelect("#today")[0].getElementsByClassName('alba_sports_events-event_item');
     //console.log(matches_);
     let matches = {};
@@ -762,7 +766,11 @@ class Scrap {
   get_lineup_old(html){
     if(html==""){return []}
     let lineups = {"home_lineup":[],"away_lineup":[],"home_substitutions":[],"away_substitutions":[]};
-    let doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
     let tlineups = doc.querySelect('.tLineup');
     for (let i=0;i<tlineups.length;i++){
       const key = i==0?"home_lineup":"away_lineup";
@@ -785,8 +793,12 @@ class Scrap {
 
   get_ch_ext(html){
     if(html==""){return []}
-    
-    let doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
+
     let as = doc.querySelect('a');
     let chs = {};
     for (let i=0;i<as.length;i++){
@@ -811,7 +823,11 @@ class Scrap {
   }
   get_iframe_url(html){
     if(html==""){return []}
-    let doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
     let iframes = doc.querySelect('iframe');
 
     for (let i=0;i<iframes.length;i++){
@@ -825,7 +841,11 @@ class Scrap {
 
   get_news_hp(html){
     if(html==""){return []}
-    let doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
     let items = doc.querySelect('.articles .article');
     let articles = [];
     for(let i=0;i<items.length;i++){
@@ -841,7 +861,11 @@ class Scrap {
   }
   get_article_hp(html){
     if(html==""){return []}
-    let doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
     let body = doc.getElementsByClassName('article_body')[0];
     let article = {"body":"","date":""};
     article["body"] = body.querySelect("p").map(p=>p.childNodes+"\n").join("");
@@ -852,7 +876,11 @@ class Scrap {
   }
   get_videos_m(html){
     if(html==""){return []}
-    let doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
     let items = doc.querySelect('.content article');
     let videos = [];
     for(let i=0;i<items.length;i++){
@@ -874,7 +902,11 @@ class Scrap {
   get_videos(html){
     if(html==""){return []}
     //console.log("-",html)
-    let doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
     let alinks = doc.querySelect('.infinitescroll_item a')
     //console.log(d[0].getAttribute("href") )
     let videos = [];
@@ -910,7 +942,11 @@ class Scrap {
   get_yify_subs(html){
     if(html==""){return []}
     //console.log("-",html)
-    let doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
     let table_trs = doc.querySelect('table tr');
     let subs = [];
     for (let i=0;i<table_trs.length;i++){
@@ -932,7 +968,13 @@ class Scrap {
   }
   get_PB_movies(html){
     if(html==""){return []}
-    const doc = new DomParser().parseFromString(html,'text/html');
+    let doc = null;
+    try {
+      doc = new 
+      
+      ().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
     let table_trs = doc.querySelect('#searchResult tr');
     let movies = [];
     for (let i=0;i<table_trs.length;i++){

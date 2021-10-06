@@ -489,7 +489,7 @@ class APP extends React.Component {
       this.is_authenting = true;
       backup._loadClient().then(output=>{
         this.setState({is_auth:backup.is_auth });
-        this.render_header();
+        //this.render_header();
         backup.user_log();
         if(output==false){return false;}
         backup.load_teams();

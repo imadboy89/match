@@ -46,6 +46,9 @@ class HomeScreen extends React.Component {
           this.state.is_auth=backup.is_auth;
           this.refresh_leagues();
         }*/
+        if(this._isMounted==false){
+          return;
+        }
         this.refresh_leagues();
         this.render_header();
       }
