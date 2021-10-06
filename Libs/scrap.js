@@ -970,9 +970,7 @@ class Scrap {
     if(html==""){return []}
     let doc = null;
     try {
-      doc = new 
-      
-      ().parseFromString(html,'text/html');
+      doc = new DomParser().parseFromString(html,'text/html');
     } catch (error) {}
     if(doc == null){return []}
     let table_trs = doc.querySelect('#searchResult tr');
