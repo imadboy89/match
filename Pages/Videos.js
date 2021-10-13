@@ -34,7 +34,7 @@ class VideosScreen extends React.Component {
   changesource = (itemValue, itemIndex)=>{
     this.state.source_id = parseInt(itemValue);
     this.state.page=1;
-    if([5,6].includes(this.state.source_id) ){
+    if([5,6,8].includes(this.state.source_id) ){
       this.props.navigation.navigate('Movies',{source_id:this.state.source_id});
       return;
     }
@@ -100,8 +100,8 @@ get_Videos = ()=>{
       }}  />
       <Picker
           selectedValue={this.state.source_id}
-          style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:80}}
-          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+          style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:100}}
+          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9",width:99 }}
           onValueChange={this.changesource}
         >
           <Picker.Item label="BeIn" value={0} />
@@ -112,6 +112,7 @@ get_Videos = ()=>{
           <Picker.Item label="FIFATV" value={7} />
           <Picker.Item label="Movies_YIFY" value={5} />
           <Picker.Item label="Movies_PB" value={6} />
+          <Picker.Item label="Movies_MC" value={8} />
           
       </Picker>
     </View>);

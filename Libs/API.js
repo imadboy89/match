@@ -14,6 +14,7 @@ class API {
     this.yify_movies_url = "https://yts.mx/api/v2/";
     this.yify_subs_url = "https://yifysubtitles.org/";
     this.PB_movies_url = "https://tpb.party/";
+    this.MC_movies_url = "https://www.moviecrumbs.net/";
     this.PB_sections = {205:"TV shows",201:"Movies"}
     //https://tpb.party/search/peaky%20blinders/1/99/205
     this.showMsg = function(msg){console.log("showMsg : ",msg)}
@@ -267,7 +268,7 @@ class API {
     return title;
   }
   get_news(page, source_id=1){
-    
+    this.scrap = new Scrap();
     const news_links = {
       1:"https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,
       2:"https://www.hesport.com/mountakhab/index."+page+".html",
@@ -1467,6 +1468,54 @@ class API {
     "https://sport360.whoscored.com/Matches/1560148/Live/";
     const resp = this.http(url_matches,"GET",null,null,false,false);
     console.log(resp);
+  }
+
+
+  get_MC_movies = (category, page, search_q)=>{
+    console.log(category, page, search_q);
+    //https://www.moviecrumbs.net/search/the-100?page=2
+    //https://www.moviecrumbs.net/genre/family-9
+    let params = "";
+    if (category){
+      params = `genre/${category}`;
+    }
+    if (search_q  && search_q.trim && search_q!=""){
+      search_q = search_q.trim().replace("/  /g"," ").replace(" ","-");
+      params = `search/${search_q}`;
+    }
+    if(page){
+      params += `?page=${page}`;
+    }
+    const url = this.MC_movies_url+params;
+    return this.http(url,"GET",null,null,false)
+    .then(async resp=>{
+      let scrap = new Scrap();
+      let movies = [];
+      try {
+        movies = scrap.get_Mc_movies(resp);
+      } catch (error) {
+        API_.debugMsg(error,"danger");
+      }
+      return movies;
+    }).catch(error=>API_.showMsg(error,"danger"));
+
+  }
+
+  get_MC_movie = (id)=>{
+
+    const url = this.MC_movies_url+id;
+    return this.http(url,"GET",null,null,false)
+    .then(async resp=>{
+      let scrap = new Scrap();
+      let movies = [];
+      try {
+        movies = scrap.get_Mc_movie(resp);
+      } catch (error) {
+        API_.debugMsg(error,"danger");
+      }
+      return movies;
+    }).catch(error=>API_.showMsg(error,"danger"));
+
   }
 }
 

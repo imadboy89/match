@@ -21,6 +21,7 @@ class MoviesScreen extends React.Component {
         section : 205,
 
     };
+    this.state.section = this.state.source_id == 4 ? "" : this.state.section;
     this.rates=[0,1,2,3,4,5,6,7,8,9];
     this.genres = [
     "all",
@@ -67,6 +68,8 @@ class MoviesScreen extends React.Component {
     }
     if (this.state.source_id==2){
       return this.get_movies_PB(loading,keep_list);
+    }else if (this.state.source_id==4){
+      return this.get_movies_MC(loading,keep_list);
     }
     const options = {};
     options.page           = this.state.page;
@@ -84,6 +87,19 @@ class MoviesScreen extends React.Component {
           data = this.state.list.concat(data.data.movies);
         }
         this.setState({list:data.data.movies});
+      }
+    });
+  }
+  get_movies_MC = (loading=true,keep_list=false)=>{
+    API_.get_MC_movies(this.state.section, this.state.page, this.state.search_qeury).then(data=>{
+      if(loading){
+        this.state.loading = false;
+      }
+      if(this._isMounted && data){
+        if(keep_list){
+          data = this.state.list.concat(data);
+        }
+        this.setState({list:data});
       }
     });
   }
@@ -129,7 +145,7 @@ class MoviesScreen extends React.Component {
       "headerRight":()=>(
         <View style={{flexDirection:"row",margin:5,padding:5,width:"90%"}}>
             <TextInput 
-              style={{flex:1,backgroundColor:"black",color:"white",marginLeft:10,marginVertical:5,borderWidth:1,borderColor:"white",borderRadius:5}}
+              style={{flex:1,backgroundColor:"black",color:"white",marginLeft:10,marginVertical:5,borderWidth:1,borderColor:"white",borderRadius:5,width:"85%"}}
               onChangeText={(val)=>{this.setState({search_qeury:val});this.render_header();}}
               value={this.state.search_qeury}
               />

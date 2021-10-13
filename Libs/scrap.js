@@ -10,6 +10,7 @@ class Scrap {
     this.img_q = "410w";
   }
   get_article(html){
+    if(html == null || !html || !html.match){return []}
     //he_article_date 
     const arr_end = '\\"\\"\\);';
     let patttern_body = /var\s*article_content\s*=\s*".*/gi;
@@ -626,6 +627,7 @@ class Scrap {
     return final_out.slice(0,50);
   }
   get_var(html,var_name, is_array=false){
+    if(html == null || !html || !html.match){return []}
     const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gi");
     let m = html.match(patttern);
     let body = m && m.length>0 ? m[0] : "" ;
@@ -638,6 +640,7 @@ class Scrap {
     return body;
   }
   get_var_array(html,var_name,end="-1,0\\s*\\);"){
+    if(html == null || !html || !html.match){return []}
     //let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
     //const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gmi");
     const patttern  = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\r\\n(((?!"+end+").)*\\r\\n)*","gmi");
@@ -744,6 +747,7 @@ class Scrap {
     return out_list;
   }
   get_video(html,source_id=0){
+    if(html == null || !html || !html.match){return []}
     if(source_id==3){
       return this.get_video_m(html);
     }
@@ -901,14 +905,12 @@ class Scrap {
   }
   get_videos(html){
     if(html==""){return []}
-    //console.log("-",html)
     let doc = null;
     try {
       doc = new DomParser().parseFromString(html,'text/html');
     } catch (error) {}
     if(doc == null){return []}
     let alinks = doc.querySelect('.infinitescroll_item a')
-    //console.log(d[0].getAttribute("href") )
     let videos = [];
     let lastlink = "";
     for (let i=0;i<alinks.length;i++){
@@ -990,7 +992,8 @@ class Scrap {
         try {
           const magnet_link = table_trs[i].querySelect("a")[3].getAttribute("href");
           movie.magnet_link = magnet_link;
-          const size = table_trs[i].querySelect(".detDesc")[0].childNodes[2].data.split(", ")[1];
+          const newLocal = ", ";
+          const size = table_trs[i].querySelect(".detDesc")[0].childNodes[2].data.split(newLocal)[1];
           movie.size = size;
         } catch (error) { }
         movies.push(movie);
@@ -998,6 +1001,69 @@ class Scrap {
 
     }
     return movies;
+  }
+  get_Mc_movies(html){
+    if(html==""){return []}
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
+    let ahrefs = doc.querySelect('.container') .length>1  ? doc.querySelect('.container')[1].querySelect("a") : [];
+    let movies = [];
+    let links = [];
+    for (let i=0;i<ahrefs.length;i++){
+      try {
+        let img= "",quality="";
+        const name = ahrefs[i].getAttribute("title").replace(/Details\s*for/gi,"").trim();
+        const url  = ahrefs[i].getAttribute("href");
+        if (url.trim()=="" || url[0]=="#"|| url.trim() == "javascript:void(0)" || links.includes(url)) continue;
+        links.push(url);
+        try{img = ahrefs[i].parentNode.querySelect("img")[0].getAttribute("data-src");
+        }catch(err){}
+        try{quality = ahrefs[i].parentNode.querySelect("div")[1].childNodes + "";
+        }catch(err){}
+        if(img=="")continue;
+        const movie = {
+          id:url,
+          url:url,
+          lang:"eng",
+          name:name,
+          img:img,
+          title_long:name,
+          is_mc:true,
+        };
+        movies.push(movie);
+      } catch (error) {}
+
+    }
+    return movies;
+  }
+  get_Mc_movie(html){
+    if(html==""){return []}
+    let doc = null;
+    try {
+      doc = new DomParser().parseFromString(html,'text/html');
+    } catch (error) {}
+    if(doc == null){return []}
+    const movie = {eps:[],};
+    movie.ifram_src = doc.querySelect('iframe').length > 0 ? doc.querySelect('iframe')[0].getAttribute("src") : "";
+
+    const eps = doc.querySelect('a').length > 0 ? doc.querySelect('a') : [];
+    for (let i = 0; i < eps.length; i++) {
+      const epp = {url:"",name:""};
+      const ep = eps[i];
+      epp.name = eps[i].getAttribute("title").replace(/Details\s*for/gi,"").trim();
+      epp.url  = eps[i].getAttribute("href");
+      epp.ep_nbr = parseInt(eps[i].getAttribute("data-number"));
+      epp.se_nbr = parseInt(eps[i].getAttribute("data-s-number"));
+      if(epp.url=="" || isNaN(epp.ep_nbr) || isNaN(epp.se_nbr)  ){
+        continue;
+      }
+      movie.eps.push(epp);
+    }
+
+    return movie;
   }
   decodeEntities(str) {
     if(str && typeof str === 'string') {

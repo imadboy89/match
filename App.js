@@ -513,10 +513,12 @@ class APP extends React.Component {
             }, 2000);
           }
         }).catch(error=>{console.log(error)});
+        /*
         get_notifications_matches().then(o=>{
           API_.notifications_matches=o;
           this.refresh_leagues();
         });
+        */
       }).catch(error=>{
         console.log(error);
         API_.debugMsg(error,"danger");

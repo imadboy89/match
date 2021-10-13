@@ -27,22 +27,36 @@ class ChannelScreen extends React.Component {
     };
     this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
     this.playerRef = React.createRef();
+    this.get_movie_details();
   }
   componentDidMount(){
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style_modals:theme}) );
+
+  ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> {/*API_.debugMsg(error+"","warning")*/} );
+  }
+  get_movie_details(){
     if(this.state.movie=="-"){
       this.get_Movie();
+    }else if(this.state.movie.source==4){
+      this.get_Movie_MC();
     }else{
       this.get_subs();
     }
-
-  ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> {/*API_.debugMsg(error+"","warning")*/} );
   }
   get_subs(){
     API_.get_yify_subs(this.state.movie.imdb_code).then(subs=>{
       this.setState({subs:subs});
     });
+  }
+  get_Movie_MC(){
+    API_.get_MC_movie(this.state.movie_id).then(resp=>{
+      if(resp && resp.ifram_src ){
+        this.state.movie.ifram_src = resp.ifram_src;
+        this.state.movie.eps = resp.eps;
+        this.setState({loading:false});
+      }
+    }).catch(err=>API_.showMsg(err,"danger"));
   }
   get_Movie(){
       API_.get_yify_movie(this.state.movie_id).then(resp=>{
@@ -77,6 +91,11 @@ class ChannelScreen extends React.Component {
   }
   on_clicked(t){
     let url = false;
+    if(t.se_nbr){
+      t.source = this.state.movie.source;
+      this.props.navigation.push('Movie', { item: t, id:t.url });
+      return;
+    }
     if(t.lang){
       url = API_.get_yify_sub_dl(t.url);
     }else{
@@ -86,6 +105,11 @@ class ChannelScreen extends React.Component {
       API_.open_ext_url(url);
     }
 
+  }
+  render_movie(){
+    if (API_.isWeb) {
+      return <iframe src={this.state.movie.ifram_src} style={{height:500,backgroundColor: "#353b48",borderWidth:0,width:"100%"}} seamless/>;
+    }
   }
   render() {
     let DL_links = this.state.movie && this.state.movie.torrents ? this.state.movie.torrents.map(t => t && t.url ? (
@@ -105,18 +129,34 @@ class ChannelScreen extends React.Component {
     //let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER","inApp-IPTV"];
     const picker_options = ["Torrent File","Magnet Link"]
     const pickers = picker_options.map(o=><Picker.Item label={o} value={o} key={o}/>);
-
+    let img  = this.state.movie && this.state.movie.medium_cover_image ? this.state.movie.medium_cover_image : null;
+    img  = this.state.movie && this.state.movie.img ? this.state.movie.img : img;
+    img = img ? <Image style={this.state.dynamic_style.channel_logo} source={{uri: img}} /> : null;
+    img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
+    let eps = null;
+    if(this.state.movie && this.state.movie.eps && this.state.movie.eps.length>0){
+      eps = this.state.movie.eps.map(ep=>{
+        ep.name = `SE ${ep.se_nbr} - EP ${ep.ep_nbr}`;
+        return <View style={{margin:8}} key={ep.url}>
+        <Button 
+          color={"#f39c12"}
+          onPress={()=>this.on_clicked(ep)} title={ep.name} style={{margin:5}}></Button>
+      </View>;
+      })
+    }
+    let name = this.state.movie && this.state.movie.title_long ? this.state.movie.title_long : null;
+    name = this.state.movie && this.state.movie.name && this.state.movie.title_long==undefined ? this.state.movie.name : name;
     return (
       <ScrollView style={this.state.dynamic_style.container}>
         <View style={globalView_style}>
 
       <View style={this.state.dynamic_style.channel_logo_v}>
-        { this.state.movie && this.state.movie.medium_cover_image ?  <Image style={this.state.dynamic_style.channel_logo} source={{uri: this.state.movie.medium_cover_image}} />: null}
+        {img}
          </View>
          <View style={this.state.dynamic_style.info_cont}>
          { this.state.loading ? <Loading /> : 
         <View style={this.state.dynamic_style.info_cont}>
-          <Text style={this.state.dynamic_style.info_text_small}> Name⠀⠀⠀⠀: {this.state.movie && this.state.movie.title_long ? this.state.movie.title_long : "-"}</Text>
+          <Text style={this.state.dynamic_style.info_text_small}> Name⠀⠀⠀⠀: {name}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Language⠀: {this.state.movie && this.state.movie.language? this.state.movie.language : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Genres⠀⠀⠀: {this.state.movie && this.state.movie.genres? this.state.movie.genres.join("-") : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Rating⠀⠀⠀: {this.state.movie && this.state.movie.rating? this.state.movie.rating+"/10": "-"}</Text>
@@ -130,7 +170,7 @@ class ChannelScreen extends React.Component {
             </View>
             :null
           }
-          
+          {eps}
           <Picker
                 selectedValue={this.state.actionType}
                 style={{ height: 50, width: 150,backgroundColor:"#2c3e50",color:"#fff" }}
