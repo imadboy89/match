@@ -121,7 +121,7 @@ class MoviesScreen extends React.Component {
 
   onItem_clicked =(item)=>{
     item.source = this.state.source_id;
-    this.props.navigation.navigate('Movie', { item: item, id:item.id });
+    this.props.navigation.navigate('Movie', { item: item, id:item.id,source:item.source });
   }
   change_genre = (itemValue, itemIndex)=>{
     this.state.genre = itemValue;

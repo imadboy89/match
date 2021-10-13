@@ -1016,8 +1016,9 @@ class Scrap {
       try {
         let img= "",quality="";
         const name = ahrefs[i].getAttribute("title").replace(/Details\s*for/gi,"").trim();
-        const url  = ahrefs[i].getAttribute("href");
+        let url  = ahrefs[i].getAttribute("href");
         if (url.trim()=="" || url[0]=="#"|| url.trim() == "javascript:void(0)" || links.includes(url)) continue;
+        url = decodeURI(url);
         links.push(url);
         try{img = ahrefs[i].parentNode.querySelect("img")[0].getAttribute("data-src");
         }catch(err){}
@@ -1046,15 +1047,19 @@ class Scrap {
       doc = new DomParser().parseFromString(html,'text/html');
     } catch (error) {}
     if(doc == null){return []}
-    const movie = {eps:[],};
+    const movie = {eps:[],name:""};
     movie.ifram_src = doc.querySelect('iframe').length > 0 ? doc.querySelect('iframe')[0].getAttribute("src") : "";
-
+    try {
+      movie.name = doc.querySelect('li').filter(o=>o.getAttribute("aria-current")=="page");
+      movie.name = movie.name[0].childNodes+"";
+    } catch (error) {}
     const eps = doc.querySelect('a').length > 0 ? doc.querySelect('a') : [];
     for (let i = 0; i < eps.length; i++) {
       const epp = {url:"",name:""};
       const ep = eps[i];
       epp.name = eps[i].getAttribute("title").replace(/Details\s*for/gi,"").trim();
       epp.url  = eps[i].getAttribute("href");
+      epp.url = decodeURI(epp.url);
       epp.ep_nbr = parseInt(eps[i].getAttribute("data-number"));
       epp.se_nbr = parseInt(eps[i].getAttribute("data-s-number"));
       if(epp.url=="" || isNaN(epp.ep_nbr) || isNaN(epp.se_nbr)  ){

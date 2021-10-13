@@ -415,7 +415,7 @@ class APP extends React.Component {
                 },
               },
               Movie    : {
-                path: 'Videos/Movies/Movie/:item/:id',
+                path: 'Videos/Movies/Movie/:source/:id',
                 parse:{ 
                   id: (id) => id,
                   item: (item) => '-',

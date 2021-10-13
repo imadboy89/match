@@ -20,11 +20,13 @@ class ChannelScreen extends React.Component {
         loading:false,
         dynamic_style:styles_channel,
         p_url:"",
-        movie : this.props.route.params.item,
+        movie : this.props.route.params.item && this.props.route.params.item!="-" ? this.props.route.params.item : {},
         movie_id : this.props.route.params.id,
         actionType:"Torrent File",
+        source_id :parseInt(this.props.route.params.source)
         
     };
+    this.state.movie_id = decodeURI(this.state.movie_id);
     this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
     this.playerRef = React.createRef();
     this.get_movie_details();
@@ -36,9 +38,9 @@ class ChannelScreen extends React.Component {
   ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> {/*API_.debugMsg(error+"","warning")*/} );
   }
   get_movie_details(){
-    if(this.state.movie=="-"){
+    if(this.state.source_id==1){
       this.get_Movie();
-    }else if(this.state.movie.source==4){
+    }else if(this.state.source_id==4){
       this.get_Movie_MC();
     }else{
       this.get_subs();
@@ -53,7 +55,8 @@ class ChannelScreen extends React.Component {
     API_.get_MC_movie(this.state.movie_id).then(resp=>{
       if(resp && resp.ifram_src ){
         this.state.movie.ifram_src = resp.ifram_src;
-        this.state.movie.eps = resp.eps;
+        this.state.movie.eps       = resp.eps;
+        this.state.movie.name      = resp.name!=""? resp.name : this.state.movie.name;
         this.setState({loading:false});
       }
     }).catch(err=>API_.showMsg(err,"danger"));
@@ -93,7 +96,7 @@ class ChannelScreen extends React.Component {
     let url = false;
     if(t.se_nbr){
       t.source = this.state.movie.source;
-      this.props.navigation.push('Movie', { item: t, id:t.url });
+      this.props.navigation.push('Movie', { item: t, id:t.url,source:t.source });
       return;
     }
     if(t.lang){
@@ -126,13 +129,13 @@ class ChannelScreen extends React.Component {
           onPress={()=>this.on_clicked(s)} title={s.name} style={{margin:5}}></Button>
       </View>
     ):null) : null;
-    //let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER","inApp-IPTV"];
+    let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER","inApp-IPTV"];
     const picker_options = ["Torrent File","Magnet Link"]
     const pickers = picker_options.map(o=><Picker.Item label={o} value={o} key={o}/>);
     let img  = this.state.movie && this.state.movie.medium_cover_image ? this.state.movie.medium_cover_image : null;
     img  = this.state.movie && this.state.movie.img ? this.state.movie.img : img;
     img = img ? <Image style={this.state.dynamic_style.channel_logo} source={{uri: img}} /> : null;
-    img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
+    //img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
     let eps = null;
     if(this.state.movie && this.state.movie.eps && this.state.movie.eps.length>0){
       eps = this.state.movie.eps.map(ep=>{
