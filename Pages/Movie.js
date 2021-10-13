@@ -129,13 +129,12 @@ class ChannelScreen extends React.Component {
           onPress={()=>this.on_clicked(s)} title={s.name} style={{margin:5}}></Button>
       </View>
     ):null) : null;
-    let picker_options = (backup && backup.is_auth && backup.admin==true) ? ["IPTV","PLAYER","inApp-IPTV"] : ["PLAYER","inApp-IPTV"];
     const picker_options = ["Torrent File","Magnet Link"]
     const pickers = picker_options.map(o=><Picker.Item label={o} value={o} key={o}/>);
     let img  = this.state.movie && this.state.movie.medium_cover_image ? this.state.movie.medium_cover_image : null;
     img  = this.state.movie && this.state.movie.img ? this.state.movie.img : img;
     img = img ? <Image style={this.state.dynamic_style.channel_logo} source={{uri: img}} /> : null;
-    //img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
+    img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
     let eps = null;
     if(this.state.movie && this.state.movie.eps && this.state.movie.eps.length>0){
       eps = this.state.movie.eps.map(ep=>{
