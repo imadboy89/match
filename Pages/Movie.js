@@ -111,7 +111,11 @@ class ChannelScreen extends React.Component {
   }
   render_movie(){
     if (API_.isWeb) {
-      return <iframe src={this.state.movie.ifram_src} style={{height:500,backgroundColor: "#353b48",borderWidth:0,width:"100%"}} seamless/>;
+      return <iframe 
+      src={this.state.movie.ifram_src} 
+      style={{height:500,backgroundColor: "#353b48",borderWidth:0,width:"100%"}} 
+      allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"
+      seamless/>;
     }
   }
   render() {
