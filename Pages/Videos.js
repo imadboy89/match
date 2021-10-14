@@ -81,6 +81,10 @@ get_Videos = ()=>{
     this.props.navigation.navigate('Video', { item: item });
   }
   render() {
+    /*
+          <Picker.Item label="Mtkhb" value={3} />
+          
+     */
     const ListFooterComponent = (        <View style={this.state.dynamic_style.nav_container}>
       <IconButton
         disabled={this.state.loading}
@@ -107,12 +111,12 @@ get_Videos = ()=>{
           <Picker.Item label="BeIn" value={0} />
           <Picker.Item label="AlMthkb" value={1} />
           <Picker.Item label="arriadia" value={2} />
-          <Picker.Item label="Mtkhb" value={3} />
           <Picker.Item label="heSport" value={4} />
           <Picker.Item label="FIFATV" value={7} />
+          <Picker.Item label="Movies_MC" value={8} />
           <Picker.Item label="Movies_YIFY" value={5} />
           <Picker.Item label="Movies_PB" value={6} />
-          <Picker.Item label="Movies_MC" value={8} />
+          
           
       </Picker>
     </View>);

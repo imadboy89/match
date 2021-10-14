@@ -10,7 +10,7 @@ import teams_en from "./teams_en";
 class API {
   constructor() {
     this.server_url = "http://107.152.39.225/imad/";
-    this.server_url = "https://107.152.39.225/";
+    //this.server_url = "https://107.152.39.225/";
     this.yify_movies_url = "https://yts.mx/api/v2/";
     this.yify_subs_url = "https://yifysubtitles.org/";
     this.PB_movies_url = "https://tpb.party/";
@@ -142,10 +142,24 @@ class API {
     return this.fetch(url, configs)
       .then(response => {
         try {
-          const out = is_json ? response.json() : response.text()
+          let out = "";
+          if(is_json && response && response.json){
+            out = response.json();
+          }else if(response && response.text){
+            out = response.text();
+          }
+          if(out==""){
+            let error_msg = "API->http : "+response;
+            error_msg += "\nUrl : "+url;
+            error_msg += "\nOptions : "+JSON.stringify(configs);
+            API_.showMsg(error_msg,"warning");  
+          }
           return out;
         } catch (error) {
-          API_.showMsg((error.message ? error.message : error)+"","warning");
+          let error_msg = "API->http : "+(error.message ? error.message : error);
+          error_msg += "\nUrl : "+url;
+          error_msg += "\nOptions : "+JSON.stringify(configs);
+          API_.showMsg(error_msg,"warning");
           return is_json ? [] : "" ;
         }
 
@@ -542,12 +556,21 @@ class API {
     this.token_post["token"] = this.token;
     //alert(JSON.stringify(url,this.token_post) + JSON.stringify(this.headers)); 
     await this.sleep(500);
-    return this.fetch(url, {
+    const configs = {
       method: "POST",
       headers: this.headers,
       body:"token="+this.token+"&app_id=2"
-      })
-      .then(response => response.json()) 
+      };
+    return this.fetch(url, configs)
+      .then(response => {
+        let out = "";
+        if(response && response.json){
+          out = response.json();
+        }else if(response && response.text){
+          out = response.text();
+        }
+        return out;
+      }) 
       .then(resJson => {
         if(resJson["status"]== "true" && resJson["message"]){
           this.headers["device-token"]=this.token;
@@ -559,7 +582,10 @@ class API {
         this.token_tries-=1;
         console.log('ERROR', error);
         this.error = error;
-        API_.showMsg((error.message ? error.message : error)+"","warning");
+        let error_msg = "API->http : "+(error.message ? error.message : error);
+        error_msg += "\nUrl : "+url;
+        error_msg += "\nOptions : "+JSON.stringify(configs);
+        API_.showMsg(error_msg,"warning");
       });
   }
   get_date(date__=null){
