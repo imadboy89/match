@@ -1509,7 +1509,7 @@ class API {
       let scrap = new Scrap();
       let movies = [];
       try {
-        movies = scrap.get_Mc_movie(resp);
+        movies = scrap.get_Mc_movie(resp, id);
       } catch (error) {
         API_.debugMsg(error,"danger");
       }

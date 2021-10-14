@@ -1040,31 +1040,44 @@ class Scrap {
     }
     return movies;
   }
-  get_Mc_movie(html){
+  get_Mc_movie(html,url=""){
     if(html==""){return []}
     let doc = null;
     try {
       doc = new DomParser().parseFromString(html,'text/html');
     } catch (error) {}
     if(doc == null){return []}
-    const movie = {eps:[],name:""};
+    const movie = {eps:[],name:"",index:0,ep_name : `-`};
     movie.ifram_src = doc.querySelect('iframe').length > 0 ? doc.querySelect('iframe')[0].getAttribute("src") : "";
     try {
       movie.name = doc.querySelect('li').filter(o=>o.getAttribute("aria-current")=="page");
       movie.name = movie.name[0].childNodes+"";
     } catch (error) {}
+    let ep_id = url.split(".");
+    ep_id = ep_id.length>0 ? ep_id[ep_id.length-1] : 0;
     const eps = doc.querySelect('a').length > 0 ? doc.querySelect('a') : [];
+    let _index = 0;
     for (let i = 0; i < eps.length; i++) {
-      const epp = {url:"",name:""};
+      const epp = {url:"",name:"",index:parseInt(_index+"")};
+      
       const ep = eps[i];
       epp.name = eps[i].getAttribute("title").replace(/Details\s*for/gi,"").trim();
       epp.url  = eps[i].getAttribute("href");
       epp.url = decodeURI(epp.url);
+      
       epp.ep_nbr = parseInt(eps[i].getAttribute("data-number"));
       epp.se_nbr = parseInt(eps[i].getAttribute("data-s-number"));
+      epp.ep_name = `SE ${epp.se_nbr} - EP ${epp.ep_nbr}`;
       if(epp.url=="" || isNaN(epp.ep_nbr) || isNaN(epp.se_nbr)  ){
         continue;
       }
+      let _ep_id = epp.url.split(".");
+      _ep_id = _ep_id.length>0 ? _ep_id[_ep_id.length-1] : 0;
+      if(_ep_id!="" && _ep_id==ep_id){
+        movie.index = parseInt(_index+"") ;
+        movie.ep_name = `SE ${epp.se_nbr} - EP ${epp.ep_nbr}`;
+      }
+      _index += 1;
       movie.eps.push(epp);
     }
 

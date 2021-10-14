@@ -402,27 +402,29 @@ class APP extends React.Component {
             initialRouteName: 'Videos',
             screens:{
               Videos     : "Videos",
-              Movies     : "Videos/Movies",
+              Movies     : "Movies",
               Video    : {
-                path: 'Videos/Video/:item/:id',
+                path: 'Video/:item/:id',
                 parse:{ 
                   id: (id) => id,
                   item: (item) => '-',
                  },
                 stringify: {
                   id: (id) => `${id}`,
-                  item: (item) => `-`,
+                  item: (item) =>   `-`,
                 },
               },
               Movie    : {
-                path: 'Videos/Movies/Movie/:source/:id',
+                path: 'Movie/:source/:id',
                 parse:{ 
                   id: (id) => id,
-                  item: (item) => '-',
+                  source: (source) => source,
+                  item: (item) =>   ``,
                  },
                 stringify: {
                   id: (id) => `${id}`,
-                  item: (item) => `-`,
+                  source: (source) => source,
+                  item: (item) =>   ``,
                 },
               },
             }

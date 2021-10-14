@@ -20,7 +20,7 @@ class ChannelScreen extends React.Component {
         loading:false,
         dynamic_style:styles_channel,
         p_url:"",
-        movie : this.props.route.params.item && this.props.route.params.item!="-" ? this.props.route.params.item : {},
+        movie : this.props.route.params.item && this.props.route.params.item!="" ? this.props.route.params.item : {},
         movie_id : this.props.route.params.id,
         actionType:"Torrent File",
         source_id :parseInt(this.props.route.params.source)
@@ -57,6 +57,7 @@ class ChannelScreen extends React.Component {
         this.state.movie.ifram_src = resp.ifram_src;
         this.state.movie.eps       = resp.eps;
         this.state.movie.name      = resp.name!=""? resp.name : this.state.movie.name;
+        this.state.movie.index     = this.state.movie.index ? this.state.movie.index : 0 ;
         this.setState({loading:false});
       }
     }).catch(err=>API_.showMsg(err,"danger"));
@@ -95,7 +96,7 @@ class ChannelScreen extends React.Component {
   on_clicked(t){
     let url = false;
     if(t.se_nbr){
-      t.source = this.state.movie.source;
+      t.source = this.state.movie.source ? this.state.movie.source : 4;
       this.props.navigation.push('Movie', { item: t, id:t.url,source:t.source });
       return;
     }
@@ -118,6 +119,25 @@ class ChannelScreen extends React.Component {
       seamless/>;
     }
   }
+  render_btns(){
+    if(this.state.movie==undefined || this.state.movie.eps==undefined) return null;
+    
+    let next_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index+1];
+    let prev_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index-1];
+    return <View style={{flexDirection:"row"}}>
+        <Button 
+          color={"#f39c12"}
+          disabled={
+            this.state.movie.eps==undefined || this.state.movie.eps.length==0 || this.state.movie.index<=0 || prev_ep==undefined
+
+          }
+          onPress={()=>this.on_clicked(this.state.movie.eps[this.state.movie.index-1])} title=">>" style={{margin:5}}></Button>
+        <Button 
+          color={"#f39c12"}
+          disabled={this.state.movie.eps==undefined || this.state.movie.eps.length==0 || this.state.movie.index>=this.state.movie.eps.length || next_ep==undefined}
+          onPress={()=>this.on_clicked(this.state.movie.eps[this.state.movie.index+1])} title=">>" style={{margin:5}}></Button>
+    </View>;
+  }
   render() {
     let DL_links = this.state.movie && this.state.movie.torrents ? this.state.movie.torrents.map(t => t && t.url ? (
         <View style={{margin:8}} key={t.url}>
@@ -138,7 +158,7 @@ class ChannelScreen extends React.Component {
     let img  = this.state.movie && this.state.movie.medium_cover_image ? this.state.movie.medium_cover_image : null;
     img  = this.state.movie && this.state.movie.img ? this.state.movie.img : img;
     img = img ? <Image style={this.state.dynamic_style.channel_logo} source={{uri: img}} /> : null;
-    img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
+    //img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
     let eps = null;
     if(this.state.movie && this.state.movie.eps && this.state.movie.eps.length>0){
       eps = this.state.movie.eps.map(ep=>{
@@ -146,11 +166,12 @@ class ChannelScreen extends React.Component {
         return <View style={{margin:8}} key={ep.url}>
         <Button 
           color={"#f39c12"}
-          onPress={()=>this.on_clicked(ep)} title={ep.name} style={{margin:5}}></Button>
+          onPress={()=>this.on_clicked(ep)} title={ep.ep_name} style={{margin:5}}></Button>
       </View>;
       })
     }
     let name = this.state.movie && this.state.movie.title_long ? this.state.movie.title_long : null;
+    let ep_name = this.state.movie && this.state.movie.ep_name ? this.state.movie.ep_name : null;
     name = this.state.movie && this.state.movie.name && this.state.movie.title_long==undefined ? this.state.movie.name : name;
     return (
       <ScrollView style={this.state.dynamic_style.container}>
@@ -158,11 +179,14 @@ class ChannelScreen extends React.Component {
 
       <View style={this.state.dynamic_style.channel_logo_v}>
         {img}
-         </View>
+        
+      </View>
+      {this.render_btns()}
          <View style={this.state.dynamic_style.info_cont}>
          { this.state.loading ? <Loading /> : 
         <View style={this.state.dynamic_style.info_cont}>
           <Text style={this.state.dynamic_style.info_text_small}> Name⠀⠀⠀⠀: {name}</Text>
+          <Text style={this.state.dynamic_style.info_text_small}> Episode  : {ep_name}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Language⠀: {this.state.movie && this.state.movie.language? this.state.movie.language : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Genres⠀⠀⠀: {this.state.movie && this.state.movie.genres? this.state.movie.genres.join("-") : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Rating⠀⠀⠀: {this.state.movie && this.state.movie.rating? this.state.movie.rating+"/10": "-"}</Text>
