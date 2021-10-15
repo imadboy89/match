@@ -1056,6 +1056,32 @@ class Scrap {
     let ep_id = url.split(".");
     ep_id = ep_id.length>0 ? ep_id[ep_id.length-1] : 0;
     const eps = doc.querySelect('a').length > 0 ? doc.querySelect('a') : [];
+    let rating = doc.querySelect('button').filter(o=>(o.childNodes+"").includes("IMDB") )[0];
+    rating = rating ? rating.firstChild.data : rating;
+    movie.rating = rating ? rating : "-";
+    const desc  = doc.querySelect('.description');
+    movie.description_full = desc && desc.length>0 ? desc[0].childNodes+"" : desc;
+    doc.querySelect('strong').map(o=>{
+      if(o.parentNode && o.parentNode.getAttribute("class").includes("btn-quality")){
+        movie.quality = o.firstChild.data ;
+      }
+      if(o.firstChild && o.firstChild.data && o.firstChild.data.trim && o.firstChild.data.trim()=="Released:"){
+        movie.released = o.parentNode.parentNode.lastChild.data ;
+      }
+      if(o.firstChild && o.firstChild.data && o.firstChild.data.trim && o.firstChild.data.trim()=="Duration:"){
+        movie.duration = o.parentNode.parentNode.lastChild.data ;
+      }
+      if(o.firstChild && o.firstChild.data && o.firstChild.data.trim && o.firstChild.data.trim()=="Genre:"){
+        const cn = o.parentNode.childNodes;
+        let genres = [];
+        for(let i=0; i<cn.length;i++){
+          if(cn[i].firstChild == undefined)continue;
+          genres.push(cn[i].firstChild.data);
+        }
+        movie.genres = genres;
+      }
+    })
+
     let _index = 0;
     for (let i = 0; i < eps.length; i++) {
       const epp = {url:"",name:"",index:parseInt(_index+"")};
@@ -1080,7 +1106,6 @@ class Scrap {
       _index += 1;
       movie.eps.push(epp);
     }
-
     return movie;
   }
   decodeEntities(str) {

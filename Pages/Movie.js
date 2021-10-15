@@ -58,6 +58,15 @@ class ChannelScreen extends React.Component {
         this.state.movie.eps       = resp.eps;
         this.state.movie.name      = resp.name!=""? resp.name : this.state.movie.name;
         this.state.movie.index     = this.state.movie.index ? this.state.movie.index : 0 ;
+        this.state.movie.index     = resp.index ? resp.index : this.state.movie.index ;
+        this.state.movie.ep_name   = resp.ep_name ? resp.ep_name : "-";
+        this.state.movie.rating    = resp.rating ? resp.rating : "-";
+        this.state.movie.description_full= resp.description_full ? resp.description_full : "-";
+        this.state.movie.duration  = resp.duration ? resp.duration : "-";
+        this.state.movie.released  = resp.released ? resp.released : "-";
+        this.state.movie.quality   = resp.quality ? resp.quality : "-";
+        this.state.movie.genres    = resp.genres ? resp.genres : "-";
+
         this.setState({loading:false});
       }
     }).catch(err=>API_.showMsg(err,"danger"));
@@ -111,7 +120,7 @@ class ChannelScreen extends React.Component {
 
   }
   render_movie(){
-    if (API_.isWeb) {
+    if (API_.isWeb) { 
       return <iframe 
       src={this.state.movie.ifram_src} 
       style={{height:500,backgroundColor: "#353b48",borderWidth:0,width:"100%"}} 
@@ -120,22 +129,23 @@ class ChannelScreen extends React.Component {
     }
   }
   render_btns(){
-    if(this.state.movie==undefined || this.state.movie.eps==undefined) return null;
-    
+    if(this.state.movie==undefined || this.state.movie.eps==undefined || this.state.movie.eps.length==0) return null;
     let next_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index+1];
     let prev_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index-1];
-    return <View style={{flexDirection:"row"}}>
+    console.log(this.state.movie);
+    return <View style={{flexDirection:"row",width:"98%",justifyContent:"center"}}>
         <Button 
-          color={"#f39c12"}
+          style={{marginRight:100}}
           disabled={
             this.state.movie.eps==undefined || this.state.movie.eps.length==0 || this.state.movie.index<=0 || prev_ep==undefined
 
           }
-          onPress={()=>this.on_clicked(this.state.movie.eps[this.state.movie.index-1])} title=">>" style={{margin:5}}></Button>
+          onPress={()=>this.on_clicked(this.state.movie.eps[this.state.movie.index-1])} title="Previous Episode" style={{margin:5}}></Button>
+          <View style={{width:"20%"}}></View>
         <Button 
-          color={"#f39c12"}
+          color={"#2ecc71"}
           disabled={this.state.movie.eps==undefined || this.state.movie.eps.length==0 || this.state.movie.index>=this.state.movie.eps.length || next_ep==undefined}
-          onPress={()=>this.on_clicked(this.state.movie.eps[this.state.movie.index+1])} title=">>" style={{margin:5}}></Button>
+          onPress={()=>this.on_clicked(this.state.movie.eps[this.state.movie.index+1])} title="Next Episode" style={{margin:5}}></Button>
     </View>;
   }
   render() {
@@ -158,7 +168,7 @@ class ChannelScreen extends React.Component {
     let img  = this.state.movie && this.state.movie.medium_cover_image ? this.state.movie.medium_cover_image : null;
     img  = this.state.movie && this.state.movie.img ? this.state.movie.img : img;
     img = img ? <Image style={this.state.dynamic_style.channel_logo} source={{uri: img}} /> : null;
-    //img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
+    img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
     let eps = null;
     if(this.state.movie && this.state.movie.eps && this.state.movie.eps.length>0){
       eps = this.state.movie.eps.map(ep=>{
@@ -187,9 +197,11 @@ class ChannelScreen extends React.Component {
         <View style={this.state.dynamic_style.info_cont}>
           <Text style={this.state.dynamic_style.info_text_small}> Name⠀⠀⠀⠀: {name}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Episode  : {ep_name}</Text>
+          <Text style={this.state.dynamic_style.info_text_small}> Released: {this.state.movie && this.state.movie.released? this.state.movie.released : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Language⠀: {this.state.movie && this.state.movie.language? this.state.movie.language : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Genres⠀⠀⠀: {this.state.movie && this.state.movie.genres? this.state.movie.genres.join("-") : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Rating⠀⠀⠀: {this.state.movie && this.state.movie.rating? this.state.movie.rating+"/10": "-"}</Text>
+          <Text style={this.state.dynamic_style.info_text_small}> Duration  : {this.state.movie && this.state.movie.duration? this.state.movie.duration+"/10": "-"}</Text>
           <Text style={this.state.dynamic_style.info_text}      > Description: </Text>
           <Text style={this.state.dynamic_style.info_text_small}>{this.state.movie && this.state.movie.description_full? this.state.movie.description_full: "-"}</Text>
           

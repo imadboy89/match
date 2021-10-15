@@ -49,10 +49,11 @@ class API {
     this.load_channels_running = false;
     this.notifcation_type ="push";
     this.notifications_matches = {};
+    /*
     if (this.isWeb){
       this.domain = this.proxy+this.domain;
       this.method = "GET";
-    }
+    }*/
     this.headers = {"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8","device-token":""};
     this.user_agents = {
       "Windows 10":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Safari/537.36",
@@ -124,11 +125,20 @@ class API {
   http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true, use_proxy_utf=true){
     let configs = {method: method,headers: headers ? headers : this.headers,}
     if (this.use_mdb_proxy){
+      if(headers){
+        console.log(headers);
+        for(let kk in headers){
+          headers[kk] = [headers[kk],];
+        }
+      }
       const args = {};
       args.url = url;
       args.body = data;
       args.is_post = method == "POST";
       args.use_proxy_utf = use_proxy_utf ? true : false;
+      args.headers = headers ? headers : {};
+      args.is_json=is_json;
+      args.use_proxy_utf = true;
       return backup.proxy(args);
     }
     if (data!=null){
@@ -540,7 +550,17 @@ class API {
     });
 
   }
-
+  async set_token_2(url){
+    const args = {}
+    args.url=url;
+    args.is_post=true;
+    args.is_json=true;
+    args.headers={"Content-Type":["application/x-www-form-urlencoded"],"charset":["UTF-8"]};
+    args.body = {"token":"",};
+    args.use_proxy_utf=true;
+    exports(args);
+    
+  }
   async set_token(){
     if(this.headers["device-token"]==""){
       let out = await this.getConfig("token");
@@ -561,7 +581,15 @@ class API {
       headers: this.headers,
       body:"token="+this.token+"&app_id=2"
       };
-    return this.fetch(url, configs)
+    this.token_tries-=1;
+    return this.http(url, "POST", body, this.headers, is_json=true).then(resJson=>{
+      if(resJson["status"]== "true" && resJson["message"]){
+        this.headers["device-token"]=this.token;
+        this.setConfig("token",this.token);
+        //alert(resJson["message"]);
+      }
+    });
+    return this.fetch(url)
       .then(response => {
         let out = "";
         if(response && response.json){
@@ -579,7 +607,6 @@ class API {
         }
       })
       .catch(error => {
-        this.token_tries-=1;
         console.log('ERROR', error);
         this.error = error;
         let error_msg = "API->http : "+(error.message ? error.message : error);
@@ -652,34 +679,6 @@ class API {
     }catch(e){
       return time;
     }
-    /*
-    try{
-      if(timeZone == undefined){
-        timeZone = "Africa/Cairo" ;
-      }
-      time = time.split(" ").length==2 ? time : this.get_date_time().split(" ")[0]+" "+time ;
-
-      const d = new Date(new Date().toLocaleString("en-US", {timeZone: "Africa/Casablanca"}));
-      
-      const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-      //notifyMessage("3"+utc);
-      const newTZ_d = new Date(new Date().toLocaleString("en-US", {timeZone: timeZone}));
-      const newTZ = newTZ_d.getTime() + (newTZ_d.getTimezoneOffset() * 60000);
-      const offset_ny = newTZ - utc;
-      //notifyMessage("4"+posix_ny);
-      let timeZone_ = parseInt(offset_ny/3600000);
-      //notifyMessage("5 "+d+" \n  "+newTZ_d);
-      timeZone_=timeZone_>0 ? "+"+timeZone_ : timeZone_ ;
-      console.log(time,);
-      notifyMessage("6 "+(new Date().toLocaleString("en-US", {timeZone: "Africa/Cairo"}) ) );
-      notifyMessage("6 "+ (new Date()) );
-
-      return  this.get_date_time((new Date(time+" GMT"+timeZone_))).split(" ")[1];
-    }catch(e){
-      notifyMessage(e);
-      return time;
-    }
-    */
   }
   get_league_matches(id){
     const url = this.domain+"get_matches_by_league";
@@ -1128,11 +1127,8 @@ class API {
       return this.set_token().then(()=> { return this.get_categories(page)});
     }
     const url = this.domain+"get_categories?page="+page;
-    return this.fetch(url, {
-      method: 'GET',
-      headers: this.headers,
-    })
-      .then(response => response.json())
+    //http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true, use_proxy_utf=true)
+    return this.http(url, "GET", null, this.headers, true)
       .then(resJson => {
         if(resJson && resJson["data"] && resJson["data"].length>0 ){
         }

@@ -123,16 +123,14 @@ class BackUp{
     savePushToken = async()=>{
       if(API_.isWeb){
         try {
-          console.log("savePushToken start2");
           this.PushToken = await this.subscribeUser();
           this.PushToken = JSON.stringify(this.PushToken);
-          console.log("savePushToken END");
         } catch (error) {
           API_.debugMsg(error,"danger");
           return false;
         }
       }
-      if( ! await this.checkCnx() || this.PushToken==undefined || this.PushToken ==""){
+      if( ! await this.checkCnx() || this.PushToken==undefined || this.PushToken =="" || this.client==undefined || this.client.callFunction == undefined){
         return new Promise(resolve=>{resolve(false);});
       }
       let  results ={};
