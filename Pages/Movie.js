@@ -201,7 +201,8 @@ class ChannelScreen extends React.Component {
           <Text style={this.state.dynamic_style.info_text_small}> Language⠀: {this.state.movie && this.state.movie.language? this.state.movie.language : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Genres⠀⠀⠀: {this.state.movie && this.state.movie.genres? this.state.movie.genres.join("-") : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Rating⠀⠀⠀: {this.state.movie && this.state.movie.rating? this.state.movie.rating+"/10": "-"}</Text>
-          <Text style={this.state.dynamic_style.info_text_small}> Duration  : {this.state.movie && this.state.movie.duration? this.state.movie.duration+"/10": "-"}</Text>
+          <Text style={this.state.dynamic_style.info_text_small}> Duration  : {this.state.movie && this.state.movie.duration? this.state.movie.duration: "-"}</Text>
+          <Text style={this.state.dynamic_style.info_text_small}> Quality  : {this.state.movie && this.state.movie.quality? this.state.movie.quality: "-"}</Text>
           <Text style={this.state.dynamic_style.info_text}      > Description: </Text>
           <Text style={this.state.dynamic_style.info_text_small}>{this.state.movie && this.state.movie.description_full? this.state.movie.description_full: "-"}</Text>
           

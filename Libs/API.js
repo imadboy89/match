@@ -126,7 +126,7 @@ class API {
     let configs = {method: method,headers: headers ? headers : this.headers,}
     if (this.use_mdb_proxy){
       if(headers){
-        console.log(headers);
+        //console.log(headers);
         for(let kk in headers){
           headers[kk] = [headers[kk],];
         }
@@ -561,7 +561,7 @@ class API {
     exports(args);
     
   }
-  async set_token(){
+  async set_token(){  
     if(this.headers["device-token"]==""){
       let out = await this.getConfig("token");
       if(out!=null && out!=false  ||this.token_tries==0){
@@ -582,8 +582,8 @@ class API {
       body:"token="+this.token+"&app_id=2"
       };
     this.token_tries-=1;
-    return this.http(url, "POST", body, this.headers, is_json=true).then(resJson=>{
-      if(resJson["status"]== "true" && resJson["message"]){
+    return this.http(url+"?"+configs.body, "POST", {}, this.headers, true).then(resJson=>{
+      if(resJson && resJson["status"]== "true" && resJson["message"]){
         this.headers["device-token"]=this.token;
         this.setConfig("token",this.token);
         //alert(resJson["message"]);
@@ -1489,16 +1489,14 @@ class API {
     const url_matches = "https://www.whoscored.com/matchesfeed/?d="+date.replace(/-/g,"");
     "https://sport360.whoscored.com/Matches/1560148/Live/";
     const resp = this.http(url_matches,"GET",null,null,false,false);
-    console.log(resp);
   }
 
 
   get_MC_movies = (category, page, search_q)=>{
-    console.log(category, page, search_q);
     //https://www.moviecrumbs.net/search/the-100?page=2
     //https://www.moviecrumbs.net/genre/family-9
     let params = "";
-    if (category){
+    if (category && category!=""){
       params = `genre/${category}`;
     }
     if (search_q  && search_q.trim && search_q!=""){

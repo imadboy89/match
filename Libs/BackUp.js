@@ -626,14 +626,19 @@ class BackUp{
 
     proxy = async(args)=>{
       let results = "";
-      try {
-        args.use_proxy_utf = args.use_proxy_utf ? args.use_proxy_utf : true;
-        if( !this.client ||  !this.client.callFunction){
+      args.use_proxy_utf = args.use_proxy_utf ? args.use_proxy_utf : true;        
+      for (let i = 0; i < 10; i++) {
+        try {
+          if( !this.client ||  !this.client.callFunction || !this.is_settings_loaded){
+            await API_.sleep(2000);
+            console.log("proxy , Try now",args.url);
+          }
+          results = await this.client.callFunction("proxy",[args,]);
+          return results && results["output"] ? results["output"] : "" ;
+        } catch (error) {
           await API_.sleep(2000);
         }
-        results = await this.client.callFunction("proxy",[args,]);
-      } catch (error) {console.log(error);}
-      return results["output"];
+      }
     }
 }
 

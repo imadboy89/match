@@ -578,34 +578,68 @@ class APP extends React.Component {
       }, 1);
     }
   }
+  int(val){
+    val = val && val.trim ? val.trim() : val;
+    return parseInt(val) && val==parseInt(val)+"" ? parseInt(val): val;
+  }
   redirect=()=>{
 
     try{
       if(this.firstRender && API_.isWeb && location.search && location.search!="" && location.href.includes("/?/") ){
           //location.href = location.href.replace("/?/","/");
+          //https://lio0.com/Movies?source_id=8 -> https://lio0.com/?/Movies&source_id=8
+          //navigationRef.current?.navigate("Videos",{ screen: "Movies", params:{source_id: 8} })
+
+          // to fix https://lio0.com/Movie/4/%2Fmovie%2Ffree-free-guy-hd-66987?item=          
           const pages_sep = {
               Channel : "channel_photo",
               League  : "league_details",
               Match   : "match_item",
               Article : "article",
             };
-          const full_path = location.search.replace("?/","");
-          const main_screen = full_path.split("/")[0];
+          let full_path = location.search.replace("?/","");
+          if(full_path.includes("Movies") && !full_path.includes("Videos/Movies")){
+            full_path = full_path.replace("Movies","Videos/Movies");
+          }
+          let main_screen = full_path.split("/")[0];
           const path__id = full_path.split("/-/");
           const screens = path__id[0].split("/");
+          main_screen = main_screen.split("&");
+          const _params = full_path && full_path.split("&").length>1 ? full_path.split("&")[1] : undefined;
+          main_screen = main_screen[0];
           let params = {};
           if(screens.length==1){
-            params.id = path__id[1]
+            if(path__id[1]){
+              params.id = path__id[1];
+            }
             if( pages_sep[main_screen]){
               params[pages_sep[main_screen]] = "-";
             }
           }else if(screens.length==2){
-            params.screen = screens[1];
-            params.params = {id:path__id[1]};
+            params.screen = screens[1].split("&").length>1 ?screens[1].split("&")[0] : screens[1];
+            if(path__id[1]){
+              params.params = {id:path__id[1]};
+            }
             if( pages_sep[params.screen]){
               params.params[ pages_sep[params.screen] ] = "-";
             }
           }
+          if(_params){
+            const _ok =_params.split("~and~").map(o=>{
+              const p = o && o.split ? o.split("=") : "";
+              if(p.length==2){
+                if(params.screen){
+                  if(params.params==undefined){
+                    params.params = {};
+                  }
+                  params.params[p[0]] = this.int(p[1]);
+                }else{
+                  params[p[0]] = this.int(p[1]);
+                }
+              }
+            });
+          }
+          console.log(main_screen,params,full_path);
           setTimeout(() => {
             if(navigationRef.current){
               navigationRef.current?.navigate(main_screen,params);

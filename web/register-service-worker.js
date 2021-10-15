@@ -7,10 +7,19 @@ if ('serviceWorker' in navigator) {
         console.info('Registered service-worker', info);
         serviceWorker = info;
         try { backup.savePushToken(); } catch (error) { console.log(error);}
+        let tries = 10;
         let interval = setInterval(() => {
+          tries-=1;
+          if(tries<0){
+            clearInterval(interval);
+            console.log("try savePushToken [FAILED]");
+          }
           console.log("try savePushToken ...");
           try {
-            backup.savePushToken().then(is_ok => {if(is_ok){clearInterval(interval);console.log("try savePushToken [OK]");}});
+            backup.savePushToken().then(is_ok => {if(is_ok){
+              clearInterval(interval);
+              console.log("try savePushToken [OK]");
+            }});
           } catch (error) {
             console.log("try savePushToken [ERROR]");
           }

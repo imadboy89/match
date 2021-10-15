@@ -146,7 +146,7 @@ class MoviesScreen extends React.Component {
         <View style={{flexDirection:"row",margin:5,padding:5,width:"90%"}}>
             <TextInput 
               style={{flex:1,backgroundColor:"black",color:"white",marginLeft:10,marginVertical:5,borderWidth:1,borderColor:"white",borderRadius:5,width:"85%"}}
-              onChangeText={(val)=>{this.setState({search_qeury:val});this.render_header();}}
+              onChangeText={(val)=>{this.state.search_qeury = val;this.render_header();}}
               value={this.state.search_qeury}
               />
           <IconButton 

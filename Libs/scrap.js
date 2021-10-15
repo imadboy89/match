@@ -381,7 +381,7 @@ class Scrap {
     let json_={"matches_comps":[],"matches_list":[]};
     try{
       json_ = JSON.parse(html);
-    }catch(err){console.log(err,html);return [];}
+    }catch(err){return [];}
     const date_str = date ? API_.get_date2(date): false;
     //parse matches_comps
     const FILTERING = API_.filtering && ignoreBL==false;
