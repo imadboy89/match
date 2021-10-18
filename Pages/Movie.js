@@ -17,7 +17,7 @@ class ChannelScreen extends React.Component {
         key_key:"channel_id",
         actionType:"PLAYER",
         channel:null,
-        loading:false,
+        loading:true,
         dynamic_style:styles_channel,
         p_url:"",
         movie : this.props.route.params.item && this.props.route.params.item!="" ? this.props.route.params.item : {},
@@ -52,6 +52,7 @@ class ChannelScreen extends React.Component {
     });
   }
   get_Movie_MC(){
+    this.setState({loading:true});
     API_.get_MC_movie(this.state.movie_id).then(resp=>{
       if(resp && resp.ifram_src ){
         this.state.movie.ifram_src = resp.ifram_src;
@@ -106,7 +107,11 @@ class ChannelScreen extends React.Component {
     let url = false;
     if(t.se_nbr){
       t.source = this.state.movie.source ? this.state.movie.source : 4;
-      this.props.navigation.push('Movie', { item: t, id:t.url,source:t.source });
+      //this.props.navigation.push('Movie', { item: t, id:t.url,source:t.source });
+      this.source_id = t.source;
+      this.state.movie_id = t.url;
+      this.item = t;
+      this.get_movie_details();
       return;
     }
     if(t.lang){

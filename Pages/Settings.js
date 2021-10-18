@@ -34,7 +34,7 @@ class SettingsScreen extends React.Component {
         is_materialTopTab:false,
         notify_isWeb : API_.notify_isWeb,
         force_open_expo :false,
-        
+        keyDown_listner:false,
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
     //this.apk_url = "https://exp-shell-app-assets.s3.us-west-1.amazonaws.com/android/%40imadboss/almatch-2dc6b0c7a3da47819e4245d25dd4221a-signed.apk";
@@ -79,12 +79,30 @@ class SettingsScreen extends React.Component {
     }).catch(error=>API_.debugMsg(error+"","warning"));
   }
   componentWillUnmount(){
+    this.toggle_keys_listner(false);
   }
 
  LoadingIndicatorView() {
     return <ActivityIndicator color='#009b88' size='large' />
   }
-
+  toggle_keys_listner=(status)=>{
+    this.state.keyDown_listner = status;
+    if(this.state.keyDown_listner){
+      if(API_.isWeb){
+        document.addEventListener("keydown", this.keysListnerFunction, false);
+      }
+    }else{
+      if(API_.isWeb){
+        document.removeEventListener("keydown", this.keysListnerFunction, false);
+      }
+    }
+    this.setState({keyDown_listner : status});
+  }
+  keysListnerFunction = (event)=>{
+    if(this.state.keyDown_listner){
+      alert(`Prissed key -${event.keyCode}-`);
+    }
+  }
   picker_themes = ()=>{
     const picker_items = themes_list.map(theme_name=>{
       return (<Picker.Item label={theme_name} value={theme_name} key={theme_name} />);
@@ -354,6 +372,22 @@ class SettingsScreen extends React.Component {
               />
             </Text>
           </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Listen to keys </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={()=>{
+                  this.toggle_keys_listner(!this.state.keyDown_listner);
+                }}
+                value={this.state.keyDown_listner}
+              />
+            </Text>
+          </View>
+
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Testing notifff </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
