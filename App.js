@@ -422,7 +422,7 @@ class APP extends React.Component {
                   item: (item) =>   ``,
                  },
                 stringify: {
-                  id: (id) => `${id}`,
+                  id: (id) => id,
                   source: (source) => source,
                   item: (item) =>   ``,
                 },

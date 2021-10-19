@@ -1025,6 +1025,7 @@ class Scrap {
         try{quality = ahrefs[i].parentNode.querySelect("div")[1].childNodes + "";
         }catch(err){}
         if(img=="")continue;
+        url = url.replace(/\//g,"~s~");
         const movie = {
           id:url,
           url:url,
@@ -1090,7 +1091,7 @@ class Scrap {
       epp.name = eps[i].getAttribute("title").replace(/Details\s*for/gi,"").trim();
       epp.url  = eps[i].getAttribute("href");
       epp.url = decodeURI(epp.url);
-      
+      epp.url = epp.url.replace(/\//g,"~s~");
       epp.ep_nbr = parseInt(eps[i].getAttribute("data-number"));
       epp.se_nbr = parseInt(eps[i].getAttribute("data-s-number"));
       epp.ep_name = `SE ${epp.se_nbr} - EP ${epp.ep_nbr}`;

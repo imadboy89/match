@@ -155,7 +155,12 @@ class ItemsList extends React.Component {
         );
     }else if(["league_name","title_news","title_long"].includes(col_key)){
       this.props.hide_images;
-      const fav_icon = this.get_fav_icon(item[col_key],col_key=="league_name"? item.id : 0,true);
+      let fav_icon = null;
+      if(item.url){
+        fav_icon = this.get_fav_icon_general(item,item.url);
+      }else{
+        fav_icon = this.get_fav_icon(item[col_key],col_key=="league_name"? item.id : 0,true);
+      }
       const koora_icon = this.get_common_icon(item["title"],item["koora_id"],true,"flag");
       let date = item.date && item.date.slice && item.date.slice(0,1) =='#' ? API_.get_date2(new Date(item.date.replace("#","") * 1000)) : item.date ;
       let image_style = {resizeMode:"center",width:"100%"};
@@ -221,6 +226,16 @@ class ItemsList extends React.Component {
         <Text style={this.state.dynamic_style.item} numberOfLines={1}>- {item[col_key]}</Text>
         );
     }
+  }
+  get_fav_icon_general(item,id,icon="star"){
+    const color = global_theme.text_color_default;
+    let fav_icon = null;
+    if(this.props.favorite && this.props.set_fav){
+      fav_icon = this.props.favorite.includes(id) ?
+        <IconButton name={icon} onPress={()=>{this.props.set_fav(item)}} color={color} /> :
+        <IconButton name={icon+"-o"} onPress={()=>{this.props.set_fav(item)}} color={color}/> ;
+    }
+    return fav_icon;
   }
   get_fav_icon(title,id,is_leagues=false,icon="star"){
     const color = is_leagues ? global_theme.text_color_default : global_theme.background_color_default;

@@ -19,6 +19,7 @@ class MoviesScreen extends React.Component {
         sortby:"date_added",
         search_qeury:"",
         section : 205,
+        favorite:[],
 
     };
     this.state.section = this.state.source_id == 4 ? "" : this.state.section;
@@ -43,12 +44,23 @@ class MoviesScreen extends React.Component {
     this.sortby = ["title", "year", "rating", "peers", "seeds", "download_count", "like_count", "date_added"];
   this.get_movies();
   }
+  load_fav=()=>{
+    backup.load_movie_fav(this.state.movie_id_ori).then(favorite=>{
+      favorite = favorite.map(o=>o.url?o.url:"");
+      this.setState({favorite});
+    });
+  }
   componentDidMount(){
     this._isMounted=true;
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
     this.render_header();
+    this.load_fav();
   }
-
+  check_is_fav=()=>{
+    backup.load_movie_fav().then(o=>{
+      this.setState({favorite:o});
+    });
+  }
   refresh_list=()=>{
     const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
     if(this._isMounted){
@@ -220,6 +232,8 @@ class MoviesScreen extends React.Component {
           onclick={this.onItem_clicked} 
           key_="title_long" key_key="id"  
           page={this.state.page}
+          favorite={this.state.favorite}
+          set_fav={(item)=>{backup.save_movie_fav(item, !this.state.favorite.includes(item.url)).then(o=>this.load_fav());}}
           />
         
       </View>

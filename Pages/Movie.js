@@ -1,9 +1,11 @@
 import React from "react";
 import { View, Button, Picker,ScrollView, Image } from 'react-native';
 import Loading from "../components/Loader";
-import {styles_channel,getTheme,globalView_style} from "../components/Themes";
+import {styles_channel,getTheme,globalView_style,styles_home} from "../components/Themes";
 import * as ScreenOrientation from 'expo-screen-orientation';
 import HLSP from "../components/HSL_player";
+import ItemsList from '../components/list';
+import IconButton from "../components/IconButton";
 
 
 class ChannelScreen extends React.Component {
@@ -21,21 +23,78 @@ class ChannelScreen extends React.Component {
         dynamic_style:styles_channel,
         p_url:"",
         movie : this.props.route.params.item && this.props.route.params.item!="" ? this.props.route.params.item : {},
-        movie_id : this.props.route.params.id,
+        movie_id_ori : this.props.route.params.id,
         actionType:"Torrent File",
-        source_id :parseInt(this.props.route.params.source)
-        
+        source_id :parseInt(this.props.route.params.source),
+        is_fav:false,
     };
-    this.state.movie_id = decodeURI(this.state.movie_id);
+    console.log(this.props.route.params.item);
+    this.state.movie_id = decodeURI(this.state.movie_id_ori).replace(/~s~/g,"/");
     this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
     this.playerRef = React.createRef();
-    this.get_movie_details();
   }
   componentDidMount(){
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style_modals:theme}) );
 
-  ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> {/*API_.debugMsg(error+"","warning")*/} );
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL).catch(error=> {/*API_.debugMsg(error+"","warning")*/} );
+    this.toggle_keys_listner(true);
+    this.get_movie_details();
+    this.render_header();
+    this.check_is_fav();
+  }
+  check_is_fav=()=>{
+    backup.load_movie_fav(this.state.movie_id_ori).then(o=>{
+      this.state.is_fav = o.length>0;
+      this.render_header();
+    });
+  }
+  componentWillUnmount(){
+    this.toggle_keys_listner(false);
+  }
+  toggle_keys_listner=(status)=>{
+    this.state.keyDown_listner = status;
+    if(API_.isWeb){
+      if(this.state.keyDown_listner){
+        document.addEventListener("keydown", this.keysListnerFunction, false);
+      }else{
+        document.removeEventListener("keydown", this.keysListnerFunction, false);
+      }
+    }
+    this.setState({keyDown_listner : status});
+  }
+  keysListnerFunction = (event)=>{
+    if(API_.keyDown_listner){
+      //alert(`Prissed key -${event.keyCode}-`);
+      if(event.keyCode==403){
+        this.prev_ep?this.on_clicked(this.prev_ep):undefined;
+      }else if(event.keyCode==404){
+        this.curr_ep?this.on_clicked(this.curr_ep):undefined;
+      }else if(event.keyCode==405){
+        this.curr_ep?this.on_clicked(this.curr_ep):undefined;
+      }else if(event.keyCode==406){
+        this.next_ep?this.on_clicked(this.next_ep):undefined;
+      }
+
+    }
+  }
+  render_header(){
+    const iconsSize = styles_home && styles_home.title ? styles_home.title.fontSize : 15;
+    this.props.navigation.setOptions({
+      title:this.name,
+      "headerRight":()=>(
+        <View style={{flexDirection:"row",margin:5,padding:5,width:"90%"}}>
+          <IconButton 
+            name={this.state.is_fav ? "star" : "star-o"}
+            size={iconsSize} 
+            style={styles_home.icons} 
+            onPress={this.save_fav}  />
+        </View>
+      )
+    });
+  }
+  save_fav = ()=>{
+    backup.save_movie_fav(this.state.movie, !this.state.is_fav).then(o=>this.check_is_fav());
   }
   get_movie_details(){
     if(this.state.source_id==1){
@@ -45,6 +104,7 @@ class ChannelScreen extends React.Component {
     }else{
       this.get_subs();
     }
+    this.toTop();
   }
   get_subs(){
     API_.get_yify_subs(this.state.movie.imdb_code).then(subs=>{
@@ -55,6 +115,7 @@ class ChannelScreen extends React.Component {
     this.setState({loading:true});
     API_.get_MC_movie(this.state.movie_id).then(resp=>{
       if(resp && resp.ifram_src ){
+        this.state.movie.url       = this.state.movie_id_ori;
         this.state.movie.ifram_src = resp.ifram_src;
         this.state.movie.eps       = resp.eps;
         this.state.movie.name      = resp.name!=""? resp.name : this.state.movie.name;
@@ -103,7 +164,7 @@ class ChannelScreen extends React.Component {
       this.props.navigation.navigate('Video', { item: item });
     }
   }
-  on_clicked(t){
+  on_clicked=(t)=>{
     let url = false;
     if(t.se_nbr){
       t.source = this.state.movie.source ? this.state.movie.source : 4;
@@ -124,6 +185,7 @@ class ChannelScreen extends React.Component {
     }
 
   }
+
   render_movie(){
     if (API_.isWeb) { 
       return <iframe 
@@ -135,23 +197,25 @@ class ChannelScreen extends React.Component {
   }
   render_btns(){
     if(this.state.movie==undefined || this.state.movie.eps==undefined || this.state.movie.eps.length==0) return null;
-    let next_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index+1];
-    let prev_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index-1];
-    console.log(this.state.movie);
+    this.next_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index+1];
+    this.prev_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index-1];
+    this.curr_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index];
     return <View style={{flexDirection:"row",width:"98%",justifyContent:"center"}}>
         <Button 
           style={{marginRight:100}}
-          disabled={
-            this.state.movie.eps==undefined || this.state.movie.eps.length==0 || this.state.movie.index<=0 || prev_ep==undefined
-
-          }
-          onPress={()=>this.on_clicked(this.state.movie.eps[this.state.movie.index-1])} title="Previous Episode" style={{margin:5}}></Button>
+          disabled={this.prev_ep==undefined}
+          onPress={()=>this.on_clicked(this.prev_ep)} title="Previous Episode" style={{margin:5}}></Button>
           <View style={{width:"20%"}}></View>
         <Button 
           color={"#2ecc71"}
-          disabled={this.state.movie.eps==undefined || this.state.movie.eps.length==0 || this.state.movie.index>=this.state.movie.eps.length || next_ep==undefined}
-          onPress={()=>this.on_clicked(this.state.movie.eps[this.state.movie.index+1])} title="Next Episode" style={{margin:5}}></Button>
+          disabled={this.next_ep==undefined}
+          onPress={()=>this.on_clicked(this.next_ep)} title="Next Episode" style={{margin:5}}></Button>
     </View>;
+  }
+  toTop = () => {
+    if( this.ScrollView_ref && this.ScrollView_ref.scrollToOffset){
+      this.ScrollView_ref.scrollToOffset({ animated: true, offset: 0 });
+    }
   }
   render() {
     let DL_links = this.state.movie && this.state.movie.torrents ? this.state.movie.torrents.map(t => t && t.url ? (
@@ -173,9 +237,12 @@ class ChannelScreen extends React.Component {
     let img  = this.state.movie && this.state.movie.medium_cover_image ? this.state.movie.medium_cover_image : null;
     img  = this.state.movie && this.state.movie.img ? this.state.movie.img : img;
     img = img ? <Image style={this.state.dynamic_style.channel_logo} source={{uri: img}} /> : null;
-    img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
+    if(API_.isWeb && location.host.includes("localhost")){}else{
+      img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
+    }
     let eps = null;
     if(this.state.movie && this.state.movie.eps && this.state.movie.eps.length>0){
+      /*
       eps = this.state.movie.eps.map(ep=>{
         ep.name = `SE ${ep.se_nbr} - EP ${ep.ep_nbr}`;
         return <View style={{margin:8}} key={ep.url}>
@@ -183,13 +250,22 @@ class ChannelScreen extends React.Component {
           color={"#f39c12"}
           onPress={()=>this.on_clicked(ep)} title={ep.ep_name} style={{margin:5}}></Button>
       </View>;
-      })
+      });
+      */
+      eps = <ItemsList 
+      ListHeaderComponent={<Text style={this.state.dynamic_style.info_text}>Episodes : </Text>}
+      loading={false}
+      list={this.state.movie.eps} 
+      onclick={this.on_clicked} 
+      key_={"ep_name"} key_key={"url"}
+      minWidth={800}
+      />
     }
-    let name = this.state.movie && this.state.movie.title_long ? this.state.movie.title_long : null;
+    this.name = this.state.movie && this.state.movie.title_long ? this.state.movie.title_long : null;
     let ep_name = this.state.movie && this.state.movie.ep_name ? this.state.movie.ep_name : null;
-    name = this.state.movie && this.state.movie.name && this.state.movie.title_long==undefined ? this.state.movie.name : name;
+    this.name = this.state.movie && this.state.movie.name ? this.state.movie.name : this.name;
     return (
-      <ScrollView style={this.state.dynamic_style.container}>
+      <ScrollView style={this.state.dynamic_style.container} ref={(ref) => { this.ScrollView_ref = ref; }} >
         <View style={globalView_style}>
 
       <View style={this.state.dynamic_style.channel_logo_v}>
@@ -200,7 +276,7 @@ class ChannelScreen extends React.Component {
          <View style={this.state.dynamic_style.info_cont}>
          { this.state.loading ? <Loading /> : 
         <View style={this.state.dynamic_style.info_cont}>
-          <Text style={this.state.dynamic_style.info_text_small}> Name⠀⠀⠀⠀: {name}</Text>
+          <Text style={this.state.dynamic_style.info_text_small}> Name⠀⠀⠀⠀: {this.name}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Episode  : {ep_name}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Released: {this.state.movie && this.state.movie.released? this.state.movie.released : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Language⠀: {this.state.movie && this.state.movie.language? this.state.movie.language : "-"}</Text>

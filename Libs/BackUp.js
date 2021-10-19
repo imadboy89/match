@@ -55,11 +55,13 @@ class BackUp{
         this.db = mongoClient.db("ba9al");
         this.db_settings     = this.db.collection("settings");
         this.db_teams_info   = this.db.collection("teams_info");
-        this.db_teams   = this.db.collection("teams");
+        this.db_teams        = this.db.collection("teams");
         this.db_IPTV         = this.db.collection("IPTV");
         this.db_IPRD         = this.db.collection("IPRD");
         this.db_live_matches = this.db.collection("live_matches");
-        this.db_leagues = this.db.collection("leagues");
+        this.db_leagues      = this.db.collection("leagues");
+        this.db_movies_fav   = this.db.collection("movies_fav");
+        
         this.is_auth         = this.email!="" && this.email !=undefined;
         if(this.is_auth) {
           setTimeout(()=>API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success"),1000);
@@ -597,6 +599,7 @@ class BackUp{
             return false;
         }
         live_match.isWeb        = API_.notify_isWeb;
+
         const o = await this.db_live_matches.find(live_match).asArray();
         const is_ok = o && o.length ;
         return  is_ok ;
@@ -619,11 +622,44 @@ class BackUp{
         query.startAt = {$gte:dateTime_s,$lte:dateTime_e}
       }
 
-
       const o = await this.db_live_matches.find(query).asArray();
       return o;
     }
-
+    save_movie_fav = async(movie,add)=>{
+      if(!this.is_mdb_ok()){
+        return false;
+      }
+      console.log("save_movie_fav",movie,add);
+      movie.user_id = this.client.auth.activeUserAuthInfo.userId;
+      movie.isWeb   = API_.notify_isWeb;
+      let is_ok = false;
+      let o = await this.db_movies_fav.deleteMany({url:movie.url});
+      if(add){
+        o  = await this.db_movies_fav.insertOne(movie);
+        is_ok = o && o.insertedId ;
+      }else{
+        is_ok = o && o.deletedCount ;
+      }
+      if(is_ok){
+        API_.movies_fav = "";
+        const action = !add ?  "إزالة" :"إضافة" ;
+        API_.showMsg("تمت "+action+" فيلم  *"+movie.name+"*","success");
+      }else if(add){
+        API_.showMsg("Something wrong : "+JSON.stringify(o) ,"danger");
+      }
+      return is_ok ;
+    }
+    load_movie_fav = async(movie_url=undefined)=>{
+      if(!this.is_mdb_ok()){
+        await API_.sleep(5000);
+      }
+      const query={user_id:this.client.auth.activeUserAuthInfo.userId};
+      if(movie_url){
+        query.url=movie_url;
+      }
+      const o_ = await this.db_movies_fav.find(query).asArray();
+      return o_;
+    }
     proxy = async(args)=>{
       let results = "";
       args.use_proxy_utf = args.use_proxy_utf ? args.use_proxy_utf : true;        
