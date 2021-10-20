@@ -26,11 +26,15 @@ class ChannelScreen extends React.Component {
         movie_id_ori : this.props.route.params.id,
         actionType:"Torrent File",
         source_id :parseInt(this.props.route.params.source),
-        is_fav:false,
     };
     this.state.movie_id = decodeURI(this.state.movie_id_ori).replace(/~s~/g,"/");
     this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
     this.playerRef = React.createRef();
+
+    this.origin_movie = false;
+    this.fav_movie    = false;
+
+    this.save_watching_timer = null;
   }
   componentDidMount(){
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
@@ -40,16 +44,28 @@ class ChannelScreen extends React.Component {
     this.toggle_keys_listner(true);
     this.get_movie_details();
     this.render_header();
-    this.check_is_fav();
+  }
+  watching=()=>{
+    if(this.origin_movie==false)return;
+    const current_ep = this.curr_ep ? this.curr_ep.url : this.state.movie.url;
+
+    if(this.fav_movie && (this.fav_movie.watching==undefined || !this.fav_movie.watching.includes(current_ep)) ){
+      backup.save_watching_fav(this.fav_movie.url, current_ep).then(o=>this.check_is_fav());
+    }
   }
   check_is_fav=()=>{
+    this.fav_movie = false;
     backup.load_movie_fav(this.state.movie_id_ori).then(o=>{
-      this.state.is_fav = o.length>0;
+      if(o && o.length>0){
+        this.fav_movie = o[0];
+        this.setState({});
+      }
       this.render_header();
     });
   }
   componentWillUnmount(){
     this.toggle_keys_listner(false);
+    clearTimeout(this.save_watching_timer);
   }
   toggle_keys_listner=(status)=>{
     if(API_.isWeb){
@@ -68,7 +84,7 @@ class ChannelScreen extends React.Component {
       }else if(event.keyCode==404){
         this.curr_ep?this.on_clicked(this.curr_ep):undefined;
       }else if(event.keyCode==405){
-        this.curr_ep?this.on_clicked(this.curr_ep):undefined;
+        this.save_fav();
       }else if(event.keyCode==406){
         this.next_ep?this.on_clicked(this.next_ep):undefined;
       }
@@ -77,21 +93,28 @@ class ChannelScreen extends React.Component {
   }
   render_header(){
     const iconsSize = styles_home && styles_home.title ? styles_home.title.fontSize : 15;
+    const _curr_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index].url;
     this.props.navigation.setOptions({
       title:this.name,
       "headerRight":()=>(
         <View style={{flexDirection:"row",margin:5,padding:5,width:"90%"}}>
           <IconButton 
-            name={this.state.is_fav ? "star" : "star-o"}
+            name={_curr_ep && this.fav_movie && this.fav_movie.watching && this.fav_movie.watching.includes(_curr_ep) ? "eye" : "eye-slash"}
+            size={iconsSize} 
+            style={styles_home.icons} 
+            onPress={this.watching}  />
+          <IconButton 
+            name={this.fav_movie ? "star" : "star-o"}
             size={iconsSize} 
             style={styles_home.icons} 
             onPress={this.save_fav}  />
         </View>
-      )
+      ),
+
     });
   }
   save_fav = ()=>{
-    backup.save_movie_fav(this.state.movie, !this.state.is_fav).then(o=>this.check_is_fav());
+    backup.save_movie_fav(this.state.movie, !this.fav_movie).then(o=>this.check_is_fav());
   }
   get_movie_details(){
     if(this.state.source_id==1){
@@ -109,16 +132,19 @@ class ChannelScreen extends React.Component {
     });
   }
   get_Movie_MC(){
+    this.fav_movie = false;
+    clearTimeout(this.save_watching_timer);
+    this.render_header();
     this.setState({loading:true});
     this.state.movie_id = decodeURI(this.state.movie_id).replace(/~s~/g,"/");
     API_.get_MC_movie(this.state.movie_id).then(resp=>{
       if(resp && resp.ifram_src ){
         this.state.movie.url       = this.state.movie_id_ori;
         this.state.movie.ifram_src = resp.ifram_src;
-        this.state.movie.eps       = resp.eps;
+        this.state.movie.eps       = this.state.movie.eps==undefined ? resp.eps : this.state.movie.eps;
         this.state.movie.name      = resp.name!=""? resp.name : this.state.movie.name;
         this.state.movie.index     = this.state.movie.index ? this.state.movie.index : 0 ;
-        this.state.movie.index     = resp.index ? resp.index : this.state.movie.index ;
+        //this.state.movie.index     = resp.index ? resp.index : this.state.movie.index ;
         this.state.movie.ep_name   = resp.ep_name ? resp.ep_name : "-";
         this.state.movie.rating    = resp.rating ? resp.rating : "-";
         this.state.movie.description_full= resp.description_full ? resp.description_full : "-";
@@ -127,7 +153,11 @@ class ChannelScreen extends React.Component {
         this.state.movie.quality   = resp.quality ? resp.quality : "-";
         this.state.movie.genres    = resp.genres ? resp.genres : "-";
 
+        this.origin_movie = this.origin_movie==false ? this.state.movie :this.origin_movie;
         this.setState({loading:false});
+
+        this.save_watching_timer = setTimeout(() => {this.watching();}, 1000*60*10);
+        this.check_is_fav();
       }
     }).catch(err=>API_.showMsg(err,"danger"));
   }
@@ -170,6 +200,7 @@ class ChannelScreen extends React.Component {
       this.source_id = t.source;
       this.state.movie_id = t.url;
       this.item = t;
+      this.state.movie.index = t.index;
       this.get_movie_details();
       return;
     }
@@ -195,15 +226,24 @@ class ChannelScreen extends React.Component {
   }
   render_btns(){
     if(this.state.movie==undefined || this.state.movie.eps==undefined || this.state.movie.eps.length==0) return null;
-    this.next_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index+1];
-    this.prev_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index-1];
-    this.curr_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index];
+    let watching_sorted = this.fav_movie && this.fav_movie.watching ? this.fav_movie.watching :[];
+    watching_sorted = watching_sorted.sort((a,b)=>a.index>b.index);
+    console.log(watching_sorted);
+    let last_watc_index = watching_sorted && watching_sorted[0] ? watching_sorted[0]:undefined;
+    const not_series = this.state.movie.eps==undefined || this.state.movie.eps.length==0;
+    this.next_ep = not_series ? undefined : this.state.movie.eps[this.state.movie.index+1];
+    this.prev_ep = not_series ? undefined : this.state.movie.eps[this.state.movie.index-1];
+    this.curr_ep = not_series ? undefined : this.state.movie.eps[this.state.movie.index];
+    last_watc_index = not_series || last_watc_index==undefined ? undefined : this.state.movie.eps.filter(e=>e.url==last_watc_index);
+    last_watc_index = last_watc_index && last_watc_index[0] ? last_watc_index[0] :last_watc_index;
+    this.last_watching = not_series || last_watc_index==undefined ? undefined : last_watc_index;
+    console.log(last_watc_index,this.last_watching)
     if(this.next_ep==undefined && this.prev_ep==undefined && this.curr_ep==undefined) return null;
     return <View style={{flexDirection:"row",width:"98%",justifyContent:"center"}}>
         <Button 
           style={{marginRight:100}}
           disabled={this.prev_ep==undefined}
-          onPress={()=>this.on_clicked(this.prev_ep)} title="Previous Episode" style={{margin:5}}></Button>
+          onPress={()=>this.on_clicked(this.prev_ep)} title="Previous Ep" style={{margin:5}}></Button>
         <View style={{width:"5%"}}></View>
         <Button 
           style={{marginRight:100}}
@@ -211,9 +251,14 @@ class ChannelScreen extends React.Component {
           onPress={()=>this.on_clicked(this.curr_ep)} title="Reload" style={{margin:5}}></Button>
         <View style={{width:"5%"}}></View>
         <Button 
+          style={{marginRight:100}}
+          disabled={this.last_watching==undefined}
+          onPress={()=>this.on_clicked(this.last_watching)} title="Continue" style={{margin:5}}></Button>
+        <View style={{width:"5%"}}></View>
+        <Button 
           color={"#2ecc71"}
           disabled={this.next_ep==undefined}
-          onPress={()=>this.on_clicked(this.next_ep)} title="Next Episode" style={{margin:5}}></Button>
+          onPress={()=>this.on_clicked(this.next_ep)} title="Next Ep" style={{margin:5}}></Button>
     </View>;
   }
   toTop = () => {
@@ -256,10 +301,15 @@ class ChannelScreen extends React.Component {
       </View>;
       });
       */
+     "👁";
+      eps = this.state.movie.eps.slice().map(e=>{
+        e.ep_name+=this.fav_movie && this.fav_movie.watching && this.fav_movie.watching.includes(e.url)?"     👁":"";
+        return e;
+      });
       eps = <ItemsList 
       ListHeaderComponent={<Text style={this.state.dynamic_style.info_text}>Episodes : </Text>}
       loading={false}
-      list={this.state.movie.eps} 
+      list={eps} 
       onclick={this.on_clicked} 
       key_={"ep_name"} key_key={"url"}
       minWidth={800}

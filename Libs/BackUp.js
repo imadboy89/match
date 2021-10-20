@@ -649,6 +649,24 @@ class BackUp{
       }
       return is_ok ;
     }
+    save_watching_fav = async(url,ep,ep_name)=>{
+      if(!this.is_mdb_ok()){
+        return false;
+      }
+      const query    = {url:url};
+      query.user_id  = this.client.auth.activeUserAuthInfo.userId;
+      query.watching = { $ne: ep };
+      let is_ok = false;
+      const upd = { $push: { "watching": ep } };
+      const o = await this.db_movies_fav.updateOne(query,upd,{upsert:true});
+      console.log(o);
+      is_ok = o.modifiedCount || o.matchedCount;
+      if(is_ok){
+        API_.movies_fav = "";
+        API_.showMsg("تمت إضافة فيلم  *"+ep_name+"*","success",500,1000);
+      }
+      return is_ok ;
+    }
     load_movie_fav = async(movie_url=undefined)=>{
       if(!this.is_mdb_ok()){
         await API_.sleep(5000);

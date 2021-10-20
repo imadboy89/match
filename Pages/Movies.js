@@ -105,6 +105,7 @@ class MoviesScreen extends React.Component {
   }
   get_favorites=()=>{
     if(this.state.is_fav_list){
+      this.setState({list:[],loading:true});
       this.get_movies();
     }else{
       this.setState({list:this.state.favorite_movies});
@@ -161,12 +162,13 @@ class MoviesScreen extends React.Component {
   }
   render_header(){
     const iconsSize = this.state.dynamic_style && this.state.dynamic_style.title ? this.state.dynamic_style.title.fontSize : 15;
+    const inputtext_width = API_.isWeb ? "85%" : 150;
     this.props.navigation.setOptions({
       title:"Movies",
       "headerRight":()=>(
         <View style={{flexDirection:"row",margin:5,padding:5,width:"90%"}}>
             <TextInput 
-              style={{flex:1,backgroundColor:"black",color:"white",marginLeft:10,marginVertical:5,borderWidth:1,borderColor:"white",borderRadius:5,width:"85%"}}
+              style={{flex:1,backgroundColor:"black",color:"white",marginLeft:10,marginVertical:5,borderWidth:1,borderColor:"white",borderRadius:5,width:inputtext_width}}
               onChangeText={(val)=>{this.state.search_qeury = val;this.render_header();}}
               value={this.state.search_qeury}
               />
