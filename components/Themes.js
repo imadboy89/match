@@ -1,6 +1,5 @@
 import {  StyleSheet, Dimensions} from 'react-native';
 
-
 function _isMobile(isWeb){
   var isMobile = true;
   if(isWeb==false){
@@ -205,7 +204,7 @@ function generateTheme(theme_name=false){
     _Global_theme_name = Global_theme_name;
   }catch(err){_Global_theme_name = "false";}
   
-  theme_name = theme_name==false ? "light" :theme_name ;
+  theme_name = theme_name==false ? Global_theme_name :theme_name ;
   let theme = Themes[theme_name];
   const header_height = isWeb ? 40 : 70;
   const __isMobile = _isMobile(isWeb);

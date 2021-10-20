@@ -28,7 +28,6 @@ class ChannelScreen extends React.Component {
         source_id :parseInt(this.props.route.params.source),
         is_fav:false,
     };
-    console.log(this.props.route.params.item);
     this.state.movie_id = decodeURI(this.state.movie_id_ori).replace(/~s~/g,"/");
     this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
     this.playerRef = React.createRef();
@@ -53,18 +52,16 @@ class ChannelScreen extends React.Component {
     this.toggle_keys_listner(false);
   }
   toggle_keys_listner=(status)=>{
-    this.state.keyDown_listner = status;
     if(API_.isWeb){
-      if(this.state.keyDown_listner){
+      if(status){
         document.addEventListener("keydown", this.keysListnerFunction, false);
       }else{
         document.removeEventListener("keydown", this.keysListnerFunction, false);
       }
     }
-    this.setState({keyDown_listner : status});
   }
   keysListnerFunction = (event)=>{
-    if(API_.keyDown_listner){
+    if(API_.remote_controle){
       //alert(`Prissed key -${event.keyCode}-`);
       if(event.keyCode==403){
         this.prev_ep?this.on_clicked(this.prev_ep):undefined;
@@ -113,6 +110,7 @@ class ChannelScreen extends React.Component {
   }
   get_Movie_MC(){
     this.setState({loading:true});
+    this.state.movie_id = decodeURI(this.state.movie_id).replace(/~s~/g,"/");
     API_.get_MC_movie(this.state.movie_id).then(resp=>{
       if(resp && resp.ifram_src ){
         this.state.movie.url       = this.state.movie_id_ori;
@@ -200,12 +198,18 @@ class ChannelScreen extends React.Component {
     this.next_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index+1];
     this.prev_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index-1];
     this.curr_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index];
+    if(this.next_ep==undefined && this.prev_ep==undefined && this.curr_ep==undefined) return null;
     return <View style={{flexDirection:"row",width:"98%",justifyContent:"center"}}>
         <Button 
           style={{marginRight:100}}
           disabled={this.prev_ep==undefined}
           onPress={()=>this.on_clicked(this.prev_ep)} title="Previous Episode" style={{margin:5}}></Button>
-          <View style={{width:"20%"}}></View>
+        <View style={{width:"5%"}}></View>
+        <Button 
+          style={{marginRight:100}}
+          disabled={this.curr_ep==undefined}
+          onPress={()=>this.on_clicked(this.curr_ep)} title="Reload" style={{margin:5}}></Button>
+        <View style={{width:"5%"}}></View>
         <Button 
           color={"#2ecc71"}
           disabled={this.next_ep==undefined}

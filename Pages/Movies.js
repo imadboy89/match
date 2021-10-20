@@ -20,6 +20,7 @@ class MoviesScreen extends React.Component {
         search_qeury:"",
         section : 205,
         favorite:[],
+        is_fav_list:false,
 
     };
     this.state.section = this.state.source_id == 4 ? "" : this.state.section;
@@ -45,9 +46,9 @@ class MoviesScreen extends React.Component {
   this.get_movies();
   }
   load_fav=()=>{
-    backup.load_movie_fav(this.state.movie_id_ori).then(favorite=>{
-      favorite = favorite.map(o=>o.url?o.url:"");
-      this.setState({favorite});
+    backup.load_movie_fav(this.state.movie_id_ori).then(favorite_movies=>{
+      const favorite = favorite_movies.map(o=>o.url?o.url:"");
+      this.setState({favorite,favorite_movies});
     });
   }
   componentDidMount(){
@@ -102,6 +103,14 @@ class MoviesScreen extends React.Component {
       }
     });
   }
+  get_favorites=()=>{
+    if(this.state.is_fav_list){
+      this.get_movies();
+    }else{
+      this.setState({list:this.state.favorite_movies});
+    }
+    this.state.is_fav_list = !this.state.is_fav_list;
+  }
   get_movies_MC = (loading=true,keep_list=false)=>{
     API_.get_MC_movies(this.state.section, this.state.page, this.state.search_qeury).then(data=>{
       if(loading){
@@ -111,7 +120,7 @@ class MoviesScreen extends React.Component {
         if(keep_list){
           data = this.state.list.concat(data);
         }
-        this.setState({list:data});
+        this.setState({list:data.slice(0,30)});
       }
     });
   }
@@ -165,6 +174,11 @@ class MoviesScreen extends React.Component {
             name="search" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
             onPress={this.get_movies}  />
         </View>
+      ),
+      "headerLeft":()=>(
+          <IconButton 
+            name="star" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
+            onPress={this.get_favorites}  />
       )
     });
   }

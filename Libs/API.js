@@ -83,8 +83,10 @@ class API {
     this.filtering = true;
     this.matches_bl = [];
     this.channels_dict = {};
-    this.getConfig("is_debug",false).then(o=>this.is_debug=o);
-    this.getConfig("filtering",false).then(o=>this.filtering=o);
+    this.remote_controle = true;
+    this.getConfig("remote_controle",this.remote_controle).then(o=>this.remote_controle=o);
+    this.getConfig("is_debug",this.is_debug).then(o=>this.is_debug=o);
+    this.getConfig("filtering",this.filtering).then(o=>this.filtering=o);
     this.days = ['الاحد', 'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعة', 'السبت'];
     this.crendentials = {"email": "" ,"password": ""};
     this.player_positions={

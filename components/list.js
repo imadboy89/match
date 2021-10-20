@@ -166,14 +166,14 @@ class ItemsList extends React.Component {
       let image_style = {resizeMode:"center",width:"100%"};
       image_style.resizeMode = col_key=="title_news" ? "stretch" : image_style.resizeMode;
       let _img = this.props.hide_images ? null : item.img;
-      let _date = date;
+      let _date = item.released ? item.released :date;
       let item_container = this.state.dynamic_style.news_container;
       let imageBackground_style={flex:1,width:"100%"};
       if(col_key=="title_long"){
         const genres = item.genres && item.genres.join ? item.genres.join(" | ") : "-";
         _img  = item.medium_cover_image ? item.medium_cover_image : _img;
         _date = item.rating ? item.rating+"/10" : _date;
-        if(item.medium_cover_image){
+        if(item.medium_cover_image ||item.is_mc){
           item_container = this.state.dynamic_style.movies_container;
           image_style.resizeMode = "cover";
           image_style.width = "80%";
@@ -185,6 +185,7 @@ class ItemsList extends React.Component {
         <View style={[item_container,shadow_style]}>
           <ImageBackground style={imageBackground_style} source={{uri: _img}} imageStyle={image_style}>
           { _date ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,textAlign:"center",}}>{_date}</Text> : null}
+          { item.seasons ? <Text style={{backgroundColor:"#00000091",color:"#fff",width:90,textAlign:"center",}}>{item.seasons}</Text> : null}
 
             <View style={this.state.dynamic_style.news_img_v}>
               <View style={this.state.dynamic_style.league_header}>
