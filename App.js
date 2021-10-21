@@ -642,7 +642,7 @@ class APP extends React.Component {
             });
           }
           this.redirect_action(main_screen,params);
-        }else if((this.firstRender && API_.isWeb && ["Home",""].includes(location.pathname.replace("/","")) ) || API_.isWeb==false){
+        }else if(this.firstRender && ( API_.isWeb && ["Home",""].includes(location.pathname.replace("/","")) || API_.isWeb==false) ){
           this.redirect_to_default_screen();
         }
     }catch(e){
