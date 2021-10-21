@@ -221,7 +221,7 @@ class MoviesScreen extends React.Component {
     this.props.navigation.setOptions({
       title:"Movies",
       "headerRight":()=>(
-        <View style={{flexDirection:"row",margin:5,padding:5,width:"90%"}}>
+        <View style={{flexDirection:"row",margin:5,padding:5,width:"80%"}}>
             <TextInput 
               style={{flex:1,backgroundColor:"black",color:"white",marginLeft:10,marginVertical:5,borderWidth:1,borderColor:"white",borderRadius:5,width:inputtext_width}}
               onChangeText={(val)=>{this.state.search_qeury = val;this.render_header();}}
@@ -233,11 +233,14 @@ class MoviesScreen extends React.Component {
             onPress={this.get_movies}  />
         </View>
       ),
-      "headerLeft":()=>(
-          <IconButton 
-            name="star" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
-            onPress={this.get_favorites}  />
-      )
+    "headerLeft":()=>(<View style={{flexDirection:"row",margin:5,padding:5,width:"50%"}}>
+        <IconButton 
+          name="long-arrow-left" size={this.state.dynamic_style.title.fontSize} style={[this.state.dynamic_style.icons,{marginHorizontal:10}]} 
+          onPress={()=>this.props.navigation.navigate('Videos')}  />
+        <IconButton 
+          name="star" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
+          onPress={this.get_favorites}  />
+</View>)
     });
   }
   render_extra_headers(){
