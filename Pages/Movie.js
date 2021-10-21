@@ -6,7 +6,7 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import HLSP from "../components/HSL_player";
 import ItemsList from '../components/list';
 import IconButton from "../components/IconButton";
-
+import { WebView } from 'react-native-webview';
 
 class ChannelScreen extends React.Component {
   constructor(props) {
@@ -35,6 +35,7 @@ class ChannelScreen extends React.Component {
     this.fav_movie    = false;
 
     this.save_watching_timer = null;
+    this.watching_sign = "     👁";
   }
   componentDidMount(){
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
@@ -219,9 +220,27 @@ class ChannelScreen extends React.Component {
     if (API_.isWeb) { 
       return <iframe 
       src={this.state.movie.ifram_src} 
-      style={{height:500,backgroundColor: "#353b48",borderWidth:0,width:"100%"}} 
+      style={{height:500,backgroundColor: "#353b48",borderWidth:0,width:"100%"}}
       allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"
       seamless/>;
+    }else{
+      return  <WebView 
+      allowsFullscreenVideo={true}
+      style={{height:500,backgroundColor: "#353b48",borderWidth:0,width:"100%"}}
+      javaScriptEnabled={true}
+      domStorageEnabled={true}
+      ref={(ref) => (this.webview = ref)}
+      onShouldStartLoadWithRequest={(request) => {
+        /*this.webview.injectJavaScript(this.js_setIframeWidth);
+        if(request.url.replace("/m.","/").replace("/www.","/") != uri_.replace("/m.","/").replace("/www.","/")){
+          console.log("stopLoading");
+          return false;
+        }
+        return true;*/
+      }}
+      source={ source }
+      userAgent={API_.user_agents["Android 10"]}
+      />;
     }
   }
   render_btns(){
@@ -303,7 +322,8 @@ class ChannelScreen extends React.Component {
       */
      "👁";
       eps = this.state.movie.eps.slice().map(e=>{
-        e.ep_name+=this.fav_movie && this.fav_movie.watching && this.fav_movie.watching.includes(e.url)?"     👁":"";
+        e.ep_name = e.ep_name.replace(this.watching_sign,"");
+        e.ep_name+=this.fav_movie && this.fav_movie.watching && this.fav_movie.watching.includes(e.url)?this.watching_sign:"";
         return e;
       });
       eps = <ItemsList 

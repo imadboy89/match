@@ -1009,53 +1009,64 @@ class Scrap {
       doc = new DomParser().parseFromString(html,'text/html');
     } catch (error) {}
     if(doc == null){return []}
-    let ahrefs = doc.querySelect('.container') .length>1  ? doc.querySelect('.container')[1].querySelect("a") : [];
-    let movies = [];
+    //block_area_home
+    let block = doc.querySelect('.container');
+    const sections = doc.querySelect("section");
+    
+    if(sections && sections.length>0){
+      block = sections;
+    }
+    let movies = {};
     let links = [];
-    for (let i=0;i<ahrefs.length;i++){
-      try {
-        let img= "",quality="",released="",seasons="",released_seasions=[];
-        const name = ahrefs[i].getAttribute("title").replace(/Details\s*for/gi,"").trim();
-        let url  = ahrefs[i].getAttribute("href");
-        if(!ahrefs[i].getAttribute("class").includes("film-poster-ahref") ){
-          continue;
-        }
-        if (url.trim()=="" || url[0]=="#"|| url.trim() == "javascript:void(0)" || links.includes(url)) continue;
-        url = decodeURI(url);
-        links.push(url);
-        try{img = ahrefs[i].parentNode.querySelect("img")[0].getAttribute("data-src");
-        }catch(err){}
-
-        try{quality = ahrefs[i].parentNode.querySelect("div").filter(o=>(o.getAttribute("class")+"").includes("film-poster-quality") )[0].childNodes + "";
-        }catch(err){}
-        try{released_seasions = ahrefs[i].parentNode.parentNode.querySelect("span").filter(o=>(o.getAttribute("class")+"").includes("fdi-item") );
-        }catch(err){}
-        released_seasions.map(o=>{
-          const att = o.childNodes+"";
-          if(att.trim().includes("SS")){
-            seasons = att;
-          }else if( !isNaN(parseInt(att.trim())) && parseInt(att.trim())>1950 ){
-            released = att;
+    for (let ii=0;ii<block.length;ii++){
+      let ahrefs = block[ii].querySelect("a");
+      const section_name = block[ii].getElementsByTagName("h2") && block[ii].getElementsByTagName("h2")[0] ?  block[ii].getElementsByTagName("h2")[0].childNodes+"" : "";
+      movies[section_name] = [];
+      for (let i=0;i<ahrefs.length;i++){
+        try {
+          let img= "",quality="",released="",seasons="",released_seasions=[];
+          const name = ahrefs[i].getAttribute("title").replace(/Details\s*for/gi,"").trim();
+          let url  = ahrefs[i].getAttribute("href");
+          if(!ahrefs[i].getAttribute("class").includes("film-poster-ahref") ){
+            continue;
           }
-        });
+          if (url.trim()=="" || url[0]=="#"|| url.trim() == "javascript:void(0)" || links.includes(url)) continue;
+          url = decodeURI(url);
+          links.push(url);
+          try{img = ahrefs[i].parentNode.querySelect("img")[0].getAttribute("data-src");
+          }catch(err){}
 
-        if(img=="")continue;
-        url = url.replace(/\//g,"~s~");
-        const movie = {
-          id:url,
-          url:url,
-          lang:"eng",
-          name:name,
-          img:img,
-          title_long:name,
-          is_mc:true,
-          quality:quality,
-          released:released,
-          seasons:seasons,
-        };
-        movies.push(movie);
-      } catch (error) {}
+          try{quality = ahrefs[i].parentNode.querySelect("div").filter(o=>(o.getAttribute("class")+"").includes("film-poster-quality") )[0].childNodes + "";
+          }catch(err){}
+          try{released_seasions = ahrefs[i].parentNode.parentNode.querySelect("span").filter(o=>(o.getAttribute("class")+"").includes("fdi-item") );
+          }catch(err){}
+          released_seasions.map(o=>{
+            const att = o.childNodes+"";
+            if(att.trim().includes("SS")){
+              seasons = att;
+            }else if( !isNaN(parseInt(att.trim())) && parseInt(att.trim())>1950 ){
+              released = att;
+            }
+          });
 
+          if(img=="")continue;
+          url = url.replace(/\//g,"~s~");
+          const movie = {
+            id:url,
+            url:url,
+            lang:"eng",
+            name:name,
+            img:img,
+            title_long:name,
+            is_mc:true,
+            quality:quality,
+            released:released,
+            seasons:seasons,
+          };
+          movies[section_name].push(movie);
+        } catch (error) {}
+
+      }
     }
     return movies;
   }

@@ -101,7 +101,8 @@ class API {
 
 
     this.use_mdb_proxy = this.isWeb;/* ok */
-
+    this.default_ui = "Movies?source_id=8";
+    this.default_ui = ["Videos",{screen:"Movies",params:{source_id:8}}];
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;
@@ -1499,7 +1500,7 @@ class API {
     //https://www.moviecrumbs.net/genre/family-9
     let params = "";
     if (category && category!=""){
-      params = `genre/${category}`;
+      params = `${category}`;
     }
     if (search_q  && search_q.trim && search_q!=""){
       search_q = search_q.trim().replace("/  /g"," ").replace(" ","-");

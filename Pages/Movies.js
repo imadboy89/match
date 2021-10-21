@@ -21,8 +21,10 @@ class MoviesScreen extends React.Component {
         section : 205,
         favorite:[],
         is_fav_list:false,
+        data_section:"--",
 
     };
+    this.data = {};
     this.state.section = this.state.source_id == 4 ? "" : this.state.section;
     this.rates=[0,1,2,3,4,5,6,7,8,9];
     this.genres = [
@@ -43,6 +45,39 @@ class MoviesScreen extends React.Component {
   "action-comedy",
   "superhero",];
     this.sortby = ["title", "year", "rating", "peers", "seeds", "download_count", "like_count", "date_added"];
+    this.genres_MC = {
+      "" : "Home",
+      "/top-imdb" : "Top IMDB",
+      "/genre/action-10" : "Action",
+      "/genre/action-adventure-24" : "Action & Adventure",
+      "/genre/adventure-18" : "Adventure",
+      "/genre/animation-3" : "Animation",
+      "/genre/comedy-7" : "Comedy",
+      "/genre/crime-2" : "Crime",
+      "/genre/documentary-11" : "Documentary",
+      "/genre/drama-4" : "Drama",
+      "/genre/family-9" : "Family",
+      "/genre/fantasy-13" : "Fantasy",
+      "/genre/history-19" : "History",
+      "/genre/horror-14" : "Horror",
+      "/genre/kids-27" : "Kids",
+      "/genre/music-15" : "Music",
+      "/genre/mystery-1" : "Mystery",
+      "/genre/news-34" : "News",
+      "/genre/reality-22" : "Reality",
+      "/genre/romance-12" : "Romance",
+      "/genre/sci-fi-fantasy-31" : "Sci-Fi & Fantasy",
+      "/genre/science-fiction-5" : "Science Fiction",
+      "/genre/soap-35" : "Soap",
+      "/genre/talk-29" : "Talk",
+      "/genre/thriller-16" : "Thriller",
+      "/genre/tv-movie-8" : "TV Movie",
+      "/genre/war-17" : "War",
+      "/genre/war-politics-28" : "War & Politics",
+      "/genre/western-6" : "Western",
+      "/tv-shows" : "TV Shows",
+      "/movies" : "Movies",
+    };
   this.get_movies();
   }
   load_fav=()=>{
@@ -77,7 +112,8 @@ class MoviesScreen extends React.Component {
   
   get_movies =(loading=true,keep_list=false)=>{
     if(this.state.loading==false && loading){
-      this.setState({loading:true});
+      this.data = {};
+      this.setState({loading:true,list:[]});
     }
     if (this.state.source_id==2){
       return this.get_movies_PB(loading,keep_list);
@@ -105,25 +141,40 @@ class MoviesScreen extends React.Component {
   }
   get_favorites=()=>{
     if(this.state.is_fav_list){
-      this.setState({list:[],loading:true});
-      this.get_movies();
+      this.setState({list:this.data_last});
     }else{
-      this.setState({list:this.state.favorite_movies});
+      this.data_last = this.state.list;
+      this.setState({list:this.state.favorite_movies?this.state.favorite_movies:[]});
     }
     this.state.is_fav_list = !this.state.is_fav_list;
   }
   get_movies_MC = (loading=true,keep_list=false)=>{
-    API_.get_MC_movies(this.state.section, this.state.page, this.state.search_qeury).then(data=>{
+    API_.get_MC_movies(this.state.genre, this.state.page, this.state.search_qeury).then(data=>{
+      try {
+        this.data = JSON.parse(JSON.stringify(data));
+      } catch (error) {this.data = {};  }
+        
       if(loading){
         this.state.loading = false;
       }
       if(this._isMounted && data){
+        data = this.get_section("Trending");
         if(keep_list){
           data = this.state.list.concat(data);
         }
-        this.setState({list:data.slice(0,30)});
+        this.setState({list:data});
       }
     });
+  }
+  get_section(section){
+    let data = [];
+    const sections = Object.keys(this.data);
+    if(sections.length>1){
+      data = this.data[section] ? this.data[section] : [];
+    }else if(sections.length == 1){
+      data = this.data[sections[0]];
+    }
+    return data.slice();
   }
   get_movies_PB = (loading=true,keep_list=false)=>{
     const options = {action:"list", section:this.state.section, page:this.state.page,search_qeury:this.state.search_qeury};
@@ -150,6 +201,10 @@ class MoviesScreen extends React.Component {
     this.state.page=1;
     this.get_movies();
   }
+  change_section = (itemValue, itemIndex)=>{
+    this.setState({list:this.get_section(itemValue),data_section:itemValue});
+  }
+  
   change_rate = (itemValue, itemIndex)=>{
     this.state.rate = itemValue;
     this.state.page=1;
@@ -171,6 +226,7 @@ class MoviesScreen extends React.Component {
               style={{flex:1,backgroundColor:"black",color:"white",marginLeft:10,marginVertical:5,borderWidth:1,borderColor:"white",borderRadius:5,width:inputtext_width}}
               onChangeText={(val)=>{this.state.search_qeury = val;this.render_header();}}
               value={this.state.search_qeury}
+              onSubmitEditing={this.get_movies} 
               />
           <IconButton 
             name="search" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
@@ -184,8 +240,59 @@ class MoviesScreen extends React.Component {
       )
     });
   }
-  render() {
+  render_extra_headers(){
     const picker_style = {height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,borderColor:"white",borderWidth:1};
+    const genres = <Picker
+    selectedValue={this.state.genre}
+    style={[picker_style,{width:"30%"}]}
+    itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+    onValueChange={this.change_genre}
+  >
+     { this.state.source_id==1 ? this.genres.map(g=><Picker.Item label={g} value={g} key={g} />)
+     : Object.keys(this.genres_MC).map(k=><Picker.Item label={this.genres_MC[k]} value={k} key={k} />)
+     }
+    </Picker>;
+    const sections = this.state.source_id==4 && this.data && Object.keys(this.data) && Object.keys(this.data).length>1 && this.state.is_fav_list==false ? 
+      <Picker
+        selectedValue={this.state.data_section}
+        style={[picker_style,{width:"30%"}]}
+        itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+        onValueChange={this.change_section}
+      >
+       {Object.keys(this.data).map(k=><Picker.Item label={k} value={k} key={k} />)}
+        </Picker> : null;
+    return this.state.source_id==1 || this.state.source_id==4 ? 
+      <View style={{flex:1,flexDirection:"row"}}>
+        <Text style={this.state.dynamic_style.text_small}>⌖</Text>
+        {this.state.is_fav_list==false ? genres : null}
+        { this.state.source_id==1?
+          <>
+        <Text style={this.state.dynamic_style.text_small}>＃</Text>
+        <Picker
+            selectedValue={this.state.rate}
+            style={[picker_style,{width:"19%"}]}
+            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+            onValueChange={this.change_rate}
+          >
+            {this.rates.map(g=><Picker.Item label={"+"+g} value={g} key={g} />)}
+        </Picker>
+        <Text style={this.state.dynamic_style.text_small}>⇅</Text>
+        <Picker
+            selectedValue={this.state.sortby}
+            style={[picker_style,{width:"40%"}]}
+            itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+            onValueChange={this.change_sortby}
+          >
+            {this.sortby.map(g=><Picker.Item label={g} value={g} key={g} />)}
+        </Picker>
+        
+        </>:sections
+        }
+        <Text style={this.state.dynamic_style.text_small}>{this.state.list && this.state.list.length>=0 ? this.state.list.length : "-"}</Text>
+      </View>
+    : null
+  }
+  render() {
     const ListHeaderComponent = (        <View style={this.state.dynamic_style.nav_container}>
       <IconButton
         disabled={this.state.loading}
@@ -203,37 +310,7 @@ class MoviesScreen extends React.Component {
         this.state.page++;
         this.get_movies();
       }}  />
-      {this.state.source_id==1 ? 
-        <View style={{flex:1,flexDirection:"row"}}>
-        <Text style={this.state.dynamic_style.text_small}>⌖</Text>
-          <Picker
-              selectedValue={this.state.genre}
-              style={[picker_style,{width:"40%"}]}
-              itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-              onValueChange={this.change_genre}
-            >
-              {this.genres.map(g=><Picker.Item label={g} value={g} key={g} />)}
-          </Picker>
-          <Text style={this.state.dynamic_style.text_small}>＃</Text>
-          <Picker
-              selectedValue={this.state.rate}
-              style={[picker_style,{width:"19%"}]}
-              itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-              onValueChange={this.change_rate}
-            >
-              {this.rates.map(g=><Picker.Item label={"+"+g} value={g} key={g} />)}
-          </Picker>
-          <Text style={this.state.dynamic_style.text_small}>⇅</Text>
-          <Picker
-              selectedValue={this.state.sortby}
-              style={[picker_style,{width:"40%"}]}
-              itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-              onValueChange={this.change_sortby}
-            >
-              {this.sortby.map(g=><Picker.Item label={g} value={g} key={g} />)}
-          </Picker>
-        </View>
-      : null}
+        {this.render_extra_headers()}
     </View>);
     return (
       <View style={this.state.dynamic_style.container}>     

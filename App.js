@@ -95,7 +95,6 @@ function _loadFontsAsync() {
     'DroidKufi-Bold': require('./assets/fonts/DroidKufi-Bold.ttf'),
     }).then(()=>{
     LoadedFonts=true;
-    console.log("FontsLoaded");
   });
   //this.setState({ fontsLoaded: true });
 }
@@ -550,7 +549,6 @@ class APP extends React.Component {
   }
   showMsg = (body,type, speed, delay, onCLicked)=>{
     if(!body || (body.trim && body.trim()=="")){return false;}
-    console.log("msg1:",this.state.showMsg,"msg2:",this.state.showMsg);
     if(this.state.showMsg==false){
       this.setState({body:body,type:type, speed:speed, delay:delay,debug:false,showMsg:true,onCLicked:onCLicked});
     }else if(this.state.showMsg==true && this.state.showMsg_2==false){
@@ -582,8 +580,12 @@ class APP extends React.Component {
     val = val && val.trim ? val.trim() : val;
     return parseInt(val) && val==parseInt(val)+"" ? parseInt(val): val;
   }
+  redirect_to_default_screen=()=>{
+    if(API_.default_ui && API_.default_ui.length==2){
+      this.redirect_action(API_.default_ui[0],API_.default_ui[1]);
+    }
+  }
   redirect=()=>{
-
     try{
       if(this.firstRender && API_.isWeb && location.search && location.search!="" && location.href.includes("/?/") ){
           //location.href = location.href.replace("/?/","/");
@@ -639,12 +641,9 @@ class APP extends React.Component {
               }
             });
           }
-          console.log(main_screen,params,full_path);
-          setTimeout(() => {
-            if(navigationRef.current){
-              navigationRef.current?.navigate(main_screen,params);
-            }
-          }, 200);
+          this.redirect_action(main_screen,params);
+        }else if((this.firstRender && API_.isWeb && ["Home",""].includes(location.pathname.replace("/","")) ) || API_.isWeb==false){
+          this.redirect_to_default_screen();
         }
     }catch(e){
       API_.showMsg(e,"danger");
@@ -653,6 +652,13 @@ class APP extends React.Component {
     if(this.firstRender){
       this.firstRender = false;
     }
+  }
+  redirect_action=(main_screen,params)=>{
+    setTimeout(() => {
+      if(navigationRef.current){
+        navigationRef.current?.navigate(main_screen,params);
+      }
+    }, 200);
   }
   redirect_deep=()=>{
 
