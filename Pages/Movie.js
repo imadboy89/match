@@ -238,9 +238,9 @@ class ChannelScreen extends React.Component {
         }
         return true;*/
       }}
-      source={ source }
-      userAgent={API_.user_agents["Android 10"]}
+      source={ {uri:this.state.movie.ifram_src} }
       />;
+      //userAgent={API_.user_agents["Android 10"]}
     }
   }
   render_btns(){
@@ -305,6 +305,7 @@ class ChannelScreen extends React.Component {
     let img  = this.state.movie && this.state.movie.medium_cover_image ? this.state.movie.medium_cover_image : null;
     img  = this.state.movie && this.state.movie.img ? this.state.movie.img : img;
     img = img ? <Image style={this.state.dynamic_style.channel_logo} source={{uri: img}} /> : null;
+
     if(API_.isWeb && location.host.includes("localhost")){}else{
       img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
     }
@@ -344,7 +345,6 @@ class ChannelScreen extends React.Component {
 
       <View style={this.state.dynamic_style.channel_logo_v}>
         {img}
-        
       </View>
       {this.render_btns()}
          <View style={this.state.dynamic_style.info_cont}>
