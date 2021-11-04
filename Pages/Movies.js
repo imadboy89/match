@@ -47,7 +47,7 @@ class MoviesScreen extends React.Component {
     this.sortby = ["title", "year", "rating", "peers", "seeds", "download_count", "like_count", "date_added"];
     this.genres_MC = {
       "" : "Home",
-      "/top-imdb" : "Top IMDB",
+      "/  -imdb" : "Top IMDB",
       "/genre/action-10" : "Action",
       "/genre/action-adventure-24" : "Action & Adventure",
       "/genre/adventure-18" : "Adventure",
@@ -79,6 +79,19 @@ class MoviesScreen extends React.Component {
       "/movies" : "Movies",
     };
   this.get_movies();
+  console.log("--------constructor");
+  this.screen_focus_mng();
+  
+  }
+  screen_focus_mng(){
+    this.subscribetions=[];
+    this.subscribetions.push(this.props.navigation.addListener('focus', () => {
+      this.toggle_keys_listner(true);
+    }));
+    this.subscribetions.push(this.props.navigation.addListener('blur', () => {
+      this.toggle_keys_listner(false);
+    }));
+    console.log(this.subscribetions);
   }
   load_fav=()=>{
     backup.load_movie_fav(this.state.movie_id_ori).then(favorite_movies=>{
@@ -87,6 +100,7 @@ class MoviesScreen extends React.Component {
     });
   }
   componentDidMount(){
+    console.log("--------componentDidMount");
     this._isMounted=true;
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
     this.render_header();
@@ -106,10 +120,43 @@ class MoviesScreen extends React.Component {
   }
   
   componentWillUnmount(){
+    console.log("--------componentWillUnmount");
     this._isMounted=false;
     clearInterval(this.interval_refresh);
+    this.toggle_keys_listner(false);
+    for(let i=0;i < this.subscribetions.length;i++){
+      this.subscribetions[i]();
+    }
   }
   
+  toggle_keys_listner=(status)=>{
+    if(API_.isWeb){
+      if(status){
+        document.addEventListener("keydown", this.keysListnerFunction, false);
+      }else{
+        document.removeEventListener("keydown", this.keysListnerFunction, false);
+      }
+    }
+  }
+  keysListnerFunction = (event)=>{
+    if(API_.remote_controle){
+      //alert(`Prissed key -${event.keyCode}-`);
+      if(event.keyCode==403){
+        if(this.state.page>1){
+          this.state.page--;
+          this.get_movies();
+        }
+      }else if(event.keyCode==404){
+        this.get_favorites();//reload
+      }else if(event.keyCode==405){
+        this.get_favorites();
+      }else if(event.keyCode==406){
+        this.state.page++;
+        this.get_movies();
+      }
+
+    }
+  }
   get_movies =(loading=true,keep_list=false)=>{
     if(this.state.loading==false && loading){
       this.data = {};
@@ -330,6 +377,8 @@ class MoviesScreen extends React.Component {
           page={this.state.page}
           favorite={this.state.favorite}
           set_fav={(item)=>{backup.save_movie_fav(item, !this.state.favorite.includes(item.url)).then(o=>this.load_fav());}}
+          keyScroll={true}
+          _navigation={this.props.navigation}
           />
         
       </View>

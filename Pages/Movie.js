@@ -7,7 +7,7 @@ import HLSP from "../components/HSL_player";
 import ItemsList from '../components/list';
 import IconButton from "../components/IconButton";
 import { WebView } from 'react-native-webview';
-
+import ScrollNav from "../Libs/scrollNav";
 class ChannelScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -29,13 +29,25 @@ class ChannelScreen extends React.Component {
     };
     this.state.movie_id = decodeURI(this.state.movie_id_ori).replace(/~s~/g,"/");
     this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
-    this.playerRef = React.createRef();
+    this.ScrollView_ref = React.createRef();
 
     this.origin_movie = false;
     this.fav_movie    = false;
 
     this.save_watching_timer = null;
     this.watching_sign = "     👁";
+    
+    this.screen_focus_mng();
+    this.ScrollNav = false;
+  }
+  screen_focus_mng(){
+    this.subscribetions=[];
+    this.subscribetions.push(this.props.navigation.addListener('focus', () => {
+      this.toggle_keys_listner(true);
+    }));
+    this.subscribetions.push(this.props.navigation.addListener('blur', () => {
+      this.toggle_keys_listner(false);
+    }));
   }
   componentDidMount(){
     getTheme("styles_channel").then(theme=>this.setState({dynamic_style:theme}));
@@ -45,6 +57,7 @@ class ChannelScreen extends React.Component {
     this.toggle_keys_listner(true);
     this.get_movie_details();
     this.render_header();
+    
   }
   watching=()=>{
     if(this.origin_movie==false)return;
@@ -67,6 +80,13 @@ class ChannelScreen extends React.Component {
   componentWillUnmount(){
     this.toggle_keys_listner(false);
     clearTimeout(this.save_watching_timer);
+    this.toggle_keys_listner(false);
+    for(let i=0;i < this.subscribetions.length;i++){
+      this.subscribetions[i]();
+    }
+    if(this.ScrollNav){
+      this.ScrollNav.unsubscribe();
+    }
   }
   toggle_keys_listner=(status)=>{
     if(API_.isWeb){
@@ -340,7 +360,11 @@ class ChannelScreen extends React.Component {
     let ep_name = this.state.movie && this.state.movie.ep_name ? this.state.movie.ep_name : null;
     this.name = this.state.movie && this.state.movie.name ? this.state.movie.name : this.name;
     return (
-      <ScrollView style={this.state.dynamic_style.container} ref={(ref) => { this.ScrollView_ref = ref; }} >
+      <ScrollView style={this.state.dynamic_style.container} ref={(ref) => { 
+        this.ScrollView_ref = ref; 
+        this.ScrollNav = new ScrollNav(this.ScrollView_ref, this.props.navigation);
+        console.log("frref");
+        }} >
         <View style={globalView_style}>
 
       <View style={this.state.dynamic_style.channel_logo_v}>

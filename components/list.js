@@ -24,6 +24,8 @@ class ItemsList extends React.Component {
     this.refs_list = [];
     this.refs_map = {};
     this.page = this.props.page;
+    this.flatlist_offset = 0;
+    this.screen_focus_mng();
   }
   componentDidMount=()=>{
     this._isMounted=true;
@@ -35,6 +37,9 @@ class ItemsList extends React.Component {
     //alert("componentWillUnmount");
     this._isMounted=false;
     Dimensions.removeEventListener("change",this.check_width)
+    for(let i=0;i < this.subscribetions.length;i++){
+      this.subscribetions[i]();
+    }
   }
   componentDidUpdate(){
     /*
@@ -43,6 +48,39 @@ class ItemsList extends React.Component {
       this.refs_list[0].current.focus();
     }
     */
+  }
+  screen_focus_mng=()=>{
+    this.subscribetions=[];
+    if(this.props._navigation){
+      this.subscribetions.push(this.props._navigation.addListener('focus', () => {
+        this.toggle_keys_listner(true);
+      }));
+      this.subscribetions.push(this.props._navigation.addListener('blur', () => {
+        this.toggle_keys_listner(false);
+      }));
+      console.log(this.subscribetions);
+    }
+
+  }
+  toggle_keys_listner=(status)=>{
+    if(API_.isWeb){
+      if(status){
+        document.addEventListener("keydown", this.keysListnerFunction, false);
+      }else{
+        document.removeEventListener("keydown", this.keysListnerFunction, false);
+      }
+    }
+  }
+  keysListnerFunction = (event)=>{
+    if(API_.remote_controle){
+      //alert(`Prissed key -${event.keyCode}-`);
+      if(event.keyCode==49 || event.keyCode==97){
+        this.scrollUp();
+      }else if(event.keyCode==50 || event.keyCode==98){
+        this.scrollDown();
+      }
+
+    }
   }
   check_width=(render=true)=>{
     const current_windowWidth= Dimensions.get('window').width<=1000 ? Dimensions.get('window').width : 1000;
@@ -354,6 +392,19 @@ class ItemsList extends React.Component {
       this.flatListRef.scrollToOffset({ animated: true, offset: 0 });
     }
   }
+
+  scrollUp = () => {
+    if(this.props.keyScroll && this.flatListRef && this.flatListRef && this.flatListRef.scrollToOffset){
+      this.flatlist_offset = this.flatlist_offset+200;
+      this.flatListRef.scrollToOffset({ animated: true, offset: this.flatlist_offset });
+    }
+  }
+  scrollDown = () => {
+    if(this.props.keyScroll && this.flatListRef && this.flatListRef && this.flatListRef.scrollToOffset){
+      this.flatlist_offset = this.flatlist_offset>0 ? this.flatlist_offset-200 : this.flatlist_offset;
+      this.flatListRef.scrollToOffset({ animated: true, offset: this.flatlist_offset });
+    }
+  }
   create_refs(){
     return false;
     this.refs_list = [];
@@ -383,6 +434,7 @@ class ItemsList extends React.Component {
         this.toTop();
       }
     }
+    console.log(this.flatListRef);
     //this.list = this.list[0] ? this.list[0]["data"]: [];
     if(is_new){
       this.setHidden(false,is_new);
