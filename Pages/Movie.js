@@ -114,7 +114,7 @@ class ChannelScreen extends React.Component {
   }
   render_header(){
     const iconsSize = styles_home && styles_home.title ? styles_home.title.fontSize : 15;
-    const _curr_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? undefined : this.state.movie.eps[this.state.movie.index].url;
+    const _curr_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? this.state.movie.url : this.state.movie.eps[this.state.movie.index].url;
     this.props.navigation.setOptions({
       title:this.name,
       "headerRight":()=>(
@@ -265,18 +265,17 @@ class ChannelScreen extends React.Component {
   }
   render_btns(){
     if(this.state.movie==undefined || this.state.movie.eps==undefined || this.state.movie.eps.length==0) return null;
-    let watching_sorted = this.fav_movie && this.fav_movie.watching ? this.fav_movie.watching :[];
-    watching_sorted = watching_sorted.sort((a,b)=>a.index>b.index);
-    console.log(watching_sorted);
-    let last_watc_index = watching_sorted && watching_sorted[0] ? watching_sorted[0]:undefined;
+    let watching_ = this.fav_movie && this.fav_movie.watching ? this.fav_movie.watching :[];
+    let last_watched = watching_.map(u=>parseInt(u.split(".").slice(-1))).sort().slice(-1);
+    last_watched = last_watched && last_watched.length ? last_watched : "";
+    const regexp = new RegExp(`${last_watched}$`, 'i');
+    const watching_ep = this.state.movie.eps.filter(e=>e.url.match(regexp));
     const not_series = this.state.movie.eps==undefined || this.state.movie.eps.length==0;
     this.next_ep = not_series ? undefined : this.state.movie.eps[this.state.movie.index+1];
     this.prev_ep = not_series ? undefined : this.state.movie.eps[this.state.movie.index-1];
     this.curr_ep = not_series ? undefined : this.state.movie.eps[this.state.movie.index];
-    last_watc_index = not_series || last_watc_index==undefined ? undefined : this.state.movie.eps.filter(e=>e.url==last_watc_index);
-    last_watc_index = last_watc_index && last_watc_index[0] ? last_watc_index[0] :last_watc_index;
-    this.last_watching = not_series || last_watc_index==undefined ? undefined : last_watc_index;
-    console.log(last_watc_index,this.last_watching)
+
+    this.last_watching = watching_ep && watching_ep.length ? watching_ep[0] : undefined;
     if(this.next_ep==undefined && this.prev_ep==undefined && this.curr_ep==undefined) return null;
     return <View style={{flexDirection:"row",width:"98%",justifyContent:"center"}}>
         <Button 
@@ -362,8 +361,7 @@ class ChannelScreen extends React.Component {
     return (
       <ScrollView style={this.state.dynamic_style.container} ref={(ref) => { 
         this.ScrollView_ref = ref; 
-        this.ScrollNav = new ScrollNav(this.ScrollView_ref, this.props.navigation);
-        console.log("frref");
+        this.ScrollNav = this.ScrollNav==false ? new ScrollNav(this.ScrollView_ref, this.props.navigation,"Movie") : this.ScrollNav;
         }} >
         <View style={globalView_style}>
 

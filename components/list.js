@@ -4,6 +4,7 @@ import { SafeAreaView,SectionList, FlatList, Dimensions,TouchableHighlight } fro
 import Loader from "./Loader";
 import {_isMobile,getTheme,global_theme} from "./Themes";
 import IconButton from "../components/IconButton";
+import ScrollNav from "../Libs/scrollNav";
 
 class ItemsList extends React.Component {
   constructor(props) {
@@ -20,12 +21,11 @@ class ItemsList extends React.Component {
     this.check_width(false);
     this.flatListRef = false;
     this.windowHeight = Dimensions.get('window').height ;
-
+    this.ScrollNav = false;
     this.refs_list = [];
     this.refs_map = {};
     this.page = this.props.page;
     this.flatlist_offset = 0;
-    this.screen_focus_mng();
   }
   componentDidMount=()=>{
     this._isMounted=true;
@@ -36,10 +36,10 @@ class ItemsList extends React.Component {
   componentWillUnmount(){
     //alert("componentWillUnmount");
     this._isMounted=false;
-    Dimensions.removeEventListener("change",this.check_width)
-    for(let i=0;i < this.subscribetions.length;i++){
-      this.subscribetions[i]();
-    }
+    Dimensions.removeEventListener("change",this.check_width);
+    try {
+      this.ScrollNav.unsubscribe();
+    } catch (error) {}
   }
   componentDidUpdate(){
     /*
@@ -48,39 +48,6 @@ class ItemsList extends React.Component {
       this.refs_list[0].current.focus();
     }
     */
-  }
-  screen_focus_mng=()=>{
-    this.subscribetions=[];
-    if(this.props._navigation){
-      this.subscribetions.push(this.props._navigation.addListener('focus', () => {
-        this.toggle_keys_listner(true);
-      }));
-      this.subscribetions.push(this.props._navigation.addListener('blur', () => {
-        this.toggle_keys_listner(false);
-      }));
-      console.log(this.subscribetions);
-    }
-
-  }
-  toggle_keys_listner=(status)=>{
-    if(API_.isWeb){
-      if(status){
-        document.addEventListener("keydown", this.keysListnerFunction, false);
-      }else{
-        document.removeEventListener("keydown", this.keysListnerFunction, false);
-      }
-    }
-  }
-  keysListnerFunction = (event)=>{
-    if(API_.remote_controle){
-      //alert(`Prissed key -${event.keyCode}-`);
-      if(event.keyCode==49 || event.keyCode==97){
-        this.scrollUp();
-      }else if(event.keyCode==50 || event.keyCode==98){
-        this.scrollDown();
-      }
-
-    }
   }
   check_width=(render=true)=>{
     const current_windowWidth= Dimensions.get('window').width<=1000 ? Dimensions.get('window').width : 1000;
@@ -392,25 +359,18 @@ class ItemsList extends React.Component {
       this.flatListRef.scrollToOffset({ animated: true, offset: 0 });
     }
   }
-
-  scrollUp = () => {
-    if(this.props.keyScroll && this.flatListRef && this.flatListRef && this.flatListRef.scrollToOffset){
-      this.flatlist_offset = this.flatlist_offset+200;
-      this.flatListRef.scrollToOffset({ animated: true, offset: this.flatlist_offset });
-    }
-  }
-  scrollDown = () => {
-    if(this.props.keyScroll && this.flatListRef && this.flatListRef && this.flatListRef.scrollToOffset){
-      this.flatlist_offset = this.flatlist_offset>0 ? this.flatlist_offset-200 : this.flatlist_offset;
-      this.flatListRef.scrollToOffset({ animated: true, offset: this.flatlist_offset });
-    }
-  }
   create_refs(){
     return false;
     this.refs_list = [];
     for(let i=0;i<this.list.length;i++){
       this.refs_list[i] = React.createRef();
       this.refs_map[this.list[i].title] = {ind:i};
+    }
+  }
+  setRef=(ScrollView_ref)=>{
+    this.ScrollView_ref = ScrollView_ref;
+    if(this.props._navigation){
+      this.ScrollNav = this.ScrollNav==false ? new ScrollNav(this.ScrollView_ref, this.props._navigation,"List") : this.ScrollNav;
     }
   }
   render_list() {
@@ -508,7 +468,7 @@ class ItemsList extends React.Component {
         <View style={this.state.dynamic_style.list_container}>
           <SafeAreaView style={this.state.dynamic_style.item_container}>
             <FlatList
-              ref={(ref) => { this.flatListRef = ref; }}
+              ref={(ref) => { this.setRef(ref); }}
               ListHeaderComponent = {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : undefined}
               ListFooterComponent = {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : undefined}
               numColumns={this.state.numColumns} 
