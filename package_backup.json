@@ -2,7 +2,7 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "deploy": "gh-pages -d web-build",
-    "predeploy": "expo build:web",
+    "predeploy": "expo build:web && echo LIO0.COM  > web-build/CNAME && echo User-agent: *>web-build/robot.txt && echo Disallow: />>web-build/robot.txt",
     "depl": "gh-pages -d web-build",
     "publish": "expo publish",
     "pubdep": "expo publish && npm run predeploy",
