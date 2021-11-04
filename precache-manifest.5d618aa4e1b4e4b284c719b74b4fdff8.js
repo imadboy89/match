@@ -45,7 +45,7 @@ self.__precacheManifest = [
   },
   {
     "revision": "bbbcde0b15cabd06aace1df82d335978",
-    "url": "/robots.twt"
+    "url": "/robots.txt"
   },
   {
     "revision": "0ec5c21df86a7e82d988a0410ad52001",

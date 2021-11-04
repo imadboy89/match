@@ -18,7 +18,7 @@
     "favicon.ico": "/favicon.ico",
     "index.html": "/index.html",
     "manifest.json": "/manifest.json",
-    "robots.twt": "/robots.twt",
+    "robots.txt": "/robots.txt",
     "serve.json": "/serve.json",
     "static/js/2.38a26d10.chunk.js.LICENSE.txt": "/static/js/2.38a26d10.chunk.js.LICENSE.txt",
     "static/media/ptch.jpg": "/static/media/ptch.a355ccf1.jpg"
