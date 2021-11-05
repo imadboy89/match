@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { View, Picker, Modal, Alert , TextInput , RefreshControl } from 'react-native';
+import { View, Modal, Alert , TextInput , RefreshControl } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
 import {styles_news,getTheme} from "../components/Themes";
+import {Picker} from '@react-native-picker/picker';
 class MoviesScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -294,7 +295,7 @@ class MoviesScreen extends React.Component {
     const picker_style = {height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,borderColor:"white",borderWidth:1};
     const genres = <Picker
     selectedValue={this.state.genre}
-    style={[picker_style,{width:"30%"}]}
+    style={[picker_style,{width:this.state.source_id==1 ? "30%" : "45%"}]}
     itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
     onValueChange={this.change_genre}
   >
@@ -305,7 +306,7 @@ class MoviesScreen extends React.Component {
     const sections = this.state.source_id==4 && this.data && Object.keys(this.data) && Object.keys(this.data).length>1 && this.state.is_fav_list==false ? 
       <Picker
         selectedValue={this.state.data_section}
-        style={[picker_style,{width:"30%"}]}
+        style={[picker_style,{width:this.state.source_id==1 ? "30%" : "45%"}]}
         itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
         onValueChange={this.change_section}
       >

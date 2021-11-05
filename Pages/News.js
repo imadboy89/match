@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { View, Picker, Modal, Button, Switch, RefreshControl } from 'react-native';
+import { View, Modal, Button, Switch, RefreshControl } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
 import {styles_news,getTheme} from "../components/Themes";
+import {Picker} from '@react-native-picker/picker';
 class NewsScreen extends React.Component {
   constructor(props) {
     super(props);
