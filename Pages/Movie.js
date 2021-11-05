@@ -39,6 +39,7 @@ class ChannelScreen extends React.Component {
     
     this.screen_focus_mng();
     this.ScrollNav = false;
+    this.js_setIframeWidth = "(function() { const iframes = document.getElementsByTagName('iframe');for(let i = 0; i<iframes.length;i++ )iframes[0].width = '100%';})();";
   }
   screen_focus_mng(){
     this.subscribetions=[];
@@ -246,19 +247,20 @@ class ChannelScreen extends React.Component {
     }else{
       return  <WebView 
       allowsFullscreenVideo={true}
-      style={{height:500,backgroundColor: "#353b48",borderWidth:0,width:"100%"}}
+      style={{height:500,backgroundColor: "#000",borderWidth:0,width:"100%"}}
       javaScriptEnabled={true}
       domStorageEnabled={true}
       ref={(ref) => (this.webview = ref)}
       onShouldStartLoadWithRequest={(request) => {
-        /*this.webview.injectJavaScript(this.js_setIframeWidth);
-        if(request.url.replace("/m.","/").replace("/www.","/") != uri_.replace("/m.","/").replace("/www.","/")){
+        this.webview.injectJavaScript(this.js_setIframeWidth);
+        if(request.url.replace("/m.","/").replace("/www.","/") != this.state.movie.ifram_src.replace("/m.","/").replace("/www.","/")){
           console.log("stopLoading");
           return false;
         }
-        return true;*/
+        return true;
       }}
       source={ {uri:this.state.movie.ifram_src} }
+      userAgent={API_.user_agents["Android 10"]}
       />;
       //userAgent={API_.user_agents["Android 10"]}
     }

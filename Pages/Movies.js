@@ -49,7 +49,7 @@ class MoviesScreen extends React.Component {
     this.sortby = ["title", "year", "rating", "peers", "seeds", "download_count", "like_count", "date_added"];
     this.genres_MC = {
       "" : "Home",
-      "/  -imdb" : "Top IMDB",
+      "/top-imdb" : "Top IMDB",
       "/genre/action-10" : "Action",
       "/genre/action-adventure-24" : "Action & Adventure",
       "/genre/adventure-18" : "Adventure",
@@ -266,7 +266,7 @@ class MoviesScreen extends React.Component {
   }
   render_header(){
     const iconsSize = this.state.dynamic_style && this.state.dynamic_style.title ? this.state.dynamic_style.title.fontSize : 15;
-    const inputtext_width = API_.isWeb ? "85%" : 150;
+    const inputtext_width = API_.isWeb ? "85%" : 120;
     this.props.navigation.setOptions({
       title:"Movies",
       "headerRight":()=>(
@@ -295,7 +295,7 @@ class MoviesScreen extends React.Component {
   }
   render_extra_headers(){
     const wide_width = API_.isWeb ? "30%" : "45%";
-    const picker_style = {height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,borderColor:"white",borderWidth:1,marginHorizontal:2};
+    const picker_style = {height:this.isIOS ? 40 :70,backgroundColor:"#2d3436",color:"#dfe6e9" ,borderColor:"white",borderWidth:1,marginHorizontal:2};
     const genres = <Picker
     selectedValue={this.state.genre}
     style={[picker_style,{width:this.state.source_id==1 ? "30%" : wide_width}]}
@@ -310,7 +310,7 @@ class MoviesScreen extends React.Component {
       <Picker
         selectedValue={this.state.data_section}
         style={[picker_style,{width:this.state.source_id==1 ? "30%" : wide_width}]}
-        itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+        itemStyle={{height: this.isIOS ? 30 :60,backgroundColor:"#2d3436",color:"#dfe6e9" }}
         onValueChange={this.change_section}
       >
        {Object.keys(this.data).map(k=><Picker.Item label={k} value={k} key={k} />)}
