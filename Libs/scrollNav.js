@@ -1,9 +1,10 @@
 class ScrollNav {
-  constructor(flatListRef,_navigation, label) {
+  constructor(flatListRef,_navigation, label, mapkeys) {
     this.flatListRef = flatListRef;
     this._navigation = _navigation;
     this.flatlist_offset = 0;
     this.label = label ? label : "scroll1";
+    this.mapkeys = mapkeys;
     console.log(this.label,"start");
     this.screen_focus_mng();
   }
@@ -45,6 +46,9 @@ class ScrollNav {
         this.scrollUp();
       }else if(event.keyCode==52 || event.keyCode==98){
         this.scrollDown();
+      }
+      if(this.mapkeys && this.mapkeys[event.keyCode]){
+        this.mapkeys[event.keyCode].action();
       }
 
     }

@@ -370,7 +370,9 @@ class ItemsList extends React.Component {
   setRef=(ScrollView_ref)=>{
     this.ScrollView_ref = ScrollView_ref;
     if(this.props._navigation){
-      this.ScrollNav = this.ScrollNav==false ? new ScrollNav(this.ScrollView_ref, this.props._navigation,"List") : this.ScrollNav;
+      this.ScrollNav = this.ScrollNav==false ? 
+        new ScrollNav(this.ScrollView_ref, this.props._navigation,"List",this.props.mapkeys) 
+        : this.ScrollNav;
     }
   }
   render_list() {

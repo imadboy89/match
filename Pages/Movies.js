@@ -23,6 +23,7 @@ class MoviesScreen extends React.Component {
         favorite:[],
         is_fav_list:false,
         data_section:"--",
+        seach_input_ref:null,
 
     };
     this.data = {};
@@ -275,6 +276,7 @@ class MoviesScreen extends React.Component {
               onChangeText={(val)=>{this.state.search_qeury = val;this.render_header();}}
               value={this.state.search_qeury}
               onSubmitEditing={this.get_movies} 
+              ref={(ref) => { this.state.search_input_ref = ref; }}
               />
           <IconButton 
             name="search" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
@@ -292,10 +294,11 @@ class MoviesScreen extends React.Component {
     });
   }
   render_extra_headers(){
-    const picker_style = {height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,borderColor:"white",borderWidth:1};
+    const wide_width = API_.isWeb ? "30%" : "45%";
+    const picker_style = {height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,borderColor:"white",borderWidth:1,marginHorizontal:2};
     const genres = <Picker
     selectedValue={this.state.genre}
-    style={[picker_style,{width:this.state.source_id==1 ? "30%" : "45%"}]}
+    style={[picker_style,{width:this.state.source_id==1 ? "30%" : wide_width}]}
     itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
     onValueChange={this.change_genre}
   >
@@ -306,7 +309,7 @@ class MoviesScreen extends React.Component {
     const sections = this.state.source_id==4 && this.data && Object.keys(this.data) && Object.keys(this.data).length>1 && this.state.is_fav_list==false ? 
       <Picker
         selectedValue={this.state.data_section}
-        style={[picker_style,{width:this.state.source_id==1 ? "30%" : "45%"}]}
+        style={[picker_style,{width:this.state.source_id==1 ? "30%" : wide_width}]}
         itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
         onValueChange={this.change_section}
       >
@@ -379,6 +382,10 @@ class MoviesScreen extends React.Component {
           favorite={this.state.favorite}
           set_fav={(item)=>{backup.save_movie_fav(item, !this.state.favorite.includes(item.url)).then(o=>this.load_fav());}}
           keyScroll={true}
+          mapkeys={{
+              51:{action:this.state.search_input_ref?()=>{this.state.search_input_ref.focus();}:undefined},
+              96:{action:this.state.search_input_ref?()=>{this.state.search_input_ref.focus();}:undefined},
+            }}
           _navigation={this.props.navigation}
           />
         
