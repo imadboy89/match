@@ -98,6 +98,7 @@ class MoviesScreen extends React.Component {
   load_fav=()=>{
     backup.load_movie_fav(this.state.movie_id_ori).then(favorite_movies=>{
       const favorite = favorite_movies.map(o=>o.url?o.url:"");
+      favorite_movies = favorite_movies.sort((a,b)=> a.saved_at.getTime()>b.saved_at.getTime()?-1:1);
       this.setState({favorite,favorite_movies});
     });
   }

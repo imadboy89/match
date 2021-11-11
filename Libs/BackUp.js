@@ -632,6 +632,7 @@ class BackUp{
       console.log("save_movie_fav",movie,add);
       movie.user_id = this.client.auth.activeUserAuthInfo.userId;
       movie.isWeb   = API_.notify_isWeb;
+      movie.saved_at = new Date();
       let is_ok = false;
       let o = await this.db_movies_fav.deleteMany({url:movie.url});
       if(add){
