@@ -170,6 +170,10 @@ class SettingsScreen extends React.Component {
   render() {
     //API_.setCredentials("imadelkholti@gmail.com","198922");
     const style= this.state.video && this.state.video.videoId ? {height:300,width:"100%",position:'absolute'} : {width:1,height:1};
+    let update_date = "-";
+    try {
+      update_date = global.last_updated;
+    } catch (error) {}
     return (
       <ScrollView  style={this.state.dynamic_style.container} keyboardShouldPersistTaps={'handled'}>
           <View style={this.state.dynamic_style.settings_row}>
@@ -454,6 +458,10 @@ class SettingsScreen extends React.Component {
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Update Id </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>{Updates.updateId}</Text>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Update Date </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>{update_date}</Text>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}> </Text> 
