@@ -369,10 +369,8 @@ class ItemsList extends React.Component {
   }
   setRef=(ScrollView_ref)=>{
     this.ScrollView_ref = ScrollView_ref;
-    if(this.props._navigation){
-      this.ScrollNav = this.ScrollNav==false ? 
-        new ScrollNav(this.ScrollView_ref, this.props._navigation,"List",this.props.mapkeys) 
-        : this.ScrollNav;
+    if(this.props._navigation && this.ScrollNav==false && this.ScrollView_ref){
+      this.ScrollNav = new ScrollNav(this.ScrollView_ref, this.props._navigation,"List",this.props.mapkeys);
     }
   }
   render_list() {
@@ -396,7 +394,6 @@ class ItemsList extends React.Component {
         this.toTop();
       }
     }
-    console.log(this.flatListRef);
     //this.list = this.list[0] ? this.list[0]["data"]: [];
     if(is_new){
       this.setHidden(false,is_new);
@@ -490,11 +487,22 @@ class ItemsList extends React.Component {
     }
 
   }
+  setScrollNavFalse=()=>{
+    if(this.ScrollNav){
+      try {
+        this.ScrollNav.unsubscribe();    
+      } catch (error) {}
+  
+      this.ScrollNav = false;
+    }
+    return null;
+  }
   render() {
     if( this.props.loading==false && (this.check_width(false) || this.state.dynamic_style==false || this.props.list==undefined)){
       return (<View style={this.state.dynamic_style.container}>
         {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : null}
         <Loader/>
+        {this.setScrollNavFalse()}
         {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : null}
         </View>);
     }
@@ -509,6 +517,7 @@ class ItemsList extends React.Component {
       ? <>
         {this.props.ListHeaderComponent!=undefined ? this.props.ListHeaderComponent : null}
         <Loader/>
+        {this.setScrollNavFalse()}
         {this.props.ListFooterComponent!=undefined ? this.props.ListFooterComponent : null}
       </> : this.render_list()}
     </View>);

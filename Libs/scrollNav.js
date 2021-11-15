@@ -65,13 +65,13 @@ class ScrollNav {
     }
 
   }
-  scrollUp = ()=>{
+  scrollDown = ()=>{
     if(this.flatListRef && this.flatListRef){
       this.flatlist_offset = this.flatlist_offset+200;
       this.scrolTo();
     }
   }
-  scrollDown = ()=>{
+  scrollUp = ()=>{
     if(this.flatListRef && this.flatListRef){
       this.flatlist_offset = this.flatlist_offset>0 ? this.flatlist_offset-200 : this.flatlist_offset;
       this.scrolTo();
