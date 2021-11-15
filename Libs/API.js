@@ -294,7 +294,7 @@ class API {
 
     return title;
   }
-  get_news(page, source_id=1){
+  get_news(page, source_id=1,news_id=""){
     this.scrap = new Scrap();
     const news_links = {
       1:"https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,
@@ -305,7 +305,9 @@ class API {
       6:"https://m.kooora.com/?n=0&o=n&arabic&pg="+page,
       7:"https://m.kooora.com/?ok&arabic&ok",
       }
-    const url = news_links[source_id] ? news_links[source_id] : news_links[1];
+    let url = news_links[source_id] ? news_links[source_id] : news_links[1];
+    console.log(page, source_id, news_id);
+    url = news_id ? `https://m.kooora.com/?n=0&o=${news_id}&arabic&pg=${page}` : url;
     return this.http(url,"GET",null,{})
     .then(resp=>{
       if(resp==undefined || !resp){

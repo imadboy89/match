@@ -198,7 +198,9 @@ function MatchesStackScreen() {
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="TV" component={TVScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="FS" component={FSScreen} animationEnabled={is_animationEnabled}/>
-      
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="News" component={NewsScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Article" component={ArticleScreen} animationEnabled={is_animationEnabled}/>
+
       
     </MatchesStack.Navigator>
   );
@@ -212,7 +214,8 @@ function LeaguesStackScreen() {
       <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} animationEnabled={is_animationEnabled}/>
       <LeaguesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} animationEnabled={is_animationEnabled}/>
       <LeaguesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} animationEnabled={is_animationEnabled}/>
-      
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="News" component={NewsScreen} animationEnabled={is_animationEnabled}/>
+      <LeaguesStack.Screen options={_app_styles.screenHeader} name="Article" component={ArticleScreen} animationEnabled={is_animationEnabled}/>
     </LeaguesStack.Navigator>
   );
 }

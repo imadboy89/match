@@ -18,9 +18,11 @@ class NewsScreen extends React.Component {
         hide_images:false,
     };
   
-  this.interval_refresh = setInterval(()=>{
-    if(this.state.page==1){this.get_news(false);}
-    }, 80000);
+    this.interval_refresh = setInterval(()=>{
+      if(this.state.page==1){this.get_news(false);}
+      }, 80000);
+
+    this.news_id = this.props.route.params && this.props.route.params.news_id ? this.props.route.params.news_id : false;
   }
   componentDidMount(){
     this._isMounted=true;
@@ -69,7 +71,7 @@ get_news =(loading=true,keep_list=false)=>{
   if(this.state.loading==false && loading){
     this.setState({loading:true});
   }
-  API_.get_news(this.state.page,this.state.source_id).then(data=>{
+  API_.get_news(this.state.page,this.state.source_id,this.news_id).then(data=>{
     if(this._isMounted){
       if(keep_list){
         data = this.state.list.concat(data);
@@ -109,6 +111,7 @@ get_news =(loading=true,keep_list=false)=>{
         this.state.page++;
         this.get_news();
       }}  />
+      {this.news_id ? null : 
       <Picker
           selectedValue={this.state.source_id}
           style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
@@ -124,6 +127,7 @@ get_news =(loading=true,keep_list=false)=>{
           <Picker.Item label="HP_mondial" value={5} />
           
       </Picker>
+      }
     </View>);
     return (
       <View style={this.state.dynamic_style.container}>     

@@ -404,6 +404,9 @@ class LeagueScreen extends React.Component {
 
         <View style={this.state.dynamic_style.tabs_list}>
           <View style={{flex:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing"})}/></View>
+          <View style={{flex:1}}><Button title="News" onPress={()=>{
+              this.props.navigation.push('News', {news_id:"n"+this.league_id})
+            }}/></View>
           <View style={{flex:1}}><Button title="Scorers"  onPress={async()=>{
             if(this.state.scorers == undefined || this.state.scorers.length==0 ){
               this.setState({loading : true,});
