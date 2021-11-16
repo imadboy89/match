@@ -103,6 +103,12 @@ class API {
     this.use_mdb_proxy = this.isWeb;/* ok */
     this.default_ui = "Movies?source_id=8";
     this.default_ui = ["Videos",{screen:"Movies",params:{source_id:8}}];
+    this.following = [];
+    this.fav_utf8 = {1 : "★",0 : "☆",};
+    this.fav_utf8[true] = this.fav_utf8[1];
+    this.fav_utf8[false] = this.fav_utf8[0];
+    this.fav_utf8[undefined] = this.fav_utf8[0];
+    this.fav_utf8[null] = this.fav_utf8[0];
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;

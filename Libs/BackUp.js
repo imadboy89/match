@@ -61,6 +61,7 @@ class BackUp{
         this.db_live_matches = this.db.collection("live_matches");
         this.db_leagues      = this.db.collection("leagues");
         this.db_movies_fav   = this.db.collection("movies_fav");
+        this.db_following    = this.db.collection("following");
         
         this.is_auth         = this.email!="" && this.email !=undefined;
         if(this.is_auth) {
@@ -677,6 +678,40 @@ class BackUp{
         query.url=movie_url;
       }
       const o_ = await this.db_movies_fav.find(query).asArray();
+      return o_;
+    }
+    save_following = async(item)=>{
+      if(!this.is_mdb_ok()){
+        return false;
+      }
+      let action = "إضافة";
+      const query    = item;
+      query.user_id  = this.client.auth.activeUserAuthInfo.userId;
+      let is_ok = false;
+      const d = await this.db_following.deleteMany(query);
+      if( d && d.deletedCount ){
+        action = "إزالة";
+        is_ok = d && d.deletedCount;
+      }else{
+        const o = await this.db_following.insertOne(query);
+        is_ok = o && o.insertedId;
+      }
+      if(is_ok){
+        API_.showMsg("تمت "+action+" المتابعة  *"+item.title+"*","success",500,1000);
+        await this.load_following();
+      }
+      return is_ok ;
+    }
+    load_following = async(item_id=undefined)=>{
+      if(!this.is_mdb_ok()){
+        await API_.sleep(5000);
+      }
+      const query={user_id:this.client.auth.activeUserAuthInfo.userId};
+      if(item_id){
+        query.id=item_id;
+      }
+      const o_ = await this.db_following.find(query).asArray();
+      API_.following=o_.map(o=>o.url);
       return o_;
     }
     proxy = async(args)=>{

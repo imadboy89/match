@@ -206,6 +206,7 @@ class ItemsList extends React.Component {
     }else if(col_key=="category_name"){  
       const item_ph = item ? ( item.category_photo ? item.category_photo : item.img ) : undefined;
       const img_uri = item_ph && item_ph.slice(0,4)=="http" ? item_ph : API_.domain_o+item_ph;
+
       return (
         <View style={[this.state.dynamic_style.news_container,shadow_style]}>
           <ImageBackground style={{flex:1,width:"100%"}} source={{uri: img_uri}} imageStyle={{resizeMode:"stretch"}}>
@@ -213,6 +214,7 @@ class ItemsList extends React.Component {
 
             </View>
             <View style={this.state.dynamic_style.news_title_v}>
+              
               <Text style={this.state.dynamic_style.news_title_t}>{item[col_key]}</Text>
             </View>
           </ImageBackground>
@@ -221,12 +223,20 @@ class ItemsList extends React.Component {
         );
     }else if(col_key.includes("related_") ){
       let text2show = item[col_key];
+      let fav_icon = null;
+      if(item.url){
+        if(typeof this.props.favorite == "string"){
+          this._favorite = eval(this.props.favorite);
+        }
+        fav_icon = this.get_fav_icon_general(item,item.url,false);
+      }
+      //console.log(item, fav_icon);
       if(col_key=="related_title"){
         if(text2show && text2show.split && text2show.split("-").length>2 && text2show.split("-")[2].split("ضد").length>1){
           text2show = text2show.split("-")[2];
         }
       }
-      return (<Text style={this.state.dynamic_style.item_related} numberOfLines={1}>- {text2show}</Text>);
+      return (<Text style={this.state.dynamic_style.item_related} numberOfLines={1}>- {fav_icon} : {text2show}</Text>);
     }else{
       return (
         <Text style={this.state.dynamic_style.item} numberOfLines={1}>- {item[col_key]}</Text>
@@ -236,10 +246,19 @@ class ItemsList extends React.Component {
   get_fav_icon_general(item,id,icon="star"){
     const color = global_theme.text_color_default;
     let fav_icon = null;
-    if(this.props.favorite && this.props.set_fav){
-      fav_icon = this.props.favorite.includes(id) ?
+    let _favorite = [];
+    if(typeof this.props.favorite == "string"){
+      _favorite = this._favorite;
+    }
+    if(_favorite && (this.props.set_fav || icon==false)){
+      console.log(_favorite,_favorite.includes(id));
+      if(icon==false){
+        fav_icon = API_.fav_utf8[_favorite.includes(id)];
+      }else{
+        fav_icon = _favorite.includes(id) ?
         <IconButton name={icon} onPress={()=>{this.props.set_fav(item)}} color={color} /> :
         <IconButton name={icon+"-o"} onPress={()=>{this.props.set_fav(item)}} color={color}/> ;
+      }
     }
     return fav_icon;
   }
@@ -292,7 +311,8 @@ class ItemsList extends React.Component {
       
       style={{width:this.elem_width,alignSelf:"center"}}
       activeOpacity={0.5}
-      onPress={ () => {this.props.onclick(item) }} onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
+      onPress={ () => {this.props.onclick(item) }} 
+      onLongPress={ () => {this.props.onLongPress?this.props.onLongPress(item):null; }} >
       <View style={{flexDirection:'row', flexWrap:'wrap',width:"100%",justifyContent: 'center',alignItems:"center",alignContent:"center",marginHorizontal:3,}}>
         {this.get_item(item,this.props.key_)}
       </View>

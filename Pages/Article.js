@@ -27,6 +27,9 @@ class ArticleScreen extends React.Component {
     this.id = this.state.article && this.state.article.link ? this.state.article.link : "n="+this.props.route.params.id;
     this.source = this.state.article && this.state.article.source ? this.state.article.source : 1;
     this.get_article();
+    if(API_.following.length == 0 ){
+      backup.load_following().then(o=>this.setState({}));
+    }    
 
   }
   componentDidMount(){
@@ -80,6 +83,16 @@ class ArticleScreen extends React.Component {
       this.setState({loading:false});
       API_.setTitleWeb(this.state.article.title_news);
     });
+  }
+  onItemLongPressed = (_item)=>{
+    if(_item.related_link){
+      const item = {};
+      item.source = this.source;
+      item.url = _item.related_link;
+      item.title = _item.related_title;
+      backup.save_following(item).then(o=>this.setState({}));
+
+    }
   }
   onItemClicked = (item)=>{
     if(item.related_news_id){
@@ -144,6 +157,8 @@ class ArticleScreen extends React.Component {
       loading={false}
       list={this.state.article.related} 
       onclick={this.onItemClicked} 
+      onLongPress={this.onItemLongPressed}
+      favorite={"API_.following"}
       key_={"related_title"} key_key={"related_link"}
       minWidth={800}
       />

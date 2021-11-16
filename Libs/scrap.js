@@ -23,8 +23,8 @@ class Scrap {
     article.related_news =this.get_var_array(html, "article_related",arr_end);
     article.related_images =this.get_var_array(html, "article_images",arr_end);
     
-
-    article.related      = article.related    .map(n=> {return {related_link:n[0],related_title:n[1]} });
+    
+    article.related      = article.related    .map(n=> {return {related_link:n[0],related_title:n[1],url:n[0]} });
     article.related_news = article.related_news.map(n=> {return {related_news_id:n[0],related_news_title:n[1]} });
     article.related_images = article.related_images.map(n=> {return {img_link:n[0].replace(/^\/\//,"https://"),img_desc:n[1]} });
     //article.news =this.get_var_array(html, "news");

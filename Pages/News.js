@@ -6,6 +6,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
 import {styles_news,getTheme} from "../components/Themes";
 import {Picker} from '@react-native-picker/picker';
+import BackUp from '../Libs/BackUp';
 class NewsScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -23,6 +24,7 @@ class NewsScreen extends React.Component {
       }, 80000);
 
     this.news_id = this.props.route.params && this.props.route.params.news_id ? this.props.route.params.news_id : false;
+    backup.load_following();
   }
   componentDidMount(){
     this._isMounted=true;
