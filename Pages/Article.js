@@ -28,7 +28,9 @@ class ArticleScreen extends React.Component {
     this.source = this.state.article && this.state.article.source ? this.state.article.source : 1;
     this.get_article();
     if(API_.following.length == 0 ){
-      backup.load_following().then(o=>this.setState({}));
+      backup.load_following().then(o=>{
+        this.setState({});
+      });
     }    
 
   }
@@ -63,18 +65,18 @@ class ArticleScreen extends React.Component {
         this.state.article.body = article.body ? article.body : this.state.article.body;
         this.state.article.img  = article.img  ? article.img  : this.state.article.img;
         this.state.article.date = article.date ? article.date : this.state.article.date;
-        article.related = article.related.map(r=>{
+        article.related = article.related ? article.related.map(r=>{
           if(r.related_link && r.related_link.slice(0,1)=="m" && r.related_title.includes(":") ){
             r.related_title = r.related_title.split(":").slice(1).join(":").replace("ضد", "Vs");
           }
           return r;
-        });
+        }) : [];
         this.state.article.related = article.related ? article.related : this.state.article.related;
         this.state.article.related_news = article.related_news ? article.related_news : this.state.article.related_news;
 
         this.state.article.img = (this.state.article.img=="" || this.state.article.img==undefined) && article.related_images && article.related_images.length>0 
         ? article.related_images[0]["img_link"] : this.state.article.img;
-        if( article.related_images[1] && parseInt(article.related_images[1]["img_link"])>0){
+        if( article.related_images && article.related_images[1] && parseInt(article.related_images[1]["img_link"])>0){
           this.isVideo(parseInt(article.related_images[1]["img_link"]));
         }
       }else{
@@ -158,7 +160,7 @@ class ArticleScreen extends React.Component {
       list={this.state.article.related} 
       onclick={this.onItemClicked} 
       onLongPress={this.onItemLongPressed}
-      favorite={"API_.following"}
+      favorite={"API_.following.map(o=>o.url)"}
       key_={"related_title"} key_key={"related_link"}
       minWidth={800}
       />

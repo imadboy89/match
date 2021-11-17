@@ -711,7 +711,7 @@ class BackUp{
         query.id=item_id;
       }
       const o_ = await this.db_following.find(query).asArray();
-      API_.following=o_.map(o=>o.url);
+      API_.following=o_;
       return o_;
     }
     proxy = async(args)=>{

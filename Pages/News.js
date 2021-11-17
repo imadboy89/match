@@ -24,7 +24,10 @@ class NewsScreen extends React.Component {
       }, 80000);
 
     this.news_id = this.props.route.params && this.props.route.params.news_id ? this.props.route.params.news_id : false;
-    backup.load_following();
+    backup.load_following().then(p=>{
+      this.setState({});
+      this.render_header();
+    });
   }
   componentDidMount(){
     this._isMounted=true;
@@ -44,6 +47,12 @@ class NewsScreen extends React.Component {
         onValueChange={this.update_is_hide_images}
         value={this.state.hide_images}
       />
+          { isNaN( this.state.source_id ) ? 
+          <IconButton 
+            name="minus-circle" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+            this.unfollow();
+          }}  />
+          :null }
           <IconButton 
             name="refresh" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
             this.get_news();
@@ -70,10 +79,16 @@ class NewsScreen extends React.Component {
   }
   
 get_news =(loading=true,keep_list=false)=>{
+  let _source_id = parseInt( this.state.source_id );
+  let _news_id   = this.news_id;
+  if( isNaN(_source_id) ){
+    _news_id = this.state.source_id;
+    _source_id = 1;
+  }
   if(this.state.loading==false && loading){
     this.setState({loading:true});
   }
-  API_.get_news(this.state.page,this.state.source_id,this.news_id).then(data=>{
+  API_.get_news(this.state.page,_source_id,_news_id).then(data=>{
     if(this._isMounted){
       if(keep_list){
         data = this.state.list.concat(data);
@@ -85,17 +100,27 @@ get_news =(loading=true,keep_list=false)=>{
     }
   });
 }
-
+  unfollow = ()=>{
+    let _source_id = parseInt( this.state.source_id );
+    let _news_id   = this.news_id;
+    if( isNaN(_source_id) ){
+      _news_id = this.state.source_id;
+      _source_id = 1;
+      backup.save_following({url:_news_id}).then(o=>this.setState({}));
+    }
+  }
   onItem_clicked =(item)=>{
     item.source = this.state.source_id;
     this.props.navigation.navigate('Article', { article: item, id:item.link.replace("n=","") });
   }
   changesource = (itemValue, itemIndex)=>{
-    this.state.source_id = parseInt(itemValue);
+    this.state.source_id = itemValue;
     this.state.page=1;
     this.get_news();
+    this.render_header();
   }
   render() {
+    const following = API_.following.map(o=><Picker.Item label={o.title} value={o.url} />);
     const ListHeaderComponent = (        <View style={this.state.dynamic_style.nav_container}>
       <IconButton
         disabled={this.state.loading}
@@ -123,11 +148,7 @@ get_news =(loading=true,keep_list=false)=>{
           <Picker.Item label="Kr_MA" value={1} />
           <Picker.Item label="Kr_world" value={6} />
           <Picker.Item label="Kr_home" value={7} />
-          <Picker.Item label="HP_mountakhab" value={2} />
-          <Picker.Item label="HP_professionnels" value={3} />
-          <Picker.Item label="HP_botola" value={4} />
-          <Picker.Item label="HP_mondial" value={5} />
-          
+          {following}
       </Picker>
       }
     </View>);

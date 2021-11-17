@@ -310,10 +310,9 @@ class API {
       5:"https://www.hesport.com/mondial/index."+page+".html",
       6:"https://m.kooora.com/?n=0&o=n&arabic&pg="+page,
       7:"https://m.kooora.com/?ok&arabic&ok",
-      }
+      };
     let url = news_links[source_id] ? news_links[source_id] : news_links[1];
-    console.log(page, source_id, news_id);
-    url = news_id ? `https://m.kooora.com/?n=0&o=${news_id}&arabic&pg=${page}` : url;
+    url = news_id ? `https://m.kooora.com/?n=0&${news_id}&arabic&pg=${page}` : url;
     return this.http(url,"GET",null,{})
     .then(resp=>{
       if(resp==undefined || !resp){
@@ -543,7 +542,7 @@ class API {
       return video;
     });
   }
-  get_article(link,source_id=1){
+  _get_article(link,source_id=1){
     //https://www.hesport.com/akhbar/122520.html
     const url = [1,6,7].includes(source_id) ? "https://m.kooora.com/?"+link+"&arabic" : "https://www.hesport.com/"+link;
     return this.http(url,"GET",null,{})
@@ -554,6 +553,24 @@ class API {
         let article  = {};
         try {
           article  = [1,6,7].includes(source_id)  ? scrap.get_article(html) : scrap.get_article_hp(html);
+        } catch (error) {console.log(error)}
+        return article;
+      }catch(err){console.log(err);}
+
+    });
+
+  }
+  get_article(link,source_id=1){
+    //https://www.hesport.com/akhbar/122520.html
+    const url = "https://m.kooora.com/?"+link+"&arabic";
+    return this.http(url,"GET",null,{})
+    .then(html=>{
+      try{
+        let scrap = new Scrap();
+        scrap.isWeb = this.isWeb;
+        let article  = {};
+        try {
+          article  = scrap.get_article(html);
         } catch (error) {console.log(error)}
         return article;
       }catch(err){console.log(err);}

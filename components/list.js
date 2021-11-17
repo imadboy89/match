@@ -251,7 +251,6 @@ class ItemsList extends React.Component {
       _favorite = this._favorite;
     }
     if(_favorite && (this.props.set_fav || icon==false)){
-      console.log(_favorite,_favorite.includes(id));
       if(icon==false){
         fav_icon = API_.fav_utf8[_favorite.includes(id)];
       }else{
