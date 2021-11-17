@@ -687,6 +687,7 @@ class BackUp{
       let action = "إضافة";
       const query    = item;
       query.user_id  = this.client.auth.activeUserAuthInfo.userId;
+      query.user_email  = this.email;
       let is_ok = false;
       const d = await this.db_following.deleteMany(query);
       if( d && d.deletedCount ){
