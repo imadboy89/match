@@ -18,6 +18,8 @@ class NewsScreen extends React.Component {
         source_id:1 ,
         hide_images:false,
     };
+    this.resources_static = {1:"Kr_MA",6:"Kr_world",7:"Kr_home"};
+    this.resources = {};
   
     this.interval_refresh = setInterval(()=>{
       if(this.state.page==1){this.get_news(false);}
@@ -36,7 +38,8 @@ class NewsScreen extends React.Component {
     this.render_header();
   }
   render_header=()=>{
-    this.props.navigation.setOptions({title: "News",
+    const title = this.resources[this.state.source_id] ? this.resources[this.state.source_id] : "News";
+    this.props.navigation.setOptions({title: title,
     "headerRight":()=>(
       <View style={{flexDirection:"row",margin:5}}>
       <Switch
@@ -108,6 +111,9 @@ get_news =(loading=true,keep_list=false)=>{
       _source_id = 1;
       backup.save_following({url:_news_id}).then(o=>this.setState({}));
     }
+    this.state.source_id = 1;
+    this.get_news();
+    this.render_header();
   }
   onItem_clicked =(item)=>{
     item.source = this.state.source_id;
@@ -120,7 +126,9 @@ get_news =(loading=true,keep_list=false)=>{
     this.render_header();
   }
   render() {
-    const following = API_.following.map(o=><Picker.Item label={o.title} value={o.url} />);
+    this.resources = JSON.parse(JSON.stringify(this.resources_static));
+    API_.following.map(f=> this.resources[f.url] = f.title);
+    const picker_options = Object.keys(this.resources).map(o=><Picker.Item label={this.resources[o]} value={o} />);
     const ListHeaderComponent = (        <View style={this.state.dynamic_style.nav_container}>
       <IconButton
         disabled={this.state.loading}
@@ -145,10 +153,7 @@ get_news =(loading=true,keep_list=false)=>{
           itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
           onValueChange={this.changesource}
         >
-          <Picker.Item label="Kr_MA" value={1} />
-          <Picker.Item label="Kr_world" value={6} />
-          <Picker.Item label="Kr_home" value={7} />
-          {following}
+          {picker_options}
       </Picker>
       }
     </View>);
