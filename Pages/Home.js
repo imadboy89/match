@@ -229,20 +229,27 @@ class HomeScreen extends React.Component {
     this.render_header();
     this.get_matches();
     }
-
+  
+    _handle_item = (item)=>{
+      //API_.debugMsg(JSON.stringify(item),"danger");
+      if(item){
+        if(item.is_user_log){
+          this.setState({show_user_log:true,user_log:data});
+        }else if(item.is_news){
+          //https://lio0.com/News/Article/-/1087048
+          this.props.navigation.navigate("Article",{id:item.id, article:"-"});
+        }else{
+          this.onMatch_clicked(item);
+        }
+      }
+    }
   _handleNotification = notification => {
     //API_.showMsg("_handleNotification : "+JSON.stringify(notification.request.content.data.data) );
     try{
       const data = notification.request.content.data.data;
       let item = typeof data == "string" ? JSON.parse(data) : data;
       console.log("notif 1 ",item);
-      if(item){
-        if(item.is_user_log){
-          this.setState({show_user_log:true,user_log:data});
-        }else{
-          this.onMatch_clicked(item);
-        }
-      }
+      this._handle_item(item);
     }catch(error){API_.debugMsg(error,"danger")}
   };
 
@@ -252,13 +259,7 @@ class HomeScreen extends React.Component {
       const data = response.notification.request.content.data.data;
       let item = typeof data == "string" ? JSON.parse(data) : data;
       console.log("notif 1 ",item);
-      if(item){
-        if(item.is_user_log){
-          this.setState({show_user_log:true,user_log:data});
-        }else{
-          this.onMatch_clicked(item);
-        }
-      }
+      this._handle_item(item);
     }catch(error){API_.debugMsg(error,"danger")}
   };
 
