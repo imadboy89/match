@@ -121,9 +121,9 @@ class ArticleScreen extends React.Component {
             home_team_ar = teams.length>1 ? teams[0].trim() : undefined;
             away_team_ar = teams.length>1 ? teams[1].trim() : undefined;
           }
-          this.props.navigation.navigate('Match', { id:link_[1], match_item: {id:link_[1],is_koora:true , home_team_ar:home_team_ar , away_team_ar:away_team_ar} });
+          this.props.navigation.push('Match', { id:link_[1], match_item: {id:link_[1],is_koora:true , home_team_ar:home_team_ar , away_team_ar:away_team_ar} });
         }else if(link_[0]=="c"){
-          this.props.navigation.navigate('League',{ id:link_[1], league_details: {league:item.related_title,league_img:undefined,id:link_[1]} });
+          this.props.navigation.push('League',{ id:link_[1], league_details: {league:item.related_title,league_img:undefined,id:link_[1]} });
         }
       } catch (error) {
         
@@ -134,7 +134,7 @@ class ArticleScreen extends React.Component {
   }
   onLeaguePressed = (league_name, league_img,league_id)=>{
     league_img = ["https:/","http://"].includes(league_img.slice(0,7)) ? league_img : API_.domain_o+league_img;
-    this.props.navigation.navigate('League',{ league_details: {league:league_name,league_img:league_img,id:league_id} });
+    this.props.navigation.push('League',{ league_details: {league:league_name,league_img:league_img,id:league_id} });
   }
   get_player_info=(player)=>{
     this.setState({modalVisible_player:true,player_id:player.player_id});

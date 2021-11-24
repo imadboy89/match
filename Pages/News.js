@@ -26,6 +26,7 @@ class NewsScreen extends React.Component {
       }, 80000);
 
     this.news_id = this.props.route.params && this.props.route.params.news_id ? this.props.route.params.news_id : false;
+    this.news_title = this.props.route.params && this.props.route.params.title ? this.props.route.params.title : false;
     backup.load_following().then(p=>{
       this.setState({});
       this.render_header();
@@ -38,7 +39,8 @@ class NewsScreen extends React.Component {
     this.render_header();
   }
   render_header=()=>{
-    const title = this.resources[this.state.source_id] ? this.resources[this.state.source_id] : "News";
+    let title = this.resources[this.state.source_id] ? this.resources[this.state.source_id] : "News";
+    title = this.news_title ? this.news_title : title;
     this.props.navigation.setOptions({title: title,
     "headerRight":()=>(
       <View style={{flexDirection:"row",margin:5}}>

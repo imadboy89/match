@@ -35,6 +35,7 @@ class SettingsScreen extends React.Component {
         notify_isWeb : API_.notify_isWeb,
         force_open_expo :false,
         keyDown_listner:false,
+        is_movies_home_page : false,
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
     //this.apk_url = "https://exp-shell-app-assets.s3.us-west-1.amazonaws.com/android/%40imadboss/almatch-2dc6b0c7a3da47819e4245d25dd4221a-signed.apk";
@@ -47,6 +48,7 @@ class SettingsScreen extends React.Component {
     const fav_t = await API_.getConfig("favorite_teams",[]);
     const fav_c = await API_.getConfig("favorite_channels",[]);
     const fav_p = await API_.getConfig("favorite_players",[]);
+    const default_ui = await API_.getConfig("default_ui",false);
     const is_materialTopTab = await API_.getConfig("is_materialTopTab",false);
     const _force_open_expo = await API_.getConfig("force_open_expo",false);
     const teams_inf_k = await API_.getTeam_logo_k();
@@ -61,6 +63,7 @@ class SettingsScreen extends React.Component {
         is_materialTopTab: is_materialTopTab,
         teams_inf_k      : teams_inf_k && Object.keys(teams_inf_k) && Object.keys(teams_inf_k).length ? Object.keys(teams_inf_k).length : 0,
         force_open_expo : _force_open_expo,
+        is_movies_home_page : default_ui != false && default_ui[0]!="Home",
       });
   }
   componentDidMount(){
@@ -218,6 +221,26 @@ class SettingsScreen extends React.Component {
                   this.setState({is_materialTopTab:is_materialTopTab__v});
                 }}
                 value={this.state.is_materialTopTab}
+              />
+            </Text>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Use home page [Movies] </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={async(is_movies_home_page)=>{
+                  if(is_movies_home_page){
+                    await API_.setConfig("default_ui",["Videos", {screen: "Movies", params: {source_id: 8}}]);
+                  }else{
+                    await API_.setConfig("default_ui",false);
+                  }
+                  this.setState({is_movies_home_page:is_movies_home_page});
+                }}
+                value={this.state.is_movies_home_page}
               />
             </Text>
           </View>

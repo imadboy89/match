@@ -103,8 +103,12 @@ class API {
     this.use_mdb_proxy = this.isWeb;/* ok */
     //this.default_ui = "Movies?source_id=8";
     //this.default_ui = this.get_settings();//["Videos",{screen:"Movies",params:{source_id:8}}];
+    //API_.setConfig("default_ui",["Videos", {screen: "Movies", params: {source_id: 8}}]);
+    this.default_ui = false;
     this.get_settings().then(c=>{
-      this.default_ui = c.default_ui;
+      if(c && c.default_ui){
+        this.default_ui = c.default_ui;
+      }
     });
     this.following = [];
     this.fav_utf8 = {1 : "★",0 : "☆",};

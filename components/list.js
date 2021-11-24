@@ -246,7 +246,7 @@ class ItemsList extends React.Component {
   get_fav_icon_general(item,id,icon="star"){
     const color = global_theme.text_color_default;
     let fav_icon = null;
-    let _favorite = [];
+    let _favorite = this.props.favorite.slice();
     if(typeof this.props.favorite == "string"){
       _favorite = this._favorite;
     }

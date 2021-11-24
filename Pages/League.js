@@ -185,7 +185,9 @@ class LeagueScreen extends React.Component {
   }
   
   onMatch_clicked =(item)=>{
-    this.props.navigation.navigate('Match', { match_item: item,id:item.id });
+    console.log('Match', { match_item: item,id:item.id });
+    //this.props.navigation.navigate('Match', { match_item: item,id:item.id });
+    this.props.navigation.push('Match', { match_item: item,id:item.id });
   }
   _onMatch_LongPressed=(item)=>{
     onMatch_LongPressed(item).then(o=>{
@@ -405,7 +407,7 @@ class LeagueScreen extends React.Component {
         <View style={this.state.dynamic_style.tabs_list}>
           <View style={{flex:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing"})}/></View>
           <View style={{flex:1}}><Button title="News" onPress={()=>{
-              this.props.navigation.push('News', {news_id:"o=n"+this.league_id})
+              this.props.navigation.push('News', {news_id:"o=n"+this.league_id , title:this.league_name})
             }}/></View>
           <View style={{flex:1}}><Button title="Scorers"  onPress={async()=>{
             if(this.state.scorers == undefined || this.state.scorers.length==0 ){

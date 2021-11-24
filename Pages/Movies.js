@@ -93,7 +93,6 @@ class MoviesScreen extends React.Component {
     this.subscribetions.push(this.props.navigation.addListener('blur', () => {
       this.toggle_keys_listner(false);
     }));
-    console.log(this.subscribetions);
   }
   load_fav=()=>{
     backup.load_movie_fav(this.state.movie_id_ori).then(favorite_movies=>{
