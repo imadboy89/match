@@ -29,9 +29,9 @@ class User_log extends React.Component{
           }
           i+=1;
           return (<View style={{flexDirection:'row', flexWrap:'wrap',width:"100%",paddingVertical:2}} key={key+i}>
-          <Text style={this.state.dynamic_style.user_log_key}>{key}</Text>
+          <Text style={this.state.dynamic_style.user_log_key}>{key+""}</Text>
           <Text style={[this.state.dynamic_style.user_log_sep,]}> : </Text>
-          <Text style={[this.state.dynamic_style.user_log_value,]}>{value}</Text>
+          <Text style={[this.state.dynamic_style.user_log_value,]}>{value+""}</Text>
         </View>);
         });
       }

@@ -5,6 +5,7 @@ import Credentials from "../components/Credentials";
 import AppLogHistory from "../components/AppLogHistory";
 import MatchesNotifs from "../components/MatchesNotifs";
 import Users from "../components/Users";
+import Users_log from "../components/Users_log";
 import * as Updates from 'expo-updates';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import {Picker} from '@react-native-picker/picker';
@@ -27,6 +28,7 @@ class SettingsScreen extends React.Component {
         window_height : parseInt(Dimensions.get('window').height),
         window_width : parseInt(Dimensions.get('window').width),
         modalVisible_users:false,
+        modalVisible_users_log:false,
         modalVisible_matchesNotif:false,
         is_debug:API_.is_debug,
         filtering:API_.filtering,
@@ -170,6 +172,15 @@ class SettingsScreen extends React.Component {
       ></Users>
     );
   }
+  render_modal_users_log(){
+    return (          
+      <Users_log
+        modal_visible={this.state.modalVisible_users_log}
+        dynamic_style={this.state.dynamic_style}
+        closeModal={()=>this.setState({modalVisible_users_log:false})}
+      ></Users_log>
+    );
+  }
   render() {
     //API_.setCredentials("imadelkholti@gmail.com","198922");
     const style= this.state.video && this.state.video.videoId ? {height:300,width:"100%",position:'absolute'} : {width:1,height:1};
@@ -267,10 +278,16 @@ class SettingsScreen extends React.Component {
             </Text>
           </View>
           { backup.admin!=true ? null : 
+          <>
             <View style={this.state.dynamic_style.settings_row}>
               <Text style={this.state.dynamic_style.settings_row_label}>Users </Text> 
               <View style={this.state.dynamic_style.settings_row_input}><Button title="Manage" onPress={()=>this.setState({modalVisible_users:true})}></Button></View>
             </View>
+            <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Users log</Text> 
+            <View style={this.state.dynamic_style.settings_row_input}><Button title="Manage" onPress={()=>this.setState({modalVisible_users_log:true})}></Button></View>
+          </View>
+          </>
           }
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Offset Time: </Text> 
@@ -493,6 +510,7 @@ class SettingsScreen extends React.Component {
           {this.render_modal_login()}
           { this.state.modalVisible_matchesNotif==true ? this.render_modal_matchesNotifs() : null}
           { backup.admin!=true ? null : this.render_modal_users()}
+          { backup.admin!=true ? null : this.render_modal_users_log()}
         </ScrollView >
     );
   }

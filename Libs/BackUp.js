@@ -719,16 +719,22 @@ class BackUp{
       return o_;
     }
     save_trace = async(item)=>{
-      if(!this.is_mdb_ok() || item == this.last_route || this.user_log_id==false){
+      if(!this.is_mdb_ok() || item == this.last_route || this.user_log_id==false || item==undefined){
         return false;
       }
       this.last_route = item;
       item.time = (new Date()).getTime() ;
-      let action = "إضافة";
       let is_ok = false;
       const o = await this.client.callFunction("users_log",[item,this.user_log_id]);
       is_ok = o && o.insertedId;
       return is_ok ;
+    }
+    load_trace = async()=>{
+      if(!this.is_mdb_ok() || this.user_log_id==false){
+        return false;
+      }
+      const o = await this.client.callFunction("users_log",["load"]);
+      return o ;
     }
     proxy = async(args)=>{
       let results = "";
