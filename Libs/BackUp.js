@@ -25,6 +25,8 @@ class BackUp{
         this.is_auth = false;
         this.is_settings_loaded = false;
         this.teams_ready = false;
+        this.last_route = false;
+        this.user_log_id = false;
     }
     checkCnx = async(check_client=true,is_silent=false)=>{
       const state = await NetInfo.fetch();
@@ -215,6 +217,7 @@ class BackUp{
       clientInfos.email = this.email;
       try{
         const results = await this.client.callFunction("users_log",[clientInfos]);
+        this.user_log_id = results.insertedId ? results.insertedId : false;
       }catch(error){
         API_.debugMsg(error,"danger");
       }
@@ -714,6 +717,18 @@ class BackUp{
       const o_ = await this.db_following.find(query).asArray();
       API_.following=o_;
       return o_;
+    }
+    save_trace = async(item)=>{
+      if(!this.is_mdb_ok() || item == this.last_route || this.user_log_id==false){
+        return false;
+      }
+      this.last_route = item;
+      item.time = (new Date()).getTime() ;
+      let action = "إضافة";
+      let is_ok = false;
+      const o = await this.client.callFunction("users_log",[item,this.user_log_id]);
+      is_ok = o && o.insertedId;
+      return is_ok ;
     }
     proxy = async(args)=>{
       let results = "";

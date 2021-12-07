@@ -529,7 +529,7 @@ class APP extends React.Component {
       });
     }
   }
-  componentDidMount(){
+  componentDidMount = async() => {
     //navigate('/News');
     this.init_mdb();
     this.mounted = true;
@@ -540,6 +540,11 @@ class APP extends React.Component {
     if (API_.isWeb){
       document.addEventListener("keydown", this.escFunction, false);
     }
+    setInterval(() => {
+      const current_route = navigationRef.current?.getCurrentRoute();
+      backup.save_trace(current_route);
+    }, 300);
+
   }
   escFunction = (event)=>{
     if(event.keyCode === 27/* || event.keyCode === 8*/) {
