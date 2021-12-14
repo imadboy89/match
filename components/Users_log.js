@@ -66,35 +66,55 @@ class Users_log extends React.Component{
         closeModal={()=>{this.setState({show_user_log:false,user_log:false})}} /> 
     }
     show_activities(){
+      //s.params
       if(this.state.user_activities == false) return null;
       const screens = this.state.user_activities.navigation_history ? this.state.user_activities.navigation_history.map(s=>{
-      return <Text key={s.time+""} style={{color:"#fff" ,textAlign: 'left',justifyContent:"center",width:"100%"}}> {s.name} : {s.params?JSON.stringify(s.params):"-"} </Text>
+        let time = parseInt(s.time);
+        time = isNaN(time) ? 0 : API_.get_date_timeS(new Date(time)) ;
+        return <View style={{flexDirection:"row",width:"95%",height:40,borderStyle:"solid",borderWidth:1,margin:3,alignItems: 'center'}} key={s.time+""}>
+        <Text style={{color:"#fff" ,textAlign: 'left',justifyContent:"center",width:"80%"}}> 
+        {s.name} - {time}
+        </Text>
+                      <IconButton
+                      name="eye"
+                      disabled={this.state.actionRunning}
+                      size ={28}
+                      color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
+                      onPress={()=>{ this.props.navigation.push(s.name, s.params); }}
+                  />
+    </View>;
+        
       }) : null;
       const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
-      return (          
-        <MModal 
-          animationType="slide"
-          transparent={true}
-          visible={this.state.user_activities != false}
-          onRequestClose={() => { this.setState({ user_activities:false,}); }}
-        >
-        <View style={{flex:.4,backgroundColor:"#2c3e5066"}}></View>
-        <View style={{height:350,width:"100%",backgroundColor:"#646c78",alignItems:"center"}}>
-          <Text style={{}}> User : {this.state.user_log.email ? this.state.user_log.email : this.state.user_log._id}</Text>
-
-          {screens}
-
-          <Icon.Button 
-            name="paper-plane"
+      return (
+<MModal 
+animationType="slide"
+transparent={true}
+visible={this.state.user_activities != false}
+onRequestClose={() => { this.setState({ user_activities:false,}); }}
+> 
+<View style={this.state.dynamic_style.modal_view_container}>
+<View style={[this.state.dynamic_style.modal_view,this.state.dynamic_style.modal_view_large]}>
+<View style={this.state.dynamic_style.modal_body}>
+    <ScrollView style={{width:"100%",backgroundColor:"#646c78"}}>
+      {screens}
+    </ScrollView> 
+    
+</View>
+<View style={this.state.dynamic_style.footer}>
+  <View style={this.state.dynamic_style.footer_button}>
+  <Icon.Button 
+            name="remove"
             disabled={this.state.actionRunning}
             onPress={()=>{
               this.setState({user_activities:false});
             }}
-          >Send</Icon.Button>
-        </View>
-        <View style={{flex:1,backgroundColor:"#2c3e5066"}}></View>
-
-        </MModal>
+          >Close</Icon.Button>
+  </View>
+</View>
+</View>
+</View>
+</MModal>
         );
     }
     render_users(){

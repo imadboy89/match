@@ -178,6 +178,7 @@ class SettingsScreen extends React.Component {
         modal_visible={this.state.modalVisible_users_log}
         dynamic_style={this.state.dynamic_style}
         closeModal={()=>this.setState({modalVisible_users_log:false})}
+        navigation={this.props.navigation}
       ></Users_log>
     );
   }
