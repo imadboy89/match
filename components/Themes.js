@@ -27,6 +27,17 @@ function getThemes(theme_name=false){
     return Themes[theme_name__];
   });
 }
+var styles_colors = {    
+  txt_danger  : {color:"#fd7f72"},
+  txt_success : {color:"#42dc84"},
+  txt_info    : {color:"#5fb2ea"},
+  txt_warning : {color:"#f9cd87"},
+  bg_danger   : {backgroundColor:"#e74c3c"},
+  bg_success  : {backgroundColor:"#2ecc71"},
+  bg_info     : {backgroundColor:"#3498db"},
+  bg_warning  : {backgroundColor:"#f39c12"},
+};
+
 var Themes = {
     "dark violet":{
         //headerStyle:
@@ -1143,7 +1154,10 @@ function generateTheme(theme_name=false){
       pressColor:theme.activeBackgroundColor,
         }
   }
+
+
   var styles_notif = StyleSheet.create({
+    ...styles_colors,
     container:{
       zIndex: 99999, // works on ios
       elevation: 99999, // works on android    
@@ -1222,14 +1236,6 @@ function generateTheme(theme_name=false){
       height:"100%",
       padding:5,
     },
-    txt_danger:{color:"#fd7f72"},
-    txt_success:{color:"#42dc84"},
-    txt_info:{color:"#5fb2ea"},
-    txt_warning:{color:"#f9cd87"},
-    bg_danger:{backgroundColor:"#e74c3c"},
-    bg_success:{backgroundColor:"#2ecc71"},
-    bg_info:{backgroundColor:"#3498db"},
-    bg_warning:{backgroundColor:"#f39c12"},
     indecator:{
       backgroundColor:"red",
       width:8,
@@ -1560,7 +1566,7 @@ var globalView_style   = themes["globalView_style"];
 
 
 
-export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme,_isMobile,styles_settings,styles_notif, styles_modal, globalView_style};
+export {Themes,styles_list,styles_article,styles_home,styles_news,styles_channel,styles_match,getTheme,getThemes,app_styles,themes_list,styles_league,global_theme,_isMobile,styles_settings,styles_notif, styles_modal, globalView_style, styles_colors};
 
 
 

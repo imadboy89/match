@@ -3,14 +3,14 @@ import {  Text, View, Button,TextInput, Modal, ActivityIndicator,ScrollView ,Tou
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IconButton from "./IconButton";
 import User_log from "./User_log";
-
+import Loader from "./Loader";
 
 class Users_log extends React.Component{
     constructor(props) {
       super(props);
       this.state = {
         user_username : "",
-        users : [],
+        users : false,
         usersLoading : true,
         actionRunning : false,
         msg_text : "",
@@ -24,7 +24,6 @@ class Users_log extends React.Component{
       
     } 
     componentDidMount(){
-      this.loadUsers();
     }
     setUser_admin_tmp(user_username,action="tmp_admin"){
       this.setState({actionRunning:true});
@@ -124,6 +123,7 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
       if(!this.state.users || !this.state.users.map){
         return null;
       }
+      //infos.device_type+" - "+infos.modelName
       return this.state.users.map( (_user,i) =>{
         const user = _user.email ;
         const online_at =  _user.datetime ? API_.get_date_time(_user.datetime) : "-";
@@ -132,13 +132,18 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
             <TouchableHighlight style={{flex:1,height:"100%",justifyContent:"center"}} 
               onPress={()=>this.setState({focused_user:_user._id})}
               >
-            <View style={{flex:1,justifyContent:"center",width:"100%",height:"100%"}}>
-              <Text style={{color: _user.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',justifyContent:"center",width:"100%"}}> {user} </Text>
+            <View style={{flex:1,justifyContent:"center",width:"100%",height:"100%", flexDirection:"row"}}>
+              <Text style={{color: _user.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',justifyContent:"center",width:"70%"}}> {user} </Text>
+              <Text style={{color: "#ecf0f1" ,textAlign: 'right',flex:50,fontSize:8,marginHorizontal:1,width:"29%"}} >
+                {_user.modelName && _user.modelName!="-"?_user.modelName:_user.device_type}
+              </Text>
               {this.state.focused_user == _user._id ? 
                 <Text style={{color: _user.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',flex:50,fontSize:8,marginHorizontal:1,width:"100%"}} >{online_at}</Text>
               : null}
             </View>
+
             </TouchableHighlight>
+
             <View style={{flexDirection:"row",alignSelf: 'center',}}>
 
               <IconButton
@@ -155,6 +160,8 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
                 size={28} 
                 color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
                 disabled={this.state.actionRunning}
+                badge_text = {_user.navigation_history ? _user.navigation_history.length : 0}
+                badge_bg_color = {"bg_warning"}
                 />
             </View>
                 
@@ -163,30 +170,40 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
       });
 
     }
-
+      close(){
+        Keyboard.dismiss();
+        
+        this.props.closeModal();
+        this.setState({users:false});
+      }
       render(){
         const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
+        if(this.props.modal_visible && this.state.users==false){
+          this.loadUsers();
+        }
         return (
           <MModal 
           animationType="slide"
           transparent={true}
           visible={this.props.modal_visible}
-          onRequestClose={() => {Keyboard.dismiss();this.props.closeModal();} }
+          onRequestClose={() => this.close() }
         > 
         <View style={this.state.dynamic_style.modal_view_container}>
         <View style={[this.state.dynamic_style.modal_view,this.state.dynamic_style.modal_view_large]}>
           <View style={this.state.dynamic_style.modal_body}>
+            {this.state.users!=false ?
               <ScrollView style={{width:"100%",backgroundColor:"#646c78"}}>
                 {this.render_users()}
               </ScrollView> 
-              
+              :<Loader/>
+              }
           </View>
           <View style={this.state.dynamic_style.footer}>
             <View style={this.state.dynamic_style.footer_button}>
               <Button
                   title={"Cancel"}
                   color="#f39c12"
-                  onPress={()=>this.props.closeModal()}
+                  onPress={()=>this.close()}
               ></Button>
             </View>
           </View>
