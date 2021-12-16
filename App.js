@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import {  View, StyleSheet, ToastAndroid,Platform,Alert  , I18nManager } from 'react-native';
+import {  View, StyleSheet, ToastAndroid,Platform,Alert  , Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer  } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -27,7 +27,6 @@ import Constants from 'expo-constants';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Font from 'expo-font';
-import TextF from "./components/TextF";
 import {app_styles,getTheme} from "./components/Themes";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import * as Notifications from 'expo-notifications';
@@ -40,7 +39,7 @@ global.g = null;
 //--release-channel imad | default
 // cmd to add google firebase server key 
 // expo push:android:upload --api-key AAAAFPoWn8w:APA91bHJ8F9ueKj_gaHXlqpJ-Ba2OIpwvI-GecDdfIWzCYLt0dVrJBmTZ6P1UmcezWjubrOqlZADJcNRdNldTcMsuhnTOJ7IpXvon_kJyHM0Rh9KT-5cr04FKd30-VeEAipDggMVKKbS
-Text = TextF;
+
 global. API_ = new API();
 global. API_.appname = "AlMatch"
 global. Global_theme_name = "dark violet";
@@ -88,6 +87,7 @@ if(API_.isWeb){
 
 
 global. LoadedFonts = false;
+global.Text = Text;
 function _loadFontsAsync() {
   Font.loadAsync({
     //'cairoregular': require('./assets/fonts/cairoregular.ttf'),
@@ -95,9 +95,11 @@ function _loadFontsAsync() {
     'DroidKufi-Bold': require('./assets/fonts/DroidKufi-Bold.ttf'),
     }).then(()=>{
     LoadedFonts=true;
+    global.Text = require("./components/TextF").default;
   });
   //this.setState({ fontsLoaded: true });
 }
+
 if(API_.isWeb){
   window.addEventListener('beforeunload', function (e) {
     if(reloading_app==false){
@@ -192,15 +194,22 @@ function MatchesStackScreen() {
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Home" component={HomeScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Settings" component={SettingsScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen}animationEnabled={is_animationEnabled} />
+
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="ChannelsCat" component={CategoriesScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Channels" component={ChannelsScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Channel" component={ChannelScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Leagues" component={LeaguesScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="League" component={LeagueScreen} animationEnabled={is_animationEnabled}/>
-      <MatchesStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} animationEnabled={is_animationEnabled}/>
+      
       <MatchesStack.Screen options={_app_styles.screenHeader} name="TV" component={TVScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="FS" component={FSScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="News" component={NewsScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Article" component={ArticleScreen} animationEnabled={is_animationEnabled}/>
 
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Videos" component={VideosScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Video" component={VideoScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Movies" component={MoviesScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Movie" component={MovieScreen} animationEnabled={is_animationEnabled}/>
       
     </MatchesStack.Navigator>
   );

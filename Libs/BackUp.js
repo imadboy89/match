@@ -729,11 +729,11 @@ class BackUp{
       is_ok = o && o.insertedId;
       return is_ok ;
     }
-    load_trace = async()=>{
+    load_trace = async(only_others)=>{
       if(!this.is_mdb_ok() || this.user_log_id==false){
         return false;
       }
-      const o = await this.client.callFunction("users_log",["load"]);
+      const o = await this.client.callFunction("users_log",["load",only_others]);
       return o ;
     }
     proxy = async(args)=>{

@@ -130,7 +130,7 @@ get_news =(loading=true,keep_list=false)=>{
   render() {
     this.resources = JSON.parse(JSON.stringify(this.resources_static));
     API_.following.map(f=> this.resources[f.url] = f.title);
-    const picker_options = Object.keys(this.resources).map(o=><Picker.Item label={this.resources[o]} value={o} />);
+    const picker_options = Object.keys(this.resources).map(o=><Picker.Item label={this.resources[o]} value={o} key={o} />);
     const ListHeaderComponent = (        <View style={this.state.dynamic_style.nav_container}>
       <IconButton
         disabled={this.state.loading}

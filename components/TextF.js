@@ -31,10 +31,10 @@ class TextF extends React.Component {
 
 const styles = StyleSheet.create({
   kufi_regular:{
-    fontFamily : "DroidKufi-Regular",
+    fontFamily : LoadedFonts ? "DroidKufi-Regular" : "",
   },
   kufi_bold:{
-    fontFamily : "DroidKufi-Bold",
+    fontFamily : LoadedFonts ? "DroidKufi-Bold" : "",
   },
   /*
   cairoregular_regular:{

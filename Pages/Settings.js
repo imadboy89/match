@@ -226,7 +226,7 @@ class SettingsScreen extends React.Component {
               <Switch
                 style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                thumbColor={this.state.is_materialTopTab__v ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={(is_materialTopTab__v)=>{
                   API_.setConfig("is_materialTopTab",is_materialTopTab__v);
@@ -242,7 +242,7 @@ class SettingsScreen extends React.Component {
               <Switch
                 style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                thumbColor={this.state.is_movies_home_page ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={async(is_movies_home_page)=>{
                   if(is_movies_home_page){
@@ -267,7 +267,7 @@ class SettingsScreen extends React.Component {
               <Switch
                 style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                thumbColor={this.state.filtering ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={()=>{
                   API_.filtering = !this.state.filtering;
@@ -377,7 +377,7 @@ class SettingsScreen extends React.Component {
               <Switch
                 style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                thumbColor={this.state.is_landScape ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={()=>{
                     ScreenOrientation.supportsOrientationLockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT)
@@ -423,7 +423,7 @@ class SettingsScreen extends React.Component {
               <Switch
                 style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={this.state.is_debug ? "#f5dd4b" : "#f4f3f4"}
+                thumbColor={this.state.keyDown_listner ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={()=>{
                   this.toggle_keys_listner(!this.state.keyDown_listner);

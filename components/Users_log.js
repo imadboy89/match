@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Text, View, Button,TextInput, Modal, ActivityIndicator,ScrollView ,TouchableHighlight,Keyboard} from 'react-native';
+import {  Text, View, Button,Switch, Modal, ActivityIndicator,ScrollView ,TouchableHighlight,Keyboard} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IconButton from "./IconButton";
 import User_log from "./User_log";
@@ -11,7 +11,7 @@ class Users_log extends React.Component{
       this.state = {
         user_username : "",
         users : false,
-        usersLoading : true,
+        usersLoading : false,
         actionRunning : false,
         msg_text : "",
         modalVisible_msg : false,
@@ -20,42 +20,19 @@ class Users_log extends React.Component{
         user_log : false,
         show_user_log : false,
         user_activities : false,
+        only_others : true,
+        page_limit:20,
+        page:1,
       };
       
     } 
     componentDidMount(){
     }
-    setUser_admin_tmp(user_username,action="tmp_admin"){
-      this.setState({actionRunning:true});
-      backup.partnersManager(action,user_username).then(res=>{
-        this.setState({actionRunning:false});
-        this.loadUsers();
-        if (res[1] && res[1]!=""){
-          alert(res[1]); 
-        }
-      }); 
-    }
-    sendMsg = async()=>{
-      this.setState({actionRunning:true});
-      const out = await backup.pushNotification(backup.email,this.state.msg_text,{"action":"msg","msg":this.state.msg_text,"by":backup.email},[this.msg_user,]);
-      this.setState({actionRunning:false,modalVisible_msg:false});
-    }
     loadUsers = async()=>{
-      let users = await backup.load_trace();
-      users = users.sort((a,b)=> a>b ? 1 : -1);
+      this.setState({users:false,usersLoading:true,actionRunning:true,page:1});
+      let users = await backup.load_trace(this.state.only_others);
+      users = users.sort((a,b)=> a.datetime>b.datetime ? -1 : 1);
       this.setState({users:users,usersLoading:false,actionRunning:false});
-
-    }
-    updateUserStatus(user){
-      this.setState({actionRunning:true});
-      backup.usersManager(user.email,user.disabled).then(res=>{
-        if(res && res.length==2){
-          if (res[0]==false){
-            alert(res[1]);
-          }
-        }
-        this.loadUsers();
-      });
     }
     user_log(){
       if(this.state.user_log==false)return null;
@@ -74,13 +51,15 @@ class Users_log extends React.Component{
         <Text style={{color:"#fff" ,textAlign: 'left',justifyContent:"center",width:"80%"}}> 
         {s.name} - {time}
         </Text>
-                      <IconButton
-                      name="eye"
-                      disabled={this.state.actionRunning}
-                      size ={28}
-                      color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
-                      onPress={()=>{ this.props.navigation.push(s.name, s.params); }}
-                  />
+            <IconButton
+              name="eye"
+              disabled={this.state.actionRunning}
+              size ={28}
+              color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
+              onPress={()=>{ 
+                this.props.navigation.push(s.name, s.params); 
+              }}
+          />
     </View>;
         
       }) : null;
@@ -124,7 +103,9 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
         return null;
       }
       //infos.device_type+" - "+infos.modelName
-      return this.state.users.map( (_user,i) =>{
+      const pagination_from = (this.state.page-1) * this.state.page_limit;
+      const pagination_to   = this.state.page * this.state.page_limit;
+      return this.state.users.slice(pagination_from, pagination_to).map( (_user,i) =>{
         const user = _user.email ;
         const online_at =  _user.datetime ? API_.get_date_time(_user.datetime) : "-";
         return (
@@ -132,13 +113,15 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
             <TouchableHighlight style={{flex:1,height:"100%",justifyContent:"center"}} 
               onPress={()=>this.setState({focused_user:_user._id})}
               >
-            <View style={{flex:1,justifyContent:"center",width:"100%",height:"100%", flexDirection:"row"}}>
-              <Text style={{color: _user.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',justifyContent:"center",width:"70%"}}> {user} </Text>
-              <Text style={{color: "#ecf0f1" ,textAlign: 'right',flex:50,fontSize:8,marginHorizontal:1,width:"29%"}} >
-                {_user.modelName && _user.modelName!="-"?_user.modelName:_user.device_type}
-              </Text>
+            <View style={{flex:1,width:"100%",height:"100%"}}>
+              <View style={{flex:1,width:"100%",height:"100%", flexDirection:"row"}}>
+                <Text style={{color: _user.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',justifyContent:"center",width:"70%"}}> {user} </Text>
+                <Text style={{color: "#ecf0f1" ,textAlign: 'right',flex:50,fontSize:8,marginHorizontal:1,width:"29%"}} >
+                  {_user.modelName && _user.modelName!="-"?_user.modelName:_user.device_type}
+                </Text>
+              </View>
               {this.state.focused_user == _user._id ? 
-                <Text style={{color: _user.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',flex:50,fontSize:8,marginHorizontal:1,width:"100%"}} >{online_at}</Text>
+                <Text style={{color: "#fff" ,textAlign: 'left',fontSize:9,marginHorizontal:1,width:"100%"}} >{online_at}</Text>
               : null}
             </View>
 
@@ -178,9 +161,28 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
       }
       render(){
         const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
-        if(this.props.modal_visible && this.state.users==false){
+        if(this.props.modal_visible && this.state.users==false && this.state.usersLoading==false){
           this.loadUsers();
         }
+        const ListHeaderComponent = (        <View style={this.state.dynamic_style.nav_container}>
+          <IconButton
+            disabled={this.state.usersLoading || this.state.page==1}
+           title="arrow-back-circle"  name="chevron-left" 
+           size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+            if(this.state.page==1){return false;}
+            this.state.page--;
+            this.setState({})
+          }}  />
+          <Text style={this.state.dynamic_style.text}>{this.state.page}</Text>
+          <IconButton 
+            disabled={this.state.usersLoading || this.state.page*this.state.page_limit> this.state.users.length}
+           title="forward"  name="chevron-right" 
+           size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+            if(this.state.page*this.state.page_limit> this.state.users.length){return false;}
+            this.state.page++;
+            this.setState({})
+          }}  />
+        </View>);
         return (
           <MModal 
           animationType="slide"
@@ -199,13 +201,27 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
               }
           </View>
           <View style={this.state.dynamic_style.footer}>
-            <View style={this.state.dynamic_style.footer_button}>
-              <Button
-                  title={"Cancel"}
-                  color="#f39c12"
-                  onPress={()=>this.close()}
-              ></Button>
-            </View>
+              <View style={this.state.dynamic_style.settings_row_input}>
+                <Switch
+                    style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                    thumbColor={this.state.only_others ? "#f5dd4b" : "#f4f3f4"}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={()=>{
+                      this.state.only_others=!this.state.only_others;
+                      this.loadUsers();
+                    }}
+                    value={this.state.only_others}
+                  />
+              </View>
+              {ListHeaderComponent}
+              <View style={this.state.dynamic_style.settings_row_input}>
+                <Button
+                    title={"Cancel"}
+                    color="#f39c12"
+                    onPress={()=>this.close()}
+                ></Button>
+              </View>
           </View>
         </View>
         </View>
