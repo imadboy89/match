@@ -373,11 +373,6 @@ class MoviesScreen extends React.Component {
           ListHeaderComponent = {ListHeaderComponent}
           ListFooterComponent = {ListHeaderComponent}
           
-          refresh_list={this.refresh_list}
-          refreshControl={<RefreshControl progressViewOffset={200} 
-          refreshing={this.state.loading} 
-          onRefresh={this.get_movies} />}
-          
           loading={this.state.loading} 
           list={this.state.list} 
           onclick={this.onItem_clicked} 
