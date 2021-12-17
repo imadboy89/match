@@ -252,11 +252,13 @@ class ChannelScreen extends React.Component {
       domStorageEnabled={true}
       ref={(ref) => (this.webview = ref)}
       onShouldStartLoadWithRequest={(request) => {
+        /*
         this.webview.injectJavaScript(this.js_setIframeWidth);
         if(request.url.replace("/m.","/").replace("/www.","/") != this.state.movie.ifram_src.replace("/m.","/").replace("/www.","/")){
           console.log("stopLoading");
           return false;
         }
+        */
         return true;
       }}
       source={ {uri:this.state.movie.ifram_src} }
@@ -326,10 +328,7 @@ class ChannelScreen extends React.Component {
     let img  = this.state.movie && this.state.movie.medium_cover_image ? this.state.movie.medium_cover_image : null;
     img  = this.state.movie && this.state.movie.img ? this.state.movie.img : img;
     img = img ? <Image style={this.state.dynamic_style.channel_logo} source={{uri: img}} /> : null;
-
-    if(API_.isWeb && location.host.includes("localhost")){}else{
-      img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
-    }
+    img = this.state.movie && this.state.movie.ifram_src ? this.render_movie() : img;
     let eps = null;
     if(this.state.movie && this.state.movie.eps && this.state.movie.eps.length>0){
       /*

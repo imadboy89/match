@@ -80,9 +80,6 @@ class MoviesScreen extends React.Component {
       "/tv-shows" : "TV Shows",
       "/movies" : "Movies",
     };
-  this.get_movies();
-  console.log("--------constructor");
-  this.screen_focus_mng();
   
   }
   screen_focus_mng(){
@@ -107,6 +104,8 @@ class MoviesScreen extends React.Component {
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
     this.render_header();
     this.load_fav();
+    this.get_movies();
+    this.screen_focus_mng();
   }
   check_is_fav=()=>{
     backup.load_movie_fav().then(o=>{
@@ -160,6 +159,7 @@ class MoviesScreen extends React.Component {
     }
   }
   get_movies =(loading=true,keep_list=false)=>{
+    alert("get_movies func");
     if(this.state.loading==false && loading){
       this.data = {};
       this.setState({loading:true,list:[]});
@@ -373,7 +373,10 @@ class MoviesScreen extends React.Component {
           ListFooterComponent = {ListHeaderComponent}
           
           refresh_list={this.refresh_list}
-          refreshControl={<RefreshControl progressViewOffset={200} refreshing={this.state.loading} onRefresh={this.get_movies} />}
+          refreshControl={<RefreshControl progressViewOffset={200} 
+          refreshing={this.state.loading} 
+          onRefresh={this.get_movies} />}
+          
           loading={this.state.loading} 
           list={this.state.list} 
           onclick={this.onItem_clicked} 
