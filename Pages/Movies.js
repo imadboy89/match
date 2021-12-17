@@ -83,6 +83,7 @@ class MoviesScreen extends React.Component {
   
   }
   screen_focus_mng(){
+    if(API_.isWeb == false){return ; }
     this.subscribetions=[];
     this.subscribetions.push(this.props.navigation.addListener('focus', () => {
       this.toggle_keys_listner(true);
