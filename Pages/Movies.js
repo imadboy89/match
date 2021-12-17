@@ -160,7 +160,7 @@ class MoviesScreen extends React.Component {
     }
   }
   get_movies =(loading=true,keep_list=false)=>{
-    alert("get_movies func");
+    if(!this.props.isFocused){ return ;}
     if(this.state.loading==false && loading){
       this.data = {};
       this.setState({loading:true,list:[]});

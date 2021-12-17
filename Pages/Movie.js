@@ -27,6 +27,7 @@ class ChannelScreen extends React.Component {
         actionType:"Torrent File",
         source_id :parseInt(this.props.route.params.source),
     };
+    this.webview = false;
     this.state.movie_id = decodeURI(this.state.movie_id_ori).replace(/~s~/g,"/");
     this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
     this.ScrollView_ref = React.createRef();
@@ -42,6 +43,7 @@ class ChannelScreen extends React.Component {
     this.js_setIframeWidth = "(function() { const iframes = document.getElementsByTagName('iframe');for(let i = 0; i<iframes.length;i++ )iframes[0].width = '100%';})();";
   }
   screen_focus_mng(){
+    if(API_.isWeb == false){return ; }
     this.subscribetions=[];
     this.subscribetions.push(this.props.navigation.addListener('focus', () => {
       this.toggle_keys_listner(true);
@@ -245,9 +247,10 @@ class ChannelScreen extends React.Component {
       allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"
       seamless/>;
     }else{
+      alert(this.state.movie.ifram_src);
       return  <WebView 
       allowsFullscreenVideo={true}
-      style={{height:500,backgroundColor: "#000",borderWidth:0,width:"100%"}}
+      style={{flex:1,backgroundColor: "#353b48"}}
       javaScriptEnabled={true}
       domStorageEnabled={true}
       ref={(ref) => (this.webview = ref)}
@@ -262,7 +265,6 @@ class ChannelScreen extends React.Component {
         return true;
       }}
       source={ {uri:this.state.movie.ifram_src} }
-      userAgent={API_.user_agents["Android 10"]}
       />;
       //userAgent={API_.user_agents["Android 10"]}
     }
