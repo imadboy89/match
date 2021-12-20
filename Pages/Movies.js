@@ -26,6 +26,7 @@ class MoviesScreen extends React.Component {
         seach_input_ref:null,
 
     };
+    this.is_focused = true;
     this.data = {};
     this.state.section = this.state.source_id == 4 ? "" : this.state.section;
     this.rates=[0,1,2,3,4,5,6,7,8,9];
@@ -83,13 +84,15 @@ class MoviesScreen extends React.Component {
   
   }
   screen_focus_mng(){
-    if(API_.isWeb == false){return ; }
+    
     this.subscribetions=[];
     this.subscribetions.push(this.props.navigation.addListener('focus', () => {
       this.toggle_keys_listner(true);
+      this.is_focused = true;
     }));
     this.subscribetions.push(this.props.navigation.addListener('blur', () => {
       this.toggle_keys_listner(false);
+      this.is_focused = false;
     }));
   }
   load_fav=()=>{
@@ -160,7 +163,8 @@ class MoviesScreen extends React.Component {
     }
   }
   get_movies =(loading=true,keep_list=false)=>{
-    if(!this.props.isFocused){ return ;}
+    console.log("get_movies this.is_focused : ",this.is_focused);
+    if(this.is_focused==false){return;}
     if(this.state.loading==false && loading){
       this.data = {};
       this.setState({loading:true,list:[]});

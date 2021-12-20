@@ -238,8 +238,10 @@ class ItemsList extends React.Component {
       }
       return (<Text style={this.state.dynamic_style.item_related} numberOfLines={1}>- {fav_icon} : {text2show}</Text>);
     }else{
+      const item_ep_name = item[col_key] ? item[col_key].replace("👁","").trim()  : "";
+      const extra_style = this.props.eps_current && this.props.eps_current==item_ep_name ? {backgroundColor:"#2980b999"} : {};
       return (
-        <Text style={this.state.dynamic_style.item} numberOfLines={1}>- {item[col_key]}</Text>
+        <Text style={[this.state.dynamic_style.item,extra_style]} numberOfLines={1}>- {item[col_key]}</Text>
         );
     }
   }

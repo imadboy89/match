@@ -27,6 +27,7 @@ class ChannelScreen extends React.Component {
         actionType:"Torrent File",
         source_id :parseInt(this.props.route.params.source),
     };
+    this.ep_name = false;
     this.webview = false;
     this.state.movie_id = decodeURI(this.state.movie_id_ori).replace(/~s~/g,"/");
     this.magnet_link = "magnet:?xt=urn:btih:[[torrent_hash]]&amp;dn=[[torrent_name]]&amp;tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&amp;tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337";
@@ -118,8 +119,9 @@ class ChannelScreen extends React.Component {
   render_header(){
     const iconsSize = styles_home && styles_home.title ? styles_home.title.fontSize : 15;
     const _curr_ep = this.state.movie.eps==undefined || this.state.movie.eps.length==0 ? this.state.movie.url : this.state.movie.eps[this.state.movie.index].url;
+    const title = this.ep_name ? this.name + " :> "+this.ep_name : this.name;
     this.props.navigation.setOptions({
-      title:this.name,
+      title:title,
       "headerRight":()=>(
         <View style={{flexDirection:"row",margin:5,padding:5,width:"90%"}}>
           <IconButton 
@@ -159,7 +161,7 @@ class ChannelScreen extends React.Component {
     this.fav_movie = false;
     clearTimeout(this.save_watching_timer);
     this.render_header();
-    this.setState({loading:true});
+    this.setState({loading:true,movie:{}});
     this.state.movie_id = decodeURI(this.state.movie_id).replace(/~s~/g,"/");
     API_.get_MC_movie(this.state.movie_id).then(resp=>{
       if(resp && resp.ifram_src ){
@@ -349,18 +351,22 @@ class ChannelScreen extends React.Component {
         e.ep_name+=this.fav_movie && this.fav_movie.watching && this.fav_movie.watching.includes(e.url)?this.watching_sign:"";
         return e;
       });
+
+      this.name = this.state.movie && this.state.movie.title_long ? this.state.movie.title_long : null;
+      this.ep_name = this.state.movie && this.state.movie.ep_name ? this.state.movie.ep_name : null;
+      this.name = this.state.movie && this.state.movie.name ? this.state.movie.name : this.name;
+
       eps = <ItemsList 
       ListHeaderComponent={<Text style={this.state.dynamic_style.info_text}>Episodes : </Text>}
       loading={false}
-      list={eps} 
+      list={eps}
+      eps_current={this.ep_name}
       onclick={this.on_clicked} 
       key_={"ep_name"} key_key={"url"}
       minWidth={800}
       />
     }
-    this.name = this.state.movie && this.state.movie.title_long ? this.state.movie.title_long : null;
-    let ep_name = this.state.movie && this.state.movie.ep_name ? this.state.movie.ep_name : null;
-    this.name = this.state.movie && this.state.movie.name ? this.state.movie.name : this.name;
+
     return (
       <ScrollView style={this.state.dynamic_style.container} ref={(ref) => { 
         this.ScrollView_ref = ref; 
@@ -376,7 +382,7 @@ class ChannelScreen extends React.Component {
          { this.state.loading ? <Loading /> : 
         <View style={this.state.dynamic_style.info_cont}>
           <Text style={this.state.dynamic_style.info_text_small}> Name⠀⠀⠀⠀: {this.name}</Text>
-          <Text style={this.state.dynamic_style.info_text_small}> Episode  : {ep_name}</Text>
+          <Text style={this.state.dynamic_style.info_text_small}> Episode  : {this.ep_name}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Released: {this.state.movie && this.state.movie.released? this.state.movie.released : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Language⠀: {this.state.movie && this.state.movie.language? this.state.movie.language : "-"}</Text>
           <Text style={this.state.dynamic_style.info_text_small}> Genres⠀⠀⠀: {this.state.movie && this.state.movie.genres? this.state.movie.genres.join("-") : "-"}</Text>
