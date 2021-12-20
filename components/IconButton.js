@@ -53,6 +53,7 @@ var styles_badge = StyleSheet.create({
         height:16, 
         textAlign:"center",
         textAlignVertical:"top",
+        paddingBottom:20,
         
     }
 });
