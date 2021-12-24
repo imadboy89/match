@@ -44,7 +44,6 @@ class ChannelScreen extends React.Component {
     this.js_setIframeWidth = "(function() { const iframes = document.getElementsByTagName('iframe');for(let i = 0; i<iframes.length;i++ )iframes[0].width = '100%';})();";
   }
   screen_focus_mng(){
-    if(API_.isWeb == false){return ; }
     this.subscribetions=[];
     this.subscribetions.push(this.props.navigation.addListener('focus', () => {
       this.toggle_keys_listner(true);
@@ -249,7 +248,6 @@ class ChannelScreen extends React.Component {
       allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"
       seamless/>;
     }else{
-      alert(this.state.movie.ifram_src);
       return  <WebView 
       allowsFullscreenVideo={true}
       style={{flex:1,backgroundColor: "#353b48"}}
