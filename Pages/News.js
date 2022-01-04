@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Modal, Button, Switch, RefreshControl } from 'react-native';
+import { View, Modal, Button, Switch, RefreshControl,Share } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -82,7 +82,6 @@ class NewsScreen extends React.Component {
     this._isMounted=false;
     clearInterval(this.interval_refresh);
   }
-  
 get_news =(loading=true,keep_list=false)=>{
   let _source_id = parseInt( this.state.source_id );
   let _news_id   = this.news_id;

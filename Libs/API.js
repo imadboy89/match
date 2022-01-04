@@ -578,6 +578,7 @@ class API {
         let article  = {};
         try {
           article  = scrap.get_article(html);
+          article.url= url;
         } catch (error) {console.log(error)}
         return article;
       }catch(err){console.log(err);}

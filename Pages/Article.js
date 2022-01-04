@@ -1,9 +1,9 @@
 import React from "react";
-import {  View, Dimensions, Modal, Button, Linking, Picker,ScrollView, Image , ImageBackground} from 'react-native';
+import {  View, Dimensions, Share, Button, Linking, Picker,ScrollView, Image , ImageBackground} from 'react-native';
 import Constants from 'expo-constants';
 import Loader from "../components/Loader";
 import {styles_article,getTheme, globalView_style} from "../components/Themes";
-import { TouchableHighlight } from "react-native-gesture-handler";
+import IconButton from "../components/IconButton";
 import ItemsList from '../components/list';
 import Player from "../components/Player";
 import Team from "../components/Team";
@@ -39,6 +39,43 @@ class ArticleScreen extends React.Component {
     let short_title = this.state.article && this.state.article.title_news ? this.state.article.title_news:"-";
     short_title = short_title.length > 0 ? short_title.slice(0,30)+"..." : short_title;
     this.props.navigation.setOptions({title: <Text>{short_title}</Text>})
+    this.render_header();
+  }
+  onShare = async () => {
+    try {
+      const id = this.id.split("=").length == 2 ? this.id.split("=")[1] : this.id;
+      const content = {};
+      content.message = this.state.article && this.state.article.title_news ? this.state.article.title_news : "";
+      content.url     = `${website_url}News/Article/-/${id}` ;
+      content.title   = this.state.article && this.state.article.title_news ? this.state.article.title_news : "";
+      
+      //API_.showMsg(content.url,"warning");
+      const result = await Share.share(content);
+      if (result && result.action && result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          API_.showMsg("Shared successfully !","success");
+        }
+      } else if (result && result.action && result.action === Share.dismissedAction) {
+        API_.showMsg("Sharing canceled !","warning");
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+  render_header=()=>{
+    let title = this.state.article && this.state.article.title_news ? this.state.article.title_news : "";
+    this.props.navigation.setOptions({title: title,
+    "headerRight":()=>(
+      <View style={{flexDirection:"row",margin:5}}>
+        <IconButton 
+          name="share" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
+          this.onShare();
+        }}  />
+    </View>
+    )
+    });
   }
   isVideo = async (id)=>{
     const v_details = await API_.get_video_k(id);
@@ -79,6 +116,7 @@ class ArticleScreen extends React.Component {
         if( article.related_images && article.related_images[1] && parseInt(article.related_images[1]["img_link"])>0){
           this.isVideo(parseInt(article.related_images[1]["img_link"]));
         }
+        this.render_header();
       }else{
         this.state.article.body = article;
       }
