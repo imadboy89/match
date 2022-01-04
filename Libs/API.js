@@ -14,7 +14,7 @@ class API {
     this.yify_movies_url = "https://yts.mx/api/v2/";
     this.yify_subs_url = "https://yifysubtitles.org/";
     this.PB_movies_url = "https://tpb.party/";
-    this.MC_movies_url = "https://www.moviecrumbs.net/";
+    this.MC_movies_url = "https://moviecrumbs.net/";
     this.PB_sections = {205:"TV shows",201:"Movies"}
     //https://tpb.party/search/peaky%20blinders/1/99/205
     this.showMsg = function(msg){console.log("showMsg : ",msg)}
