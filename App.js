@@ -609,7 +609,8 @@ class APP extends React.Component {
           //https://lio0.com/Movies?source_id=8 -> https://lio0.com/?/Movies&source_id=8
           //navigationRef.current?.navigate("Videos",{ screen: "Movies", params:{source_id: 8} })
 
-          // to fix https://lio0.com/Movie/4/%2Fmovie%2Ffree-free-guy-hd-66987?item=          
+          // to fix https://lio0.com/Movie/4/%2Fmovie%2Ffree-free-guy-hd-66987?item=    
+          // https://lio0.com/News/Article/-/1100657      
           const pages_sep = {
               Channel : "channel_photo",
               League  : "league_details",
@@ -658,6 +659,8 @@ class APP extends React.Component {
               }
             });
           }
+          console.log(location.href);
+          console.log(main_screen,params);
           this.redirect_action(main_screen,params);
         }else if(this.firstRender && ( API_.isWeb && ["Home",""].includes(location.pathname.replace("/","")) || API_.isWeb==false) ){
           this.redirect_to_default_screen();
