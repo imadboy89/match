@@ -676,7 +676,7 @@ class APP extends React.Component {
   redirect_action=(main_screen,params)=>{
     setTimeout(() => {
       if(navigationRef.current){
-        navigationRef.current?.push(main_screen,params);
+        navigationRef.current?.navigate(main_screen,params);
       }
     }, 200);
   }
