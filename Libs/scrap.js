@@ -730,6 +730,26 @@ class Scrap {
     }
     return out_list;
   }
+  get_events(html){
+    let comps = this.get_var_array(html, "comps");
+    let out_list = {};
+    let key = "";
+    for(let i =0;i<comps.length;i++){
+      let comp_r   = comps[i];
+      if(comp_r[0]<=0){
+        if (comp_r[0]==0){
+          key=comp_r[2];
+        }
+        continue;
+      }
+      if(out_list[key] == undefined){
+        out_list[key] = [];
+      }
+      out_list[key].push({id: comp_r[0], info: comp_r[1], name: comp_r[2], logo: comp_r[3]});
+    }
+
+    return out_list;
+  }
   get_leagues(html){
     '6950,0,"نهائيات كأس العالم <span dir=ltr>2022</span>","",'
     const comp_h = ["id","sport_id","name","info_1"]

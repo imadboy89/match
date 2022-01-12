@@ -133,6 +133,16 @@ class ChannelScreen extends React.Component {
             size={iconsSize} 
             style={styles_home.icons} 
             onPress={this.save_fav}  />
+          <IconButton 
+            name="share" size={iconsSize} style={styles_home.icons} 
+            onPress={()=>{
+              //http://localhost:19006/Movie/4/~s~movie~s~free-spider-man-no-way-home-hd-71326?item=
+              const id = this.state.movie_id.replace("/movie/","");
+              const message = title;
+              const url     = `Movie/${this.state.source_id}/-/${id}` ;
+              const title   = title;
+              API_.onShare(title,message,url);
+          }}  />
         </View>
       ),
 

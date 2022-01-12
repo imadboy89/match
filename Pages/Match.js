@@ -47,16 +47,34 @@ class Matchcreen extends React.Component {
     API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{this.setState({favorite_p:o});});
     API_.getConfig("favorite_teams_k",this.state.favorite_t).then(o=>{this.setState({favorite_t:o});});
     
-    this.set_title();
+    this.render_header();
     
   }
-  set_title(){
-    if(this.state.matche_details==undefined){
-      return false;
+  render_header=()=>{
+    let title_str = "";
+    let title = "";
+    if(this.state.matche_details!=undefined){
+      this.home_team_ar = this.state.matche_details && this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
+      this.away_team_ar = this.state.matche_details && this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;  
+      title_str = this.home_team_ar +" - "+ this.away_team_ar ;
+      title = <Text >{title_str}</Text>;
     }
-    this.home_team_ar = this.state.matche_details && this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
-    this.away_team_ar = this.state.matche_details && this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;
-    this.props.navigation.setOptions({title: <Text >{this.home_team_ar +" - "+ this.away_team_ar}</Text>});
+    this.props.navigation.setOptions({title: title,
+    "headerRight":()=>(
+      <View style={{flexDirection:"row",margin:5}}>
+        <IconButton 
+          name="share" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
+          onPress={()=>{
+             //http://localhost:19006/Match/-/2095804
+            const id = this.id;
+            const message = title_str;
+            const url     = `Match/-/${id}` ;
+            const title   = title_str;
+            API_.onShare(title,message,url);
+        }}  />
+    </View>
+    )
+    });
   }
   get_Match(id){
     //console.log("get_Match",id,this.state.matche_details);
@@ -75,8 +93,8 @@ class Matchcreen extends React.Component {
         this.state.matche_details = resp["data"][0];
         this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
         this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
+        this.render_header();
         API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
-        //this.set_title();
         this.setState({loading:false});
       }
       //this.state.matche_details.away_team_badge ? this.state.matche_details.away_team_badge : this.state.matche_details.away_team_logo
@@ -123,7 +141,7 @@ class Matchcreen extends React.Component {
           this.state.matche_details = this.state.matche_details ? {...this.state.matche_details, ...resp} : resp;
           this.home_team_ar = this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
           this.away_team_ar = this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team; 
-          this.set_title();
+          this.render_header();
           this.setState({loading:false});
           API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
           if(is_linked){

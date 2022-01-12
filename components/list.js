@@ -399,8 +399,15 @@ class ItemsList extends React.Component {
     /*let is_new = JSON.stringify(this.list_origin) != JSON.stringify(this.props.list);
     is_new = is_new && (this.props.ListHeaderComponent!= this.ListHeaderComponent || this.props.ListFooterComponent!=this.ListFooterComponent);
     */
+    let list_n;
     const list_o = this.list_origin ? JSON.parse(JSON.stringify(this.list_origin)).map(o=>{ delete o["data"];return o}) : [];
-    const list_n = this.props.list ? JSON.parse(JSON.stringify(this.props.list)).map(o=>{ delete o["data"];return o}) : [];
+    try {
+      list_n = this.props.list ? JSON.parse(JSON.stringify(this.props.list)).map(o=>{ delete o["data"];return o}) : [];
+    } catch (error) {
+      console.log(error, this.props.list);
+      return ;
+    }
+    
     let is_new = JSON.stringify(list_o) != JSON.stringify(list_n);
     const is_paginated = this.props.ListHeaderComponent!= this.ListHeaderComponent || this.props.ListFooterComponent!=this.ListFooterComponent ;
 

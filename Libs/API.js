@@ -1,4 +1,4 @@
-import { Platform, Dimensions } from 'react-native';
+import { Platform, Dimensions, Share } from 'react-native';
 //import AsyncStorage from '@react-native-community/async-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Scrap from "./scrap";
@@ -341,6 +341,21 @@ class API {
       return list;
     });
   }
+  get_events(){
+    this.scrap = new Scrap();
+    let url = "https://m.kooora.com/?t=0&arabic=true";
+    return this.http(url,"GET",null,{})
+    .then(resp=>{
+      if(resp==undefined || !resp){
+        return [];
+      }
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      let list = scrap.get_events(resp);
+      return list;
+    });
+  }
+  
   async get_leagues_k(region_id){
     return this.http("https://m.kooora.com/?y="+region_id+"&arabic","GET",null,{})
     .then(async resp=>{
@@ -1573,6 +1588,28 @@ class API {
     }).catch(error=>API_.showMsg(error,"danger"));
 
   }
+
+  onShare = async (title,message,url) => {
+    try {
+      const content = {};
+      content.message = message;
+      content.url     = url.includes("http") ? url : `${website_url}${url}` ;
+      content.title   = title;
+      
+      const result = await Share.share(content);
+      if (result && result.action && result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          API_.showMsg("Shared successfully !","success");
+        }
+      } else if (result && result.action && result.action === Share.dismissedAction) {
+        API_.showMsg("Sharing canceled !","warning");
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 }
 
 export default API;

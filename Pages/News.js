@@ -1,12 +1,9 @@
 import * as React from 'react';
-import { View, Modal, Button, Switch, RefreshControl,Share } from 'react-native';
-import Constants from 'expo-constants';
+import { View, Modal, Button, Switch, RefreshControl,ScrollView } from 'react-native';
 import ItemsList from '../components/list';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
 import {styles_news,getTheme} from "../components/Themes";
 import {Picker} from '@react-native-picker/picker';
-import BackUp from '../Libs/BackUp';
 class NewsScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -17,6 +14,8 @@ class NewsScreen extends React.Component {
         dynamic_style : styles_news,
         source_id:1 ,
         hide_images:false,
+        show_events_modal : false,
+        modal_events_content : null,
     };
     this.resources_static = {1:"Kr_MA",6:"Kr_world",7:"Kr_home"};
     this.resources = {};
@@ -35,13 +34,28 @@ class NewsScreen extends React.Component {
   componentDidMount(){
     this._isMounted=true;
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
+    getTheme("styles_modal").then(theme=>this.setState({modal_dynamic_style:theme}));
     this.get_news();
     this.render_header();
+    API_.get_events().then(data=>{
+      if(this._isMounted){
+        this.setState({modal_events_content:data});
+      }
+    });
   }
   render_header=()=>{
     let title = this.resources[this.state.source_id] ? this.resources[this.state.source_id] : "News";
     title = this.news_title ? this.news_title : title;
     this.props.navigation.setOptions({title: title,
+    "headerLeft":()=>(<View style={{flexDirection:"row",margin:5}}>
+         <IconButton 
+            name="podcast" 
+            size={this.state.dynamic_style.title.fontSize} 
+            style={this.state.dynamic_style.icons} 
+            onPress={()=>{
+            this.setState({show_events_modal:true});
+          }}  />
+    </View>),
     "headerRight":()=>(
       <View style={{flexDirection:"row",margin:5}}>
       <Switch
@@ -126,6 +140,64 @@ get_news =(loading=true,keep_list=false)=>{
     this.get_news();
     this.render_header();
   }
+  onclick_events = (item)=>{
+    item.logo = ["https:/","http://"].includes(item.logo.slice(0,7)) ? item.logo : API_.domain_o+item.logo;
+    this.props.navigation.push('League',{ league_details: {league:item.name,league_img:item.logo,id:item.id} });
+    this.setState({show_events_modal:false});
+  }
+  render_modal_events(){
+    const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
+    if(this.state.modal_dynamic_style == undefined){
+      return null;
+    }
+    let content = [];
+    console.log("modal_events_content",this.state.modal_events_content);
+    if(this.state.modal_events_content){
+      for(let key in this.state.modal_events_content){
+        const list_comps = this.state.modal_events_content[key];
+        const related_header = <Text style={this.state.dynamic_style.events_title}>{key} :</Text>;
+        content.push(<ItemsList 
+          ListHeaderComponent={related_header}
+          loading={false}
+          list={list_comps} 
+          key_={"name"} key_key={"id"}
+          minWidth={500}
+          onclick={this.onclick_events}
+          />);
+      }
+    }
+    return (
+      <MModal 
+      animationType="slide"
+      transparent={true}
+      visible={this.state.show_events_modal}
+      onRequestClose={() => {} }
+      
+    > 
+          <View style={this.state.modal_dynamic_style.modal_view_container}>
+          <View style={[this.state.modal_dynamic_style.modal_view,this.state.modal_dynamic_style.modal_view_large]}>
+
+          <View style={[this.state.dynamic_style.modal_body,{justifyContent:"flex-start",height:450}]}>
+            <ScrollView  style={[{flex: 1,width:"98%",marginHorizontal:10,height:"99%"}]}>
+                { this.state.modal_events_content && content && content.length ? content : null }
+            </ScrollView>
+          </View>
+
+
+            <View style={this.state.modal_dynamic_style.footer}>
+              <View style={this.state.dynamic_style.settings_row_input}>
+                <Button
+                      title={"close"}
+                      disabled={this.state.savingCredents || this.state.email=="" || this.state.password=="" }
+                      color= "#2ecc71"
+                      onPress={()=> this.setState({show_events_modal:false}) }
+                  ></Button>
+              </View>
+            </View>
+          </View>
+          </View>
+    </MModal>);
+  }
   render() {
     this.resources = JSON.parse(JSON.stringify(this.resources_static));
     API_.following.map(f=> this.resources[f.url] = f.title);
@@ -159,7 +231,8 @@ get_news =(loading=true,keep_list=false)=>{
       }
     </View>);
     return (
-      <View style={this.state.dynamic_style.container}>     
+      <View style={this.state.dynamic_style.container}>
+        {this.state.list ? 
         <ItemsList 
           ListHeaderComponent = {ListHeaderComponent}
           ListFooterComponent = {ListHeaderComponent}
@@ -173,7 +246,8 @@ get_news =(loading=true,keep_list=false)=>{
           page={this.state.page}
           hide_images={this.state.hide_images}
           />
-        
+          :null}
+        {this.render_modal_events()}
       </View>
     );
   }

@@ -1,6 +1,5 @@
 import React from "react";
-import {  View, Dimensions, Share, Button, Linking, Picker,ScrollView, Image , ImageBackground} from 'react-native';
-import Constants from 'expo-constants';
+import {  View, Dimensions,ScrollView , ImageBackground} from 'react-native';
 import Loader from "../components/Loader";
 import {styles_article,getTheme, globalView_style} from "../components/Themes";
 import IconButton from "../components/IconButton";
@@ -41,37 +40,20 @@ class ArticleScreen extends React.Component {
     this.props.navigation.setOptions({title: <Text>{short_title}</Text>})
     this.render_header();
   }
-  onShare = async () => {
-    try {
-      const id = this.id.split("=").length == 2 ? this.id.split("=")[1] : this.id;
-      const content = {};
-      content.message = this.state.article && this.state.article.title_news ? this.state.article.title_news : "";
-      content.url     = `${website_url}News/Article/-/${id}` ;
-      content.title   = this.state.article && this.state.article.title_news ? this.state.article.title_news : "";
-      
-      //API_.showMsg(content.url,"warning");
-      const result = await Share.share(content);
-      if (result && result.action && result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          API_.showMsg("Shared successfully !","success");
-        }
-      } else if (result && result.action && result.action === Share.dismissedAction) {
-        API_.showMsg("Sharing canceled !","warning");
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
+
   render_header=()=>{
     let title = this.state.article && this.state.article.title_news ? this.state.article.title_news : "";
     this.props.navigation.setOptions({title: title,
     "headerRight":()=>(
       <View style={{flexDirection:"row",margin:5}}>
         <IconButton 
-          name="share" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>{
-          this.onShare();
+          name="share" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} 
+          onPress={()=>{
+            const id = this.id.split("=").length == 2 ? this.id.split("=")[1] : this.id;
+            const message = this.state.article && this.state.article.title_news ? this.state.article.title_news : "";
+            const url     = `${website_url}News/Article/-/${id}` ;
+            const title   = this.state.article && this.state.article.title_news ? this.state.article.title_news : "";
+            API_.onShare(title,message,url);
         }}  />
     </View>
     )

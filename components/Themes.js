@@ -257,17 +257,21 @@ function generateTheme(theme_name=false){
     },
     item: {
       padding: 2,
+      paddingRight:50,
       fontSize: 18,
       //height: 50,
       flex:1,
       color:theme.text_color_default,
+      textAlign: 'right'
     },
     item_related: {
       padding: 2,
+      paddingRight:50,
       fontSize: 18,
       //height: 50,
       flex:1,
       color:theme.link_text_color,
+      textAlign: 'right'
     },
     header_container: {
       //backgroundColor: theme.list_header_backgroundColor,
@@ -672,6 +676,21 @@ function generateTheme(theme_name=false){
       //paddingTop: Constants.statusBarHeight,
       backgroundColor: theme.background_color_default,
       color : "#fff",
+    },
+    events_title : {
+      //padding:5,
+      fontSize: 12,
+      color : theme.article_date_color,
+      textAlign:"right",
+    },
+    modal_view_container:{
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      width:"100%",
+      height:"100%",
+      paddingTop: 22,
+      //backgroundColor:"red"
     },
     nav_container: {
       flexDirection:'row', 
@@ -1428,6 +1447,29 @@ function generateTheme(theme_name=false){
       height:"100%",
       paddingTop: 22,
       //backgroundColor:"red"
+    },
+    modal_row_input:{
+      flex:3,
+      backgroundColor: theme.background_color_default,
+      color : theme.text_color_default,
+      height:40,
+      borderRadius: isWeb ? 10 : 8,
+      paddingHorizontal : 3,
+    },
+    modal_row:{
+      flexDirection:'row', 
+      flexWrap:'wrap',
+      width:"95%",
+      //height:50,
+      marginHorizontal:5,
+      marginVertical:5,
+      backgroundColor: "#0000",
+      color : theme.text_color_default,
+    },
+    modal_row_label:{
+      flex:3,
+      backgroundColor: theme.background_color_default,
+      color : theme.text_color_default,
     },
     modal_view: {
       margin: 10,
