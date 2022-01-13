@@ -141,7 +141,7 @@ get_news =(loading=true,keep_list=false)=>{
     this.render_header();
   }
   onclick_events = (item)=>{
-    item.logo = ["https:/","http://"].includes(item.logo.slice(0,7)) ? item.logo : API_.domain_o+item.logo;
+    item.logo = ["https://","http://"].includes(item.logo.slice(0,7)) ? item.logo : "https:"+item.logo;
     this.props.navigation.push('League',{ league_details: {league:item.name,league_img:item.logo,id:item.id} });
     this.setState({show_events_modal:false});
   }
@@ -151,12 +151,11 @@ get_news =(loading=true,keep_list=false)=>{
       return null;
     }
     let content = [];
-    console.log("modal_events_content",this.state.modal_events_content);
     if(this.state.modal_events_content){
       for(let key in this.state.modal_events_content){
         const list_comps = this.state.modal_events_content[key];
         const related_header = <Text style={this.state.dynamic_style.events_title}>{key} :</Text>;
-        content.push(<ItemsList 
+        content.push(<ItemsList key={key}
           ListHeaderComponent={related_header}
           loading={false}
           list={list_comps} 
@@ -230,6 +229,7 @@ get_news =(loading=true,keep_list=false)=>{
       </Picker>
       }
     </View>);
+    
     return (
       <View style={this.state.dynamic_style.container}>
         {this.state.list ? 
@@ -242,7 +242,7 @@ get_news =(loading=true,keep_list=false)=>{
           loading={this.state.loading} 
           list={this.state.list} 
           onclick={this.onItem_clicked} 
-          key_="title_news" key_key="title_news"  
+          key_="title_news" key_key="link"  
           page={this.state.page}
           hide_images={this.state.hide_images}
           />

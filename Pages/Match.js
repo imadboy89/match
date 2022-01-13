@@ -57,7 +57,7 @@ class Matchcreen extends React.Component {
       this.home_team_ar = this.state.matche_details && this.state.matche_details.home_team_ar ? this.state.matche_details.home_team_ar : this.state.matche_details.home_team;
       this.away_team_ar = this.state.matche_details && this.state.matche_details.away_team_ar ? this.state.matche_details.away_team_ar : this.state.matche_details.away_team;  
       title_str = this.home_team_ar +" - "+ this.away_team_ar ;
-      title = <Text >{title_str}</Text>;
+      title = <Text>{title_str}</Text>;
     }
     this.props.navigation.setOptions({title: title,
     "headerRight":()=>(

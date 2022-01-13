@@ -503,7 +503,7 @@ class ItemsList extends React.Component {
               onEndReached = {this.props.onEndReached}
               refreshControl={this.props.refreshControl}
               data={final_list}
-              keyExtractor={(item, index) => item[this.props.key_key]+""} 
+              keyExtractor={(item, index) => {return item[this.props.key_key]+""}} 
               renderItem={this._render_item}
               renderSectionHeader={this._render_header}
 
