@@ -84,6 +84,7 @@ class Matchcreen extends React.Component {
     }
     if(this.state.matche_details==undefined || this.state.matche_details.is_koora){
       this.is_k = true;
+      this.get_head2head(id);
       return this.get_Match_k(id);
     }
     this.state.matche_details
@@ -97,18 +98,30 @@ class Matchcreen extends React.Component {
         API_.setTitleWeb(this.home_team_ar +" - "+ this.away_team_ar);
         this.setState({loading:false});
       }
-      //this.state.matche_details.away_team_badge ? this.state.matche_details.away_team_badge : this.state.matche_details.away_team_logo
-      /*API_.getTeam_logo_k().then(teams_logo =>{
-        matches.map(l=>{
-          l.data.map(m=>{
-            const t_id = parseInt(m.home_team_id);
-            const t_id2 = parseInt(m.away_team_id);
-            //queued_get_teams
-            if(t_id>0 && teams_logo[t_id]==undefined){queue_teams2upload.push(t_id);}
-            if(t_id2>0 && teams_logo[t_id2]==undefined){queue_teams2upload.push(t_id2);}
-          });
+    });
+  }
+  get_head2head(id){
+    const draw_str = "تعادل";
+    this.state.head2head = {};
+    this.state.head2head[draw_str] = 0;
+    API_.get_match_head2head(id).then(resp=>{
+      if(resp && resp.length>0){
+        resp.map(r=> {
+            const t1 = r[8];
+            const t2 = r[10];
+            const s1 = r[3];
+            const s2 = r[4];
+            
+            if(this.state.head2head[t1] == undefined){
+              this.state.head2head[t1] = 0;
+                this.state.head2head[t2] = 0;
+            }
+            this.state.head2head[t1] += s1>s2 ? 1 : 0;
+            this.state.head2head[t2] += s2>s1 ? 1 : 0;
+            this.state.head2head[draw_str] += s2==s1 ? 1 : 0;
         });
-      })*/
+        this.setState({});
+      }
     });
   }
   load_logos_old(){
@@ -267,6 +280,11 @@ class Matchcreen extends React.Component {
     const style_team_name ={flexDirection:'row',flexWrap:'wrap',width:"100%",height:50,borderColor:global_theme.text_color_default,borderBottomWidth :1,borderRadius:40,justifyContent:"center"};
 
     const live_style = this.state.matche_details.live ? {"color":global_theme.live_borderColor}:{};
+    
+    const head2head_info = this.state.head2head && Object.keys(this.state.head2head).length==3 ?
+    Object.keys(this.state.head2head).map(k=><Text style={[this.state.dynamic_style.text_info,{color:"red"}]} key={k}>{k} : {this.state.head2head[k]}</Text>)
+    : null;
+   console.log(this.state.head2head, head2head_info);
     return (
       <View style={this.state.dynamic_style.view_tab}>
         <Text style={this.state.dynamic_style.text_info}>{this.state.matche_details.datetime ? this.state.matche_details.datetime : this.state.matche_details.date+" "+API_.convert_time(this.state.matche_details.time)} </Text>
@@ -329,6 +347,9 @@ class Matchcreen extends React.Component {
         {this.state.matche_details.desc!="-" ?
           <Text style={[this.state.dynamic_style.text_info,{color:"red"}]}>Description : {this.state.matche_details.desc}</Text>
          : null}
+         
+        {head2head_info}
+
         <View style={{flexDirection:'row', flexWrap:'wrap', flex:1}}>
           <Text style={this.state.dynamic_style.text_info}>Live match :</Text>
           <Switch

@@ -1588,7 +1588,20 @@ class API {
     }).catch(error=>API_.showMsg(error,"danger"));
 
   }
-
+  get_match_head2head = (id)=>{
+    const url = `https://www.kooora.com/?m=${id}&arabic`;
+    return this.http(url,"GET")
+    .then(async resp=>{
+      let scrap = new Scrap();
+      let head2head = [];
+      try {
+        head2head = scrap.get_head2head(resp);
+      } catch (error) {
+        API_.debugMsg(error,"danger");
+      }
+      return head2head;
+    }).catch(error=>API_.showMsg(error,"danger"));
+  }
   onShare = async (title,message,url) => {
     try {
       const content = {};

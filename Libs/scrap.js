@@ -643,7 +643,7 @@ class Scrap {
     if(html == null || !html || !html.match){return []}
     //let patttern = /var\s+news\s+=\s+new\s+Array\s+\(((.*\r\n.*){16})\);/gmi;
     //const patttern = new RegExp("var\\s*"+var_name+"\\s*=\\s*.*","gmi");
-    const patttern  = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\r\\n(((?!"+end+").)*\\r\\n)*","gmi");
+    const patttern  = new RegExp("var\\s*"+var_name+"\\s*=\\s*new\\s+Array\\s*\\(\\s*\\r\\n(((?!"+end+").)*\\r\\n)*","gmi");
     let m = html.match(patttern);
     if(m){
       let out = "[["+m[0].trim().replace("var "+var_name+" = new Array (","").replace("var "+var_name+" = new Array(","").replace(/(,\r\n)?\s*\-1,0\);/mi,"").replace(/,$/i,'').replace(/	/g,'').replace(/,\r\n/gi,"],[") + "]]";
@@ -765,6 +765,16 @@ class Scrap {
       out_list.push({"img": "","league_name": this.removeHtml(line[2]), id:line[0],koora_id:line[0]});
     }
     return out_list;
+  }
+  get_head2head(html){
+    let head2head_matches = this.get_var_array(html, "head2head_matches" , '-1,\\"\\"\\);');
+    let head2head = [];
+    /*
+    for (let i=0; i<head2head_matches.length;i++){
+      let line = head2head_matches[i];
+      head2head.push({"img": "","league_name": this.removeHtml(line[2]), id:line[0],koora_id:line[0]});
+    }*/
+    return head2head_matches;
   }
   get_video(html,source_id=0){
     if(html == null || !html || !html.match){return []}

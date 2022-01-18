@@ -186,7 +186,7 @@ class ArticleScreen extends React.Component {
       />
       :null;
     const article_body = this.state.article && this.state.article.body ? this.state.article.body : "";
-    const body_composed = article_body.split("IMG**").map(o=>{
+    const body_composed = article_body && article_body.split ? article_body.split("IMG**").map(o=>{
       if(o.trim()==""){
         return null;
       }
@@ -202,7 +202,7 @@ class ArticleScreen extends React.Component {
         dom2retrurn = <Text key={o} style={this.state.dynamic_style.article_body_t}>{o}</Text>
       }
       return dom2retrurn;
-    });
+    }) : <Text key={o} style={this.state.dynamic_style.article_body_t}>{article_body}</Text>;
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
         <View style={globalView_style}>
