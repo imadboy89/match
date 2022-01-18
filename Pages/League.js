@@ -46,6 +46,8 @@ class LeagueScreen extends React.Component {
     if(API_.leagues_dict[this.league_name] && API_.leagues_dict[this.league_name].koora_id && api_type == 1){
       this.real_id = API_.leagues_dict[this.league_name].koora_id;
     }
+    this.c_years=null;
+    
   }
   componentDidMount(){
     this.is_k = true;
@@ -84,7 +86,7 @@ class LeagueScreen extends React.Component {
     this.setState({league_details:resp,loading:false,favorite:favorite});
     API_.setTitleWeb(this.league_name);
     API_.get_league_years(this.real_id).then(yrs=>{
-      this.setState({c_years:yrs});
+    this.setState({c_years:yrs});
     });
   }
   get_matches(league_id){
@@ -285,7 +287,7 @@ class LeagueScreen extends React.Component {
       return null;
     }
     this.table_x = [];
-    let standing_ = [];
+    let standing_ = [this.c_years];
     let standing_before = {"":this.state.league_details};
     if(Object.keys(this.state.league_details[0]).length==1){
       standing_before = this.state.league_details.slice();
@@ -394,8 +396,22 @@ class LeagueScreen extends React.Component {
         this.setState({visible_tab:"matches"});
       }
   }
+  changesource = (itemValue, itemIndex)=>{
+    this.real_id = itemValue;
+    this.league_id = itemValue ;
+    this.state.page=1;
+    this.get_standing_k();
+  }
   render() {
-    this.state.c_years.map(y=><Picker.Item label={y[0]} value={y[1]} key={y[0]} />);
+    const c_years_options = this.state.c_years.map(y=><Picker.Item label={y[1]} value={y[0]} key={y[0]} />);
+    this.c_years = <Picker
+    selectedValue={this.real_id}
+    style={{ height:API_.isWeb ? 50 : 75,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
+    itemStyle={{height:API_.isWeb ? 40 : 70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+    onValueChange={this.changesource}
+  >
+    {c_years_options}
+</Picker> ;
     return (
       <ScrollView style={this.state.dynamic_style.container}>
         { this.league_img ?  
