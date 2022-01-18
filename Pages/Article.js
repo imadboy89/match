@@ -202,7 +202,7 @@ class ArticleScreen extends React.Component {
         dom2retrurn = <Text key={o} style={this.state.dynamic_style.article_body_t}>{o}</Text>
       }
       return dom2retrurn;
-    }) : <Text key={o} style={this.state.dynamic_style.article_body_t}>{article_body}</Text>;
+    }) : <Text style={this.state.dynamic_style.article_body_t}>{article_body}</Text>;
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
         <View style={globalView_style}>

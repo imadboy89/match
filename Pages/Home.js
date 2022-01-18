@@ -172,8 +172,8 @@ class HomeScreen extends React.Component {
     if(API_.isWeb){return;}
     this.state.is_upd_available=-1
     this.render_header();
-    const customUpdater = new ExpoCustomUpdater()
-    customUpdater.isAppUpdateAvailable().then(isAv=>{
+    this.customUpdater = new ExpoCustomUpdater()
+    this.customUpdater.isAppUpdateAvailable().then(isAv=>{
       this.state.is_upd_available=isAv;
       this.render_header();
     });
@@ -274,7 +274,7 @@ class HomeScreen extends React.Component {
           name="cloud-download" size={iconsSize} style={this.state.dynamic_style.icons}
             onPress={()=>{
               this.setState({list:[],loading:true});
-              customUpdater.doUpdateApp();
+              this.customUpdater.doUpdateApp();
         }}  /> );
     }else{
       headerLeft = ()=>(

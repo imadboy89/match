@@ -100,7 +100,7 @@ export default class ExpoCustomUpdater {
   
         this.beforeDownloadCallback && this.beforeDownloadCallback()
   
-        this.log('doUpdateApp: Fetching Update',true)
+        this.log('doUpdateApp: Fetching Update .',true)
         await Updates.fetchUpdateAsync()
   
         this.log('doUpdateApp: Update fetched, reloading...',true)

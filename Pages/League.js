@@ -36,6 +36,7 @@ class LeagueScreen extends React.Component {
         player:false,
         matches_only_fav:false,
         modalVisible_team : false,
+        c_years:[],
     };
     this.league_name = this.props.route.params.league_details && this.props.route.params.league_details.league ? this.props.route.params.league_details.league : "-";
     this.league_img   = this.props.route.params.league_details && this.props.route.params.league_details.league_img ? this.props.route.params.league_details.league_img : "";
@@ -79,8 +80,12 @@ class LeagueScreen extends React.Component {
     if(resp.length == 0){
       this.showMatchesTab();
     }
+    
     this.setState({league_details:resp,loading:false,favorite:favorite});
     API_.setTitleWeb(this.league_name);
+    API_.get_league_years(this.real_id).then(yrs=>{
+      this.setState({c_years:yrs});
+    });
   }
   get_matches(league_id){
       get_notifications_matches().then(o=>{
@@ -390,7 +395,7 @@ class LeagueScreen extends React.Component {
       }
   }
   render() {
-  
+    this.state.c_years.map(y=><Picker.Item label={y[0]} value={y[1]} key={y[0]} />);
     return (
       <ScrollView style={this.state.dynamic_style.container}>
         { this.league_img ?  

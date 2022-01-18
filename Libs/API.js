@@ -1602,6 +1602,18 @@ class API {
       return head2head;
     }).catch(error=>API_.showMsg(error,"danger"));
   }
+  get_league_years(id){
+    return this.http("https://m.kooora.com/?c="+id+"&arabic","GET",null,{})
+    .then(resp=>{
+      let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      let years = [];
+      try {
+        years = scrap.get_league_years(resp);
+      } catch (e) {}
+      return years
+    });
+  }
   onShare = async (title,message,url) => {
     try {
       const content = {};

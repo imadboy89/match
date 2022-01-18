@@ -776,6 +776,11 @@ class Scrap {
     }*/
     return head2head_matches;
   }
+  get_league_years(html){
+    let years = this.get_var_array(html, "ci_years" , "0\\s*\\);");
+    console.log(years);
+    return years;
+  }
   get_video(html,source_id=0){
     if(html == null || !html || !html.match){return []}
     if(source_id==3){
