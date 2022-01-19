@@ -261,9 +261,15 @@ class Scrap {
 
         team_st [ standing_header[h] ] = json_["ranks_table"][i];
         h++;
-        if(h==standing_header.length){
+        if(team_st["team"] && (h==standing_header.length || ["r","g"].includes(json_["ranks_table"][i+1])) ){
           //team_st["subs_in_time"] = team_st["subs_in_time"]+""
-          let team = team_st["team"].split("~");
+          if(h<standing_header.length){
+            team_st["goals_received"] = team_st["goals_scored"];
+            team_st["goals_scored"] = team_st["rest"];
+            team_st["points"] = team_st["goals_difference"];
+            team_st["goals_difference"] = team_st["goals_received"];
+          }
+          let team = team_st["team"] && team_st["team"].split  ? team_st["team"].split("~") : team_st["team"];
           team = team.length>=4 ? team : ["","",team.join(""),team.join("")];
           team_st["played"] = team_st["played"].includes("~") ? team_st["info_2"] : team_st["played"];
 
@@ -294,7 +300,7 @@ class Scrap {
           h=0;
           team_st={};
         }
-      }catch(err){console.log(err)}
+      }catch(err){console.log(team_st, err)}
     }
     return standing;
   }
@@ -778,7 +784,6 @@ class Scrap {
   }
   get_league_years(html){
     let years = this.get_var_array(html, "ci_years" , "0\\s*\\);");
-    console.log(years);
     return years;
   }
   get_video(html,source_id=0){
