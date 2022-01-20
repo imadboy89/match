@@ -404,6 +404,9 @@ class Scrap {
     const comp_header = ["divider","league_id","comp_name","comp_logo","comp_id_news","options"];
     const MIN_ALLOWED_OPTIONS = is_oneMatch || FILTERING==false ? 1 : 3;
     let k = 0;
+    if(json_==undefined || json_["matches_comps"] == undefined ){
+      return [];
+    }
     for(let i=0;i< json_["matches_comps"].length;i++){
       compitition[ comp_header[k] ] = json_["matches_comps"][i];
       if(comp_header[k]=="comp_logo" && compitition[ comp_header[k] ].length<=3){
@@ -782,9 +785,12 @@ class Scrap {
     }*/
     return head2head_matches;
   }
-  get_league_years(html){
-    let years = this.get_var_array(html, "ci_years" , "0\\s*\\);");
-    return years;
+  get_league_options(html){
+    const options = {};
+    options.years = this.get_var_array(html, "ci_years" , "0\\s*\\);");
+    options.stages = this.get_var_array(html, "ci_stages" , "0\\s*\\);");
+    
+    return options;
   }
   get_video(html,source_id=0){
     if(html == null || !html || !html.match){return []}

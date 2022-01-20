@@ -1,9 +1,6 @@
 import React from "react";
-import { View, Pressable, Modal, Button, Linking, Picker, TouchableOpacity, Image, ScrollView, Dimensions, ImageBackground} from 'react-native';
-import Constants from 'expo-constants';
+import { View, Button, Picker, TouchableOpacity, Image, ScrollView, ImageBackground} from 'react-native';
 import ItemsList from '../components/list';
-import ReactHlsPlayer from "react-hls-player";
-import Video from 'expo';
 import Loading from '../components/Loader';
 import {styles_league,getTheme,global_theme} from "../components/Themes";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
@@ -37,6 +34,8 @@ class LeagueScreen extends React.Component {
         matches_only_fav:false,
         modalVisible_team : false,
         c_years:[],
+        c_stages:[],
+        c_stage:1,
     };
     this.league_name = this.props.route.params.league_details && this.props.route.params.league_details.league ? this.props.route.params.league_details.league : "-";
     this.league_img   = this.props.route.params.league_details && this.props.route.params.league_details.league_img ? this.props.route.params.league_details.league_img : "";
@@ -47,6 +46,7 @@ class LeagueScreen extends React.Component {
       this.real_id = API_.leagues_dict[this.league_name].koora_id;
     }
     this.c_years=null;
+    this.c_stages=null;
     
   }
   componentDidMount(){
@@ -84,73 +84,24 @@ class LeagueScreen extends React.Component {
     
     this.setState({league_details:resp,loading:false,favorite:favorite});
     API_.setTitleWeb(this.league_name);
-    API_.get_league_years(this.real_id).then(yrs=>{
-    this.setState({c_years:yrs});
+    API_.get_league_options(this.real_id).then(opts=>{
+      let current_position = 1;
+      opts.stages.map(r => {
+        if(r[1]=="p"){
+          current_position = r[0];
+        }
+      });
+      this.setState({c_years:opts.years , c_stages:opts.stages , c_stage:current_position});
     });
   }
   get_matches(league_id){
-      get_notifications_matches().then(o=>{
-        if(this._isMounted){
-          this.setState({notifications_matches:o});
-        }
-        });
-        return this.get_matches_k();
-      if(this.real_id!=this.league_id && this.real_id!=undefined){
-        return this.get_matches_k();
-      }
-      //API_.days[this.state.matches_date.getDay()]
-      API_.get_league_matches(this.league_id).then(resp=>{
-      if(resp && resp["status"]=="true"){
-        let list = [];
-        let maches = {};
-        let data = Object.keys(resp["data"]).map(k =>{
-          let date_str = "";
-          let img = resp["data"][k] && resp["data"][k].length>0 && resp["data"][k][0]["league_badge"] && resp["data"][k][0]["league_badge"]["path"] 
-                    ? resp["data"][k][0]["league_badge"]["path"] : false;
-          for(let i=0;i<resp["data"][k].length;i++){
-            resp["data"][k][i].time = API_.convert_time(resp["data"][k][i].time);
-            if(resp["data"][k][i].live){
-              const played_time = API_.convert_time_spent(resp["data"][k][i].date + " "+resp["data"][k][i].time) ;
-              resp["data"][k][i].time_played = played_time ? played_time : "";
-              if(played_time==false || played_time<-10){
-                resp["data"][k][i].live = 0;
-              }
-            }
-            let dayname = "";
-            try {
-              dayname = API_.days[API_.convert_time_o(resp["data"][k][i].date+" 00:00").getDay()]
-            } catch (error) {
-              
-            }
-            if(
-              this.state.matches_only_fav==true && 
-              !this.state.favorite.includes(resp["data"][k][i].home_team_id) && 
-              !this.state.favorite.includes(resp["data"][k][i].away_team_id)  ){
-              continue;
-            }
-            date_str = resp["data"][k][i].date;
-            if( maches[date_str] == undefined){
-              maches[date_str] = {title: date_str + " - " + dayname, data: [ resp["data"][k][i],] };
-            }else{
-              maches[date_str]["data"].push(resp["data"][k][i]);
-            }
-          }
-          maches = Object.values(maches);
-          maches = maches.sort((a,b)=> (a.title > b.title ? 1 : -1));
-          return maches;
-        });
-        this.setState({matches:data[0],loading:false,visible_tab:"matches"});
-        for(let i=0;i<data.length;i++){
-          
-        }
-      }
-    });
+      return this.get_matches_k();
   }
   get_matches_k = async()=>{
     this.setState({loading:true});
     let matches = {};
     const _notifications_matches = await get_notifications_matches();
-    let resp = await API_.get_matches_league_k(this.real_id);
+    let resp = await API_.get_matches_league_k(this.real_id, this.state.c_stage);
     let data = resp && resp.length>0 ? resp : [];
     let header = {};
     try {
@@ -191,8 +142,7 @@ class LeagueScreen extends React.Component {
   }
   
   onMatch_clicked =(item)=>{
-    console.log('Match', { match_item: item,id:item.id });
-    //this.props.navigation.navigate('Match', { match_item: item,id:item.id });
+
     this.props.navigation.push('Match', { match_item: item,id:item.id });
   }
   _onMatch_LongPressed=(item)=>{
@@ -201,12 +151,12 @@ class LeagueScreen extends React.Component {
     });
   }
   render_matches(){
-    return <ItemsList 
+    return <>{this.c_stages}<ItemsList 
           favorite_teams={this.state.favorite}
           loading={this.state.loading} list={this.state.matches} 
           onclick={this.onMatch_clicked}
           onLongPress={this._onMatch_LongPressed}
-          key_="home_team" key_key="id"  />;
+          key_="home_team" key_key="id"  /></>;
   }
   set_fav_p= async(player_name)=>{
     let favorite_p = await API_.getConfig("favorite_players",this.state.favorite_p);
@@ -399,10 +349,22 @@ class LeagueScreen extends React.Component {
     this.real_id = itemValue;
     this.league_id = itemValue ;
     this.state.page=1;
-    this.get_standing_k();
+    this.state.matches = undefined;
+    //this.get_standing_k();
+    this.props.navigation.push('League',
+      { 
+        id:this.real_id,
+        league_details: {league:this.league_name,league_img:this.league_img,id:this.real_id,koora_id:true} 
+    });
+  }
+  changesource_stage = (itemValue, itemIndex)=>{
+
+    this.setState({c_stage:itemValue, matches:[]})
+    this.get_matches_k();
   }
   render() {
-    const c_years_options = this.state.c_years.map(y=><Picker.Item label={y[1]} value={y[0]} key={y[0]} />);
+    const c_years_options = this.state.c_years.map(y=><Picker.Item label={y[1]} value={y[0]} key={`${y[0]}-${y[1]}`} />);
+    const c_stages_options = this.state.c_stages.map(y=><Picker.Item label={y[2]} value={y[0]} key={`${y[0]}-${y[1]}`} />);
     this.c_years = <Picker
     selectedValue={this.real_id}
     style={{ height:API_.isWeb ? 50 : 75,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
@@ -410,6 +372,14 @@ class LeagueScreen extends React.Component {
     onValueChange={this.changesource}
   >
     {c_years_options}
+</Picker> ;
+    this.c_stages = <Picker
+    selectedValue={this.state.c_stage}
+    style={{ height:API_.isWeb ? 50 : 75,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
+    itemStyle={{height:API_.isWeb ? 40 : 70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
+    onValueChange={this.changesource_stage}
+  >
+    {c_stages_options}
 </Picker> ;
     return (
       <ScrollView style={this.state.dynamic_style.container}>
@@ -425,7 +395,7 @@ class LeagueScreen extends React.Component {
         : null}
 
         <View style={this.state.dynamic_style.tabs_list}>
-          <View style={{flex:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing"})}/></View>
+          <View style={{flex:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing",matches_only_fav:false})}/></View>
           <View style={{flex:1}}><Button title="News" onPress={()=>{
               this.props.navigation.push('News', {news_id:"o=n"+this.league_id , title:this.league_name})
             }}/></View>
@@ -436,7 +406,7 @@ class LeagueScreen extends React.Component {
               const scorers = await API_.get_scorers(this.real_id);
               this.setState({scorers:scorers,loading : false, favorite_p:favorite_p})
             }
-            this.setState({visible_tab:"scorers"});}}/></View>
+            this.setState({visible_tab:"scorers",matches_only_fav:false});}}/></View>
           {/*<View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"}) }/></View> */}
           <View style={{flex:1}}><Button title="Matches" onPress={this.showMatchesTab}/></View>
           {/* <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/> */}

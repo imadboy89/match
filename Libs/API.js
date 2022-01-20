@@ -904,8 +904,8 @@ class API {
       return matches;//this.set_logos(matches);
     });
   }
-  get_matches_league_k(league_id){
-    let url = "https://www.kooora.com/?c="+league_id+"&cm=m&ajax=1&arabic";
+  get_matches_league_k(league_id, c_stage){
+    let url = "https://www.kooora.com/?c="+league_id+"&sch=true&ajax=1&arabic&stage="+c_stage;
     return this.http(url,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -1602,16 +1602,16 @@ class API {
       return head2head;
     }).catch(error=>API_.showMsg(error,"danger"));
   }
-  get_league_years(id){
+  get_league_options(id){
     return this.http("https://m.kooora.com/?c="+id+"&arabic","GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      let years = [];
+      let options = [];
       try {
-        years = scrap.get_league_years(resp);
+        options = scrap.get_league_options(resp);
       } catch (e) {}
-      return years
+      return options
     });
   }
   onShare = async (title,message,url) => {
