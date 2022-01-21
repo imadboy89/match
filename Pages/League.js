@@ -351,11 +351,16 @@ class LeagueScreen extends React.Component {
     this.state.page=1;
     this.state.matches = undefined;
     //this.get_standing_k();
-    this.props.navigation.push('League',
-      { 
-        id:this.real_id,
-        league_details: {league:this.league_name,league_img:this.league_img,id:this.real_id,koora_id:true} 
-    });
+    if(API_.isWeb){
+      this.props.navigation.push('League',
+        { 
+          id:this.real_id,
+          league_details: {league:this.league_name,league_img:this.league_img,id:this.real_id,koora_id:true} 
+      });
+    }else{
+      this.get_standing_k();
+      this.get_matches_k();
+    }
   }
   changesource_stage = (itemValue, itemIndex)=>{
 
