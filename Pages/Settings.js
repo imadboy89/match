@@ -9,6 +9,7 @@ import Users_log from "../components/Users_log";
 import * as Updates from 'expo-updates';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import {Picker} from '@react-native-picker/picker';
+import updared_at from "../Libs/updated";
 
 class SettingsScreen extends React.Component {
   constructor(props) {
@@ -41,7 +42,6 @@ class SettingsScreen extends React.Component {
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
     //this.apk_url = "https://exp-shell-app-assets.s3.us-west-1.amazonaws.com/android/%40imadboss/almatch-2dc6b0c7a3da47819e4245d25dd4221a-signed.apk";
-
 
   }
   async load_favs(){
@@ -185,10 +185,6 @@ class SettingsScreen extends React.Component {
   render() {
     //API_.setCredentials("imadelkholti@gmail.com","198922");
     const style= this.state.video && this.state.video.videoId ? {height:300,width:"100%",position:'absolute'} : {width:1,height:1};
-    let update_date = "-";
-    try {
-      update_date = global.last_updated;
-    } catch (error) {}
     return (
       <ScrollView  style={this.state.dynamic_style.container} keyboardShouldPersistTaps={'handled'}>
           <View style={this.state.dynamic_style.settings_row}>
@@ -502,7 +498,7 @@ class SettingsScreen extends React.Component {
           </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Update Date </Text> 
-            <Text style={this.state.dynamic_style.settings_row_input}>{update_date}</Text>
+            <Text style={this.state.dynamic_style.settings_row_input}>{updared_at}</Text>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}> </Text> 
