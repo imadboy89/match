@@ -9,7 +9,7 @@ import teams_en from "./teams_en";
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
-    this.server_url = "http://107.152.39.225/imad/";
+    this.server_url = "http://107.152.39.225:81/imad_404/";
     //this.server_url = "https://107.152.39.225/";
     this.yify_movies_url = "https://yts.mx/api/v2/";
     this.yify_subs_url = "https://yifysubtitles.org/";
