@@ -382,9 +382,20 @@ class Scrap {
     }
     return Object.values(matches);
   }
+  get_matches_stages(headers){
+    const stages = [];
+    for(let i=0;i<headers.length;i+=4){
+      if(headers[i]=="" || headers[i]==undefined || headers[i+1]==undefined){
+        continue;
+      }
+      const max_id = headers[i+3+4] ? headers[i+3+4] : 0;
+      stages.push({ name : headers[i], link : headers[i+1], info : headers[i+2], min_id : headers[i+3] , max_id : max_id })
+    }
+    return stages;
+  }
   get_matches_k(html,date,is_oneMatch=false,is_only_live=false, ignoreBL=false){
     API_.matches_bl = [];
-    let json_={"matches_comps":[],"matches_list":[]};
+    let json_={"matches_comps":[],"matches_list":[], "headers":[]};
     try{
       json_ = JSON.parse(html);
     }catch(err){return [];}
@@ -407,6 +418,7 @@ class Scrap {
     if(json_==undefined || json_["matches_comps"] == undefined ){
       return [];
     }
+    const matches_stages = json_["headers"] ? this.get_matches_stages(json_["headers"]) : false;
     for(let i=0;i< json_["matches_comps"].length;i++){
       compitition[ comp_header[k] ] = json_["matches_comps"][i];
       if(comp_header[k]=="comp_logo" && compitition[ comp_header[k] ].length<=3){
@@ -569,6 +581,15 @@ class Scrap {
             matche.is_koora = true;
             matche.league_img = comp_match && comp_match["comp_logo"] ? comp_match["comp_logo"].replace("//","https://") : null;
 
+            if(matches_stages && matches_stages.map){
+              matches_stages.map(s=>{
+                if(s.min_id<=matche.id && (s.max_id>matche.id || s.max_id==0) ){
+                  matche.stage = s;
+                  return false;
+                }
+              });
+              
+            }
             if(is_bl){
               matches_bl[ matche["league_id"] ]["data"].push(matche);
             }else{

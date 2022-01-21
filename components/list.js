@@ -102,6 +102,7 @@ class ItemsList extends React.Component {
       //API_.debugMsg(league_img);
       //"#ffffff87"
       let time_style={};
+      const game_nbr  ={color:"#8fa2ff", fontSize:12};
       try {
         time_style = JSON.parse(JSON.stringify(this.state.dynamic_style.matche_team_time_live));
       } catch (error) {}
@@ -115,6 +116,11 @@ class ItemsList extends React.Component {
       //console.log(API_.notifications_matches[item.id]);
       let style_extra = API_.notifications_matches && API_.notifications_matches[item.id]!=undefined ? this.state.dynamic_style.matche_container_notif : {};
       style_extra = item.live==1 ? this.state.dynamic_style.matche_container_live: style_extra;
+      const match_details = API_.parse_details(item.details);
+      let match_nbr = 0;
+      if(match_details && match_details.mn && match_details.mn.length>0 && match_details.mn[0].length>0){
+        match_nbr = match_details.mn[0][1];
+      }
       return (
         <View style={[this.state.dynamic_style.matche_container,style_extra,shadow_style]}>
           <View style={this.state.dynamic_style.matche_team_time}>
@@ -124,6 +130,9 @@ class ItemsList extends React.Component {
             : null}
             {item.live==1 ? 
               <Text style={time_style}  noFonts={true}>{time_played}</Text>
+            : null}
+            {match_nbr!==0 ? 
+              <Text style={game_nbr}  noFonts={true}>M {match_nbr}</Text>
             : null}
             
           </View>

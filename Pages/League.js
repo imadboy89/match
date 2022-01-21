@@ -85,7 +85,7 @@ class LeagueScreen extends React.Component {
     this.setState({league_details:resp,loading:false,favorite:favorite});
     API_.setTitleWeb(this.league_name);
     API_.get_league_options(this.real_id).then(opts=>{
-      let current_position = 1;
+      let current_position = 0;
       opts.stages.map(r => {
         if(r[1]=="p"){
           current_position = r[0];
@@ -113,6 +113,7 @@ class LeagueScreen extends React.Component {
       //let _data = data[0]["data"].map
       data = data && data.length>0 && data[0]["data"] ? data[0]["data"] : [];
       data = data.map(row =>{
+        const stage_name = row && row.stage && row.stage.name ? row.stage.name : false;
         const date_str = row.date;
         let dayname = "";
         try {
@@ -128,7 +129,10 @@ class LeagueScreen extends React.Component {
         }
         if(matches[date_str] == undefined){
           matches[date_str] = JSON.parse(JSON.stringify(header));
-          matches[date_str].title = date_str+" - "+dayname;
+          matches[date_str].title = date_str+" /"+dayname ;
+          if(stage_name){
+            matches[date_str].title += ` - [${stage_name}]`;
+          }
         }
         matches[date_str].data.push(row);
 

@@ -905,7 +905,8 @@ class API {
     });
   }
   get_matches_league_k(league_id, c_stage){
-    let url = "https://www.kooora.com/?c="+league_id+"&sch=true&ajax=1&arabic&stage="+c_stage;
+    let url = "https://www.kooora.com/?c="+league_id+"&sch=true&ajax=1&arabic&";
+    url += c_stage!=0 ? "stage="+c_stage : "cm=m";
     return this.http(url,"GET",null,{})
     .then(resp=>{
       let scrap = new Scrap();
@@ -1635,6 +1636,23 @@ class API {
       alert(error.message);
     }
   };
+
+  parse_details(details){
+    details = details.split("~");
+    let details_dict = {};
+    for (let i=0;i<details.length;i++){
+      let el = details[i] ? details[i].trim() : "";
+      el = el.split("|");
+      if(el.length==0){continue}
+  
+      if(details_dict[el[0]] ==undefined){
+        details_dict[el[0]] = [el,];
+      }else{
+        details_dict[el[0]].push(el);
+      }
+    }
+    return details_dict;
+  }
 }
 
 export default API;
