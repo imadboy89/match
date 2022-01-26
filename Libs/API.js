@@ -16,7 +16,7 @@ class API {
     this.PB_movies_url = "https://tpb.party/";
     this.MC_movies_url = "https://moviecrumbs.net/";
     this.PB_sections = {205:"TV shows",201:"Movies"}
-    this.yt_api_key = "AIzaSyDrnMtjXTTebaIg_FEACLCSolQ3ITyDN50";
+    this.yt_api_key = "AIzaSyC_Dnp88128mp5CZ_htFtSRpiNFBCMHaco";
     //https://tpb.party/search/peaky%20blinders/1/99/205
     this.showMsg = function(msg){console.log("showMsg : ",msg)}
 
