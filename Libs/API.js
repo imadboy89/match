@@ -16,6 +16,7 @@ class API {
     this.PB_movies_url = "https://tpb.party/";
     this.MC_movies_url = "https://moviecrumbs.net/";
     this.PB_sections = {205:"TV shows",201:"Movies"}
+    this.yt_api_key = "AIzaSyDrnMtjXTTebaIg_FEACLCSolQ3ITyDN50";
     //https://tpb.party/search/peaky%20blinders/1/99/205
     this.showMsg = function(msg){console.log("showMsg : ",msg)}
 
@@ -1233,8 +1234,8 @@ class API {
 
   get_channel_info(channel_id){
     channel_id = this.channels[channel_id] ;
-    
-    const url = 'https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0&id='+channel_id+'';
+    this.yt_api_key
+    const url = 'https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&key='+this.yt_api_key+'&id='+channel_id+'';
     return this.fetch(url, {
           method: 'GET',
           headers: this.headers2,
@@ -1247,7 +1248,7 @@ class API {
   get_channel_items(playlist_id){
       //pageToken
       const pagetoken = this.pageToken== undefined ? "" : "&pageToken="+this.pageToken;
-      const url = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=25&playlistId='+playlist_id+'&key=AIzaSyBAd3__pfFSDfSSDL64TJkgGrzmq84lhL0'+pagetoken;
+      const url = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&key='+this.yt_api_key+'&maxResults=25&playlistId='+playlist_id+''+pagetoken;
       return this.fetch(url, {
             method: 'GET',
             headers: this.headers2,
@@ -1538,6 +1539,7 @@ class API {
 
 
   get_players_ratings = async(team_h, team_a, date)=>{
+    "https://www.whoscored.com/matchesfeed/?d=20220124";//date
     const url_matches = "https://www.whoscored.com/matchesfeed/?d="+date.replace(/-/g,"");
     "https://sport360.whoscored.com/Matches/1560148/Live/";
     const resp = this.http(url_matches,"GET",null,null,false,false);
