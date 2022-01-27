@@ -153,20 +153,27 @@ class HomeScreen extends React.Component {
       });
 
     this.interval_refresh = setInterval(()=>{
-      this.setState({is_auth:backup.is_auth });
-      if(backup.is_auth){
-        backup.load_settings().then(o=>{
-          if(o){
-            this.refresh_leagues(this.state.list);
-          }
-        })
-      }
-      if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
-        this.get_matches(null,false);
-      }
+      _refresh_();
       }, 50000);
-
+      setTimeout(() => {
+        if(this.state.list==undefined || !this.state.list || !this.state.list.length || this.state.list.length==0){
+          _refresh_();
+        }
+      }, 2000);
       API_.load_channels__();
+  }
+  _refresh_(){
+    this.setState({is_auth:backup.is_auth });
+    if(backup.is_auth){
+      backup.load_settings().then(o=>{
+        if(o){
+          this.refresh_leagues(this.state.list);
+        }
+      })
+    }
+    if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
+      this.get_matches(null,false);
+    }
   }
   checkUpdAvailability(){
     if(API_.isWeb){return;}

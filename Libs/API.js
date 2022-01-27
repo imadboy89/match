@@ -161,6 +161,12 @@ class API {
     if (data!=null){
       configs["body"] = data;
     }
+    configs.headers = configs.headers==undefined ? {} : configs.headers ;
+    try {
+      configs.headers["almatch_session_id"] = backup.client.auth.activeUserAuthInfo.userId;
+    } catch (error) {}
+    
+    
     if(this.isWeb || use_proxy){
       url = method=="GET" ? this.proxy1+url : this.proxy+url; 
     }
