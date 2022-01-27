@@ -23,6 +23,7 @@ class CategoriesScreen extends React.Component {
     this.get_cats(1);
   }
   componentDidMount(){
+    API_.load_external_channels();
     this.props.navigation.setOptions({title: "Channels categroires",
         "headerRight":()=>(
               <IconButton 

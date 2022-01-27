@@ -32,6 +32,7 @@ class NewsScreen extends React.Component {
     });
   }
   componentDidMount(){
+    this.screen_focus_mng();
     this._isMounted=true;
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
     getTheme("styles_modal").then(theme=>this.setState({modal_dynamic_style:theme}));
@@ -42,6 +43,16 @@ class NewsScreen extends React.Component {
         this.setState({modal_events_content:data});
       }
     });
+  }
+  screen_focus_mng(){
+    this.is_focused = true;
+    this.subscribetions=[];
+    this.subscribetions.push(this.props.navigation.addListener('focus', () => {
+      this.is_focused = true;
+    }));
+    this.subscribetions.push(this.props.navigation.addListener('blur', () => {
+      this.is_focused = false;
+    }));
   }
   render_header=()=>{
     let title = this.resources[this.state.source_id] ? this.resources[this.state.source_id] : "News";
@@ -97,6 +108,7 @@ class NewsScreen extends React.Component {
     clearInterval(this.interval_refresh);
   }
 get_news =(loading=true,keep_list=false)=>{
+  if(this.is_focused==false){return;}
   let _source_id = parseInt( this.state.source_id );
   let _news_id   = this.news_id;
   if( isNaN(_source_id) ){

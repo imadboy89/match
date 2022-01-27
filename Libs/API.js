@@ -9,6 +9,8 @@ import teams_en from "./teams_en";
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
+    this.first_api_call_almtchapi = true;
+    this.running_calls = [];
     this.server_url = "http://107.152.39.225:81/imad_404/";
     //this.server_url = "https://107.152.39.225/";
     this.yify_movies_url = "https://yts.mx/api/v2/";
@@ -78,7 +80,7 @@ class API {
     this.token = "";
     this.is_auth = false;
     this.leagues_dict = {};
-    //this.set_token();
+    this.set_token(true);
     this.is_debug=false;
     this.messages_history = [];
     this.filtering = true;
@@ -145,7 +147,7 @@ class API {
       if(headers){
         //console.log(headers);
         for(let kk in headers){
-          headers[kk] = [headers[kk],];
+          headers[kk] = typeof headers[kk] == "string" ? [headers[kk],] : headers[kk];
         }
       }
       const args = {};
@@ -219,12 +221,14 @@ class API {
     });
   }
   async load_external_channels(source_id){
-    const url = "http://goal.kora-live.tv/channels.html";
+    //const url = "http://goal.kora-live.tv/channels.html";
+    const url = "https://can2021.aflam4you.tv/browse-kora_live-videos-1-date.html";
     const html = await  this.http(url,"GET", null,{});
     //console.log(html);
     let scrap = new Scrap();
     scrap.isWeb = this.isWeb;
     this.external_channels = scrap.get_ch_ext(html);
+    console.log(this.external_channels);
     try {
       await AsyncStorage.setItem('external_channels',JSON.stringify(this.external_channels) );
     } catch (error) {
@@ -233,13 +237,20 @@ class API {
     return true
   }
   get_iframe = async(url)=>{
+    console.log("get_iframe 1 :: ", url);
+    //https://can2021.aflam4you.tv/beinsports-max-5_5555.html
     const html = await  this.http(url,"GET", null,{});
     let scrap = new Scrap();
-    const iframe_url = scrap.get_iframe_url(html);
-
+    let iframe_url = scrap.get_iframe_url(html);
+    iframe_url = iframe_url[0]=="/" ? url.split("/").slice(0,3).join("/")+iframe_url : iframe_url;
+    try {
+      iframe_url = iframe_url[0]=="/" ? url.split("/").slice(0,3).join("/")+iframe_url : iframe_url;
+    } catch (error) {}
+    /*
     const html2 = await  this.http(iframe_url,"GET", null,{});
-    const final_url = scrap.get_iframe_url(html2,2);
-    return final_url;
+    iframe_url = scrap.get_iframe_url(html2,2);
+    */
+    return iframe_url;
   }
   get_cc_img(flag,small=false){
     return small ? this.cc_url_small.replace("[cc]",flag) : this.cc_url.replace("[cc]",flag) ; 
@@ -314,7 +325,21 @@ class API {
 
     return title;
   }
+  running_calls_remove(url){
+    this.running_calls = this.running_calls.filter(u=>url!=url);
+  }
+  running_calls_add(url){
+    this.running_calls.push(url);
+  }
+  running_calls_check(url){
+    if( this.running_calls.includes(url) ){
+      return false;
+    }
+    this.running_calls_add(url);
+    return true;
+  }
   get_news(page, source_id=1,news_id=""){
+
     this.scrap = new Scrap();
     const news_links = {
       1:"https://m.kooora.com/?n=0&o=ncma&arabic&pg="+page,
@@ -327,9 +352,11 @@ class API {
       };
     let url = news_links[source_id] ? news_links[source_id] : news_links[1];
     url = news_id ? `https://m.kooora.com/?n=0&${news_id}&arabic&pg=${page}` : url;
+    if(!this.running_calls_check(url)){return [];}
     return this.http(url,"GET",null,{})
     .then(resp=>{
       if(resp==undefined || !resp){
+        this.running_calls_remove(url);
         return [];
       }
       let scrap = new Scrap();
@@ -345,6 +372,7 @@ class API {
           return true;
         });
       }
+      this.running_calls_remove(url);
       return list;
     });
   }
@@ -364,7 +392,9 @@ class API {
   }
   
   async get_leagues_k(region_id){
-    return this.http("https://m.kooora.com/?y="+region_id+"&arabic","GET",null,{})
+    const url = "https://m.kooora.com/?y="+region_id+"&arabic";
+    if(!this.running_calls_check(url)){return [];}
+    return this.http(url,"GET",null,{})
     .then(async resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
@@ -377,8 +407,12 @@ class API {
       for(let i =0;i<leagues.length;i++){
         leagues[i].img = leagues[i] && leagues[i].koora_id && leagues[i].koora_id>0 && this.leagues_dict[leagues[i].koora_id] ? this.domain_+this.leagues_dict[leagues[i].koora_id].logo : "";
       }
+      this.running_calls_remove(url);
       return leagues;
-    }).catch(error=>API_.showMsg(error,"danger"));
+    }).catch(error=>{
+      API_.showMsg(error,"danger");
+      this.running_calls_remove(url);
+    });
   }
   get_player(player_id){
     return this.http("https://m.kooora.com/?player="+player_id+"&arabic","GET",null,{})
@@ -399,7 +433,6 @@ class API {
         out = JSON.parse(resp);
       } catch (error) {/*API_.debugMsg("get_video_k: Cannot parse JSON! "+resp,"warning")*/}
 
-      //return {"Category":"بلا تعليق","CatId":212213,"Embed":"//player.octivid.com/v1/video?id=27970994&user_id=167&countries=Q0M=&w=100%25&h=100%25&filter=DENY&signature=8e3de25e0f4a4f940927b0bc19ae07b2","Id":27970994,"Image":"https://ktv.kooora.ws/images/167/thumb_1621843431.jpg","PublishDate":"2021-05-24","Subcategory":"Blank","SubId":212214,"Tags":"","Title":"جوارديولا يودع أجويرو بالدموع.. شاهد كيف وصفه!","VideoTime":"1:1"};
       return out;
     }).catch(error=>API_.showMsg(error,"danger"));
   }
@@ -608,7 +641,7 @@ class API {
     });
 
   }
-  async set_token_2(url){
+  async set_token_2_(url){
     const args = {}
     args.url=url;
     args.is_post=true;
@@ -619,8 +652,8 @@ class API {
     exports(args);
     
   }
-  async set_token(){  
-    if(this.headers["device-token"]==""){
+  async set_token(foreced=false){  
+    if(this.headers["device-token"]=="" && foreced==false){
       let out = await this.getConfig("token");
       if(out!=null && out!=false  ||this.token_tries==0){
         this.token=out;
@@ -873,6 +906,7 @@ class API {
     }else if(source_id==2){
       url = "https://table.super-kora.tv/";
     }
+    if(!this.running_calls_check(url)){return [];}
     return this.http(url,"GET",null,null)
     .then(resp=>{
       let scrap = new Scrap();
@@ -908,6 +942,7 @@ class API {
         /////////////////////////////////////////////////////////////////////////////
 
       } catch (e) { console.log(e);}
+      this.running_calls_remove(url);
       return matches;//this.set_logos(matches);
     });
   }
@@ -1269,8 +1304,11 @@ class API {
       });
   }
   get_yt_vids(channel_id){
+    const ch_key = `yt_chn_${channel_id}` ;
+    if(!this.running_calls_check(ch_key)){return [];}
     return this.get_channel_info(channel_id).then(o=>{
       let playlist_id = "";
+      this.running_calls_remove(ch_key);
       if(!o || Object.keys(o).length==0){
         return [];
       }

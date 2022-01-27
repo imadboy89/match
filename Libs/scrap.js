@@ -876,14 +876,13 @@ class Scrap {
       const as_ = as[i];
       const ch = {"img":"","name":"", "url":"","id":"","is_external":true,"category_name":"","category_photo":"","category_id":""};
       ch.url = as_.getAttribute("href");
-      ch.name = as_.getElementsByClassName("g_t_inf_schdiv");
-      ch.name = ch.name && ch.name[0] ? ch.name[0].childNodes+"" : "";
-      ch.name = ch.name.trim()
-      ch.codename = ch.name.toLocaleLowerCase().replace(/\s/gi,"").replace(/hd/g,"").replace("beinsports","beinsport");
-      if (ch.name==""){continue;}
-      ch.img = as_.querySelect("img")[0].getAttribute("src")+"";
+      const name = as_.getAttribute("title");
+      //ch.name = ch.name && ch.name[0] ? ch.name[0].childNodes+"" : "";
+      ch.name = name && name.split ? name.split("-")[0].trim() : name;
+      ch.codename = name && name.split && name.split("-")[1] ? name.split("-")[1].trim() : ch.name;
+      if (ch.name=="" || as_.querySelect("img").length==0 || !as_.querySelect("img")[0].getAttribute ){continue;}
+      ch.img = as_.querySelect("img")[0].getAttribute("data-echo")+"";
       ch.id=ch.url;
-
       ch.category_name = ch.name;
       ch.category_photo = ch.img;
       ch.category_id = ch.id;
@@ -892,22 +891,19 @@ class Scrap {
     }
     return chs;
   }
+  get_regex_iframe(html){
+    
+    const patttern  = new RegExp(`iframe\\s*src\\s*=\\s*['\\"]([^\\"']*)['\\"]`,"gmi");
+    let m = html.match(patttern);
+    let iframe = m && m.length>0 ? m[0].replace(/[\'\"]/g,"") : "";
+    iframe = iframe.replace(/^iframe\s*src\s*=\s*[\'\"]?/g,"").trim();
+
+    return iframe;
+  }
   get_iframe_url(html){
     if(html==""){return []}
-    let doc = null;
-    try {
-      doc = new DomParser().parseFromString(html,'text/html');
-    } catch (error) {}
-    if(doc == null){return []}
-    let iframes = doc.querySelect('iframe');
-
-    for (let i=0;i<iframes.length;i++){
-      const iframe_url = iframes[i].getAttribute("src") ;
-      if(iframe_url && iframe_url.match(/kora-live/i)){
-        return iframe_url;
-      }
-    }
-    return false;
+    const iframe = this.get_regex_iframe(html);
+    return iframe;
   }
 
   get_news_hp(html){

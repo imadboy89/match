@@ -117,6 +117,7 @@ class HomeScreen extends React.Component {
       },50000);
   }
   componentDidMount=async()=>{
+    this.screen_focus_mng();
     if(API_.isWeb){
       API_.next = this.nextPage;
       API_.setDate = this.onChange;
@@ -330,8 +331,18 @@ class HomeScreen extends React.Component {
         )
       });
   }
+  screen_focus_mng(){
+    this.is_focused = true;
+    this.subscribetions=[];
+    this.subscribetions.push(this.props.navigation.addListener('focus', () => {
+      this.is_focused = true;
+    }));
+    this.subscribetions.push(this.props.navigation.addListener('blur', () => {
+      this.is_focused = false;
+    }));
+  }
   get_matches = (date_obj=null,setloading=true,next=false)=>{
-    //if(API_.is_auth==false){return false;}
+    if(this.is_focused==false){return;}
     if(this.state.loading==false && setloading){this.setState({loading:true});}
     if(this.state.source_id!=0){
       return this.get_matches_koora(date_obj,next);
