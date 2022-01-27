@@ -62,6 +62,7 @@ class HomeScreen extends React.Component {
     }
     this._isMounted = false;
     clearInterval(this.interval_refresh);
+    clearInterval(this.interval_refresh_if_issue);
     if(backup.timer){
       clearInterval(backup.timer);
     }
@@ -153,14 +154,17 @@ class HomeScreen extends React.Component {
       });
 
     this.interval_refresh = setInterval(()=>{
-      _refresh_();
-      }, 50000);
-      setTimeout(() => {
-        if(this.state.list==undefined || !this.state.list || !this.state.list.length || this.state.list.length==0){
-          _refresh_();
-        }
-      }, 2000);
-      API_.load_channels__();
+      this._refresh_();
+    }, 50000);
+
+    this.interval_refresh_if_issue = setInterval(()=>{
+      if(this.state.list==undefined || !this.state.list || !this.state.list.length || this.state.list.length==0){
+        this._refresh_();
+      }else{
+        clearInterval(this.interval_refresh_if_issue);
+      }
+    }, 2000);
+    API_.load_channels__();
   }
   _refresh_(){
     this.setState({is_auth:backup.is_auth });
