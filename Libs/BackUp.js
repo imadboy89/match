@@ -738,7 +738,7 @@ class BackUp{
     }
     proxy = async(args)=>{
       let results = "";
-      args.use_proxy_utf = args.use_proxy_utf ? args.use_proxy_utf : true;        
+      args.use_proxy_utf = args.use_proxy_utf!=undefined ? args.use_proxy_utf : true;        
       for (let i = 0; i < 10; i++) {
         try {
           if( !this.client ||  !this.client.callFunction || !this.is_settings_loaded){

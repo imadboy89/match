@@ -17,6 +17,59 @@
       content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1.00001, viewport-fit=cover"
     />
     <title>%WEB_TITLE%</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+      var video_hls_ref = null;
+      var hls = null;
+      function calculate_dems(){
+        const dims = {width:100,height:100};
+        try {
+          const parentDom = getComputedStyle( video_hls_ref.parentElement ) ;
+          let width = parentDom.width;
+          let height = parentDom.height;
+          dims.width = parseInt(width.split(".")[0].replace("px",""));
+          dims.height = parseInt(height.split(".")[0].replace("px",""));
+          
+        } catch (error) {}
+        video_hls_ref.width = dims.width;
+        video_hls_ref.height = dims.height-50;
+        return dims;
+      }
+      function initialize_hls(element_id){
+        video_hls_ref = document.getElementById(element_id);
+        const videoSrc = video_hls_ref.getAttribute("videosrc");
+        const configs = {maxBufferSize: 120*1000*1000};
+        const w_h = calculate_dems();
+        if (Hls.isSupported()) {
+            hls = new Hls(configs);
+            hls.loadSource(videoSrc);
+            hls.attachMedia(video_hls_ref);
+            hls.on(Hls.Events.ERROR, function (event, data) {
+              if (data.fatal) {
+                switch (data.type) {
+                  case Hls.ErrorTypes.NETWORK_ERROR:
+                    // try to recover network error
+                    API_.showMsg('cannot play video [network]',"warning");
+                    hls.startLoad();
+                    break;
+                  case Hls.ErrorTypes.MEDIA_ERROR:
+                  API_.showMsg('cannot play video [Media]',"warning");
+                    hls.recoverMediaError();
+                    break;
+                  default:
+                    // cannot recover
+                    API_.showMsg('cannot play video [crashed]',"error");
+                    hls.destroy();
+                    break;
+                }
+              }
+            });
+          video_hls_ref.play();
+        }
+      }
+
+    </script>
     <style>
       /**
        * Extend the react-native-web reset:

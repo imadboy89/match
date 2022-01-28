@@ -20,10 +20,13 @@ class VideoScreen extends React.Component {
         videoQuality:"380",
         modalVisible_hlsp : false,
         player_type : 1,
+        history_urls : [],
         
     };
+
     this.is_external_loaded = false;
     this.js_setIframeWidth = "(function() { const iframes = document.getElementsByTagName('iframe');for(let i = 0; i<iframes.length;i++ )iframes[0].width = '100%';})();";
+    this.whitelisted_redirection = ["wigistream.to",];
   }
   componentDidMount(){
     this.state.video = this.state.video && this.state.video != "-" ? this.state.video : {};
@@ -136,9 +139,15 @@ class VideoScreen extends React.Component {
       }, 100);
     }
     if (API_.isWeb) {
-      return <iframe src={uri_} style={{flex:1,backgroundColor: "#353b48",borderWidth:0,height:"100%",width:"100%"}} seamless/>;
+      return <iframe 
+        src={uri_}
+        style={{flex:1,backgroundColor: "#353b48",borderWidth:0,height:"100%",width:"100%"}} 
+        seamless 
+         />;
     }
     const source = html ? {html:html} : {uri:uri_};
+    const uri_standard = uri_.replace("/m.","/").replace("/www.","/");
+    const uri_origin_domain  = uri_standard.split("/")[2].trim() ;
     return  <WebView 
               allowsFullscreenVideo={true}
               style={{flex:1,backgroundColor: "#353b48"}}
@@ -146,11 +155,15 @@ class VideoScreen extends React.Component {
               domStorageEnabled={true}
               ref={(ref) => (this.webview = ref)}
               onShouldStartLoadWithRequest={(request) => {
-                this.webview.injectJavaScript(this.js_setIframeWidth);
-                if(request.url.replace("/m.","/").replace("/www.","/") != uri_.replace("/m.","/").replace("/www.","/")){
-                  console.log("stopLoading");
+                const request_url_domain = request.url.replace("/m.","/").replace("/www.","/").split("/")[2].trim() ;
+                //this.webview.injectJavaScript(this.js_setIframeWidth);
+                //alert("loading : "+request.url);
+                if(request_url_domain != uri_origin_domain && !this.whitelisted_redirection.includes(request_url_domain) ){
+                  //alert("stopLoading : -"+ request_url_domain +"-"+ uri_origin_domain+"-");
                   return false;
                 }
+                this.state.history_urls.push(request.url);
+                this.setState({});
                 return true;
               }}
               source={ source }
@@ -175,26 +188,12 @@ class VideoScreen extends React.Component {
           <Text style={this.state.dynamic_style.article_date_t}>{this.state.video && this.state.video.date ? this.state.video.date :""}</Text> 
           <Text style={this.state.dynamic_style.article_title_t}>{this.state.video && this.state.video.title_news ? this.state.video.title_news : ""}</Text>
           
-          
+          {this.state.history_urls.map(t=><Text style={this.state.dynamic_style.article_title_t}>{t}</Text>)}
         </View>
         <Text style={this.state.dynamic_style.article_body_t}>{this.state.video&&this.state.video.desc?this.state.video.desc :""}</Text>
         { this.state.video && (this.state.video.videoId || this.state.video.url || this.is_external_loaded) 
         ? null : <Loader/> }
-        <Picker
-          selectedValue={this.state.videoQuality}
-          style={{ height:"90%",flex:1,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-          itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
-          onValueChange={(itemValue, itemIndex)=>{
-            this.setState({videoQuality : itemValue});
-          }}
-        >
-          <Picker.Item label={"144"} value={"144p"} key={"144"} />
-          <Picker.Item label={"240"} value={"240p"} key={"240"} />
-          <Picker.Item label={"360"} value={"360p"} key={"360"} />
-          <Picker.Item label={"480"} value={"480p"} key={"480"} />
-          <Picker.Item label={"720"} value={"hd720&hd=1"} key={"720"} />
-          <Picker.Item label={"1080"} value={"hd1080&hd=1"} key={"1080"} />
-        </Picker>
+
         {this.render_modal_HLSP()}
 
         </View>

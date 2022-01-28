@@ -4,7 +4,36 @@ import ReactHlsPlayer from "react-hls-player";
 import {Video} from 'expo-av';
 import {getTheme} from "../components/Themes";
 
-
+export class HLSPlayer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.tries = 10;
+  }
+  componentDidMount(){
+    console.log("componentDidMount hls_video loaded ");
+    this.init();
+  }
+  componentWillUnmount(){
+    hls.destroy();
+  }
+  init(){
+    this.tries -=1 ;
+    if(this.tries==0){
+      return;
+    }
+    setTimeout(() => {
+      if(document.getElementById(this.props.dom_id) != null){
+        initialize_hls(this.props.dom_id);
+      }else{
+        init();
+      }
+    }, 300);;
+  }
+  render(){
+    console.log("render hls_video loaded ");
+    return <video id={this.props.dom_id} controls videosrc={this.props.url} ></video>;
+  }
+}
 class HLSP extends React.Component {
     constructor(props) {
       super(props);
@@ -19,21 +48,16 @@ class HLSP extends React.Component {
       getTheme("styles_settings").then(theme=>this.setState({dynamic_style:theme}) );
     }
     render_ReactHlsPlayer(){
-      console.log(this.props.p_url);
+      const url = this.props.p_url;
+      const hls_configs = {};
+      hls_configs.maxBufferSize = 0.1*1000*1000;
+      console.log(url , this.playerRef);
+      //hlsConfig={{maxBufferSize: 120*1000*1000}}
       if (this.state.player_type == 1){
-        return ( <ReactHlsPlayer
-                  url={this.props.p_url}
-                  autoPlay={true}
-                  controls={true}
-                  width="100%" 
-                  height="auto" 
-                  onError={e => console.log("errr",e)}
-                  playerRef={this.playerRef}
-                  
-              />);
+        return <HLSPlayer dom_id={"hls_video"} url={url}/>;
       }else{
         return (<Video 
-                  source={{uri: this.props.p_url}}   
+                  source={{uri: url}}   
                   ref={(ref) => {
                     this.player = ref
                   }} />

@@ -57,7 +57,7 @@ class API {
       this.domain = this.proxy+this.domain;
       this.method = "GET";
     }*/
-    this.headers = {"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8","device-token":""};
+    this.headers = {"Content-Type":"application/x-www-form-urlencoded","device-token":""};
     this.user_agents = {
       "Windows 10":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Safari/537.36",
       "Windows 7":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Safari/537.36",
@@ -75,12 +75,11 @@ class API {
       'User-Agent': default_ua
     }
 
-    this.token_tries = 2;
+    this.token_tries = 3;
     this.token_post = {"token":"","app_id":2} ;
     this.token = "";
     this.is_auth = false;
     this.leagues_dict = {};
-    this.set_token(true);
     this.is_debug=false;
     this.messages_history = [];
     this.filtering = true;
@@ -154,10 +153,12 @@ class API {
       args.url = url;
       args.body = data;
       args.is_post = method == "POST";
+      
       args.use_proxy_utf = use_proxy_utf ? true : false;
       args.headers = headers ? headers : {};
       args.is_json=is_json;
-      args.use_proxy_utf = true;
+      //args.use_proxy_utf = true;
+      console.log(url, args.use_proxy_utf , use_proxy_utf);
       return backup.proxy(args);
     }
     if (data!=null){
@@ -200,7 +201,13 @@ class API {
 
       }) 
       .catch(error => {
-        API_.showMsg((error.message ? error.message : error)+"","warning");
+        if(url.includes("device_app")){
+          return "";
+        }
+        let error_msg = "API->http : "+(error.message ? error.message : error);
+        error_msg += "\nUrl : "+url;
+        error_msg += "\nOptions : "+JSON.stringify(configs);
+        API_.showMsg(error_msg,"warning");
         console.log('ERROR', error);
         this.error = error;
         return "";
@@ -223,12 +230,11 @@ class API {
   async load_external_channels(source_id){
     //const url = "http://goal.kora-live.tv/channels.html";
     const url = "https://can2021.aflam4you.tv/browse-kora_live-videos-1-date.html";
-    const html = await  this.http(url,"GET", null,{});
+    const html = await  this.http(url,"GET", null,{},false,false,false);
     //console.log(html);
     let scrap = new Scrap();
     scrap.isWeb = this.isWeb;
     this.external_channels = scrap.get_ch_ext(html);
-    console.log(this.external_channels);
     try {
       await AsyncStorage.setItem('external_channels',JSON.stringify(this.external_channels) );
     } catch (error) {
@@ -239,7 +245,7 @@ class API {
   get_iframe = async(url)=>{
     console.log("get_iframe 1 :: ", url);
     //https://can2021.aflam4you.tv/beinsports-max-5_5555.html
-    const html = await  this.http(url,"GET", null,{});
+    const html = await  this.http(url,"GET", null,{},false,false,false);
     let scrap = new Scrap();
     let iframe_url = scrap.get_iframe_url(html);
     iframe_url = iframe_url[0]=="/" ? url.split("/").slice(0,3).join("/")+iframe_url : iframe_url;
@@ -247,7 +253,7 @@ class API {
       iframe_url = iframe_url[0]=="/" ? url.split("/").slice(0,3).join("/")+iframe_url : iframe_url;
     } catch (error) {}
     /*
-    const html2 = await  this.http(iframe_url,"GET", null,{});
+    const html2 = await  this.http(iframe_url,"GET", null,{},false,false,false);
     iframe_url = scrap.get_iframe_url(html2,2);
     */
     return iframe_url;
@@ -663,7 +669,7 @@ class API {
     }
     this.token = (Math.random().toString(36).substring(2)+Math.random().toString(36).substring(2) ).slice(0,20) ;
     //notifyMessage("new");
-    const url = this.domain+"device_app";
+    let url = this.domain+"device_app";
     this.token_post["token"] = this.token;
     //alert(JSON.stringify(url,this.token_post) + JSON.stringify(this.headers)); 
     await this.sleep(500);
@@ -672,39 +678,18 @@ class API {
       headers: this.headers,
       body:"token="+this.token+"&app_id=2"
       };
+    url = url+"?"+configs.body;
     this.token_tries-=1;
-    return this.http(url+"?"+configs.body, "POST", {}, this.headers, true).then(resJson=>{
+    if(!this.running_calls_check(url)){return [];}
+    return this.http(url, "POST", {}, this.headers, true,false,false).then(resJson=>{
+      this.running_calls_remove(url);
+      console.log(" token_tries -= 1", resJson);
       if(resJson && resJson["status"]== "true" && resJson["message"]){
         this.headers["device-token"]=this.token;
         this.setConfig("token",this.token);
-        //alert(resJson["message"]);
+        API_.showMsg(error);
       }
     });
-    return this.fetch(url)
-      .then(response => {
-        let out = "";
-        if(response && response.json){
-          out = response.json();
-        }else if(response && response.text){
-          out = response.text();
-        }
-        return out;
-      }) 
-      .then(resJson => {
-        if(resJson["status"]== "true" && resJson["message"]){
-          this.headers["device-token"]=this.token;
-          this.setConfig("token",this.token);
-          //alert(resJson["message"]);
-        }
-      })
-      .catch(error => {
-        console.log('ERROR', error);
-        this.error = error;
-        let error_msg = "API->http : "+(error.message ? error.message : error);
-        error_msg += "\nUrl : "+url;
-        error_msg += "\nOptions : "+JSON.stringify(configs);
-        API_.showMsg(error_msg,"warning");
-      });
   }
   get_date(date__=null){
     const d = date__==null ? new Date() : date__;
@@ -874,12 +859,9 @@ class API {
   }
   get_leagues(page){
       const url = this.domain+"leagues?page="+page;
-      return this.fetch(url, {
-        method: 'GET',
-        headers: this.headers,
-      })
-      .then(response => response.json())
-      .then(o => {
+
+      return this.http(url, "GET", {}, this.headers, true)
+      .then(o=>{
         if(o && o["data"] && o["data"].length>0){
           for(let i=0;i<o["data"].length;i++){
             let league_name = o["data"][i]["ar_league_name"] ? o["data"][i]["ar_league_name"] : o["data"][i]["league"] ;
@@ -893,9 +875,9 @@ class API {
       .catch(error => {
         this.setConfig("token","");
         this.headers["device-token"]="";
-        console.log('ERROR', error);
-        this.error = error;
+        API_.showMsg(error);
       });
+
   }
   get_matches_k(date_obj, is_only_live, source_id=1,next=false){
     let url = "";
@@ -1069,43 +1051,37 @@ class API {
     this.matches = page==1 ? {} : this.matches;
     const url = this.domain+"get_matches?page="+page;
     date_obj = date_obj ? date_obj : new Date();
-    let data = "match_date="+this.get_date(date_obj);
-    return this.fetch(url, {
-      method: 'POST',
-      headers: this.headers,
-      body:data
+    //let data = "match_date="+this.get_date(date_obj);
+    let data = {match_date:this.get_date(date_obj) };
+    const custom_headers = {};
+    custom_headers["device-token"] = this.headers["device-token"];
+    custom_headers["User-Agent"] = this.headers["User-Agent"];
+
+    return this.http(url, "POST", data, custom_headers, true, false, false)
+    .then(resJson=>{
+      if(resJson["status"]== "true" ){//console.log(resJson["data"]);
+        const matches = Object.keys(resJson["data"]);
+        for(let i=0;i<matches.length;i++){      
+          if(this.matches[matches[i]] == undefined){
+            this.matches[matches[i]] = resJson["data"][matches[i]];
+          }else{
+            this.matches[matches[i]] = this.matches[matches[i]].concat(resJson["data"][matches[i]]);
+          }
+        }
+        if(Object.keys(resJson["data"]).length>0){
+          this.get_logos();
+        }
+        return Object.keys(resJson["data"]).length>0 ? this.get_matches(date_obj, page+1) : this.matches;
+      }
+      return resJson;
     })
-      .then(response =>{
-        if(response["ok"]){
-          return response.json()
-        }
-        notifyMessage("There is something wrong with this request\nstatus code:"+response.status+"\nurl: "+response.url+"\ntoken :"+this.headers["device-token"]);
-        return {};
-      })
-      .then(resJson => {
-        if(resJson["status"]== "true" ){//console.log(resJson["data"]);
-          const matches = Object.keys(resJson["data"]);
-          for(let i=0;i<matches.length;i++){      
-            if(this.matches[matches[i]] == undefined){
-              this.matches[matches[i]] = resJson["data"][matches[i]];
-            }else{
-              this.matches[matches[i]] = this.matches[matches[i]].concat(resJson["data"][matches[i]]);
-            }
-          }
-          if(Object.keys(resJson["data"]).length>0){
-            this.get_logos();
-          }
-          return Object.keys(resJson["data"]).length>0 ? this.get_matches(date_obj, page+1) : this.matches;
-        }
-        return resJson;
-      })
-      .catch(error => {
-        console.log("api_ error",error , url);
-        this.setConfig("token","");
-        this.headers["device-token"]="";
-        const is_err = this.error ? true : false;
-        this.error = error;
-      });
+    .catch(error => {
+      console.log("api_ error",error , url);
+      this.setConfig("token","");
+      this.headers["device-token"]="";
+      API_.showMsg(error);
+    });
+
   }
   get_match(match_id){
     if(this.token_tries<=0){return new Promise((resolve, reject)=>{return resolve([])});}
@@ -1138,19 +1114,19 @@ class API {
       return this.set_token().then(()=> { return this.get_channel(id)});
     }
     const url = this.domain+"get_channel";
-    return this.fetch(url, {
-      method: 'POST',
-      headers: this.headers,
-      body:"channel_id="+id
-    })
-      .then(response => response.json())
+    const body= {channel_id: ""+id,};//"category_id="+cat+"&page="+page;
+    const custom_headers = {};
+    custom_headers["device-token"] = this.headers["device-token"];
+    custom_headers["User-Agent"] = this.headers["User-Agent"];
+    return this.http(url, "POST", body, custom_headers, true, false, false)
       .then(resJson => {
+        if(resJson && resJson["data"] && resJson["data"].length>0 ){
+        }
         return resJson;
       })
       .catch(error => {
-        API_.showMsg(error,"danger");
         console.log('ERROR', error);
-        this.error = error;
+        API_.showMsg(error);
       });
   }
   get_channels(cat,page=1){
@@ -1159,20 +1135,21 @@ class API {
       return this.set_token().then(()=> { return this.get_channels(cat,page)});
     }
     const url = this.domain+"get_channels";
-    let data = "match_date=05-11-2020";//{"match_date":"05-11-2020"};
-    return this.fetch(url, {
-      method: 'POST',
-      headers: this.headers,
-      body:"category_id="+cat+"&page="+page
-    })
-      .then(response => response.json())
+    const body= {category_id: ""+cat, page:""+page};//"category_id="+cat+"&page="+page;
+    const custom_headers = {};
+    custom_headers["device-token"] = this.headers["device-token"];
+    custom_headers["User-Agent"] = this.headers["User-Agent"];
+    return this.http(url, "POST", body, custom_headers, true, false, false)
       .then(resJson => {
+        if(resJson && resJson["data"] && resJson["data"].length>0 ){
+        }
         return resJson;
       })
       .catch(error => {
         console.log('ERROR', error);
-        this.error = error;
+        API_.showMsg(error);
       });
+
   }
   fix_channel_name(name){
     name = name.replace(/\s/g,"").toLocaleLowerCase().trim() ;
@@ -1222,7 +1199,7 @@ class API {
     }
     const url = this.domain+"get_categories?page="+page;
     //http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true, use_proxy_utf=true)
-    return this.http(url, "GET", null, this.headers, true)
+    return this.http(url, "GET", null, this.headers, true, false, false)
       .then(resJson => {
         if(resJson && resJson["data"] && resJson["data"].length>0 ){
         }
@@ -1230,7 +1207,7 @@ class API {
       })
       .catch(error => {
         console.log('ERROR', error);
-        this.error = error;
+        API_.showMsg(error);
       });
   }
 

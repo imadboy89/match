@@ -139,7 +139,7 @@ class HomeScreen extends React.Component {
     }
 
     this.get_matches(this.state.matches_date);
-    this.checkUpdAvailability();
+    this.checkUpdAvailability(true);
     //handle notification
     Notifications.addNotificationReceivedListener(this._handleNotification);
     Notifications.addNotificationResponseReceivedListener(this._handleNotificationResponse);
@@ -182,7 +182,7 @@ class HomeScreen extends React.Component {
       this.get_matches(null,setLoading);
     }
   }
-  checkUpdAvailability(){
+  checkUpdAvailability(force_update=false){
     if(API_.isWeb){return;}
     this.state.is_upd_available=-1
     this.render_header();
@@ -190,6 +190,13 @@ class HomeScreen extends React.Component {
     this.customUpdater.isAppUpdateAvailable().then(isAv=>{
       this.state.is_upd_available=isAv;
       this.render_header();
+      if(force_update && this.state.is_upd_available){
+        try {
+          this.customUpdater.doUpdateApp();
+        } catch (error) {
+          API_.showMsg(error);
+        }
+      }
     });
   }
   refresh_list=()=>{
@@ -351,7 +358,7 @@ class HomeScreen extends React.Component {
 
     API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
       get_notifications_matches().then(_notifications_matches=>{
-        API_.load_leagues().then(leagues_dict=>{
+        API_.getLeagues().then(leagues_dict=>{
           API_.get_matches(date_obj,this.state.page).then(resp=>{
             const matches_list = resp ? resp : {};
             let data = [];

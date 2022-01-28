@@ -35,7 +35,6 @@ class ChannelScreen extends React.Component {
       this.channel_photo = this.props.route.params.channel_photo;
       const ch_item = this.props.route.params.ch_item;
       if(ch_item){
-        console.log(ch_item);
         setTimeout(()=>{this.setState({channel:ch_item,loading:false});},300);
         return ;
       }
@@ -83,12 +82,10 @@ class ChannelScreen extends React.Component {
     }
   }
   render() {
-    console.log(this.state.channel?this.state.channel.channel_servers:null);
     const ch_name_ = this.state.channel && this.state.channel.en_name ? this.state.channel.en_name.toLocaleLowerCase().trim().replace(/\s/g,"").replace(/hd/g,"") : "";
     const ext_ch = API_.external_channels && API_.external_channels[ch_name_] ? API_.external_channels[ch_name_] : null;
 
     const _channel_servers = this.state.channel && this.state.channel.channel_servers && this.state.channel.channel_servers.map ?this.state.channel.channel_servers:[];
-    console.log(_channel_servers);
     if(ext_ch){_channel_servers.push(ext_ch);}
     let servers_list = _channel_servers.map(serv => serv && serv.name ? (
         <View style={{margin:8}} key={serv.id}>
