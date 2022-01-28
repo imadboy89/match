@@ -2,9 +2,9 @@ import * as React from 'react';
 import { Text, View, StyleSheet, Modal, Button, Linking } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
-import ReactHlsPlayer from "react-hls-player";
+import HLSP from "../components/HSL_player";
+
 import { Video } from 'expo-av';
-import { useRoute } from '@react-navigation/native';
 
 let list = [
 
@@ -53,13 +53,14 @@ class ChannelsScreen extends React.Component {
   }
   render_ReactHlsPlayer(){
     if (this.state.player_type == 1){
-      return ( <ReactHlsPlayer
-                url={this.state.url}
-                autoplay={true}
-                controls={true}
-                width="100%" 
-                height="auto" 
-            />);
+      return ( 
+        <HLSP 
+        modalVisible_hlsp={this.state.modalVisible_hlsp}
+        dynamic_style={this.state.dynamic_style_modals}
+        p_url={this.state.url}
+        player_type={this.state.player_type}
+        closeM={()=>{this.setState({modalVisible_hlsp:false, ignore : true})}}
+      />);
     }else{
       return (<Video 
                 source={{uri: "https://stream.mux.com/your-playback-id.m3u8"}}   

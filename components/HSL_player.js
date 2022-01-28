@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Modal, Button, Dimensions } from 'react-native';
-import ReactHlsPlayer from "react-hls-player";
 import {Video} from 'expo-av';
 import {getTheme} from "../components/Themes";
 
