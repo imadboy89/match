@@ -823,6 +823,7 @@ function generateTheme(theme_name=false){
       //marginTop:10,
       flex: 13 ,
       //height:20
+      padding :10
     },
     view_tab_text:{
       //flex: 1 ,

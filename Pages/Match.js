@@ -272,6 +272,8 @@ class Matchcreen extends React.Component {
     this.state.matche_details.retour_score = this.state.matche_details.retour_score ? this.state.matche_details.retour_score : "-";
     this.state.matche_details.stadium      = this.state.matche_details.stadium ? this.state.matche_details.stadium : "-";
     this.state.matche_details.desc         = this.state.matche_details.desc ? this.state.matche_details.desc : "-";
+    this.state.matche_details.match_status = this.state.matche_details.match_status ? this.state.matche_details.match_status : "OK";
+    
     //const fav_style_h = this.state.matche_details && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
     //const fav_style_a = this.state.matche_details && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
     const fav_style={};
@@ -282,9 +284,8 @@ class Matchcreen extends React.Component {
     const live_style = this.state.matche_details.live ? {"color":global_theme.live_borderColor}:{};
     
     const head2head_info = this.state.head2head && Object.keys(this.state.head2head).length==3 ?
-    Object.keys(this.state.head2head).map(k=><Text style={[this.state.dynamic_style.text_info,{color:"red"}]} key={k}>{k} : {this.state.head2head[k]}</Text>)
+    Object.keys(this.state.head2head).map(k=><Text style={[this.state.dynamic_style.text_info,{color:"orange"}]} key={k}>{k} : {this.state.head2head[k]}</Text>)
     : null;
-   console.log(this.state.head2head, head2head_info);
     return (
       <View style={this.state.dynamic_style.view_tab}>
         <Text style={this.state.dynamic_style.text_info}>{this.state.matche_details.datetime ? this.state.matche_details.datetime : this.state.matche_details.date+" "+API_.convert_time(this.state.matche_details.time)} </Text>
@@ -320,8 +321,11 @@ class Matchcreen extends React.Component {
         <View style={{flex:1}}></View>
       </TouchableOpacity>
          : null}
-        {this.state.matche_details.status!="-" ?
+        {this.state.matche_details.status!="-" && this.state.matche_details.match_status=="ok" ?
           <Text style={this.state.dynamic_style.text_info}>Status : {this.state.matche_details.status}</Text>
+         : null}
+        {this.state.matche_details.match_status!="ok" ?
+          <Text style={[this.state.dynamic_style.text_info,{color:"red"}]}>Status : {this.state.matche_details.match_status}</Text>
          : null}
         {this.state.matche_details.time_played && this.state.matche_details.time_played!="-" ?
           <Text style={[this.state.dynamic_style.text_info,live_style]}>Playing time : {this.state.matche_details.time_played}</Text>
@@ -345,7 +349,7 @@ class Matchcreen extends React.Component {
           <Text style={this.state.dynamic_style.text_info}>Staduim : {this.state.matche_details.stadium}</Text>
          : null}
         {this.state.matche_details.desc!="-" ?
-          <Text style={[this.state.dynamic_style.text_info,{color:"red"}]}>Description : {this.state.matche_details.desc}</Text>
+          <Text style={[this.state.dynamic_style.text_info,{color:"Orange"}]}>Description : {this.state.matche_details.desc}</Text>
          : null}
          
         {head2head_info}

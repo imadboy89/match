@@ -3,11 +3,18 @@ var DomParser = require('react-native-html-parser').DOMParser
 
 
 class Scrap {
+
   constructor() {
     this.error = null;
     this.html="";
     this.isWeb = API_.isWeb;
     this.img_q = "410w";
+    this.game_status = {
+        "0":"ok", 
+        "1":"تأجلت", 
+        "2":"ألغيت", 
+        "3":"أوقف اللعب"
+    };
   }
   get_article(html){
     if(html == null || !html || !html.match){return []}
@@ -74,6 +81,10 @@ class Scrap {
       match_details["stadium"] = details_dict["a"][0] && details_dict["a"][0].length >=3 ? details_dict["a"][0][3] : "";
       match_details["stadium"] = details_dict["a"][0] && details_dict["a"][0][5]
       ? details_dict["a"][0][5]+" | "+match_details["stadium"] : match_details["stadium"];
+    }
+    if(details_dict["s"] && details_dict["s"].length>0){
+      const m_status = details_dict["s"] && details_dict["s"][0] ? details_dict["s"][0][1] : details_dict["s"][0];
+      match_details["match_status"] = m_status && this.game_status[m_status] ? this.game_status[m_status] : m_status;
     }
     // league name
     match_details["league"] = league_name;
