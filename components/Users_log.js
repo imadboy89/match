@@ -120,8 +120,9 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
                   {_user.modelName && _user.modelName!="-"?_user.modelName:_user.device_type}
                 </Text>
               </View>
+              <Text style={{color: "#fff" ,textAlign: 'left',fontSize:9,marginHorizontal:1,width:"100%"}} >{online_at}</Text>
               {this.state.focused_user == _user._id ? 
-                <Text style={{color: "#fff" ,textAlign: 'left',fontSize:9,marginHorizontal:1,width:"100%"}} >{online_at}</Text>
+                null
               : null}
             </View>
 
