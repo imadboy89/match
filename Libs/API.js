@@ -9,6 +9,7 @@ import teams_en from "./teams_en";
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
+    this.hidden_leagues = [22787,22756];
     this.first_api_call_almtchapi = true;
     this.running_calls = [];
     this.server_url = "http://107.152.39.225:81/imad_404/";

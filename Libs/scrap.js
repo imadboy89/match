@@ -417,6 +417,7 @@ class Scrap {
     " الثاني","تحت ","شمال","الثالث"," A ", " B ", " C "," D ","الدرجة D","الدرجة C","الدرجة B",
     "الدوري النرويجي الدرجة"
   ]
+    const hidden_leagues = is_oneMatch || FILTERING==false ? [] : API_.hidden_leagues;
     const blacklisted_countries = is_oneMatch || FILTERING==false ? [] :  ["SA","BH","KW","IQ","PS","ND","AR","BR","CO","JO","SS","VN","ZA","TR","UZ"];
     const exceptions = ["افريقيا","مباريات دولية ودية"];
     let compititions = {};
@@ -463,7 +464,11 @@ class Scrap {
         if(blacklisted_countries.includes(compitition["country"]) || compitition["options"].includes("h")){
           is_allowed = false;
         }
-        if(is_allowed || "MA"==compitition["country"] || 214241111 == compitition["league_id"] || FILTERING==false){
+        const league_id = parseInt(compitition["league_id"]) ;
+        const is_league_hidden = hidden_leagues.includes(league_id);
+        is_allowed = is_allowed && !is_league_hidden;
+        is_allowed = is_allowed || ("MA"==compitition["country"] && !is_league_hidden) || FILTERING==false ;
+        if(is_allowed){
           compititions[compitition["league_id"]] = compitition;
 
           API_.set_common_league_id({id:compitition["league_id"],title:compitition["comp_name"]});
