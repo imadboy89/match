@@ -9,7 +9,7 @@ import teams_en from "./teams_en";
 //https://al-match.com/api/get_server_generator  POST channel_id=17
 class API {
   constructor() {
-    this.hidden_leagues = [22787,22756];
+    this.hidden_leagues =  [22787, 22756, 23133, 22559, 22442, 22562, 23176, 22558];
     this.first_api_call_almtchapi = true;
     this.running_calls = [];
     this.server_url = "http://107.152.39.225:81/imad_404/";
@@ -111,6 +111,9 @@ class API {
     this.get_settings().then(c=>{
       if(c && c.default_ui){
         this.default_ui = c.default_ui;
+      }
+      if(c && c.hidden_leagues){
+        this.hidden_leagues = c.hidden_leagues;
       }
     });
     this.following = [];
@@ -1335,7 +1338,20 @@ class API {
         this.error = error;
       });
   }
-
+  add_league_hiddenLeagues = async(league_id)=>{
+    league_id = parseInt(league_id);
+    API_.hidden_leagues = await API_.getConfig("hidden_leagues", API_.hidden_leagues);
+    API_.hidden_leagues.push(league_id);
+    await API_.setConfig("hidden_leagues", API_.hidden_leagues);
+    API_.showMsg("League banned !","success");
+  }
+  remove_league_hiddenLeagues = async(league_id)=>{
+    league_id = parseInt(league_id);
+    API_.hidden_leagues = await API_.getConfig("hidden_leagues", API_.hidden_leagues);
+    API_.hidden_leagues = API_.hidden_leagues.filter(l=>l!=league_id);
+    await API_.setConfig("hidden_leagues", API_.hidden_leagues);
+    API_.showMsg("League allowed !","success");
+  }
   get_settings = async()=>{
     let configs = await AsyncStorage.getItem('configs');
     if(configs){

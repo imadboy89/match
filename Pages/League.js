@@ -6,6 +6,7 @@ import {styles_league,getTheme,global_theme} from "../components/Themes";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 import Player from "../components/Player";
 import Team from "../components/Team";
+import IconButton from "../components/IconButton";
 
 let list = [
 
@@ -56,6 +57,7 @@ class LeagueScreen extends React.Component {
     this.props.navigation.setOptions({title: <Text>{this.league_name}</Text>});
     this.get_standing_k(this.league_id);
     API_.setTitleWeb(this.league_name);
+    this.render_header();
   }
   async componentWillUnmount(){
     this._isMounted = false;
@@ -371,6 +373,25 @@ class LeagueScreen extends React.Component {
     this.setState({c_stage:itemValue, matches:[]})
     this.get_matches_k();
   }
+  render_header=()=>{
+    this.props.navigation.setOptions({
+        "headerRight": ()=>(
+          <View style={{flexDirection:"row",margin:5}}>
+            <IconButton 
+            name={API_.hidden_leagues.includes(this.league_id)  ? "check-circle" : "ban" }
+            onPress={async()=>{
+              if(API_.hidden_leagues.includes(this.league_id) ){
+                await API_.remove_league_hiddenLeagues(this.league_id);
+              }else{
+                await API_.add_league_hiddenLeagues(this.league_id);
+              }
+              this.render_header();
+            }}  
+            />
+          </View>
+        )
+      });
+  }
   render() {
     const c_years_options = this.state.c_years.map(y=><Picker.Item label={y[1]} value={y[0]} key={`${y[0]}-${y[1]}`} />);
     const c_stages_options = this.state.c_stages.map(y=><Picker.Item label={y[2]} value={y[0]} key={`${y[0]}-${y[1]}`} />);
@@ -382,6 +403,7 @@ class LeagueScreen extends React.Component {
   >
     {c_years_options}
 </Picker> ;
+
     this.c_stages = <Picker
     selectedValue={this.state.c_stage}
     style={{ height:API_.isWeb ? 50 : 75,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
