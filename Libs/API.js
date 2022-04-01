@@ -18,6 +18,8 @@ class API {
     this.yify_subs_url = "https://yifysubtitles.org/";
     this.PB_movies_url = "https://tpb.party/";
     this.MC_movies_url = "https://moviecrumbs.net/";
+    this.MC_movies_url = "https://www1.moviecrumbs.net/";
+    
     this.PB_sections = {205:"TV shows",201:"Movies"}
     this.yt_api_key = "AIzaSyC_Dnp88128mp5CZ_htFtSRpiNFBCMHaco";
     //https://tpb.party/search/peaky%20blinders/1/99/205
