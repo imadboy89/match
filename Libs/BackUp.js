@@ -554,7 +554,13 @@ class BackUp{
         live_match.active      = true;
         live_match.match_title = match_title;
         live_match.createdAt = new Date();
-        live_match.startAt = new Date(match_details.datetime.replace(" ", "T")+":00.000+01:00");
+        let offset = live_match.createdAt.getTimezoneOffset();
+        offset = offset==0 ? 0 : offset/60;
+        let offset_pos = offset>0 ? "-" : "+";
+        offset = `${offset_pos}0${Math.abs(offset)}`;
+        // not sure how thats work
+        //offset = "+00";
+        live_match.startAt = new Date(match_details.datetime.replace(" ", "T")+`:00.000${offset}:00`);
 
         delete match_details.matches_list;
         delete match_details.details;
