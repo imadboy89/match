@@ -13,6 +13,7 @@ class API {
     this.first_api_call_almtchapi = true;
     this.running_calls = [];
     this.server_url = "http://107.152.39.225:81/imad_404/";
+    this.server_url = "http://20.224.94.179/imad_404/";
     //this.server_url = "https://107.152.39.225/";
     this.yify_movies_url = "https://yts.mx/api/v2/";
     this.yify_subs_url = "https://yifysubtitles.org/";
@@ -105,7 +106,7 @@ class API {
     this.time_offset = (new Date()).getTimezoneOffset()/60;
 
 
-    this.use_mdb_proxy = this.isWeb;/* ok */
+    this.use_mdb_proxy = false;this.isWeb;/* ok */
     //this.default_ui = "Movies?source_id=8";
     //this.default_ui = this.get_settings();//["Videos",{screen:"Movies",params:{source_id:8}}];
     //API_.setConfig("default_ui",["Videos", {screen: "Movies", params: {source_id: 8}}]);
@@ -163,8 +164,7 @@ class API {
       args.use_proxy_utf = use_proxy_utf ? true : false;
       args.headers = headers ? headers : {};
       args.is_json=is_json;
-      //args.use_proxy_utf = true;
-      console.log(url, args.use_proxy_utf , use_proxy_utf);
+
       return backup.proxy(args);
     }
     if (data!=null){
@@ -173,7 +173,9 @@ class API {
     configs.headers = configs.headers==undefined ? {} : configs.headers ;
     try {
       configs.headers["almatch_session_id"] = backup.client.auth.activeUserAuthInfo.userId;
-    } catch (error) {}
+    } catch (error) {
+      return this.sleep(2).then(o=>this.http(url,method,data,headers,is_json, use_proxy, use_proxy_utf));
+    }
     
     
     if(this.isWeb || use_proxy){
