@@ -41,8 +41,8 @@ class API {
     this.domain_ = 'https://al-match.com';
     this.domain = 'https://al-match.com/api/';
     this.configs = {};
-    this.proxy = `${this.server_url}.proxy2.php?url=`;
-    this.proxy1 = `${this.server_url}.proxy.php?url=`;
+    this.proxy_post = `${this.server_url}.proxy2.php?url=`;
+    this.proxy_get = `${this.server_url}.proxy.php?url=`;
     this.cc_url = "https://o.kooora.com/f/big/[cc].png";
     this.cc_url_small = "https://o.kooora.com/f/[cc].png";
     this.IPTV_json = `${this.server_url}.index.php?action=json`;
@@ -178,8 +178,8 @@ class API {
     }
     
     
-    if(this.isWeb){
-      url = method=="GET" ? this.proxy1+url : this.proxy+url; 
+    if(this.isWeb || use_proxy){
+      url = method=="GET" ? this.proxy_get+url : this.proxy_post+url; 
     }
     //url = "https://developers.facebook.com/tools/debug/echo/?q="+url;
 
