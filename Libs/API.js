@@ -13,7 +13,7 @@ class API {
     this.first_api_call_almtchapi = true;
     this.running_calls = [];
     this.server_url = "http://107.152.39.225:81/imad_404/";
-    this.server_url = "https://20.101.63.9/imad_404/";
+    this.server_url = "https://20.101.44.225/imad_404/";
     //this.server_url = "https://107.152.39.225/";
     this.yify_movies_url = "https://yts.mx/api/v2/";
     this.yify_subs_url = "https://yifysubtitles.org/";
