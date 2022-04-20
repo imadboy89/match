@@ -44,11 +44,14 @@ class Team extends React.Component{
         return;
       }
       this.state.favorite_p = await API_.getConfig("favorite_players",this.state.favorite_p);
+      const team_info_ls = await API_.getTeam_logo_k(this.props.team_id);
       API_.get_team(this.props.team_id,true,undefined,true).then(res=>{
         res.comps = res && res.comps ? res.comps.filter(c => c[0]>0) : [];
         res.comps = res && res.comps ? res.comps.map(c=>{ return c[0]>0?{id:c[0],comp_name:c[2], info_1:c[1], info_2:c[3]}:false;}) : {};
 
-        API_.setTeam_logo(res["team_name_ar"], res.team_logo, this.props.league_name, this.props.league_id,true,true);
+        if(team_info_ls == false && res.l){
+          API_.queued_get_teams([res.team_id]);
+        }
         this.setState({team:res,loading:false});
       });
     }

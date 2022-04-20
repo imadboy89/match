@@ -102,7 +102,7 @@ class API {
       3:"وسط",
       4:"هجوم"};
 
-    this.mdb_save_teams = false;
+    this.mdb_save_teams = true;
     this.time_offset = (new Date()).getTimezoneOffset()/60;
 
 
@@ -457,11 +457,12 @@ class API {
     let teams_info = await this.getTeam_logo_k();
     for(const team_id of queue){
       while(queue_inprocess>=queue_maxInprocess){
-        await this.sleep(1000);
+        const tmp_1 = await this.sleep(1000);
       }
       queue_inprocess+=1;
       this.get_team(team_id, false,teams_info).then(r=>{
         queue_inprocess-=1;
+        console.log(r);
         if(r && r.team_id>0 && (r.team_name_ar || r.team_name_en)){
           teams_info[r.team_id] = r;
         }
@@ -469,7 +470,7 @@ class API {
       });
     }
     while(queue_inprocess>0){
-      await this.sleep(200);
+      const tmp_2 = await this.sleep(200);
     }
     console.log("queued_get_teams getting Teams [Done]",queue_size);
     //await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams_info));
@@ -477,7 +478,7 @@ class API {
     await backup.save_teams();
     console.log("queued_get_teams saving [Done]",queue_size);
     if(API_.next && next){
-      await this.sleep(1000);
+      const tmp_3 = await this.sleep(1000);
       API_.next();
     }
     return true;
@@ -546,6 +547,9 @@ class API {
       img_logo_uri=res && res.team_type && res.team_type==2? API_.get_cc_img(res.team_flag) : img_logo_uri;
       res.team_group_photo = img_uri;
       res.team_logo = img_logo_uri;
+      if(img_logo_uri && img_logo_uri.split && img_logo_uri.split("?").length==2){
+        res.l = "?"+img_logo_uri.split("?")[1];
+      }
       res.team_country;
       if(res && (res.team_name_ar || res.team_name_en) ){
         //API_.setTeam_logo(res["team_name_ar"], img_logo_uri, this.props.league_name, this.props.league_id,true,true);
@@ -1430,11 +1434,10 @@ class API {
       teams_info = teams_info_;
       //teams_info = teams_info.filter(t=> t!=undefined && t.id>0 && i.name!=undefined);
     }
-    return 
-    //await AsyncStorage.setItem('teams_info_k', JSON.stringify(teams_info));
+    return ;
     if(save_db){
       console.log("save teams remotly [id="+team_o.team_id+"]");
-      //await backup.save_teams();
+      await backup.save_teams();
     }
   };
   getTeam_logo = async (team_name=undefined) => {
