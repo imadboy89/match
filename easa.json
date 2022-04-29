@@ -1,0 +1,12 @@
+{
+  "builds": {
+    "android": {
+      "release": {
+        "workflow": "managed",
+        "distribution": "internal",
+        "buildType": "apk"
+      }
+      
+    }
+  }
+}

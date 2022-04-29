@@ -180,7 +180,7 @@ class API {
     
     
     if(this.isWeb || use_proxy){
-      const _url_enc = btoa(url);
+      const _url_enc = link = Base64.btoa(url);
       url = method=="GET" ? this.proxy_get+_url_enc : this.proxy_post+_url_enc; 
     }
     //url = "https://developers.facebook.com/tools/debug/echo/?q="+url;
