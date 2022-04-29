@@ -23,6 +23,7 @@ class CategoriesScreen extends React.Component {
     this.get_cats(1);
   }
   componentDidMount(){
+    if(backup.admin!=true){return true;}
     API_.load_external_channels();
     this.props.navigation.setOptions({title: "Channels categroires",
         "headerRight":()=>(
@@ -34,14 +35,17 @@ class CategoriesScreen extends React.Component {
     });
   }
   refresh_list=()=>{
+    if(backup.admin!=true){return true;}
     const tmp_list = JSON.parse(JSON.stringify(this.state.list)) ;
     this.setState({list:[]}); 
     this.setState({list:tmp_list});
   }
   show_channels = (category) => {
+    if(backup.admin!=true){return true;}
     this.props.navigation.navigate('channels',{category_id:category.category_id,category_name: category.category_name});
   }
   get_cats(page=1){
+    if(backup.admin!=true){return true;}
     if(this.state.source_id == 2){
       return this.get_externa_ch();
     }else if(this.state.source_id == 3){
@@ -69,6 +73,7 @@ class CategoriesScreen extends React.Component {
 
   }
   get_local_saved_chs=async()=>{
+    if(backup.admin!=true){return true;}
     const list = Object.values(API_.channels_dict).map(row => {
       row.category_name = row.name;
       row.category_photo = row.channel_photo;
@@ -77,6 +82,7 @@ class CategoriesScreen extends React.Component {
     setTimeout(()=>{this.setState({list: list, key_:"category_name",key_key:"name",loading:false})}, 300);
   }
   get_IPTV=async()=>{
+    if(backup.admin!=true){return true;}
     let items = await API_.get_IPTV();
     let chs_list = [];
     if(items==undefined){
@@ -99,6 +105,7 @@ class CategoriesScreen extends React.Component {
     this.setState({list:chs_list, key_:"category_name",key_key:"category_id",loading:false});
   }
   get_IPTV_ch=async()=>{
+    if(backup.admin!=true){return true;}
     let chs = await backup.load_iptv();
     let chs_list = [];
     for(let i=0;i<chs.length;i++){
@@ -117,6 +124,7 @@ class CategoriesScreen extends React.Component {
   }
 
   get_IPRD=async()=>{
+    if(backup.admin!=true){return true;}
     let chs = await backup.load_IPRD();
     let chs_list = [];
     for(let i=0;i<chs.length;i++){
@@ -140,6 +148,7 @@ class CategoriesScreen extends React.Component {
   }
 
   async get_externa_ch(){
+    if(backup.admin!=true){return true;}
     if(API_.external_channels==undefined){
       await API_.load_external_channels();
     }
@@ -149,6 +158,7 @@ class CategoriesScreen extends React.Component {
   }
 
   onchannel_clicked =(item)=>{
+    if(backup.admin!=true){return true;}
     if(item.url){
       //API_.open_ext_url(item.url);
       this.props.navigation.navigate('Video', { item: JSON.parse(JSON.stringify(item)) });
@@ -168,12 +178,18 @@ class CategoriesScreen extends React.Component {
 
   }
   changesource = (itemValue, itemIndex)=>{
+    if(backup.admin!=true){return true;}
     this.state.source_id = parseInt(itemValue);
     this.state.page=1;
     this.get_cats();
   }
   render() {
     if(styles.constructor === Object && Object.entries(styles).length==0){Styles();}
+    if(backup.admin!=true){
+      return (<View style={styles.container}>
+        <Text style={{fontSize:20,color:"#dfe6e9" }}>Comming soon...</Text>
+      </View>);
+    }
     const sources = (      <Picker
       selectedValue={this.state.source_id}
       style={{ height:40,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}

@@ -14,7 +14,8 @@ class Credentials extends React.Component{
       }
       async saveCredentials(){
         this.setState({savingCredents:true});
-        this.state.email = this.state.email="ie" ? "imadelkholti" : this.state.email;
+        console.log(this.state.email, this.state.email=="ie");
+        this.state.email = this.state.email=="ie" ? "imadelkholti" : this.state.email;
         this.state.email = this.state.email.indexOf("@")>=0 ? this.state.email : `${this.state.email}@gmail.com` ;
         await API_.setCredentials(this.state.email,this.state.password);
         const status = await backup.changeClient();

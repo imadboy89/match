@@ -85,6 +85,19 @@ get_Videos = ()=>{
           <Picker.Item label="Mtkhb" value={3} />
           
      */
+    const _sources = {
+      0:"BeIn",
+      1:"AlMthkb",
+      2:"Arriadia",
+      4:"heSport",      
+    };
+    if(backup.admin==true){
+      _sources[8] = "Movies_MC";
+      _sources[5] = "Movies_YIFY";
+      _sources[6] = "Movies_PB";
+      _sources[7] = "FIFATV";
+    }
+    const sources_picker = Object.keys(_sources).map(k=><Picker.Item label={_sources[k]} value={k} key={_sources[k]} />);
     const ListFooterComponent = (        <View style={this.state.dynamic_style.nav_container}>
       <IconButton
         disabled={this.state.loading}
@@ -102,23 +115,14 @@ get_Videos = ()=>{
         this.state.page++;
         this.get_Videos();
       }}  />
+      
       <Picker
           selectedValue={this.state.source_id}
           style={{ height:"90%",backgroundColor:"#2d3436",color:"#dfe6e9" ,flex:1}}
           itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9",width:"99%" }}
           onValueChange={this.changesource}
-        >
-          <Picker.Item label="BeIn" value={0} />
-          <Picker.Item label="AlMthkb" value={1} />
-          <Picker.Item label="arriadia" value={2} />
-          <Picker.Item label="heSport" value={4} />
-          <Picker.Item label="FIFATV" value={7} />
-          <Picker.Item label="Movies_MC" value={8} />
-          <Picker.Item label="Movies_YIFY" value={5} />
-          <Picker.Item label="Movies_PB" value={6} />
-          
-          
-      </Picker>
+        >{sources_picker}</Picker>
+
     </View>);
     return (
       <View style={this.state.dynamic_style.container}>

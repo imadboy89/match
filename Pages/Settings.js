@@ -42,7 +42,8 @@ class SettingsScreen extends React.Component {
     };
     this.apk_url = "https://github.com/imadboy89/download/raw/main/almatch.apk";
     //this.apk_url = "https://exp-shell-app-assets.s3.us-west-1.amazonaws.com/android/%40imadboss/almatch-2dc6b0c7a3da47819e4245d25dd4221a-signed.apk";
-
+    this.privacy = "https://imad.is-a.dev/privacy_policy.html";
+    this.terms = "https://imad.is-a.dev/terms_and_conditions.html";
   }
   async load_favs(){
     const fav_l = await API_.getConfig("favorite_leagues",[]);
@@ -217,6 +218,30 @@ class SettingsScreen extends React.Component {
             <View style={this.state.dynamic_style.settings_row_input}>{this.picker_themes()}</View>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Clean cache </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>clean</Text>
+          </View>
+
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Filtering Matches </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.filtering ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={()=>{
+                  API_.filtering = !this.state.filtering;
+                  API_.setConfig("filtering",API_.filtering);
+                  this.setState({filtering:API_.filtering});
+                }}
+                value={this.state.filtering}
+              />
+            </Text>
+          </View>
+          { backup.admin!=true ? null : 
+          <>
+          <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>is_materialTopTab </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>
               <Switch
@@ -252,30 +277,6 @@ class SettingsScreen extends React.Component {
               />
             </Text>
           </View>
-          <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>Clean cache </Text> 
-            <Text style={this.state.dynamic_style.settings_row_input}>clean</Text>
-          </View>
-
-          <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>Filtering Matches </Text> 
-            <Text style={this.state.dynamic_style.settings_row_input}>
-              <Switch
-                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={this.state.filtering ? "#f5dd4b" : "#f4f3f4"}
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={()=>{
-                  API_.filtering = !this.state.filtering;
-                  API_.setConfig("filtering",API_.filtering);
-                  this.setState({filtering:API_.filtering});
-                }}
-                value={this.state.filtering}
-              />
-            </Text>
-          </View>
-          { backup.admin!=true ? null : 
-          <>
             <View style={this.state.dynamic_style.settings_row}>
               <Text style={this.state.dynamic_style.settings_row_label}>Users </Text> 
               <View style={this.state.dynamic_style.settings_row_input}><Button title="Manage" onPress={()=>this.setState({modalVisible_users:true})}></Button></View>
@@ -284,7 +285,57 @@ class SettingsScreen extends React.Component {
             <Text style={this.state.dynamic_style.settings_row_label}>Users log</Text> 
             <View style={this.state.dynamic_style.settings_row_input}><Button title="Manage" onPress={()=>this.setState({modalVisible_users_log:true})}></Button></View>
           </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Notify ISweb </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.notify_isWeb ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={()=>{
+                  API_.notify_isWeb = !API_.notify_isWeb;
+                  this.setState({notify_isWeb:API_.notify_isWeb});
+                }}
+                value={this.state.notify_isWeb}
+              />
+            </Text>
+          </View>
+
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>load channels </Text> 
+            <View style={this.state.dynamic_style.settings_row_input}>
+              <Button 
+              title="load" 
+              disabled={API_.load_channels_running}
+              onPress={()=>{
+                this.setState({});
+                API_.load_channels().then(o=>this.setState({}))
+                }}></Button>
+            </View>
+          </View>
+
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>TEST TV </Text> 
+            <View style={this.state.dynamic_style.settings_row_input}>
+              <Button title="TV controller" onPress={()=>this.props.navigation.navigate('TV')}></Button>
+            </View>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>FS TEST </Text> 
+            <View style={this.state.dynamic_style.settings_row_input}>
+              <Button title="FS test" onPress={()=>this.props.navigation.navigate('FS')}></Button>
+            </View>
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}> </Text> 
+          </View>
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Update Channel </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>{Updates.releaseChannel}</Text>
+          </View>
           </>
+          
           }
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Offset Time: </Text> 
@@ -333,22 +384,7 @@ class SettingsScreen extends React.Component {
               }}></Button>
             </View>
           </View>
-          <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>Notify ISweb </Text> 
-            <Text style={this.state.dynamic_style.settings_row_input}>
-              <Switch
-                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={this.state.notify_isWeb ? "#f5dd4b" : "#f4f3f4"}
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={()=>{
-                  API_.notify_isWeb = !API_.notify_isWeb;
-                  this.setState({notify_isWeb:API_.notify_isWeb});
-                }}
-                value={this.state.notify_isWeb}
-              />
-            </Text>
-          </View>
+
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Debug mode </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>
@@ -397,22 +433,7 @@ class SettingsScreen extends React.Component {
               />
             </Text>
           </View>
-          <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>ISO open expo </Text> 
-            <Text style={this.state.dynamic_style.settings_row_input}>
-              <Switch
-                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={this.state.force_open_expo ? "#f5dd4b" : "#f4f3f4"}
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={()=>{
-                  API_.setConfig("force_open_expo",!this.state.force_open_expo);
-                  this.setState({force_open_expo:!this.state.force_open_expo});
-                }}
-                value={this.state.force_open_expo}
-              />
-            </Text>
-          </View>
+
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Listen to keys </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>
@@ -435,18 +456,7 @@ class SettingsScreen extends React.Component {
               <Button title="Testing notifff" onPress={()=>API_.showMsg("Testing notifff 123",["info","danger","warning","success","info","danger","warning","success","info"][parseInt((Math.random(1)+"").slice(2,3))],undefined,10000)}></Button>
             </View>
           </View>
-          <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>load channels </Text> 
-            <View style={this.state.dynamic_style.settings_row_input}>
-              <Button 
-              title="load" 
-              disabled={API_.load_channels_running}
-              onPress={()=>{
-                this.setState({});
-                API_.load_channels().then(o=>this.setState({}))
-                }}></Button>
-            </View>
-          </View>
+
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>load external channels </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
@@ -473,25 +483,23 @@ class SettingsScreen extends React.Component {
             </View>
           </View>
 
+
+
           <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>TEST TV </Text> 
+            <Text style={this.state.dynamic_style.settings_row_label}>Privacy policy: </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
-              <Button title="TV controller" onPress={()=>this.props.navigation.navigate('TV')}></Button>
+              <Button color="#42dc84" title="Open" onPress={()=>{ API_.open_ext_url(this.privacy); }}></Button>
             </View>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>FS TEST </Text> 
+            <Text style={this.state.dynamic_style.settings_row_label}>Terms and conditions </Text> 
             <View style={this.state.dynamic_style.settings_row_input}>
-              <Button title="FS test" onPress={()=>this.props.navigation.navigate('FS')}></Button>
+              <Button color="#42dc84" title="Open" onPress={()=>{ API_.open_ext_url(this.terms); }}></Button>
             </View>
           </View>
-          <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}> </Text> 
-          </View>
-          <View style={this.state.dynamic_style.settings_row}>
-            <Text style={this.state.dynamic_style.settings_row_label}>Update Channel </Text> 
-            <Text style={this.state.dynamic_style.settings_row_input}>{Updates.releaseChannel}</Text>
-          </View>
+
+
+
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Update Id </Text> 
             <Text style={this.state.dynamic_style.settings_row_input}>{Updates.updateId}</Text>
