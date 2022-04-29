@@ -198,14 +198,14 @@ class API {
             let error_msg = "API->http : "+response;
             error_msg += "\nUrl : "+url;
             error_msg += "\nOptions : "+JSON.stringify(configs);
-            API_.showMsg(error_msg,"warning");  
+            API_.debugMsg(error_msg,"warning");  
           }
           return out;
         } catch (error) {
           let error_msg = "API->http : "+(error.message ? error.message : error);
           error_msg += "\nUrl : "+url;
           error_msg += "\nOptions : "+JSON.stringify(configs);
-          API_.showMsg(error_msg,"warning");
+          API_.debugMsg(error_msg,"warning");
           return is_json ? [] : "" ;
         }
 
@@ -217,7 +217,7 @@ class API {
         let error_msg = "API->http : "+(error.message ? error.message : error);
         error_msg += "\nUrl : "+url;
         error_msg += "\nOptions : "+JSON.stringify(configs);
-        API_.showMsg(error_msg,"warning");
+        API_.debugMsg(error_msg,"warning");
         console.log('ERROR', error);
         this.error = error;
         return "";
@@ -701,7 +701,7 @@ class API {
       if(resJson && resJson["status"]== "true" && resJson["message"]){
         this.headers["device-token"]=this.token;
         this.setConfig("token",this.token);
-        API_.showMsg(error);
+        //API_.showMsg(error);
       }
     });
   }
