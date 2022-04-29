@@ -27,6 +27,7 @@ class BackUp{
         this.teams_ready = false;
         this.last_route = false;
         this.user_log_id = false;
+        this.version = 1;
     }
     checkCnx = async(check_client=true,is_silent=false)=>{
       const state = await NetInfo.fetch();
@@ -215,6 +216,7 @@ class BackUp{
       }
       let clientInfos = await _ClientInfo.getInfo();
       clientInfos.email = this.email;
+      clientInfos.version = this.version;
       try{
         const results = await this.client.callFunction("users_log",[clientInfos]);
         this.user_log_id = results.insertedId ? results.insertedId : false;
