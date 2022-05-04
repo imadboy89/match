@@ -20,7 +20,7 @@ class API {
     this.yify_subs_url = "https://yifysubtitles.org/";
     this.PB_movies_url = "https://tpb.party/";
     this.MC_movies_url = "https://moviecrumbs.net/";
-    this.MC_movies_url = "https://www1.moviecrumbs.net/";
+    this.MC_movies_url = "https://moviecrumbs.net/";
     
     this.PB_sections = {205:"TV shows",201:"Movies"}
     this.yt_api_key = "AIzaSyC_Dnp88128mp5CZ_htFtSRpiNFBCMHaco";
@@ -148,7 +148,7 @@ class API {
     //console.log("async fetch : ",resource);
     return response;
   }
-  http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true, use_proxy_utf=true){
+  http(url,method="GET",data=null,headers=null,is_json=false, use_proxy=true, use_proxy_utf=true, force_origin=false){
     let configs = {method: method,headers: headers ? headers : this.headers,}
     if (this.use_mdb_proxy){
       if(headers){
@@ -175,11 +175,11 @@ class API {
     try {
       configs.headers["almatch_session_id"] = backup.client.auth.activeUserAuthInfo.userId;
     } catch (error) {
-      return this.sleep(2).then(o=>this.http(url,method,data,headers,is_json, use_proxy, use_proxy_utf));
+      return this.sleep(2).then(o=>this.http(url,method,data,headers,is_json, use_proxy, use_proxy_utf,force_origin));
     }
     
     
-    if(this.isWeb || use_proxy){
+    if( (this.isWeb || use_proxy) && force_origin!=true){
       const _url_enc = Base64.btoa(url);
       url = method=="GET" ? this.proxy_get+_url_enc : this.proxy_post+_url_enc; 
     }
@@ -1612,13 +1612,17 @@ class API {
     .then(async resp=>{
       let scrap = new Scrap();
       let movies = [];
+      
       try {
         movies = scrap.get_Mc_movies(resp);
+        if(Object.keys(movies).length==0 && resp.includes("301 Moved Permanently")){
+          return this.get_final_mc_dom().then(o=>this.get_MC_movies(category, page, search_q));
+        }
       } catch (error) {
         API_.debugMsg(error,"danger");
       }
       return movies;
-    }).catch(error=>API_.showMsg(error,"danger"));
+    }).catch(error=>{API_.showMsg(error,"danger");});
 
   }
 
@@ -1701,6 +1705,16 @@ class API {
       }
     }
     return details_dict;
+  }
+
+
+
+  get_final_mc_dom(){
+    const url = `${this.server_url}get_final_dom.php?url=${Base64.btoa(this.MC_movies_url)}`;
+    return this.http(url,"GET",null,{},false, false, false, true).then(o=>{
+      console.log(o);
+      this.MC_movies_url = o;
+    });
   }
 }
 

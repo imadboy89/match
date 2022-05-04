@@ -289,8 +289,8 @@ class BackUp{
       //API_.debugMsg("Settings loaded ["+Object.keys(settings).length+"]!","info");
       return JSON.stringify(settings_cloud) != JSON.stringify(settings);
     }
-    is_mdb_ok(){
-      if(this.db_settings==undefined || this.db_settings.findOne==undefined || this.client == undefined || this.is_auth==false){
+    is_mdb_ok(ignore_auth=false){
+      if(this.db_settings==undefined || this.db_settings.findOne==undefined || this.client == undefined || (ignore_auth==false && this.is_auth==false) ){
         //console.log(this.db_settings.findOne,this.client.id, this.is_auth);
         return false;
       }
@@ -727,7 +727,7 @@ class BackUp{
       return o_;
     }
     save_trace = async(item)=>{
-      if(!this.is_mdb_ok() || item == this.last_route || this.user_log_id==false || item==undefined){
+      if(!this.is_mdb_ok(true) || item == this.last_route || this.user_log_id==false || item==undefined){
         return false;
       }
       this.last_route = item;
