@@ -31,7 +31,33 @@ class Player extends React.Component{
         this.setState({player:res,loading:false});
       });
     }
-
+    render_transfers=()=>{
+      return this.state.player && this.state.player.transfers ? this.state.player.transfers.map(t=>{
+        const player_id     = t[1];
+        const player_name   = t[2];
+        let   date          = t[3];
+        const transfer_type = t[4];
+        const TFrom_id      = t[6];
+        const TFrom_name    = t[7];
+        const TFrom_cc      = t[8];
+        const TTo_id        = t[9];
+        const TTo_name      = t[10];
+        const TTo_cc        = t[11];
+        date = date && date.slice && date.slice(0,1) =='#' ? API_.get_date2(new Date(date.replace("#","") * 1000)) : date ;
+        date = date && date.split && date.includes("-") ? date.split("-").slice(0,-1).join("-") : date;
+        return <View key={`${player_id}-${date}`}>
+          <View style={{flex:1,marginVertical:2}}>
+            <View style={{flex:1,flexDirection:"row"}}>
+              <Text style={[{flex:1}, this.state.dynamic_style.trans_txt]}>{date}</Text>
+              <Text style={[{flex:2}, this.state.dynamic_style.trans_txt]}>{TTo_name}</Text>
+              <Text style={[{flex:2}, this.state.dynamic_style.trans_txt]}>{TFrom_name}</Text>
+              <Text style={[{flex:1}, this.state.dynamic_style.trans_txt]}>{transfer_type}</Text>
+              <Text style={[{flex:2}, this.state.dynamic_style.trans_txt]}>{player_name}</Text>
+            </View>
+          </View>
+        </View>
+      }) : null;
+    }
     render(){
       const allowed_infs = {
         "player_name_ar":"اسم اللاعب",
@@ -85,6 +111,10 @@ class Player extends React.Component{
                 {p_img!=false ? <Image style={{height:"100%",width:"100%",resizeMode:"contain"}} source={{uri: p_img}} /> : null}
               </View>
               {pl_inf}
+              <View style={{width:"99%",justifyContent:"center", marginVertical:10}} >
+                <Text style={[this.state.dynamic_style.text_info, {color:"#b7eefb"}]}>انتقالات : </Text>
+                {this.render_transfers()}
+              </View>
               {pl_career}
             </ScrollView> 
         }

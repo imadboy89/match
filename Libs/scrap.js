@@ -722,10 +722,11 @@ class Scrap {
       "player_height":"",
       "player_birthdate":"",
       "player_career":"",
+      "transfers":[],
     }
     for(let i=0;i<Object.keys(infos).length;i++){
       const k = Object.keys(infos)[i];
-      infos[k] = this.get_var(html, k);
+      infos[k] = typeof infos[k] == "string" ? this.get_var(html, k) : this.get_var_array(html, k);
       if(k=="player_position"){
         infos[k] = API_.player_positions[infos[k]];
       }
