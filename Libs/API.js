@@ -814,6 +814,7 @@ class API {
     return new Promise(resolve => setTimeout(resolve, ms));
   }  
   async load_channels__(){
+    return true;
     if(this.token_tries<=0){return false;}
     if(this.headers["device-token"]==""){
       return await this.set_token().then(()=> { return this.load_channels__()});
@@ -843,7 +844,7 @@ class API {
     }
     
     this.load_channels();
-    this.load_external_channels();
+    //this.load_external_channels();
     return false;
   }
   async is_expired(key, ttl=undefined){

@@ -2,7 +2,6 @@ import * as React from 'react';
 import { View, RefreshControl, Modal, Button, TouchableOpacity } from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import IconButton from "../components/IconButton";
 import {styles_news,getTheme} from "../components/Themes";
 import {Picker} from '@react-native-picker/picker';
@@ -32,10 +31,11 @@ class VideosScreen extends React.Component {
     });
   }
   changesource = (itemValue, itemIndex)=>{
-    this.state.source_id = parseInt(itemValue);
+    const source_id = parseInt(itemValue);
+    this.setState({source_id : source_id});
     this.state.page=1;
-    if([5,6,8].includes(this.state.source_id) ){
-      this.props.navigation.navigate('Movies',{source_id:this.state.source_id});
+    if([5,6,8].includes(source_id) ){
+      this.props.navigation.navigate('Movies',{source_id:source_id});
       return;
     }
     this.get_Videos();
