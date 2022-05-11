@@ -13,7 +13,7 @@
     "ios": "expo start --ios",
     "web": "expo start:web",
     "eject": "expo eject",
-    "doall": "powershell -File generate_updates_info.ps1 && git add . && git commit -a -m \"fix bugs and more ..DOALL\" && git push origin master && expo publish && npm run deploy",
+    "doall": "powershell -File generate_updates_info.ps1 && git add . && git commit -a -m \"fix bugs and more ..DOALL\" && git push origin master  && expo publish && npm run deploy",
     "git": "git commit -a -m \"fix bugs and more ..DOALL\" && git push origin"
   },
   "dependencies": {
