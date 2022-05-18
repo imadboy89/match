@@ -35,9 +35,17 @@ class HomeScreen extends React.Component {
         user_log:false,
         //dynamic_style_list:styles_list,
     };
+    this.max_delay_to_refresh = 20000;
     this.last_refreshed = (new Date()).getTime();
     api_type = this.state.source_id;
     this.is_authenting = false;
+    this.interval_refresh = setInterval(()=>{
+      const time_now = (new Date()).getTime();
+      if(time_now-this.last_refreshed >=20){
+        this.last_refreshed = (new Date()).getTime();
+        this._refresh_();
+      }
+    }, 60000);
     this.didBlurSubscription = this.props.navigation.addListener(
       'focus',
       payload => {
@@ -51,7 +59,8 @@ class HomeScreen extends React.Component {
         }
         const time_now = (new Date()).getTime();
         this.render_header();
-        if(time_now-this.last_refreshed >=20){
+        if(time_now-this.last_refreshed >=this.max_delay_to_refresh){
+          this.last_refreshed = (new Date()).getTime();
           this._refresh_();
         }
       }
