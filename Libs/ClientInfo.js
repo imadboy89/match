@@ -22,10 +22,10 @@ class ClientInfo {
         infos.platformApiLevel  = DeviceInfo.platformApiLevel;
         infos.totalMemory       = DeviceInfo.totalMemory
         
-        infos.package     = Constants.manifest.android.package;
-        infos.versionCode = Constants.manifest.android.versionCode;
-        infos.platform    = Constants.platform;
-        infos.deviceName  = Constants.deviceName;
+        infos.package     = Constants&&Constants.manifest&&Constants.manifest.android&&Constants.manifest.android.package ? Constants.manifest.android.package : "-";
+        infos.versionCode = Constants&&Constants.manifest&&Constants.manifest.android&&Constants.manifest.android.versionCode?Constants.manifest.android.versionCode:"-";
+        infos.platform    = Constants&&Constants.platform?Constants.platform:"-";
+        infos.deviceName  = Constants&&Constants.deviceName?Constants.deviceName:"-";
 
         infos.navigator          = this.getinfoBrowser();
         const _keys= Object.keys(infos);

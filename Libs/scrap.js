@@ -68,6 +68,9 @@ class Scrap {
     let home_players_events_dict = this.parse_details(match_details['home_scorers']);
     let away_players_events_dict = this.parse_details(match_details['away_scorers']);
     /// chanels
+    if(details_dict["r"] && details_dict["r"].length>0 && details_dict["r"][0].length >2 ){
+      match_details["referee"] = details_dict["r"][0][2];
+    }
     if(details_dict["l"] && details_dict["l"].length>0){
       let channels = [];
       for(let i=0; i<details_dict["l"].length;i++){

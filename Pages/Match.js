@@ -348,10 +348,15 @@ class Matchcreen extends React.Component {
         {this.state.matche_details.stadium!="-" ?
           <Text style={this.state.dynamic_style.text_info}>Staduim : {this.state.matche_details.stadium}</Text>
          : null}
+        {this.state.matche_details.referee && this.state.matche_details.referee!="-" ?
+          <Text style={this.state.dynamic_style.text_info}>Referee : {this.state.matche_details.referee}</Text>
+         : null}
         {this.state.matche_details.desc!="-" ?
           <Text style={[this.state.dynamic_style.text_info,{color:"Orange"}]}>Description : {this.state.matche_details.desc}</Text>
          : null}
-         
+        {head2head_info && head2head_info.length>0 && 
+        <Text style={this.state.dynamic_style.text_info}>Head to Head : </Text>
+        }
         {head2head_info}
 
         <View style={{flexDirection:'row', flexWrap:'wrap', flex:1}}>
