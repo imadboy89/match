@@ -1,5 +1,5 @@
 import * as DeviceInfo from 'expo-device';
-
+import Constants from 'expo-constants';
 class ClientInfo {
     constructor() {
         this.getInfo().then(o=>{
@@ -22,7 +22,11 @@ class ClientInfo {
         infos.platformApiLevel  = DeviceInfo.platformApiLevel;
         infos.totalMemory       = DeviceInfo.totalMemory
         
-        
+        infos.package     = Constants.manifest.android.package;
+        infos.versionCode = Constants.manifest.android.versionCode;
+        infos.platform    = Constants.platform;
+        infos.deviceName  = Constants.deviceName;
+
         infos.navigator          = this.getinfoBrowser();
         const _keys= Object.keys(infos);
         for(let i=0;i<_keys.length;i++){

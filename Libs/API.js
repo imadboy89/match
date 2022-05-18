@@ -1479,9 +1479,11 @@ class API {
     this.leagues_dict = {};
     try{
       leagues=JSON.parse(leagues);
-      for(let i =0;i<leagues.length;i++){
-        if(leagues[i].koora_id == undefined) continue;
-        this.leagues_dict[leagues[i].koora_id] = leagues[i];
+      if(leagues && !leagues.length){
+        for(let i =0;i<leagues.length;i++){
+          if(leagues[i].koora_id == undefined) continue;
+          this.leagues_dict[leagues[i].koora_id] = leagues[i];
+        }
       }
     }catch(error){
       console.log(error);
