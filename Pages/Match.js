@@ -48,6 +48,12 @@ class Matchcreen extends React.Component {
     API_.getConfig("favorite_teams_k",this.state.favorite_t).then(o=>{this.setState({favorite_t:o});});
     
     this.render_header();
+
+    this.interval_refresh = setInterval(()=>{
+      if(this.state.matche_details && this.state.matche_details.live){
+        this.get_Match(this.id)
+      }
+    }, 40000);
     
   }
   render_header=()=>{
