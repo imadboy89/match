@@ -35,7 +35,7 @@ class HomeScreen extends React.Component {
         user_log:false,
         //dynamic_style_list:styles_list,
     };
-
+    this.last_refreshed = (new Date()).getTime();
     api_type = this.state.source_id;
     this.is_authenting = false;
     this.didBlurSubscription = this.props.navigation.addListener(
@@ -49,8 +49,11 @@ class HomeScreen extends React.Component {
         if(this._isMounted==false){
           return;
         }
-        this.refresh_leagues();
+        const time_now = (new Date()).getTime();
         this.render_header();
+        if(time_now-this.last_refreshed >=20){
+          this._refresh_();
+        }
       }
     );
 
