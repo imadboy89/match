@@ -1674,8 +1674,12 @@ class API {
     try {
       const content = {};
       content.message = message;
-      content.url     = url.includes("http") ? url : `${website_url}${url}` ;
-      content.title   = title;
+      if(Platform.OS === 'ios' ){
+        content.url     = url;
+      }else{
+        content.message = `${message} \n ${url}`;
+        content.title   = title;
+      }
       
       const result = await Share.share(content);
       if (result && result.action && result.action === Share.sharedAction) {
@@ -1688,7 +1692,7 @@ class API {
         API_.showMsg("Sharing canceled !","warning");
       }
     } catch (error) {
-      alert(error.message);
+      API_.debugMsg(error);
     }
   };
 

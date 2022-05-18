@@ -31,11 +31,10 @@ class VideosScreen extends React.Component {
     });
   }
   changesource = (itemValue, itemIndex)=>{
-    const source_id = parseInt(itemValue);
-    this.setState({source_id : source_id});
+    this.state.source_id = parseInt(itemValue);
     this.state.page=1;
-    if([5,6,8].includes(source_id) ){
-      this.props.navigation.navigate('Movies',{source_id:source_id});
+    if([5,6,8].includes(this.state.source_id) ){
+      this.props.navigation.navigate('Movies',{source_id:this.state.source_id});
       return;
     }
     this.get_Videos();

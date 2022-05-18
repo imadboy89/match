@@ -49,7 +49,7 @@ class Users_log extends React.Component{
         time = isNaN(time) ? 0 : API_.get_date_timeS(new Date(time)) ;
         return <View style={{flexDirection:"row",width:"95%",height:40,borderStyle:"solid",borderWidth:1,margin:3,alignItems: 'center'}} key={s.time+""}>
         <Text style={{color:"#fff" ,textAlign: 'left',justifyContent:"center",width:"80%"}}> 
-        {s.name} - {time}
+        {s.name}-{s.app?s.app:""} - {time}
         </Text>
             <IconButton
               name="eye"
@@ -108,6 +108,7 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
       return this.state.users.slice(pagination_from, pagination_to).map( (_user,i) =>{
         const user = _user.email ;
         const online_at =  _user.datetime ? API_.get_date_time(_user.datetime) : "-";
+        console.log(_user);
         return (
           <View style={{flexDirection:"row",width:"95%",height:40,borderStyle:"solid",borderWidth:1,margin:3,alignItems: 'center'}} key={_user._id}>
             <TouchableHighlight style={{flex:1,height:"100%",justifyContent:"center"}} 
@@ -115,7 +116,9 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
               >
             <View style={{flex:1,width:"100%",height:"100%"}}>
               <View style={{flex:1,width:"100%",height:"100%", flexDirection:"row"}}>
-                <Text style={{color: _user.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',justifyContent:"center",width:"70%"}}> {user} </Text>
+                <Text style={{color: _user.disabled  ? "#95a5a6" : "#fff" ,textAlign: 'left',justifyContent:"center",width:"70%"}}> 
+                  {_user.app && _user.app!="AL-Match"?_user.app+"-":""}{user} 
+                </Text>
                 <Text style={{color: "#ecf0f1" ,textAlign: 'right',flex:50,fontSize:8,marginHorizontal:1,width:"29%"}} >
                   {_user.modelName && _user.modelName!="-"?_user.modelName:_user.device_type}
                 </Text>

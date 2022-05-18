@@ -497,7 +497,12 @@ class SettingsScreen extends React.Component {
               <Button color="#42dc84" title="Open" onPress={()=>{ API_.open_ext_url(this.terms); }}></Button>
             </View>
           </View>
-
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Share </Text> 
+            <View style={this.state.dynamic_style.settings_row_input}>
+              <Button color="#42dc84" title="Share" onPress={()=>{ API_.onShare("AL-match","AL-match Live matches results,highlites and news","https://play.google.com/store/apps/details?id=com.imados.almatch");}}></Button>
+            </View>
+          </View>
 
 
           <View style={this.state.dynamic_style.settings_row}>
