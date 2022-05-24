@@ -83,7 +83,6 @@ class LeagueScreen extends React.Component {
     if(resp.length == 0){
       this.showMatchesTab();
     }
-    
     this.setState({league_details:resp,loading:false,favorite:favorite});
     API_.setTitleWeb(this.league_name);
     API_.get_league_options(this.real_id).then(opts=>{
@@ -193,6 +192,7 @@ class LeagueScreen extends React.Component {
         const p_img = p && p.team_badge && p.team_badge!="" ? p.team_badge : false;
         const fav_style = this.state.favorite_p.includes(p_name) ? {backgroundColor: global_theme.fav_background} : {};
         return  <TouchableOpacity  
+                  key={p_name}
                   style={[this.state.dynamic_style.team_view,fav_style]} key={p.player_id+p_name}
                   delayLongPress={300}
                   activeOpacity={0.7}
@@ -393,6 +393,7 @@ class LeagueScreen extends React.Component {
       });
   }
   render() {
+    
     const c_years_options = this.state.c_years.map(y=><Picker.Item label={y[1]} value={y[0]} key={`${y[0]}-${y[1]}`} />);
     const c_stages_options = this.state.c_stages.map(y=><Picker.Item label={y[2]} value={y[0]} key={`${y[0]}-${y[1]}`} />);
     this.c_years = <Picker
@@ -426,11 +427,11 @@ class LeagueScreen extends React.Component {
         : null}
 
         <View style={this.state.dynamic_style.tabs_list}>
-          <View style={{flex:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing",matches_only_fav:false})}/></View>
-          <View style={{flex:1}}><Button title="News" onPress={()=>{
+          <View style={{flex:1,marginHorizontal:1}}><Button title="Standing" onPress={()=>this.setState({visible_tab:"standing",matches_only_fav:false})}/></View>
+          <View style={{flex:1,marginHorizontal:1}}><Button title="News" onPress={()=>{
               this.props.navigation.push('News', {news_id:"o=n"+this.league_id , title:this.league_name})
             }}/></View>
-          <View style={{flex:1}}><Button title="Scorers"  onPress={async()=>{
+          <View style={{flex:1,marginHorizontal:1}}><Button title="Scorers"  onPress={async()=>{
             if(this.state.scorers == undefined || this.state.scorers.length==0 ){
               this.setState({loading : true,});
               const favorite_p = await API_.getConfig("favorite_players",this.state.favorite_p);
@@ -438,9 +439,7 @@ class LeagueScreen extends React.Component {
               this.setState({scorers:scorers,loading : false, favorite_p:favorite_p})
             }
             this.setState({visible_tab:"scorers",matches_only_fav:false});}}/></View>
-          {/*<View style={{flex:1}}><Button title="Statistics" onPress={()=>this.setState({visible_tab:"stats"}) }/></View> */}
-          <View style={{flex:1}}><Button title="Matches" onPress={this.showMatchesTab}/></View>
-          {/* <Button title="Line-up" onPress={()=>this.setState({visible_tab:"lineup"})}/> */}
+          <View style={{flex:1,marginHorizontal:1}}><Button title="Matches" onPress={this.showMatchesTab}/></View>
         </View>
         {this.state.loading ? <Loading /> : 
           <View style={this.state.dynamic_style.container}>

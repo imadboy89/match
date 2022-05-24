@@ -24,6 +24,7 @@ class API {
     
     this.PB_sections = {205:"TV shows",201:"Movies"}
     this.yt_api_key = "AIzaSyC_Dnp88128mp5CZ_htFtSRpiNFBCMHaco";
+    this.scraping_pages = true;
     //https://tpb.party/search/peaky%20blinders/1/99/205
     this.showMsg = function(msg){console.log("showMsg : ",msg)}
 
@@ -45,6 +46,7 @@ class API {
     this.configs = {};
     this.proxy_post = `${this.server_url}.proxy2.php?url=`;
     this.proxy_get = `${this.server_url}.proxy.php?url=`;
+    this.proxy_scrp = `${this.server_url}scrp.php?url=`;
     this.cc_url = "https://o.kooora.com/f/big/[cc].png";
     this.cc_url_small = "https://o.kooora.com/f/[cc].png";
     this.IPTV_json = `${this.server_url}.index.php?action=json`;
@@ -127,6 +129,23 @@ class API {
     this.fav_utf8[false] = this.fav_utf8[0];
     this.fav_utf8[undefined] = this.fav_utf8[0];
     this.fav_utf8[null] = this.fav_utf8[0];
+
+
+    this.sport_types={
+      0:'كرة القدم',
+      1:'كرة السلة',
+      2:'كرة اليد',
+      3:'كرة الطائرة',
+      4:'هوكي الجليد',
+      5:'-',
+      6:'كرة التنس',
+      7:'-',
+      8:'كرة القدم صالات',
+    };
+    this.sport_scoops={
+      'l':'مسابقات محلية',
+      'o':'مسابقات عالمية',
+    }
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;
@@ -181,8 +200,14 @@ class API {
     
     
     if( (this.isWeb || use_proxy) && force_origin!=true){
-      const _url_enc = Base64.btoa(url);
-      url = method=="GET" ? this.proxy_get+_url_enc : this.proxy_post+_url_enc; 
+      if(url.split("scarp_").length==2){
+        url = url.replace("scarp_","");
+        const _url_enc = Base64.btoa(url);
+        url = this.proxy_scrp+_url_enc;
+      }else{
+        const _url_enc = Base64.btoa(url);
+        url = method=="GET" ? this.proxy_get+_url_enc : this.proxy_post+_url_enc; 
+      }
     }
     //url = "https://developers.facebook.com/tools/debug/echo/?q="+url;
 
@@ -369,6 +394,7 @@ class API {
       };
     let url = news_links[source_id] ? news_links[source_id] : news_links[1];
     url = news_id ? `https://m.kooora.com/?n=0&${news_id}&arabic&pg=${page}` : url;
+    url = this.scraping_pages ? "scarp_"+url : url;
     if(!this.running_calls_check(url)){return [];}
     return this.http(url,"GET",null,{})
     .then(resp=>{
@@ -378,7 +404,19 @@ class API {
       }
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      let list = url.includes("kooora.com")?scrap.get_news(resp) : scrap.get_news_hp(resp)
+      let list = undefined;
+      if(this.scraping_pages){
+        try {
+          list = JSON.parse(resp);
+          list = scrap.get_news(resp, list.news);
+          //list = list.news.map(line=>{ return {link:line[1], date:line[2], img:line[3].replace("//","https://"), title_news:line[4], desc:line[5],}; });
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
+      }else{
+        list = url.includes("kooora.com")?scrap.get_news(resp) : scrap.get_news_hp(resp)  
+      }
       if(url.includes("kooora.com")){
         let exist_list = [];
         list = list.filter(o=>{
@@ -396,6 +434,7 @@ class API {
   get_events(){
     this.scrap = new Scrap();
     let url = "https://m.kooora.com/?t=0&arabic=true";
+    url = this.scraping_pages ? "scarp_"+url : url;
     return this.http(url,"GET",null,{})
     .then(resp=>{
       if(resp==undefined || !resp){
@@ -403,24 +442,46 @@ class API {
       }
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      let list = scrap.get_events(resp);
+      let list=[];
+      if(this.scraping_pages){
+        try {
+          const comps= JSON.parse(resp);
+          return scrap.get_events(resp,comps.comps);
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
+      }
+      list = scrap.get_events(resp);
       return list;
     });
   }
   
   async get_leagues_k(region_id){
-    const url = "https://m.kooora.com/?y="+region_id+"&arabic";
+    let url = "https://m.kooora.com/?y="+region_id+"&arabic";
+    url = this.scraping_pages ? "scarp_"+url : url;
     if(!this.running_calls_check(url)){return [];}
     return this.http(url,"GET",null,{})
     .then(async resp=>{
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       let leagues = [];
-      try {
-        leagues = scrap.get_leagues(resp);
-      } catch (error) {
-        API_.debugMsg(error,"danger");
+      if(this.scraping_pages){
+        try {
+          leagues = JSON.parse(resp);
+          leagues = scrap.get_leagues(resp,leagues.comps);
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
+      }else{
+        try {
+          leagues = scrap.get_leagues(resp);
+        } catch (error) {
+          API_.debugMsg(error,"danger");
+        }
       }
+
       for(let i =0;i<leagues.length;i++){
         leagues[i].img = leagues[i] && leagues[i].koora_id && leagues[i].koora_id>0 && this.leagues_dict[leagues[i].koora_id] ? this.domain_+this.leagues_dict[leagues[i].koora_id].logo : "";
       }
@@ -432,8 +493,18 @@ class API {
     });
   }
   get_player(player_id){
-    return this.http("https://m.kooora.com/?player="+player_id+"&arabic","GET",null,{})
+    let url = "https://m.kooora.com/?player="+player_id+"&arabic";
+    url = this.scraping_pages ? "scarp_"+url : url;
+    return this.http(url,"GET",null,{})
     .then(resp=>{
+      if(this.scraping_pages){
+        try {
+          return JSON.parse(resp);
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
+      }
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       return scrap.get_player(resp);
@@ -531,18 +602,30 @@ class API {
     return teams_info;
   }
   async get_team(team_id,save_db=true,teams_info=undefined,get_fresh=false){
-    "https://m.kooora.com/?player=33085"
     if(teams_info==undefined){
       teams_info = await this.getTeam_logo_k();
     }
     if(get_fresh==false && teams_info[team_id]){
       return teams_info[team_id];
     }
-    return this.http("https://m.kooora.com/?team="+team_id+"&arabic","GET",null,{})
+    let url = "https://m.kooora.com/?team="+team_id+"&arabic";
+    url = this.scraping_pages ? "scarp_"+url : url;
+    return this.http(url,"GET",null,{})
     .then(resp=>{
-      let scrap = new Scrap();
-      scrap.isWeb = this.isWeb;
-      const res = scrap.get_team(resp);
+      let res = [];
+      if(this.scraping_pages){
+        try {
+          res = JSON.parse(resp);
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
+      }else{
+        let scrap = new Scrap();
+        scrap.isWeb = this.isWeb;
+        res = scrap.get_team(resp);
+      }
+
       let img_uri = res && res.team_group_photo ? res.team_group_photo : false;
       let img_logo_uri = res && res.team_logo ? res.team_logo : false;
       img_uri = img_uri && img_uri.slice(0,2)=="//" ? img_uri.replace("//","https://") : img_uri;
@@ -565,14 +648,32 @@ class API {
     }).catch(error=>API_.showMsg(error,"danger"));
   }
   get_scorers(league_id){
-    return this.http("https://m.kooora.com/?c="+league_id+"&scorers=true&arabic","GET",null,{})
+    let url = "https://m.kooora.com/?c="+league_id+"&scorers=true&arabic" ;
+    url = this.scraping_pages ? "scarp_"+url : url;
+    return this.http(url,"GET",null,{})
     .then(async resp=>{
+      let scorers = [];
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
-      let scorers = [];
-      try {
-        scorers = scrap.get_scorers(resp);
-      } catch (error) {console.log(error);}
+      if(this.scraping_pages){
+        try {
+          scorers = JSON.parse(resp);
+          scorers = scorers.scorers_details;
+          try {
+            scorers = scrap.get_scorers(resp,scorers);
+          } catch (error) {console.log(error);}
+  
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
+      }else{
+
+        try {
+          scorers = scrap.get_scorers(resp);
+        } catch (error) {console.log(error);}
+  
+      }
       const teams = await this.getTeam_logo_k();
       
       return scorers.map(s => {
@@ -635,7 +736,7 @@ class API {
         scrap.isWeb = this.isWeb;
         let article  = {};
         try {
-          article  = [1,6,7].includes(source_id)  ? scrap.get_article(html) : scrap.get_article_hp(html);
+          article  = [1,6,7].includes(source_id) ? scrap.get_article(html) : scrap.get_article_hp(html);
         } catch (error) {console.log(error)}
         return article;
       }catch(err){console.log(err);}
@@ -645,17 +746,38 @@ class API {
   }
   get_article(link,source_id=1){
     //https://www.hesport.com/akhbar/122520.html
-    const url = "https://m.kooora.com/?"+link+"&arabic";
+    this.scraping_pages;
+    let url = "https://m.kooora.com/?"+link+"&arabic";
+    url = this.scraping_pages ? "scarp_"+url : url;
     return this.http(url,"GET",null,{})
     .then(html=>{
-      try{
-        let scrap = new Scrap();
+      let article  = {};
+      let scrap = new Scrap();
+      if(this.scraping_pages){
+        try {
+          const _article = JSON.parse(html);
+          article.related = _article.article_links.map(n=> {return {related_link:n[0],related_title:n[1],url:n[0]} });
+          article.related_news = _article.article_related.map(n=> {return {related_news_id:n[0],related_news_title:n[1]} });
+          article.related_images = _article.article_images.map(n=> {return {img_link:n[0].replace(/^\/\//,"https://"),img_desc:n[1]} });
+
+          article.body = scrap.decodeEntities(_article.article_content);
+          article.date = _article.he_article_date;
+          article.title_news = _article.he_article_title;
+          article.date = article.date && article.date.slice && article.date.slice(0,1) =='#' ? API_.get_date2(new Date(article.date.replace("#","") * 1000)) : article.date ;
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
+      }else{
+        
         scrap.isWeb = this.isWeb;
-        let article  = {};
         try {
           article  = scrap.get_article(html);
-          article.url= url;
+          
         } catch (error) {console.log(error)}
+      }
+      try{
+        article.url= url;
         return article;
       }catch(err){console.log(err);}
 
@@ -1661,8 +1783,19 @@ class API {
     }).catch(error=>API_.showMsg(error,"danger"));
   }
   get_league_options(id){
-    return this.http("https://m.kooora.com/?c="+id+"&arabic","GET",null,{})
+    let url = "https://m.kooora.com/?c="+id+"&arabic";
+    url = this.scraping_pages ? "scarp_"+url : url;
+    return this.http(url,"GET",null,{})
     .then(resp=>{
+      if(this.scraping_pages){
+        try {
+          const _opt = JSON.parse(resp);
+          return {years :_opt.ci_years, stages :_opt.ci_stages};
+        } catch (error) {
+          console.log(error,url);
+          return [];
+        }
+      }
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       let options = [];

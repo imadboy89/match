@@ -632,10 +632,14 @@ class Scrap {
     //matches = matches.sort((a,b)=>{return a["country"]=="MA"? -1 : 1;});
     return matches;
   }
-  get_scorers(html){
-    //let patttern = /var\s+scorers_details\s*=\s*new\s+Array\s*\((([^;]*\r\n[^;]*)*)/gmi;
-    let patttern = /var\s+scorers_details\s*=\s*new\s+Array\s*\(\r\n([^0][^;\r\n]*\r\n)*/gim;
-    const scorers_details = this.get_var_array(html,"scorers_details", '-1,-1\\s*\\);');
+  get_scorers(html,scorers=undefined){
+    let scorers_details = [];
+    if(scorers){
+      scorers_details = scorers;
+    }else{
+      scorers_details = this.get_var_array(html,"scorers_details", '-1,-1\\s*\\);');
+    }
+    
     const header = [
       "goals",
       "goals_pn",
@@ -769,8 +773,10 @@ class Scrap {
     }
     return infos;
   }
-  get_news(html){
-    let news = this.get_var_array(html, "news");
+  get_news(html, news=undefined){
+    if(!news | news==undefined){
+      news = this.get_var_array(html, "news");
+    }
     let out_list = []; 
     for (let i=0; i<news.length;i++){
       let line = news[i];
@@ -780,8 +786,13 @@ class Scrap {
     }
     return out_list;
   }
-  get_events(html){
-    let comps = this.get_var_array(html, "comps");
+  get_events(html,_comps=undefined){
+    let comps
+    if(_comps){
+      comps = _comps;
+    }else{
+      comps = this.get_var_array(html, "comps");
+    }
     let out_list = {};
     let key = "";
     for(let i =0;i<comps.length;i++){
@@ -800,19 +811,43 @@ class Scrap {
 
     return out_list;
   }
-  get_leagues(html){
+  get_leagues(html,comps=undefined){
     '6950,0,"نهائيات كأس العالم <span dir=ltr>2022</span>","",'
-    const comp_h = ["id","sport_id","name","info_1"]
-    let comps = this.get_var_array(html, "comps");
+    const comp_h = ["id","sport_id","name","info_1"];
+    if(!comps ||comps==undefined){
+      comps = this.get_var_array(html, "comps");
+    }
     let out_list = []; 
-    
+    let sports_type_cnt = 99999999;
+    let s_index = -1;
     for (let i=0; i<comps.length;i++){
       let line = comps[i];
+      /*
       if(line[0]==0 || [0,8].includes(line[1])==false){
         continue;
       }
-      
-      out_list.push({"img": "","league_name": this.removeHtml(line[2]), id:line[0],koora_id:line[0]});
+      */
+      const league_name = this.removeHtml(line[2]);
+      if(parseInt(line[0]) == 0){
+        const sport_type = parseInt(line[1]) in API_.sport_types ? API_.sport_types[parseInt(line[1])] : '-';
+        const sport_scop = league_name in API_.sport_scoops ? API_.sport_scoops[league_name] : '-' ;
+
+        sports_type_cnt+=1;
+        line[0] = sports_type_cnt;
+        const _title =`${sport_scop} : ${sport_type}`;
+        out_list.push({title:_title,data:[], id:_title});
+        s_index+=1;
+        continue;
+      }
+      out_list[s_index].data.push({
+        "img": "",
+        "league_name": league_name, 
+        id:line[0],
+        koora_id:line[0] , 
+        sport_type:line[1], 
+        sports_type_cnt : sports_type_cnt,
+        is_sport_info : line[0] == sports_type_cnt,
+      });
     }
     return out_list;
   }

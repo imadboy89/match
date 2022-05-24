@@ -178,9 +178,9 @@ class CategoriesScreen extends React.Component {
 
   }
   changesource = (itemValue, itemIndex)=>{
-    if(backup.admin!=true){return true;}
     this.state.source_id = parseInt(itemValue);
     this.state.page=1;
+    this.setState({loading:true,list:[]});
     this.get_cats();
   }
   render() {
@@ -190,20 +190,22 @@ class CategoriesScreen extends React.Component {
         <Text style={{fontSize:20,color:"#dfe6e9" }}>Comming soon...</Text>
       </View>);
     }
-    const sources = (      <Picker
+    const sources = (<Picker
       selectedValue={this.state.source_id}
       style={{ height:40,backgroundColor:"#2d3436",color:"#dfe6e9" ,width:150}}
       itemStyle={{height:70,backgroundColor:"#2d3436",color:"#dfe6e9" }}
       onValueChange={this.changesource}
     >
       <Picker.Item label="Almtch" value={1} />
+      <Picker.Item label="Radio" value={6} />
+  </Picker>);
+  /*
       <Picker.Item label="kora-live" value={2} />
       <Picker.Item label="inApp-IPTV" value={3} />
       {(backup && backup.is_auth && backup.admin==true) ?  <Picker.Item label="local-IPTV" value={4} /> : null}
       {(backup && backup.is_auth && backup.admin==true) ?  <Picker.Item label="IPTV" value={5} /> : null}
-      <Picker.Item label="Radio" value={6} />
-      
-  </Picker>);
+
+  */
     return (
       <View style={styles.container}>
         <ItemsList

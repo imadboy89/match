@@ -119,7 +119,9 @@ get_leagues(){
           favorite={this.state.favorite}
           set_fav={this.set_fav}
           loading={this.state.loading} list={this.state.list} 
-          onclick={this.onItem_clicked} key_={this.state.key} key_key="id"  />
+          onclick={this.onItem_clicked} key_={this.state.key} key_key="id"
+            />
+          
       </View>
     );
   }

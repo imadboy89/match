@@ -168,6 +168,12 @@ class ItemsList extends React.Component {
         </View>
         );
     }else if(["league_name","title_news","title_long"].includes(col_key)){
+      if(item.is_sport_info){
+        const sport_type = parseInt(item.sport_type) in API_.sport_types ? API_.sport_types[parseInt(item.sport_type)] : '-';
+        const sport_scop = item.league_name in API_.sport_scoops ? API_.sport_scoops[item.league_name] : '-' ;
+        const extra_style = {backgroundColor:"#2980b999"};
+        return <Text style={[this.state.dynamic_style.item,extra_style]} numberOfLines={1}>{sport_scop} : {sport_type}</Text>;
+      }
       this.props.hide_images;
       let fav_icon = null;
       if(item.url){
@@ -339,6 +345,7 @@ class ItemsList extends React.Component {
     let header_style = {flex:1};
     const max_lenght = parseInt(this.windowWidth/14) ;
     if(title.length>max_lenght){ header_style={fontSize:17}; }
+    
     return (
       <TouchableHighlight style={this.state.dynamic_style.header_container}
         underlayColor={"green"}
@@ -347,6 +354,8 @@ class ItemsList extends React.Component {
           let id_=0;
           try {
             id_ = API_.common_league_id({title,id,is_koora});
+            id_ = _id==0?title:_id;
+            
           } catch (error) {}
           if (id_==0 || this.props.refresh_list == undefined) return;
           if(this.state.header_to_hide.includes(id_)){

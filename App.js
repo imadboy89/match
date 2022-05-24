@@ -39,7 +39,7 @@ global.g = null;
 //--release-channel imad | default
 // cmd to add google firebase server key 
 // expo push:android:upload --api-key AAAAFPoWn8w:APA91bHJ8F9ueKj_gaHXlqpJ-Ba2OIpwvI-GecDdfIWzCYLt0dVrJBmTZ6P1UmcezWjubrOqlZADJcNRdNldTcMsuhnTOJ7IpXvon_kJyHM0Rh9KT-5cr04FKd30-VeEAipDggMVKKbS
-global.website_url = "https://lio0.com/";
+global.website_url = "https://almatch.is-a.dev/";
 global. API_ = new API();
 global. API_.appname = "AlMatch"
 global. Global_theme_name = "dark violet";
