@@ -48,7 +48,15 @@ class LeagueScreen extends React.Component {
     }
     this.c_years=null;
     this.c_stages=null;
-    
+    this.set_cc();
+    //https://imad.is-a.dev/imad_404/cc/png250px/ma.png
+  }
+  set_cc=()=>{
+    this.league_img_origin = this.league_img+"";
+    if(this.league_img && this.league_img!="" && this.league_img.includes('/f/')){
+      const cc_name =this.league_img.split("/").pop().toLowerCase();
+      this.league_img = `${API_.server_url}/cc/png250px/${cc_name}`;
+    }
   }
   componentDidMount(){
     this.is_k = true;
@@ -417,7 +425,12 @@ class LeagueScreen extends React.Component {
       <ScrollView style={this.state.dynamic_style.container}>
         { this.league_img ?  
         <View style={this.state.dynamic_style.channel_logo_v}>
-            <ImageBackground style={{flex:1,width:"100%"}} source={{uri: this.league_img}} >
+            <ImageBackground style={{flex:1,width:"100%"}} source={{uri: this.league_img}} onError={()=>{
+              if(this.league_img != this.league_img_origin && this.league_img && this.league_img!=""){
+                this.league_img = this.league_img_origin;
+                this.setState({});
+              }
+            }}>
               <View style={this.state.dynamic_style.news_img_v}></View>
               <View style={this.state.dynamic_style.news_title_v}>
                 <Text style={this.state.dynamic_style.news_title_t} numberOfLines={1}>{this.league_name}</Text>

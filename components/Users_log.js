@@ -108,7 +108,7 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
       return this.state.users.slice(pagination_from, pagination_to).map( (_user,i) =>{
         const user = _user.email ;
         const online_at =  _user.datetime ? API_.get_date_time(_user.datetime) : "-";
-        console.log(_user);
+        
         return (
           <View style={{flexDirection:"row",width:"95%",height:40,borderStyle:"solid",borderWidth:1,margin:3,alignItems: 'center'}} key={_user._id}>
             <TouchableHighlight style={{flex:1,height:"100%",justifyContent:"center"}} 
