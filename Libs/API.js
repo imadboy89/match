@@ -751,34 +751,23 @@ class API {
     url = this.scraping_pages ? "scarp_"+url : url;
     return this.http(url,"GET",null,{})
     .then(html=>{
-      let article  = {};
       let scrap = new Scrap();
+      scrap.isWeb = this.isWeb;
+      let article = undefined;
       if(this.scraping_pages){
         try {
-          const _article = JSON.parse(html);
-          article.related = _article.article_links.map(n=> {return {related_link:n[0],related_title:n[1],url:n[0]} });
-          article.related_news = _article.article_related.map(n=> {return {related_news_id:n[0],related_news_title:n[1]} });
-          article.related_images = _article.article_images.map(n=> {return {img_link:n[0].replace(/^\/\//,"https://"),img_desc:n[1]} });
-
-          article.body = scrap.decodeEntities(_article.article_content);
-          article.date = _article.he_article_date;
-          article.title_news = _article.he_article_title;
-          article.date = article.date && article.date.slice && article.date.slice(0,1) =='#' ? API_.get_date2(new Date(article.date.replace("#","") * 1000)) : article.date ;
+          article = JSON.parse(html);
         } catch (error) {
           console.log(error);
           return [];
         }
-      }else{
-        
-        scrap.isWeb = this.isWeb;
-        try {
-          article  = scrap.get_article(html);
-          
-        } catch (error) {console.log(error)}
       }
+      try {
+        article  = scrap.get_article(html, article);
+      } catch (error) {console.log(error)}
       try{
         article.url= url;
-        return article;
+        return article ? article : {};
       }catch(err){console.log(err);}
 
     });

@@ -16,30 +16,41 @@ class Scrap {
         "3":"أوقف اللعب"
     };
   }
-  get_article(html){
+  get_article(html, _article=undefined){
     if(html == null || !html || !html.match){return []}
     //he_article_date 
-    const arr_end = '\\"\\"\\);';
-    let patttern_body = /var\s*article_content\s*=\s*".*/gi;
-    let m = html.match(patttern_body);
-    let body = m && m.length>0 ? m[0].replace(/\\"/g,"'") : "";
-    body = body.split('"').length>1 ? body.split('"')[1] : "Error";
-    //body = body.replace("<p");
-    const article = {};
-    article.related =this.get_var_array(html, "article_links",arr_end);
-    article.related_news =this.get_var_array(html, "article_related",arr_end);
-    article.related_images =this.get_var_array(html, "article_images",arr_end);
-    
+    if(_article==undefined || !_article){
+      const arr_end = '\\"\\"\\);';
+      let patttern_body = /var\s*article_content\s*=\s*".*/gi;
+      let m = html.match(patttern_body);
+      let body = m && m.length>0 ? m[0].replace(/\\"/g,"'") : "";
+      body = body.split('"').length>1 ? body.split('"')[1] : "Error";
+      //body = body.replace("<p");
+      _article = {};
+      _article.article_links =this.get_var_array(html, "article_links",arr_end);
+      _article.article_related =this.get_var_array(html, "article_related",arr_end);
+      _article.article_images =this.get_var_array(html, "article_images",arr_end);
+      _article.he_article_date = this.get_var(html,"he_article_date");
+      _article.he_article_title = this.get_var(html,"he_article_title");
+      _article.article_content = body;
+    }
+    const article = {}
+    article.related        = _article.article_links;
+    article.related_news   = _article.article_related;
+    article.related_images = _article.article_images;
+    article.date           = _article.he_article_date;
+    article.title_news     = _article.he_article_title;
+    article.body           = _article.article_content;
+
     
     article.related      = article.related    .map(n=> {return {related_link:n[0],related_title:n[1],url:n[0]} });
     article.related_news = article.related_news.map(n=> {return {related_news_id:n[0],related_news_title:n[1]} });
     article.related_images = article.related_images.map(n=> {return {img_link:n[0].replace(/^\/\//,"https://"),img_desc:n[1]} });
     //article.news =this.get_var_array(html, "news");
-    article.body = this.decodeEntities(body);
-    article.date = this.get_var(html,"he_article_date");
+    article.body = this.decodeEntities(article.body);
+    
     article.date = article.date && article.date.slice && article.date.slice(0,1) =='#' ? API_.get_date2(new Date(article.date.replace("#","") * 1000)) : article.date ;
 
-    article.title_news = this.get_var(html,"he_article_title");
     return article;
   }
   parse_details(details){
@@ -1259,7 +1270,7 @@ class Scrap {
   decodeEntities(str) {
     if(str && typeof str === 'string') {
       // strip script/html tags
-      str = str.replace(/<img\s*src\s*=\s*("|')\s*([^'"]+)\s*("|')\s\/>/gi,"IMG***$2IMG**");
+      str = str.replace(/<img\s*src\s*=\s*\\*("|')\s*([^'"\\]+)\s*\\*("|')\s\/>/gi,"IMG***$2IMG**");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&quot;/gi," ' ");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&nbsp;/gi," ");
       str = str.replace(/<br\s*\/>/gi,"\r\n").replace(/&[^;]+;/gi,"");
