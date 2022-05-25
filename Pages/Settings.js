@@ -46,28 +46,34 @@ class SettingsScreen extends React.Component {
     this.terms = "https://imad.is-a.dev/terms_and_conditions.html";
   }
   async load_favs(){
-    const fav_l = await API_.getConfig("favorite_leagues",[]);
-    const fav_tk = await API_.getConfig("favorite_teams_k",[]);
-    const fav_t = await API_.getConfig("favorite_teams",[]);
-    const fav_c = await API_.getConfig("favorite_channels",[]);
-    const fav_p = await API_.getConfig("favorite_players",[]);
-    const default_ui = await API_.getConfig("default_ui",false);
-    const is_materialTopTab = await API_.getConfig("is_materialTopTab",false);
-    const _force_open_expo = await API_.getConfig("force_open_expo",false);
-    const teams_inf_k = await API_.getTeam_logo_k();
-    this.setState({
-        fav_leagues_nbr  : fav_l.length  ? fav_l.length : 0,
-        fav_teams_nbr    : fav_t.length  ? fav_t.length : 0,
-        fav_teams_k_nbr  : fav_tk.length ? fav_tk.length : 0,
-        fav_channels_nbr : fav_c.length  ? fav_c.length : 0,
-        fav_players_nbr  : fav_p.length  ? fav_p.length : 0,
-        is_debug         : API_.is_debug,
-        filtering        : API_.filtering,
-        is_materialTopTab: is_materialTopTab,
-        teams_inf_k      : teams_inf_k && Object.keys(teams_inf_k) && Object.keys(teams_inf_k).length ? Object.keys(teams_inf_k).length : 0,
-        force_open_expo : _force_open_expo,
-        is_movies_home_page : default_ui != false && default_ui[0]!="Home",
-      });
+    try {
+      const fav_l = await API_.getConfig("favorite_leagues",[]);
+      const fav_tk = await API_.getConfig("favorite_teams_k",[]);
+      const fav_t = await API_.getConfig("favorite_teams",[]);
+      const fav_c = await API_.getConfig("favorite_channels",[]);
+      const fav_p = await API_.getConfig("favorite_players",[]);
+      const default_ui = await API_.getConfig("default_ui",false);
+      const is_materialTopTab = await API_.getConfig("is_materialTopTab",false);
+      const _force_open_expo = await API_.getConfig("force_open_expo",false);
+
+      const teams_inf_k = await API_.getTeam_logo_k();
+      this.setState({
+          fav_leagues_nbr  : fav_l && fav_l.length  ? fav_l.length : 0,
+          fav_teams_nbr    : fav_t && fav_t.length  ? fav_t.length : 0,
+          fav_teams_k_nbr  : fav_tk && fav_tk.length ? fav_tk.length : 0,
+          fav_channels_nbr : fav_c && fav_c.length  ? fav_c.length : 0,
+          fav_players_nbr  : fav_p && fav_p.length  ? fav_p.length : 0,
+          is_debug         : API_.is_debug,
+          filtering        : API_.filtering,
+          is_materialTopTab: is_materialTopTab,
+          teams_inf_k      : teams_inf_k && Object.keys(teams_inf_k) && Object.keys(teams_inf_k).length ? Object.keys(teams_inf_k).length : 0,
+          force_open_expo : _force_open_expo,
+          is_movies_home_page : default_ui != false && default_ui[0]!="Home",
+        });
+    } catch (error) {
+      console.log(error);
+    }
+
   }
   componentDidMount(){
     if(this.props.route && this.props.route.params && this.props.route.params.action=="signup"){

@@ -21,7 +21,7 @@ class User_log extends React.Component{
         let i=0;
         return Object.keys(dict).map(key=>{
           const value = dict[key];
-          if (value.constructor == Object){ 
+          if (value && value.constructor == Object){ 
             this.objects_[key] = value;
             return null;
           }else if(value=="-"){

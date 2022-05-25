@@ -261,6 +261,7 @@ class BackUp{
           usingAnon = false;
         }*/
         await this.login();
+        backup.user_log();
       }
 
     clean = async(db)=>{
@@ -301,7 +302,10 @@ class BackUp{
         return false;
       }
       let settings = await API_.get_settings();
-      if(settings.favorite_leagues.length == 0 && settings.favorite_teams_k.length == 0 && settings.favorite_channels.length == 0  ){
+      if(
+        settings && settings.favorite_leagues && settings.favorite_leagues.length == 0 && 
+        settings.favorite_teams_k && settings.favorite_teams_k.length == 0 && 
+        settings.favorite_channels && settings.favorite_channels.length == 0  ){
         API_.debugMsg("saving empty configs","info");
         return false;
       }
