@@ -17,7 +17,7 @@ class CategoriesScreen extends React.Component {
         key_key:"category_id",
         loading:true,
         page:1,
-        source_id:1,
+        source_id:6,
     };
     this.end = false;
     this.get_cats(1);

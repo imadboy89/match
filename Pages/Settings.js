@@ -55,6 +55,7 @@ class SettingsScreen extends React.Component {
       const default_ui = await API_.getConfig("default_ui",false);
       const is_materialTopTab = await API_.getConfig("is_materialTopTab",false);
       const _force_open_expo = await API_.getConfig("force_open_expo",false);
+      const notification_fav_teams = await API_.getConfig("notification_fav_teams",false);
 
       const teams_inf_k = await API_.getTeam_logo_k();
       this.setState({
@@ -69,6 +70,7 @@ class SettingsScreen extends React.Component {
           teams_inf_k      : teams_inf_k && Object.keys(teams_inf_k) && Object.keys(teams_inf_k).length ? Object.keys(teams_inf_k).length : 0,
           force_open_expo : _force_open_expo,
           is_movies_home_page : default_ui != false && default_ui[0]!="Home",
+          notification_fav_teams : notification_fav_teams,
         });
     } catch (error) {
       console.log(error);
@@ -245,6 +247,24 @@ class SettingsScreen extends React.Component {
               />
             </Text>
           </View>
+
+          <View style={this.state.dynamic_style.settings_row}>
+            <Text style={this.state.dynamic_style.settings_row_label}>Notification for fav teams </Text> 
+            <Text style={this.state.dynamic_style.settings_row_input}>
+              <Switch
+                style={{justifyContent:"center",marginVertical:"auto",marginHorizontal:10,width:40}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={this.state.is_materialTopTab__v ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={(val)=>{
+                  API_.setConfig("notification_fav_teams",val);
+                  this.setState({notification_fav_teams:val});
+                }}
+                value={this.state.notification_fav_teams}
+              />
+            </Text>
+          </View>
+
           { backup.admin!=true ? null : 
           <>
           <View style={this.state.dynamic_style.settings_row}>

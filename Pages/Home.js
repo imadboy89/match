@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {  View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl, Picker , Switch} from 'react-native';
+import {  View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl, Switch} from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -11,6 +11,7 @@ import Loader from "../components/Loader";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import User_log from "../components/User_log";
+import {Picker} from '@react-native-picker/picker';
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -41,7 +42,7 @@ class HomeScreen extends React.Component {
     this.is_authenting = false;
     this.interval_refresh = setInterval(()=>{
       const time_now = (new Date()).getTime();
-      if(time_now-this.last_refreshed >=20){
+      if(time_now-this.last_refreshed >=this.max_delay_to_refresh){
         this.last_refreshed = (new Date()).getTime();
         this._refresh_();
       }
@@ -49,6 +50,7 @@ class HomeScreen extends React.Component {
     this.didBlurSubscription = this.props.navigation.addListener(
       'focus',
       payload => {
+        this.is_focused = true;
         /*
         if(this.state.is_auth!=backup.is_auth){
           this.state.is_auth=backup.is_auth;
@@ -58,6 +60,7 @@ class HomeScreen extends React.Component {
           return;
         }
         const time_now = (new Date()).getTime();
+        console.log(time_now, this.last_refreshed ,time_now-this.last_refreshed);
         this.render_header();
         if(time_now-this.last_refreshed >=this.max_delay_to_refresh){
           this.last_refreshed = (new Date()).getTime();
@@ -186,12 +189,14 @@ class HomeScreen extends React.Component {
     if(load_settings && backup.is_auth){
       backup.load_settings().then(o=>{
         if(o){
+          console.log("settings loaded");
           this.refresh_leagues(this.state.list);
         }
       })
     }
     if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
-      this.get_matches(null,setLoading);
+      console.log("get_matches loading");
+      this.get_matches(null,true);
     }
   }
   checkUpdAvailability(force_update=false){
@@ -353,15 +358,12 @@ class HomeScreen extends React.Component {
   screen_focus_mng(){
     this.is_focused = true;
     this.subscribetions=[];
-    this.subscribetions.push(this.props.navigation.addListener('focus', () => {
-      this.is_focused = true;
-    }));
     this.subscribetions.push(this.props.navigation.addListener('blur', () => {
       this.is_focused = false;
     }));
   }
   get_matches = (date_obj=null,setloading=true,next=false)=>{
-    if(this.is_focused==false){return;}
+    if(this.is_focused==false){console.log("get_matches not focused");return;}
     if(this.state.loading==false && setloading){this.setState({loading:true});}
     if(this.state.source_id!=0){
       return this.get_matches_koora(date_obj,next);
@@ -480,6 +482,7 @@ get_matches_koora = async(date_obj=null,next=false)=>{
   //API_.load_leagues(this.refresh_leagues);
   get_notifications_matches().then(o=>{
     API_.notifications_matches=o;
+    console.log(API_.notifications_matches);
     this.refresh_leagues();
   });
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
@@ -610,12 +613,8 @@ show_DateP(){
     </Picker>
   </View>);
     return (
-      <GestureRecognizer 
+      <View 
         style={this.state.dynamic_style.container}
-        directionalOffsetThreshold={60}
-        onSwipeRight={(state) => this.onSwipeRight(state)}
-        onSwipeLeft={(state) => this.onSwipeLeft(state)}
-
       >        
         <ItemsList 
           ListHeaderComponent = {ListHeaderComponent}
@@ -640,7 +639,7 @@ show_DateP(){
           modal_visible={this.state.show_user_log && this.state.user_log} 
           closeModal={()=>{this.setState({show_user_log:false})}} /> 
 
-      </GestureRecognizer>
+      </View>
     );
   }
 }

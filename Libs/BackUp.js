@@ -622,9 +622,13 @@ class BackUp{
       } catch (error) {API_.showMsg(error,"danger");}
       return false;
     }
-    get_match_live = async(date_obj)=>{
+    get_match_live = async(date_obj,second_try=undefined)=>{
       if(!this.is_mdb_ok()){
-        return false;
+        if(second_try){
+          return false;
+        }
+        const tmp_1 = await API_.sleep(1000);
+        return await this.get_match_live(date_obj, true);
       }
       const query = {active:true, isWeb:API_.notify_isWeb} ;
       if(date_obj){
