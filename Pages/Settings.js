@@ -84,6 +84,7 @@ class SettingsScreen extends React.Component {
     this.load_favs();
     let short_title = "Settings" ;
     getTheme("styles_settings").then(theme=>this.setState({dynamic_style:theme})); 
+    /*
     ScreenOrientation.getOrientationLockAsync().then(o=>{
       //console.log(o,ScreenOrientation.OrientationLock,);
     }).catch(error=>API_.debugMsg(error+"","warning"));
@@ -91,6 +92,7 @@ class SettingsScreen extends React.Component {
     ScreenOrientation.getOrientationAsync().then(o=>{
       this.setState({ is_landScape : [3,4].includes(o) });
     }).catch(error=>API_.debugMsg(error+"","warning"));
+    */
   }
   componentWillUnmount(){
     this.toggle_keys_listner(false);
@@ -101,7 +103,7 @@ class SettingsScreen extends React.Component {
   }
   toggle_keys_listner=(status)=>{
     this.state.keyDown_listner = status;
-    if(this.state.keyDown_listner){
+    if(status){
       if(API_.isWeb){
         document.addEventListener("keydown", this.keysListnerFunction, false);
       }
@@ -110,7 +112,9 @@ class SettingsScreen extends React.Component {
         document.removeEventListener("keydown", this.keysListnerFunction, false);
       }
     }
-    this.setState({keyDown_listner : status});
+    if(API_.isWeb){
+      this.setState({keyDown_listner : status});
+    }
   }
   keysListnerFunction = (event)=>{
     if(this.state.keyDown_listner){
