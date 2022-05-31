@@ -463,6 +463,7 @@ class BackUp{
             error = results["data"][i]["status"] && results["data"][i]["status"]=="error" ? results["data"][i]["message"] : "" ;
           }
         }
+        error = error=="" && results && results["error"] ? results["error"] : error ;
         if(pushednotifto>0){
           API_.showMsg("تم إرسال الإخطار بنجاح إلى "+pushednotifto+" مستخدمين.","success");
         }else if (error!=""){
