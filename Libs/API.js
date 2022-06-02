@@ -393,7 +393,8 @@ class API {
       7:"https://m.kooora.com/?ok&arabic&ok",
       };
     let url = news_links[source_id] ? news_links[source_id] : news_links[1];
-    url = news_id ? `https://m.kooora.com/?n=0&${news_id}&arabic&pg=${page}` : url;
+    url = news_id ? `https://m.kooora.com/?${news_id}&mode=n&arabic&pg=${page}` : url;
+    //https://m.kooora.com/?player=25254&mode=n&arabic
     url = this.scraping_pages ? "scarp_"+url : url;
     if(!this.running_calls_check(url)){return [];}
     return this.http(url,"GET",null,{})
