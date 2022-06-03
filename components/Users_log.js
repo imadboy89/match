@@ -26,8 +26,13 @@ class Users_log extends React.Component{
       };
       
     } 
-    componentDidMount(){
+    componentDidMount() {
+      this.props.onRef(this);
     }
+    componentWillUnmount() {
+      this.props.onRef(undefined);
+    }
+
     loadUsers = async()=>{
       this.setState({users:false,usersLoading:true,actionRunning:true,page:1});
       let users = await backup.load_trace(this.state.only_others);
@@ -165,9 +170,6 @@ onRequestClose={() => { this.setState({ user_activities:false,}); }}
       }
       render(){
         const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
-        if(this.props.modal_visible && this.state.users==false && this.state.usersLoading==false){
-          this.loadUsers();
-        }
         const ListHeaderComponent = (        <View style={this.state.dynamic_style.nav_container}>
           <IconButton
             disabled={this.state.usersLoading || this.state.page==1}

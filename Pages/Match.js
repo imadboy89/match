@@ -740,9 +740,9 @@ class Matchcreen extends React.Component {
         </TouchableOpacity>
         
         <View style={this.state.dynamic_style.tabs_list}>
-          <View style={{flex:1}}><Button title="General" onPress={()=>this.setState({visible_tab:"general"})} /></View>
-          <View style={{flex:1}}><Button title="Stats" onPress={()=>this.setState({visible_tab:"stats"})}/></View>
-          <View style={{flex:1}}><Button title="Line-up" onPress={()=>{
+          <View style={{flex:1,marginHorizontal:1}}><Button title="General" onPress={()=>this.setState({visible_tab:"general"})} /></View>
+          <View style={{flex:1,marginHorizontal:1}}><Button title="Stats" onPress={()=>this.setState({visible_tab:"stats"})}/></View>
+          <View style={{flex:1,marginHorizontal:1}}><Button title="Line-up" onPress={()=>{
             this.setState({visible_tab:"lineup2",loading:true});
             if(this.state.matche_details.details && this.state.matche_details.home_lineup==undefined){
               API_.get_lineup_k(this.state.matche_details.id).then(o=>{
@@ -756,7 +756,7 @@ class Matchcreen extends React.Component {
               this.setState({visible_tab:"lineup2",loading:false});
             }
             }}/></View>
-          <View style={{flex:1}}><Button title="League" onPress={()=>{
+          <View style={{flex:1,marginHorizontal:1}}><Button title="League" onPress={()=>{
             const league_img = this.state.matche_details.league_badge ? API_.domain_o+this.state.matche_details.league_badge.path : null ;
             this.props.navigation.navigate('League', { league_details: {id:this.state.matche_details.league_id,league:this.state.matche_details.league,league_img: league_img} });
           }

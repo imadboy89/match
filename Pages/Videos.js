@@ -16,10 +16,11 @@ class VideosScreen extends React.Component {
         source_id:4,
     };
     this.pageTokens={};
-  this.get_Videos();
+    this.have_access = backup&&backup.userInfo&&backup.userInfo.iptv? backup.userInfo.iptv:false;
 
   }
   componentDidMount(){
+    this.have_access = backup&&backup.userInfo&&backup.userInfo.iptv? backup.userInfo.iptv:false;
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
     this.props.navigation.setOptions({title: "Videos",
       "headerRight":()=>(
@@ -29,6 +30,7 @@ class VideosScreen extends React.Component {
             }}  />
     )
     });
+    this.get_Videos();
   }
   changesource = (itemValue, itemIndex)=>{
     this.state.source_id = parseInt(itemValue);
@@ -80,10 +82,7 @@ get_Videos = ()=>{
     this.props.navigation.navigate('Video', { item: item });
   }
   render() {
-    /*
-          <Picker.Item label="Mtkhb" value={3} />
-          
-     */
+    this.have_access = backup&&backup.userInfo&&backup.userInfo.iptv? backup.userInfo.iptv:false;
     const _sources = {
       0:"BeIn",
       1:"AlMthkb",
@@ -91,7 +90,7 @@ get_Videos = ()=>{
       4:"heSport",
       9:"RadioMars",
     };
-    if(backup.admin==true){
+    if(this.have_access==true){
       _sources[8] = "Movies_MC";
       _sources[5] = "Movies_YIFY";
       _sources[6] = "Movies_PB";

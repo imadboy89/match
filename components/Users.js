@@ -59,6 +59,13 @@ class Users extends React.Component{
         this.loadUsers();
       });
     }
+    updateUserPerms = async(user)=>{
+      const newstatus = user && user.iptv ? false : true;
+      this.setState({actionRunning:true});
+      const res = await backup.db_users.updateOne({_id:user._id},{$set:{iptv:newstatus}});
+      console.log(res);
+      this.loadUsers();
+    }
     render_users(){
       if (this.state.usersLoading){
         return <ActivityIndicator size="large" color="#00ff00" /> ;
@@ -84,11 +91,11 @@ class Users extends React.Component{
               : null}
             </View>
             </TouchableHighlight>
-            <View style={{flexDirection:"row",alignSelf: 'center',}}>
+            <View style={{flexDirection:"row",alignSelf: 'center',width:140}}>
               <IconButton
                   name={ is_tmp_admin ? "minus" : "plus"}
                   disabled={this.state.actionRunning}
-                  size ={28}
+                  size ={25}
                   color={ this.state.actionRunning ? "#bdc3c7" : (is_tmp_admin ? "#e74c3c" : "#2ecc71")}
                   onPress={()=>{
                     if(is_tmp_admin){
@@ -102,7 +109,7 @@ class Users extends React.Component{
               <IconButton
                   name="paper-plane"
                   disabled={this.state.actionRunning}
-                  size ={28}
+                  size ={25}
                   color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
                   onPress={()=>{
                     this.msg_user = user;
@@ -114,7 +121,14 @@ class Users extends React.Component{
               <IconButton 
                 name={ value.disabled  ? "unlock" : "lock"}
                 onPress={()=>this.updateUserStatus(value)}
-                size={28} 
+                size={25} 
+                color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
+                disabled={this.state.actionRunning}
+                />
+              <IconButton 
+                name={ value.iptv==true  ? "remove" : "tv"}
+                onPress={()=>this.updateUserPerms(value)}
+                size={25} 
                 color={this.state.actionRunning ? "#bdc3c7" : "#3498db"}
                 disabled={this.state.actionRunning}
                 />

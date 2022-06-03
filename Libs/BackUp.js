@@ -48,11 +48,11 @@ class BackUp{
       try {
         this.client = await this.get_default_appClient();
         const mongoClient = this.client.getServiceClient(RemoteMongoClient.factory,"mongodb-atlas");
+
         try {
-          this.lastActivity = this.client.auth.activeUserAuthInfo.lastAuthActivity;
-        } catch (error) {this.lastActivity=""}
-        try {
-          this.email = this.client.auth.activeUserAuthInfo.userProfile.data.email;
+          console.log(this.client.auth);
+          this.email  = this.client.auth.activeUserAuthInfo.userProfile.data.email;
+          this.userId = this.client.auth.activeUserAuthInfo.userId;
         } catch (error) {this.email="";}
         this.email = this.email ? this.email.toLocaleLowerCase().trim() : "";
         this.db = mongoClient.db("ba9al");
@@ -65,8 +65,13 @@ class BackUp{
         this.db_leagues      = this.db.collection("leagues");
         this.db_movies_fav   = this.db.collection("movies_fav");
         this.db_following    = this.db.collection("following");
+        this.db_users        = this.db.collection("users");
         
         this.is_auth         = this.email!="" && this.email !=undefined;
+        this.userInfo = await this.db_users.findOne({id: this.userId });
+        try {
+          this.lastActivity = this.userInfo.lastLogin ? this.userInfo.lastLogin : this.client.auth.activeUserAuthInfo.lastAuthActivity;
+        } catch (error) {this.lastActivity=""}
         if(this.is_auth) {
           setTimeout(()=>API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success"),1000);
           await this.isAdmin();

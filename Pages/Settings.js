@@ -192,6 +192,7 @@ class SettingsScreen extends React.Component {
         dynamic_style={this.state.dynamic_style}
         closeModal={()=>this.setState({modalVisible_users_log:false})}
         navigation={this.props.navigation}
+        onRef={(ref) => (this.Users_log_ref = ref)}
       ></Users_log>
     );
   }
@@ -313,7 +314,10 @@ class SettingsScreen extends React.Component {
             </View>
             <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Users log</Text> 
-            <View style={this.state.dynamic_style.settings_row_input}><Button title="Manage" onPress={()=>this.setState({modalVisible_users_log:true})}></Button></View>
+            <View style={this.state.dynamic_style.settings_row_input}><Button title="Manage" onPress={()=>{
+              this.setState({modalVisible_users_log:true});
+              this.Users_log_ref.loadUsers();
+              }}></Button></View>
           </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Notify ISweb </Text> 
