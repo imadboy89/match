@@ -23,7 +23,7 @@ class API {
     this.MC_movies_url = "https://moviecrumbs.net/";
     
     this.PB_sections = {205:"TV shows",201:"Movies"}
-    this.yt_api_key = "AIzaSyC_Dnp88128mp5CZ_htFtSRpiNFBCMHaco";
+    this.yt_api_key = "AIzaSyBijhAAaMj7WlyqP1cKtoevvELg6Q6YQ_M";
     this.scraping_pages = true;
     //https://tpb.party/search/peaky%20blinders/1/99/205
     this.showMsg = function(msg){console.log("showMsg : ",msg)}
@@ -45,7 +45,7 @@ class API {
     this.domain = 'https://al-match.com/api/';
     this.configs = {};
     this.proxy_post = `${this.server_url}.proxy2.php?url=`;
-    this.proxy_get = `${this.server_url}.proxy.php?url=`;
+    this.proxy_get  = `${this.server_url}.proxy.php?url=`;
     this.proxy_scrp = `${this.server_url}scrp.php?url=`;
     this.cc_url = "https://o.kooora.com/f/big/[cc].png";
     this.cc_url_small = "https://o.kooora.com/f/[cc].png";
@@ -1387,7 +1387,7 @@ class API {
           headers: this.headers2,
     }).then(response => response.json())
     .catch(error => {
-        console.log('ERROR', error);
+        console.log('ERROR', error, error.error.message);
         this.error = error;
     });
   }
@@ -1404,7 +1404,7 @@ class API {
         return response;
       })
       .catch(error => {
-          console.log('ERROR', error);
+          console.log('ERROR', error, error.error.message);
           this.error = error;
       });
   }
@@ -1417,7 +1417,15 @@ class API {
       if(!o || Object.keys(o).length==0){
         return [];
       }
-      try{playlist_id=o["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"];}catch(err){console.log(o);return[];}
+      try{
+        playlist_id=o["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"];
+      }catch(err){
+        console.log(o);
+        if(o && o.error){
+          API_.showMsg(o.error.message,"warning");
+        }
+        return[];
+      }
       return this.get_channel_items(playlist_id).then(o=>{
         let list = [];
         if(o["items"] && o["items"].length>0){
