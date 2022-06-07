@@ -249,6 +249,7 @@ class LeagueScreen extends React.Component {
     if(this.state.league_details==undefined || this.state.league_details.length==0){
       return null;
     }
+    let standing_count = 0;
     this.table_x = [];
     let standing_ = [this.c_years];
     let standing_before = {"":this.state.league_details};
@@ -282,8 +283,10 @@ class LeagueScreen extends React.Component {
         }
         standing_ = standing_.concat(<View style={{flex:1,alignItems:"center"}} key={key}><Text style={this.state.dynamic_style.group_name_t}>{key}</Text></View>);
       }
+      standing_count += rows && rows.filter ? rows.filter(r=>r.table_r=='r').length : 0;
       rows = [{"team_name":"Team name","team_badge":"","overall_league_payed":"Pld","overall_league_PTS":"Pts","goals":"Gls","id":"h_"+index}].concat(rows);
       standing_ = standing_.concat( rows.map(row=>{
+        
         if(row.table_r=="x"){
           return null;
         }
@@ -327,6 +330,7 @@ class LeagueScreen extends React.Component {
         </TouchableOpacity>);
       }) );
     }
+
     if(this.table_x && Object.keys(this.table_x).length>0){
       standing_.push(<View key="separator_1"style={{flex:1,marginVertical:10}}></View>);
       for(let backg of Object.keys(this.table_x)){
@@ -341,6 +345,7 @@ class LeagueScreen extends React.Component {
         </View>);
       }
     }
+    standing_.push(<Text style={[{flex:1},this.state.dynamic_style.team_name_t]}>Teams Count : {standing_count}</Text>);
     return standing_;
   }
   onmt_clicked(item){

@@ -1830,7 +1830,7 @@ class API {
   };
 
   parse_details(details){
-    details = details.split("~");
+    details = details && details.split ? details.split("~") : [];
     let details_dict = {};
     for (let i=0;i<details.length;i++){
       let el = details[i] ? details[i].trim() : "";
