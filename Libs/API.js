@@ -53,7 +53,7 @@ class API {
     this.method = "POST";
     this.usingproxy = Platform.OS == 'web';
     this.isWeb = Platform.OS == 'web';
-    this.notify_isWeb = Platform.OS == 'web';
+    this.notify_isWeb = false;//Platform.OS == 'web';
     this.OS = DeviceInfo.osName.toLocaleLowerCase();
     this.isIOS = this.OS.toLocaleLowerCase() === "ios";
     this.main_domain = this.isWeb?location.host:"almatch";
