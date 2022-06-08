@@ -500,7 +500,9 @@ class API {
     .then(resp=>{
       if(this.scraping_pages){
         try {
-          return JSON.parse(resp);
+          const player = JSON.parse(resp) ;
+          player["player_position"] = player["player_position"] in API_.player_positions ? API_.player_positions[player["player_position"]] : player["player_position"];
+          return player;
         } catch (error) {
           console.log(error);
           return [];
