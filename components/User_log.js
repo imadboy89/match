@@ -12,10 +12,10 @@ class User_log extends React.Component{
         dynamic_style_colors:false,
         user_log:this.props.user_log,
       };
+      this.MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
       }
       componentDidMount(){
-
-        getTheme("styles_settings").then(theme=>this.setState({dynamic_style:theme}) );
+        getTheme("styles_settings").then(theme=>{this.setState({dynamic_style:theme})} );
       }
       map_keys(dict){
         let i=0;
@@ -40,7 +40,7 @@ class User_log extends React.Component{
         if(!this.state.dynamic_style){
           return null;
         }
-        const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
+        const MModal = this.MModal;
         let user_log = this.map_keys(this.props.user_log);
         for(let key_d of Object.keys(this.objects_)){
           const dict_x = this.objects_[key_d];

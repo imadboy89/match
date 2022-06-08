@@ -40,15 +40,19 @@ class Users_log extends React.Component{
       this.setState({users:users,usersLoading:false,actionRunning:false});
     }
     user_log(){
-      if(this.state.user_log==false)return null;
+      if(this.state.show_user_log==false){
+        return null;
+      }
       return <User_log 
         user_log={this.state.user_log} 
-        modal_visible={this.state.show_user_log && this.state.user_log} 
+        modal_visible={this.state.show_user_log===true && this.state.user_log!=false} 
         closeModal={()=>{this.setState({show_user_log:false,user_log:false})}} /> 
     }
     show_activities(){
       //s.params
-      if(this.state.user_activities == false) return null;
+      if(this.state.user_activities == false){
+        return null;
+      }
       const screens = this.state.user_activities.navigation_history ? this.state.user_activities.navigation_history.map(s=>{
         let time = parseInt(s.time);
         time = isNaN(time) ? 0 : API_.get_date_timeS(new Date(time)) ;
