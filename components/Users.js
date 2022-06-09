@@ -177,6 +177,7 @@ class Users extends React.Component{
                   this.sendMsg();
                 }}
               >Send</Icon.Button>
+              <View style={{width:10}}></View>
               <Icon.Button 
                 name="remove"
                 backgroundColor="#f39c12"

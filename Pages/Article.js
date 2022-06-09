@@ -217,6 +217,7 @@ class ArticleScreen extends React.Component {
         
           <View style={this.state.dynamic_style.article_v}>
             <Text style={this.state.dynamic_style.article_date_t}>{this.state.article && this.state.article.date?this.state.article.date:"-"}</Text>
+            {this.state.article!=undefined && this.state.article.author!=undefined ? <Text style={this.state.dynamic_style.article_date_t}>{this.state.article.author}</Text> : null}
             <Text style={this.state.dynamic_style.article_title_t}>{this.state.article && this.state.article.title_news ? this.state.article.title_news : ""}</Text>
             
             {this.state.loading ? <Loader/> : body_composed  }
