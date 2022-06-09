@@ -38,7 +38,7 @@ class Users extends React.Component{
     }
     sendMsg = async()=>{
       this.setState({actionRunning:true});
-      const out = await backup.pushNotification(this.state.msg_text,this.state.msg_text,{"action":"msg","msg":this.state.msg_text,"by":backup.email},[this.msg_user,]);
+      const out = await backup.pushNotification(this.state.msg_title,this.state.msg_text,{"action":"msg","msg":this.state.msg_text,"by":backup.email},[this.msg_user,]);
       this.setState({actionRunning:false,modalVisible_msg:false});
     }
     loadUsers(){
@@ -154,9 +154,8 @@ class Users extends React.Component{
           <View style={{flex:.4,backgroundColor:"#2c3e5066"}}></View>
           <View style={{height:400,width:"100%",backgroundColor:"#646c78",alignItems:"center"}}>
             <Text style={{}}> Message to : {this.msg_user}</Text>
-            <Text style={{width:"28%"}}>Subject</Text>
             <TextInput
-              style={{width:"70%",backgroundColor:"#95a5a6",marginBottom:10,fontSize:20,color:"white",}}
+              style={{width:"95%",backgroundColor:"#95a5a6",marginBottom:10,fontSize:20,color:"white",padding:5}}
               editable
               maxLength={30}
               onChangeText={text => this.setState({msg_title : text})}
