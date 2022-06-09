@@ -153,7 +153,7 @@ class Users extends React.Component{
           >
           <View style={{flex:.4,backgroundColor:"#2c3e5066"}}></View>
           <View style={{height:400,width:"100%",backgroundColor:"#646c78",alignItems:"center"}}>
-            <Text style={{}}> Message to : {this.msg_user}</Text>
+            <Text style={{color:"white",fontSize:18}}> Message to : {this.msg_user}</Text>
             <TextInput
               style={{width:"95%",backgroundColor:"#95a5a6",marginBottom:10,fontSize:20,color:"white",padding:5}}
               editable
@@ -169,14 +169,23 @@ class Users extends React.Component{
               onChangeText={text => this.setState({msg_text : text})}
               value={this.state.msg_text}
             />
-
-            <Icon.Button 
-              name="paper-plane"
-              disabled={this.state.actionRunning}
-              onPress={()=>{
-                this.sendMsg();
-              }}
-            >Send</Icon.Button>
+            <View style={{ flexDirection:"row",margin:10,alignItems:"center",width:"95%",justifyContent:"center"}}>
+              <Icon.Button 
+                name="paper-plane"
+                disabled={this.state.actionRunning}
+                onPress={()=>{
+                  this.sendMsg();
+                }}
+              >Send</Icon.Button>
+              <Icon.Button 
+                name="remove"
+                backgroundColor="#f39c12"
+                disabled={this.state.actionRunning}
+                onPress={()=>{
+                  this.setState({modalVisible_msg:false});
+                }}
+              >Cancel</Icon.Button>
+            </View>
           </View>
           <View style={{flex:1,backgroundColor:"#2c3e5066"}}></View>
 
