@@ -749,7 +749,6 @@ class API {
   }
   get_article(link,source_id=1){
     //https://www.hesport.com/akhbar/122520.html
-    this.scraping_pages;
     let url = "https://m.kooora.com/?"+link+"&arabic";
     url = this.scraping_pages ? "scarp_"+url : url;
     return this.http(url,"GET",null,{})

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {  View, StyleSheet, Modal, Button, TouchableOpacity, Platform, RefreshControl, Switch} from 'react-native';
+import {  View, StyleSheet, Modal, Dimensions, TouchableOpacity, Platform, RefreshControl, Switch} from 'react-native';
 import Constants from 'expo-constants';
 import ItemsList from '../components/list';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -482,7 +482,6 @@ get_matches_koora = async(date_obj=null,next=false)=>{
   //API_.load_leagues(this.refresh_leagues);
   get_notifications_matches().then(o=>{
     API_.notifications_matches=o;
-    console.log(API_.notifications_matches);
     this.refresh_leagues();
   });
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
@@ -576,6 +575,7 @@ show_DateP(){
     this.render_header();
   }
   render() {
+    const is_small_screen = Dimensions.get('window').width<=600;
     let dayname="";
     try {
       dayname = API_.days[this.state.matches_date.getDay()];
@@ -587,7 +587,7 @@ show_DateP(){
       return <Loader/>; 
     }
     const ListHeaderComponent = (        
-    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center"}} >
+    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center",width:is_small_screen?400:"98%",backgroundColor:"#a29bfe6b",padding:5,borderColor:"white",borderRadius:50,marginBottom:2}} >
     <IconButton 
       disabled={this.state.loading}
       name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.previousPage()}  />
@@ -603,8 +603,8 @@ show_DateP(){
       name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.nextPage()}  />
     <Picker
         selectedValue={this.state.source_id}
-        style={{ height:"90%",width:80,backgroundColor:"#000",color:"#fff" }}
-        itemStyle={{height:70,backgroundColor:"#000",color:"#fff" }}
+        style={{ height:60,width:150,backgroundColor:"#ffffff4a",color:"#fff",borderRadius:40, padding:5 }}
+        itemStyle={{height:50,backgroundColor:"#000",color:"#fff",width:"95%",fontSize:15,borderRadius:30 }}
         onValueChange={this.changesource}
       >
         <Picker.Item label="AL match" value={0} />

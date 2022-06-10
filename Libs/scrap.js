@@ -17,6 +17,7 @@ class Scrap {
     };
   }
   get_article(html, _article=undefined){
+    
     if(html == null || !html || !html.match){return []}
     //he_article_date 
     if(_article==undefined || !_article){
@@ -41,8 +42,9 @@ class Scrap {
     article.date           = _article.he_article_date;
     article.title_news     = _article.he_article_title;
     article.body           = _article.article_content;
+    article.author         = _article.author;
+    article.author_cc      = _article.author_cc;
 
-    
     article.related      = article.related    .map(n=> {return {related_link:n[0],related_title:n[1],url:n[0]} });
     article.related_news = article.related_news.map(n=> {return {related_news_id:n[0],related_news_title:n[1]} });
     article.related_images = article.related_images.map(n=> {return {img_link:n[0].replace(/^\/\//,"https://"),img_desc:n[1]} });

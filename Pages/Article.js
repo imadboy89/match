@@ -1,5 +1,5 @@
 import React from "react";
-import {  View, Dimensions,ScrollView , ImageBackground} from 'react-native';
+import {  View, Dimensions,ScrollView , ImageBackground, Image} from 'react-native';
 import Loader from "../components/Loader";
 import {styles_article,getTheme, globalView_style} from "../components/Themes";
 import IconButton from "../components/IconButton";
@@ -84,6 +84,8 @@ class ArticleScreen extends React.Component {
         this.state.article.body = article.body ? article.body : this.state.article.body;
         this.state.article.img  = article.img  ? article.img  : this.state.article.img;
         this.state.article.date = article.date ? article.date : this.state.article.date;
+        this.state.article.author = article.author ? article.author : this.state.article.author;
+        this.state.article.author_cc = article.author_cc ? article.author_cc : this.state.article.author_cc;
         article.related = article.related ? article.related.map(r=>{
           if(r.related_link && r.related_link.slice(0,1)=="m" && r.related_title.includes(":") ){
             r.related_title = r.related_title.split(":").slice(1).join(":").replace("ضد", "Vs");
@@ -203,6 +205,8 @@ class ArticleScreen extends React.Component {
       }
       return dom2retrurn;
     }) : <Text style={this.state.dynamic_style.article_body_t}>{article_body}</Text>;
+    let author_flag = this.state.article&& this.state.article.author_cc ?  API_.get_cc_img(this.state.article.author_cc,true) :null;
+    author_flag = author_flag!=null ? <Image style={{height:25,width:25, borderRadius:25,marginHorizontal:5}} source={{uri: author_flag}} /> : null;
     return (
       <ScrollView  style={this.state.dynamic_style.container}>
         <View style={globalView_style}>
@@ -214,10 +218,15 @@ class ArticleScreen extends React.Component {
             </ImageBackground>
           : null}
         </View>
-        
+            
           <View style={this.state.dynamic_style.article_v}>
             <Text style={this.state.dynamic_style.article_date_t}>{this.state.article && this.state.article.date?this.state.article.date:"-"}</Text>
-            {this.state.article!=undefined && this.state.article.author!=undefined ? <Text style={this.state.dynamic_style.article_date_t}>{this.state.article.author}</Text> : null}
+            {this.state.article!=undefined && this.state.article.author!=undefined ? 
+            <View style={{flexDirection:"row-reverse",width:"100%",}}>
+              {author_flag}
+              <Text style={this.state.dynamic_style.article_date_t}>{this.state.article.author}</Text> 
+            </View>
+            : null}
             <Text style={this.state.dynamic_style.article_title_t}>{this.state.article && this.state.article.title_news ? this.state.article.title_news : ""}</Text>
             
             {this.state.loading ? <Loader/> : body_composed  }

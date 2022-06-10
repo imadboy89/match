@@ -290,6 +290,7 @@ class LeagueScreen extends React.Component {
         if(row.table_r=="x"){
           return null;
         }
+        
         const fav_icon = row.team ? this.get_fav_icon(row.team.id) : "";
         let team_name ="";
         if(row && row.team_name){
@@ -303,10 +304,13 @@ class LeagueScreen extends React.Component {
         goals = row && row.overall_league_GA ? goals-row.overall_league_GA : goals;
         goals = row && row.goals=="Gls" ? row.goals : goals;
         let fav_style = row.team && this.get_fav_icon(row.team.id, true) ? {backgroundColor: global_theme.fav_background} : {};
-        const cc_flag = row && row.c_code && row.c_code.split("~").length>=2 ? row.c_code.split("~")[2] : false;
+        let cc_flag = row && row.c_code && row.c_code.split("~").length>=2 ? row.c_code.split("~")[2] : false;
         if (Object.keys(fav_style).length==0 && row.backgroundColor){
           fav_style = {backgroundColor:row.backgroundColor}
         }
+        
+        cc_flag = cc_flag ? API_.get_cc_img(cc_flag) : null;
+        cc_flag = cc_flag!=null && cc_flag != team_badge ? cc_flag  : null;
         return (
         <TouchableOpacity 
           activeOpacity={0.7}
@@ -320,9 +324,9 @@ class LeagueScreen extends React.Component {
             <Image style={{height:"95%",width:"95%"}} source={{uri: team_badge}} />
           </View>
           <View style={{flex:6}}><Text style={this.state.dynamic_style.team_name_t} numberOfLines={1}>{team_name}</Text></View>
-          {cc_flag!=false ? 
+          {cc_flag!=false && cc_flag!=null ? 
           <View style={{flex:1,padding:1}} >
-            <Image style={{height:"95%",width:"95%"}} source={{uri: API_.get_cc_img(cc_flag)}} />
+            <Image style={{height:"95%",width:"95%"}} source={{uri: cc_flag}} />
           </View> : null }
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{played}</Text></View>
           <View style={{flex:1}}><Text style={this.state.dynamic_style.team_name_t}>{goals}</Text></View>

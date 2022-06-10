@@ -17,6 +17,7 @@ class NewsScreen extends React.Component {
         show_events_modal : false,
         modal_events_content : null,
     };
+    this._isMounted= false;
     this.resources_static = {1:"Kr_MA",6:"Kr_world",7:"Kr_home"};
     this.resources = {};
   
@@ -30,10 +31,11 @@ class NewsScreen extends React.Component {
       this.setState({});
       this.render_header();
     });
+    
   }
   componentDidMount(){
-    this.screen_focus_mng();
     this._isMounted=true;
+    this.screen_focus_mng();
     getTheme("styles_news").then(theme=>this.setState({dynamic_style:theme}));
     getTheme("styles_modal").then(theme=>this.setState({modal_dynamic_style:theme}));
     this.get_news();
