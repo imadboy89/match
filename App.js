@@ -301,10 +301,10 @@ function MyTabs(props){
       tabBarPosition="bottom"
     >
       <StackNav.Screen name="Home" component={MatchesStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
-      <StackNav.Screen name="Leagues" component={LeaguesStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
-      <StackNav.Screen name="Videos" component={VideosStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
-      <StackNav.Screen name="Channels" component={ChannelsStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
-      <StackNav.Screen name="News" component={NewsStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
+      <StackNav.Screen name="Leagues" component={LeaguesStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: false }}/>
+      <StackNav.Screen name="Videos" component={VideosStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: false }}/>
+      <StackNav.Screen name="Channels" component={ChannelsStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: false }}/>
+      <StackNav.Screen name="News" component={NewsStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: false }}/>
       
     </StackNav.Navigator>
   );
