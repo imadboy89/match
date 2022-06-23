@@ -578,7 +578,7 @@ function generateTheme(theme_name=false){
       alignItems: 'center'
     },
     date_text: {
-      fontSize: 15,
+      fontSize: 12,
       fontWeight: 'bold',
       textAlign: 'center',
       color : theme.home_title_color,

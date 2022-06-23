@@ -132,11 +132,12 @@ class HomeScreen extends React.Component {
       },50000);
   }
   componentDidMount=async()=>{
+    this.max_tries = 3;
     this.screen_focus_mng();
     if(API_.isWeb){
       API_.next = this.nextPage;
       API_.setDate = this.onChange;
-      this.promtInstallWPA();
+      //this.promtInstallWPA();
       this.promtSignUp();
       if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
         navigator.serviceWorker.removeEventListener('message',()=>{});
@@ -174,8 +175,9 @@ class HomeScreen extends React.Component {
     }, 50000);
 
     this.interval_refresh_if_issue = setInterval(()=>{
-      if(this.state.list==undefined || !this.state.list || !this.state.list.length || this.state.list.length==0){
+      if(this.max_tries>0 && (this.state.list==undefined || !this.state.list || !this.state.list.length || this.state.list.length==0 ) ){
         this._refresh_(true,true);
+        this.max_tries -= 1;
       }else{
         clearInterval(this.interval_refresh_if_issue);
       }
@@ -313,9 +315,11 @@ class HomeScreen extends React.Component {
             onPress={()=>{
               this.setState({list:[],loading:true});
               this.customUpdater.doUpdateApp();
-        }}  /> );
+        }}  
+        /> );
     }else{
       headerLeft = ()=>(
+        <View style={{flexDirection:"row"}}>
         <IconButton 
           name={API_.isWeb==true ? "search-plus" : "inbox" }
           disabled={API_.isWeb==false && this.state.is_upd_available===-1}
@@ -323,7 +327,14 @@ class HomeScreen extends React.Component {
             onPress={()=>{
               this.checkUpdAvailability();
               this.goFullscreen();
-        }}  /> );
+        }}  />
+        <IconButton 
+          name={"search" }
+          size={iconsSize} style={this.state.dynamic_style.icons} 
+            onPress={()=>{
+              this.props.navigation.navigate('Search');
+        }}  />
+        </View> );
     }
     
     this.props.navigation.setOptions({
@@ -586,11 +597,21 @@ show_DateP(){
       setTimeout(() =>this.setState({}), 100);
       return <Loader/>; 
     }
+    const sources_picker =     <Picker
+    selectedValue={this.state.source_id}
+    style={{ height:50,width:140,backgroundColor:"#ffffff4a",color:"#fff",borderRadius:25, padding:5 }}
+    itemStyle={{height:40,backgroundColor:"#000",color:"#fff",width:"95%",fontSize:14,borderRadius:20 }}
+    onValueChange={this.changesource}
+  >
+    <Picker.Item label="AL match" value={0} />
+    <Picker.Item label="Kooora" value={1} />
+    <Picker.Item label="kora-star" value={2} />
+</Picker> ;
     const ListHeaderComponent = (        
-    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center",width:is_small_screen?400:"98%",backgroundColor:"#a29bfe6b",padding:5,borderColor:"white",borderRadius:50,marginBottom:2}} >
+    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center",width:is_small_screen?"98%":400,backgroundColor:"#a29bfe6b",padding:5,borderColor:"white",borderRadius:50,marginBottom:2,paddingHorizontal:50}} >
     <IconButton 
       disabled={this.state.loading}
-      name="minus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.previousPage()}  />
+      name="minus" size={this.state.dynamic_style.title.fontSize-2} style={this.state.dynamic_style.icons} onPress={()=>this.previousPage()}  />
     <TouchableOpacity 
       disabled={this.state.loading}
       activeOpacity={0.5}
@@ -600,17 +621,9 @@ show_DateP(){
     </TouchableOpacity>
     <IconButton 
       disabled={this.state.loading}
-      name="plus" size={this.state.dynamic_style.title.fontSize} style={this.state.dynamic_style.icons} onPress={()=>this.nextPage()}  />
-    <Picker
-        selectedValue={this.state.source_id}
-        style={{ height:60,width:150,backgroundColor:"#ffffff4a",color:"#fff",borderRadius:40, padding:5 }}
-        itemStyle={{height:50,backgroundColor:"#000",color:"#fff",width:"95%",fontSize:15,borderRadius:30 }}
-        onValueChange={this.changesource}
-      >
-        <Picker.Item label="AL match" value={0} />
-        <Picker.Item label="Kooora" value={1} />
-        <Picker.Item label="kora-star" value={2} />
-    </Picker>
+      name="plus" size={this.state.dynamic_style.title.fontSize-2} style={this.state.dynamic_style.icons} onPress={()=>this.nextPage()}  
+      />
+
   </View>);
     return (
       <View 

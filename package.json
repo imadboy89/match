@@ -62,7 +62,9 @@
     "react-native-web": "0.17.1",
     "react-native-webview": "11.15.0",
     "remove": "^0.1.5",
-    "webpack": "^5.10.2"
+    "webpack": "^5.10.2",
+    "expo-store-review": "~5.1.0",
+    "expo-linking": "~3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

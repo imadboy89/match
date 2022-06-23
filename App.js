@@ -20,6 +20,7 @@ import VideoScreen from './Pages/Video';
 import LeagueScreen from './Pages/League';
 import LeaguesScreen from './Pages/Leagues';
 import SettingsScreen from './Pages/Settings';
+import SearchScreen from './Pages/search';
 import TVScreen from './Pages/TV';
 import MoviesScreen from './Pages/Movies';
 import MovieScreen from './Pages/Movie';
@@ -84,6 +85,16 @@ if(API_.isWeb){
   open_page.id   = pathname.split("@")[1]?pathname.split("@")[1]:null;
 }
 
+//tmp
+let versionCode = Constants&&Constants.manifest&&Constants.manifest.android&&Constants.manifest.android.versionCode?Constants.manifest.android.versionCode:0;
+versionCode = parseInt(versionCode);
+
+if(versionCode>3){
+  setTimeout(async () => {
+    const StoreReview = require("./Libs/StoreReview").default;
+    StoreReview();
+  }, 30000);
+}
 
 
 global. LoadedFonts = false;
@@ -193,6 +204,7 @@ function MatchesStackScreen() {
     <MatchesStack.Navigator>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Home" component={HomeScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Settings" component={SettingsScreen} animationEnabled={is_animationEnabled}/>
+      <MatchesStack.Screen options={_app_styles.screenHeader} name="Search" component={SearchScreen} animationEnabled={is_animationEnabled}/>
       <MatchesStack.Screen options={_app_styles.screenHeader} name="Match" component={Matchcreen}animationEnabled={is_animationEnabled} />
 
       <MatchesStack.Screen options={_app_styles.screenHeader} name="ChannelsCat" component={CategoriesScreen} animationEnabled={is_animationEnabled}/>
@@ -288,11 +300,11 @@ function MyTabs(props){
       tabBarOptions={props.is_materialTopTab ? _app_styles.tabBarOptions_mat : _app_styles.tabBarOptions}
       tabBarPosition="bottom"
     >
-      <StackNav.Screen name="Home" component={MatchesStackScreen} animationEnabled={is_animationEnabled}/>
-      <StackNav.Screen name="Leagues" component={LeaguesStackScreen} animationEnabled={is_animationEnabled}/>
-      <StackNav.Screen name="Videos" component={VideosStackScreen} animationEnabled={is_animationEnabled}/>
-      <StackNav.Screen name="Channels" component={ChannelsStackScreen} animationEnabled={is_animationEnabled}/>
-      <StackNav.Screen name="News" component={NewsStackScreen} animationEnabled={is_animationEnabled}/>
+      <StackNav.Screen name="Home" component={MatchesStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
+      <StackNav.Screen name="Leagues" component={LeaguesStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
+      <StackNav.Screen name="Videos" component={VideosStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
+      <StackNav.Screen name="Channels" component={ChannelsStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
+      <StackNav.Screen name="News" component={NewsStackScreen} animationEnabled={is_animationEnabled} options={{ unmountOnBlur: true }}/>
       
     </StackNav.Navigator>
   );
