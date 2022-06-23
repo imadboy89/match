@@ -34,6 +34,7 @@ class HomeScreen extends React.Component {
         is_auth:false, 
         show_user_log:false,
         user_log:false,
+        category : "0",
         //dynamic_style_list:styles_list,
     };
     this.max_delay_to_refresh = 20000;
@@ -260,6 +261,13 @@ class HomeScreen extends React.Component {
     this.end=false;
     this.state.source_id = parseInt(itemValue);
     this.setState({source_id:parseInt(itemValue),page:1});
+    this.get_matches();
+    api_type = parseInt( itemValue );
+  }
+  changeCategory = (itemValue, itemIndex)=>{
+    this.end=false;
+    this.state.category = parseInt(itemValue);
+    this.setState({category:parseInt(itemValue),page:1});
     this.get_matches();
     api_type = parseInt( itemValue );
   }
@@ -497,7 +505,7 @@ get_matches_koora = async(date_obj=null,next=false)=>{
   });
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
   let resp = [];
-  resp = await API_.get_matches_k(date_obj,this.state.is_only_live,this.state.source_id,next);
+  resp = await API_.get_matches_k(date_obj,this.state.is_only_live,this.state.source_id,next,this.state.category);
   let data = resp && resp.length>0 ? resp : [];
   //alert("HOME->get_matches_koora -> 1 "+data.length);
   data = await this.get_favs(data);
@@ -597,6 +605,7 @@ show_DateP(){
       setTimeout(() =>this.setState({}), 100);
       return <Loader/>; 
     }
+    /* // later
     const sources_picker =     <Picker
     selectedValue={this.state.source_id}
     style={{ height:50,width:140,backgroundColor:"#ffffff4a",color:"#fff",borderRadius:25, padding:5 }}
@@ -606,9 +615,19 @@ show_DateP(){
     <Picker.Item label="AL match" value={0} />
     <Picker.Item label="Kooora" value={1} />
     <Picker.Item label="kora-star" value={2} />
+</Picker> ;*/
+    let sources_items = Object.keys(API_.matches_categories).map(c=><Picker.Item label={API_.matches_categories[c]} value={c} />)
+    const sources_picker_1 =     <Picker
+    selectedValue={this.state.category}
+    style={{ height:50,width:135,backgroundColor:"#ffffff4a",color:"#fff",borderRadius:25, padding:5 }}
+    itemStyle={{height:40,backgroundColor:"#000",color:"#fff",width:"95%",fontSize:14,borderRadius:20,textAlign:"center" }}
+    onValueChange={this.changeCategory}
+  >
+    {sources_items}
 </Picker> ;
+
     const ListHeaderComponent = (        
-    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center",width:is_small_screen?"98%":400,backgroundColor:"#a29bfe6b",padding:5,borderColor:"white",borderRadius:50,marginBottom:2,paddingHorizontal:50}} >
+    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center",width:is_small_screen?"98%":400,backgroundColor:"#a29bfe6b",padding:5,borderColor:"white",borderRadius:50,marginBottom:2}} >
     <IconButton 
       disabled={this.state.loading}
       name="minus" size={this.state.dynamic_style.title.fontSize-2} style={this.state.dynamic_style.icons} onPress={()=>this.previousPage()}  />
@@ -623,7 +642,7 @@ show_DateP(){
       disabled={this.state.loading}
       name="plus" size={this.state.dynamic_style.title.fontSize-2} style={this.state.dynamic_style.icons} onPress={()=>this.nextPage()}  
       />
-
+    {sources_picker_1}
   </View>);
     return (
       <View 

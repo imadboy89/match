@@ -146,6 +146,17 @@ class API {
       'l':'مسابقات محلية',
       'o':'مسابقات عالمية',
     }
+    this.matches_categories ={
+      "0":"كرة القدم",
+      "1":"أخرى",
+      "6":"جارية حاليا",
+      "101":"كرة السلة",
+      "103":"الكرة الطائرة",
+      "106":"التنس",
+      "199":"مسابقات نسائية",
+      "201":"أوروبا",
+      "202":"آسيا وأفريقيا",
+  };
   }
   async fetch(resource, options) {
     const { timeout = 8000 } = options;
@@ -1008,10 +1019,11 @@ class API {
       });
 
   }
-  get_matches_k(date_obj, is_only_live, source_id=1,next=false){
+  get_matches_k(date_obj, is_only_live, source_id=1,next=false,area=0){
+    //https://www.kooora.com/?region=-1&area=1&dd=22&mm=6&yy=2022;
     let url = "";
     if(source_id==1){
-      url = "https://www.kooora.com/?region=-1&area=0&dd=";
+      url = `https://www.kooora.com/?region=-1&area=${area}&dd=`;
       url = is_only_live ? "https://www.kooora.com/?region=-1&area=6&dd=" : url;
       url +=date_obj.getDate()+"&mm="+(date_obj.getMonth()+1)+"&yy="+date_obj.getFullYear()+"&arabic&ajax=1";
     }else if(source_id==2){
