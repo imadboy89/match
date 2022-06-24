@@ -73,12 +73,12 @@ class SearchScreen extends React.Component {
 
       }
     }
-    const list = [];
+    let list = [];
     if(res_teams && res_teams.length>0){
-      list.push({title:"Clubs",data:res_teams});
+      list.push({title:"أندية",data:res_teams});
     }
     if(res_players && res_players.length>0){
-      list.push({title:"Players",data:res_players});
+      list.push({title:"لاعبون",data:res_players});
     }
     
     this.setState({list:list, loading:false});
