@@ -50,7 +50,6 @@ class SearchScreen extends React.Component {
         type       : "team"
       };
     });
-    console.log(res_teams)
 
     let res_players_teams = await backup.db_teams.find({ 
       $or: [ {squad_club: {$elemMatch:{4:patttern}}}, {squad_club: {$elemMatch:{5:patttern}}} ] 
@@ -74,7 +73,6 @@ class SearchScreen extends React.Component {
 
       }
     }
-    console.log(res_players)
     const list = [
       {title:"Clubs",data:res_teams},
       {title:"Players",data:res_players},
