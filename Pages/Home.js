@@ -627,7 +627,7 @@ show_DateP(){
 </Picker> ;
 
     const ListHeaderComponent = (        
-    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",alignContent:"center",alignItems:"center",width:is_small_screen?"98%":400,backgroundColor:"#a29bfe6b",padding:5,borderColor:"white",borderRadius:50,marginBottom:2}} >
+    <View style={{flexDirection:'row', flexWrap:'wrap', alignSelf:"center",justifyContent:"center",width:is_small_screen?"98%":400,backgroundColor:"#a29bfe6b",padding:5,borderColor:"white",borderRadius:50,marginBottom:2}} >
     <IconButton 
       disabled={this.state.loading}
       name="minus" size={this.state.dynamic_style.title.fontSize-2} style={this.state.dynamic_style.icons} onPress={()=>this.previousPage()}  />
