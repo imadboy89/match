@@ -586,6 +586,7 @@ function generateTheme(theme_name=false){
       fontWeight: 'bold',
       textAlign: 'center',
       color : theme.home_title_color,
+      marginTop:10,
       //fontFamily : "cairoregular",
     },
     title: {

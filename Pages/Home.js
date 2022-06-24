@@ -616,11 +616,13 @@ show_DateP(){
     <Picker.Item label="Kooora" value={1} />
     <Picker.Item label="kora-star" value={2} />
 </Picker> ;*/
+    const picker_height_1 = API_.OS == "ios" ? 50 : 40 ;
+    const picker_height_2 = API_.OS == "ios" ? 40 : 37 ;
     let sources_items = Object.keys(API_.matches_categories).map(c=><Picker.Item label={API_.matches_categories[c]} value={c} />)
     const sources_picker_1 =     <Picker
     selectedValue={this.state.category}
-    style={{ height:50,width:135,backgroundColor:"#ffffff4a",color:"#fff",borderRadius:25, padding:5 }}
-    itemStyle={{height:40,backgroundColor:"#000",color:"#fff",width:"95%",fontSize:14,borderRadius:20,textAlign:"center" }}
+    style={{ height:picker_height_1,width:135,backgroundColor:"#ffffff4a",color:"black",borderRadius:25, padding:5,textAlign:"center" }}
+    itemStyle={{height:picker_height_2,backgroundColor:"#b5afaf",color:"black",width:"95%",fontSize:14,borderRadius:20,textAlign:"center" }}
     onValueChange={this.changeCategory}
   >
     {sources_items}
