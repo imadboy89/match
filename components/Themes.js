@@ -204,15 +204,16 @@ var Themes = {
 var themes_list = Object.keys(Themes);
 
 function generateTheme(theme_name=false){
-  let isWeb=false;
+  let isWeb = false;
+  let isIOS = false;
   let _Global_theme_name = "";
   const window_width = Dimensions.get('window').width;
   const window_height = Dimensions.get('window').height;
   try{
-    isWeb = API_ ? API_.isWeb : false;
+    isWeb = API_.isWeb;
   }catch(err){isWeb = false;}
   try{
-    isIOS = API_ ? API_.OS=="ios" : false;
+    isIOS = API_.OS=="ios" ;
   }catch(err){isIOS = false;}
   try{
     _Global_theme_name = Global_theme_name;
