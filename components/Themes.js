@@ -217,7 +217,7 @@ function generateTheme(theme_name=false){
   
   theme_name = theme_name==false ? Global_theme_name :theme_name ;
   let theme = Themes[theme_name];
-  const header_height = isWeb ? 40 : 90;
+  const header_height = API_.OS=="ios" ? 90 : 50;
   const __isMobile = _isMobile(isWeb);
   const maxWidth = window_width<1000 ? "100%" : 1000;
   const modal_maxWidth = window_width<1000 ? window_width*0.9 : 1000;
