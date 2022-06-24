@@ -618,7 +618,7 @@ show_DateP(){
 </Picker> ;*/
     const picker_height_1 = API_.OS == "ios" ? 50 : 40 ;
     const picker_height_2 = API_.OS == "ios" ? 40 : 37 ;
-    let sources_items = Object.keys(API_.matches_categories).map(c=><Picker.Item label={API_.matches_categories[c]} value={c} />)
+    let sources_items = Object.keys(API_.matches_categories).map(c=><Picker.Item label={API_.matches_categories[c]} value={c} key={c} />)
     const sources_picker_1 =     <Picker
     selectedValue={this.state.category}
     style={{ height:picker_height_1,width:135,backgroundColor:"#ffffff4a",color:"black",borderRadius:25, padding:5,textAlign:"center" }}

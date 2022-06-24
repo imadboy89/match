@@ -252,6 +252,11 @@ class ItemsList extends React.Component {
         }
       }
       return (<Text style={this.state.dynamic_style.item_related} numberOfLines={1}>- {fav_icon} : {text2show}</Text>);
+    }else if(item.type && ["team","player"].includes(item.type)){
+      return (<View style={{flexDirection:"row",flex:1}}>
+        <Text style={[this.state.dynamic_style.item,{flex:1,paddingRight:10}]}>{item[col_key]}</Text>
+        <Image style={{height:33,width:40}} source={{uri: item.cc_flag}}/>
+      </View>);
     }else{
       const item_ep_name = item[col_key] ? item[col_key].replace("👁","").trim()  : "";
       const extra_style = this.props.eps_current && this.props.eps_current==item_ep_name ? {backgroundColor:"#2980b999"} : {};
