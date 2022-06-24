@@ -209,15 +209,18 @@ function generateTheme(theme_name=false){
   const window_width = Dimensions.get('window').width;
   const window_height = Dimensions.get('window').height;
   try{
-    isWeb = API_ ? API_.isWeb : {isWeb:false};
+    isWeb = API_ ? API_.isWeb : false;
   }catch(err){isWeb = false;}
+  try{
+    isIOS = API_ ? API_.OS=="ios" : false;
+  }catch(err){isIOS = false;}
   try{
     _Global_theme_name = Global_theme_name;
   }catch(err){_Global_theme_name = "false";}
   
   theme_name = theme_name==false ? Global_theme_name :theme_name ;
   let theme = Themes[theme_name];
-  const header_height = API_.OS=="ios" ? 90 : 50;
+  const header_height = isIOS? 90 : 50;
   const __isMobile = _isMobile(isWeb);
   const maxWidth = window_width<1000 ? "100%" : 1000;
   const modal_maxWidth = window_width<1000 ? window_width*0.9 : 1000;
