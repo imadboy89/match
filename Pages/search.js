@@ -1,5 +1,5 @@
 import React from "react";
-import {  View, Dimensions, Modal, Button, Linking, ScrollView , RefreshControl, ActivityIndicator, TextInput} from 'react-native';
+import {  View, Dimensions, keyboard , Button, Linking, ScrollView , RefreshControl, ActivityIndicator, TextInput} from 'react-native';
 import {styles_settings,getTheme, themes_list} from "../components/Themes";
 import ItemsList from '../components/list';
 import Player from "../components/Player";
@@ -83,6 +83,9 @@ class SearchScreen extends React.Component {
     
     this.setState({list:list, loading:false});
     //squad_club
+    if(API_.isWeb != false){
+      keyboard.dismiss(); 
+    }
   }
   get_player_info=(player)=>{
     this.setState({modalVisible_player:true,_player_id:player.player_id});
@@ -104,7 +107,7 @@ class SearchScreen extends React.Component {
           <View style={[this.state.dynamic_style.settings_row,{padding:10}]}>
             <View style={{flex:4}}>
               <TextInput
-                    style={{height:"100%",backgroundColor:"grey",paddingHorizontal:10}}
+                    style={{height:40,backgroundColor:"grey",paddingHorizontal:10}}
                     placeholder={"Search"}
                     placeholderTextColor="#ecf0f1"
                     onChangeText ={newValue=>{
@@ -115,13 +118,13 @@ class SearchScreen extends React.Component {
                 />
               </View>
               <View style={{flex:1}}>
-              <Button
-                title={"Go"}
-                color={"#f39c12"}
-                onPress={()=>{
-                  this.search();
-                }}
-              ></Button>
+                <Button
+                  title={"Go"}
+                  color={"#f39c12"}
+                  onPress={()=>{
+                    this.search();
+                  }}
+                ></Button>
             </View>
           </View>
 

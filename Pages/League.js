@@ -308,7 +308,6 @@ class LeagueScreen extends React.Component {
         if (Object.keys(fav_style).length==0 && row.backgroundColor){
           fav_style = {backgroundColor:row.backgroundColor}
         }
-        
         cc_flag = cc_flag ? API_.get_cc_img(cc_flag) : null;
         cc_flag = cc_flag!=null && cc_flag != team_badge ? cc_flag  : null;
         return (

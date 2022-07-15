@@ -425,7 +425,7 @@ class Scrap {
     let json_={"matches_comps":[],"matches_list":[], "headers":[]};
     try{
       json_ = JSON.parse(html);
-    }catch(err){return [];}
+    }catch(err){return -1;}
     const date_str = date ? API_.get_date2(date): false;
     //parse matches_comps
     const FILTERING = API_.filtering && ignoreBL==false;
@@ -444,7 +444,7 @@ class Scrap {
     const MIN_ALLOWED_OPTIONS = is_oneMatch || FILTERING==false ? 1 : 3;
     let k = 0;
     if(json_==undefined || json_["matches_comps"] == undefined ){
-      return [];
+      return false;
     }
     const matches_stages = json_["headers"] ? this.get_matches_stages(json_["headers"]) : false;
     for(let i=0;i< json_["matches_comps"].length;i++){

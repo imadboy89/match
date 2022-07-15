@@ -27,7 +27,12 @@ async function storeReview(){
         }
         const isAvailable = await StoreReview.isAvailableAsync();
         if(isAvailable==false){ return false;}
-        await StoreReview.requestReview();   
+        await StoreReview.requestReview();
+        try {
+            backup.save_trace({key:"storeReview",name:"storeReview",params:undefined,time:new Date()});
+        } catch (error) {
+            
+        }
     } catch (error) {
         console.log(error);
     }

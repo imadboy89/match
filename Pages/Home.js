@@ -176,6 +176,7 @@ class HomeScreen extends React.Component {
     }, 50000);
 
     this.interval_refresh_if_issue = setInterval(()=>{
+      alert(this.state.list)
       if(this.max_tries>0 && (this.state.list==undefined || !this.state.list || !this.state.list.length || this.state.list.length==0 ) ){
         this._refresh_(true,true);
         this.max_tries -= 1;

@@ -156,6 +156,7 @@ class API {
       "199":"مسابقات نسائية",
       "201":"أوروبا",
       "202":"آسيا وأفريقيا",
+      "102":"كرة اليد",
   };
   }
   async fetch(resource, options) {
@@ -1046,7 +1047,7 @@ class API {
         /////////////////////////////////////////////
         if(this.mdb_save_teams){
           let queue_teams2upload=[];
-          if(backup.teams_ready==true){
+          if(backup.teams_ready==true && matches!==-1){
             this.getTeam_logo_k().then(teams_logo =>{
               matches.map(l=>{
                 l.data.map(m=>{

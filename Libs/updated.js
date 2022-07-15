@@ -1,1 +1,1 @@
-﻿export default '2022-06-24 11:00:33';
+﻿export default '2022-07-15 03:08:00';
