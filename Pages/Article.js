@@ -197,6 +197,7 @@ class ArticleScreen extends React.Component {
         const width = Dimensions.get('window').width<=400 ? "99%" : "70%";
         let img_src = o.replace(/\*/gi,"").trim();
         img_src = img_src && img_src.slice(0,2) == "//" ? "https:"+img_src : img_src;
+        img_src = img_src && img_src.slice(0,4) == "http" ? `${kooora_domain}${img_src}` : img_src;
         dom2retrurn = <View key={o} style={{flexDirection: 'row',height:300,width:width,alignSelf:"center",marginVertical:10}}>
         <ImageBackground source={{uri:img_src}} style={{aspectRatio: 1,resizeMode: 'contain',flex: 1,}} resizeMode={'contain'}/>
         </View>;

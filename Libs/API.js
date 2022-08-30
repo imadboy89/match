@@ -43,6 +43,7 @@ class API {
     this.domain_o = 'https://al-match.com/';
     this.domain_ = 'https://al-match.com';
     this.domain = 'https://al-match.com/api/';
+    this.kooora_domain = "https://kooora.com/"
     this.configs = {};
     this.proxy_post = `${this.server_url}.proxy2.php?url=`;
     this.proxy_get  = `${this.server_url}.proxy.php?url=`;
