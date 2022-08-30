@@ -337,6 +337,20 @@ class API {
       this.leagues_dict[title].koora_id = league.id;
     }
   }  
+  set_fav_p=async(player_name)=>{
+    let favorite_p = await API_.getConfig("favorite_players",{});
+    let msg_action = "";
+    if( favorite_p.includes(player_name) ){
+      favorite_p = favorite_p.filter(o=>{if(o!=player_name)return o;});
+      msg_action = "تمت إزالته من";
+    }else{
+      favorite_p.push(player_name);
+      msg_action = "تمت إضافته إلى";
+    }
+    API_.setConfig("favorite_players",favorite_p);
+    API_.showMsg(`اللاعب ٭${player_name}٭ ${msg_action} المفضلة!`);
+    return favorite_p;
+  }
   leagueId_byTitle(title,default_id){
     default_id = default_id==undefined ? 0 : default_id ;
     title = this.fix_title(title);

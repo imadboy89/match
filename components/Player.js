@@ -31,6 +31,22 @@ class Player extends React.Component{
         this.setState({player:res,loading:false});
       });
     }
+    set_fav_p=async()=>{
+      const player_name = this.state.player.player_name_ar;
+      this.setState({});
+      const favorite_p = await API_.set_fav_p(player_name);
+      this.setState({favorite_p:favorite_p});
+    }
+    save_follow = ()=>{
+      if(_item.related_link){
+        const item = {};
+        item.source = 1;
+        item.url = `player=${this.props.player_id}`;
+        item.title = this.state.player.player_name_ar;
+        backup.save_following(item).then(o=>this.setState({}));
+  
+      }
+    }
     render_transfers=()=>{
       return this.state.player && this.state.player.transfers ? this.state.player.transfers.map(t=>{
         const player_id     = t[1];
@@ -109,6 +125,10 @@ class Player extends React.Component{
             <ScrollView style={{width:"100%",backgroundColor:"#646c78"}}>
               <View style={{width:"100%",height:260,justifyContent:"center"}} >
                 {p_img!=false ? <Image style={{height:"100%",width:"100%",resizeMode:"contain"}} source={{uri: p_img}} /> : null}
+              </View>
+              <View style={{flex:1,flexDirection:"row"}}>
+                <View style={{width:100}}><Button title="set Fav" onPress={this.set_fav_p}></Button></View>
+                <View style={{width:100}}><Button title="Follow" onPress={this.save_follow}></Button></View>
               </View>
               {pl_inf}
               <View style={{width:"99%",justifyContent:"center", marginVertical:10}} >

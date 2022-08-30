@@ -221,21 +221,10 @@ class Matchcreen extends React.Component {
     });
     this.setState({});
   }
-  set_fav_p=(player_name)=>{
-    API_.getConfig("favorite_players",this.state.favorite_p).then(o=>{
-      let msg_action = "";
-      if( o.includes(player_name) ){
-        o = o.filter(o=>{if(o!=player_name)return o;});
-        msg_action = "تمت إزالته من";
-      }else{
-        o.push(player_name);
-        msg_action = "تمت إضافته إلى";
-      }
-      this.setState({favorite_p:o});
-      API_.setConfig("favorite_players",o);
-      API_.showMsg(`اللاعب ٭${player_name}٭ ${msg_action} المفضلة!`);
-    });
+  set_fav_p=async(player_name)=>{
     this.setState({});
+    const favorite_p = await API_.set_fav_p(player_name);
+    this.setState({favorite_p:favorite_p});
   }
   get_fav_icon(ch){
     let fav_icon = null;
