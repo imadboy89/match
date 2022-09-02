@@ -612,15 +612,20 @@ class Scrap {
             }
             matche.is_koora = true;
             matche.league_img = comp_match && comp_match["comp_logo"] ? comp_match["comp_logo"].replace("//","https://") : null;
-
             if(matches_stages && matches_stages.map){
               matches_stages.map(s=>{
-                if(s.min_id<=matche.id && (s.max_id>matche.id || s.max_id==0) ){
+                if(s.min_id<=matche.id && (s.max_id>matche.id ) ){
                   matche.stage = s;
                   return false;
                 }
               });
-              
+              if(matche.stage==undefined){
+                matche.stage = JSON.parse(JSON.stringify(matches_stages[0]));
+              }
+              /*
+              const parsed_details = this.parse_details(matche["details"]);
+              matche.stage.name = parsed_details.g ? parsed_details.g : matche.stage.name;
+              */
             }
             if(is_bl){
               matches_bl[ matche["league_id"] ]["data"].push(matche);

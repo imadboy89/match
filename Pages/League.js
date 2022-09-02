@@ -95,11 +95,14 @@ class LeagueScreen extends React.Component {
     API_.setTitleWeb(this.league_name);
     API_.get_league_options(this.real_id).then(opts=>{
       let current_position = 0;
-      opts.stages.map(r => {
-        if(r[1]=="p"){
-          current_position = r[0];
-        }
-      });
+      if(opts && opts.stages && opts.stages){
+        opts.stages.map(r => {
+          if(r[1]=="p"){
+            current_position = r[0];
+          }
+        });
+      }
+
       this.setState({c_years:opts.years , c_stages:opts.stages , c_stage:current_position});
     });
   }
@@ -111,6 +114,7 @@ class LeagueScreen extends React.Component {
     let matches = {};
     const _notifications_matches = await get_notifications_matches();
     let resp = await API_.get_matches_league_k(this.real_id, this.state.c_stage);
+
     let data = resp && resp.length>0 ? resp : [];
     let header = {};
     try {
