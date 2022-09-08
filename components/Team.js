@@ -39,6 +39,21 @@ class Team extends React.Component{
         this.state.dynamic_style_league = this.props.dynamic_style;
       }
     }
+    save_team=async(last_team)=>{
+      const teams_info = await API_.getTeam_logo_k();
+      const team_ls = teams_info[this.props.team_id];
+      let queue_teams2upload = [];
+      if(team_ls && team_ls.l && team_ls.l.trim && last_team && last_team.l && last_team.l.trim && 
+        team_ls.l.trim() != last_team.l.trim() ){
+          console.log("This team is having updated logo, updating ....");
+          queue_teams2upload.push(last_team.team_id);
+          teams_info[this.props.team_id].l = last_team.l.trim();
+          teams_info[this.props.team_id].is_backedup = false;
+          await API_.save_teams_ls(teams_info);
+          await backup.save_teams();
+          console.log("This team is updated!");
+        }
+    }
     async loadTeam(){
       if(this.props.team_id==undefined){
         return;
@@ -51,6 +66,12 @@ class Team extends React.Component{
 
         if(team_info_ls == false && res.l){
           API_.queued_get_teams([res.team_id]);
+        }else if(res && res.l && team_info_ls && team_info_ls.l){
+          try {
+            this.save_team(res);
+          } catch (error) {
+            API_.showMsg(error);
+          }
         }
         this.setState({team:res,loading:false});
       });
