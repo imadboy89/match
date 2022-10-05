@@ -249,7 +249,7 @@ class Team extends React.Component{
                 <View style={{flex:1}}><Button title="Fav" color={this.state.is_fav?"green":"grey"} onPress={()=>{
                   this.set_fav(this.props.team_id,this.state.team.team_name_ar);
                 }}/></View>
-                <View style={{flex:1}}>
+                <View style={{flex:2}}>
                   <Button title="News" onPress={()=>{
                     if(this.props && this.props.navigation && this.props.navigation.push){
                       this.props.navigation.push('News', {news_id:"mode=n&team="+this.props.team_id , title:this.state.team.team_name_ar})

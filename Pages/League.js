@@ -479,6 +479,7 @@ class LeagueScreen extends React.Component {
           modal_visible={this.state.modalVisible_player}
           dynamic_style={this.state.dynamic_style}
           player_id = {this.state.player_id}
+          navigation={this.props.navigation}
           closeModal={()=>{
           this.setState({modalVisible_player:false})}}></Player>
 

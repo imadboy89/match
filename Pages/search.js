@@ -141,6 +141,7 @@ class SearchScreen extends React.Component {
           <Player       
           modal_visible={this.state.modalVisible_player}
           player_id = {this.state._player_id}
+          navigation={this.props.navigation}
           closeModal={()=>{
           this.setState({modalVisible_player:false})}}></Player>
           : null }
