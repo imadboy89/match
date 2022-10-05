@@ -76,12 +76,12 @@ class Player extends React.Component{
     }
     render(){
       const allowed_infs = {
-        "player_name_ar":"اسم اللاعب",
         "player_nationality":"الجنسية",
         "player_nteam_name":"المنتخب",
         "player_team_name":"النادي",
         "player_birthdate" : "تاريخ الميلاد",
         "player_position" : "المركز",
+        "player_name_ar":"اسم اللاعب",
       };
       const MModal = API_.isWeb ? require("modal-enhanced-react-native-web").default : Modal;
       if(this.state.player && this.state.player.player_career && this.state.player.player_career.split){
@@ -129,6 +129,13 @@ class Player extends React.Component{
               <View style={{flex:1,flexDirection:"row"}}>
                 <View style={{width:100}}><Button title="set Fav" onPress={this.set_fav_p}></Button></View>
                 <View style={{width:100}}><Button title="Follow" onPress={this.save_follow}></Button></View>
+                <View style={{width:100}}>
+                  <Button title="News" onPress={()=>{
+                    if(this.props && this.props.navigation && this.props.navigation.push){
+                      this.props.navigation.push('News', {news_id:"mode=n&player="+this.props.player_id , title:this.state.player.player_name_ar})
+                    }
+                    }}/>
+                </View>
               </View>
               {pl_inf}
               <View style={{width:"99%",justifyContent:"center", marginVertical:10}} >
