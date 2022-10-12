@@ -346,7 +346,7 @@ function generateTheme(theme_name=false){
       flexDirection:'row', 
       flexWrap:'wrap',
       flex: 1 ,
-      height:83,
+      height: isWeb ? 87 : 83,
       marginRight:5,
       //marginLeft:5,
       borderRadius:10,
