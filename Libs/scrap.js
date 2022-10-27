@@ -106,27 +106,23 @@ class Scrap {
     match_details["league"] = league_name;
     // scorers
     let scorers = [];
-    const goal_keys = ["p","g","o"] ;
+    let cards = [];
+    const goal_keys = ["p","g","o"];
     for(let k=0;k<goal_keys.length;k++){
       const key_ = goal_keys[k];
-      if(home_players_events_dict[key_] && home_players_events_dict[key_].length>0){
-        for(let i=0;i< home_players_events_dict[key_].length;i++){
-          let scorer = {"home_scorer":"","home_assist":"","away_scorer":"","away_assist":"","time":""};
-          scorer["home_scorer"] = home_players_events_dict[key_][i][3];
-          scorer["time"] = home_players_events_dict[key_][i][1];
-          scorers.push(scorer);
-        }
-      }
-      if(away_players_events_dict[key_] && away_players_events_dict[key_].length>0){
-        for(let i=0;i< away_players_events_dict[key_].length;i++){
-          let scorer = {"home_scorer":"","home_assist":"","away_scorer":"","away_assist":"","time":""};
-          scorer["away_scorer"] = away_players_events_dict[key_][i][3];
-          scorer["time"] = away_players_events_dict[key_][i][1];
-          scorers.push(scorer);
-        }
-      }
+      const scrorers_home = this.get_scorers_details("home",home_players_events_dict,key_);
+      const scrorers_away = this.get_scorers_details("away",away_players_events_dict,key_);
+      scorers = scorers.concat(scrorers_home).concat(scrorers_away);
+    }
+    const cards_keys = ["y","r"];
+    for(let k=0;k<cards_keys.length;k++){
+      const key_ = cards_keys[k];
+      const cards_home = this.get_cards("home",home_players_events_dict,key_);
+      const cards_away = this.get_cards("away",away_players_events_dict,key_);
+      cards = cards.concat(cards_home).concat(cards_away);
     }
     match_details["goal_scorer"] = scorers;
+    match_details["cards"] = cards;
     match_details["round"] = details_dict["o"] && details_dict["o"].length>0 ? "الجولة "+details_dict["o"][0][1] : "-" ;
     match_details["round"] = match_details["round"]=="-" && details_dict["w"] && details_dict["w"].length>0 ? "الأسبوع "+details_dict["w"][0][1] : match_details["round"] ;
     match_details["phase"] = details_dict["e"] && details_dict["e"].length>0 ? details_dict["e"][0][2] : "-" ;
@@ -138,6 +134,39 @@ class Scrap {
       match_details["desc"] = details_dict["no"][0][1];
     }
     return match_details;
+  }
+  get_scorers_details(_type,events_dict,key){
+    let scorers = []
+    if(events_dict[key] && events_dict[key].length>0){
+      for(let i=0;i< events_dict[key].length;i++){
+        let scorer = {"home_scorer":"","home_assist":"","away_scorer":"","away_assist":"","time":"", "player_id":0};
+        scorer[`${_type}_scorer`] = events_dict[key][i][3];
+        scorer["time"] = events_dict[key][i][1];
+        scorer["type"] = key;
+        scorer["player_id"] = events_dict[key][i][2];
+
+        scorer["time"] = !isNaN(scorer["time"]) ? parseInt(scorer["time"]) : scorer["time"];
+
+        scorers.push(scorer);
+      }
+    }
+    return scorers;
+  }
+  get_cards(_type,events_dict,key){
+    let scorers = []
+    if(events_dict[key] && events_dict[key].length>0){
+      for(let i=0;i< events_dict[key].length;i++){
+        let scorer = {"home_card":"", "away_card":"","time":"", "player_id":0};
+        scorer[`${_type}_card`] = events_dict[key][i][3];
+        scorer["time"] = events_dict[key][i][1];
+        scorer["type"] = key;
+        scorer["player_id"] = events_dict[key][i][2];
+
+        scorer["time"] = !isNaN(scorer["time"]) ? parseInt(scorer["time"]) : scorer["time"];
+        scorers.push(scorer);
+      }
+    }
+    return scorers;
   }
   get_lineup(html){
     let json_={"match_squads":[]};

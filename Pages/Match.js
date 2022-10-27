@@ -34,6 +34,9 @@ class Matchcreen extends React.Component {
     };
     this.sub_out = {"home":[],"away":[]};
     this.id = 0;
+    this.symbol_goal = "⚽";
+    this.symbol_redcard = "🟥";
+    this.symbol_yallowcard = "🟨";
   }
   componentDidMount(){
     this.state.matche_details = this.state.matche_details && this.state.matche_details!="-" ? this.state.matche_details : undefined;
@@ -451,8 +454,14 @@ class Matchcreen extends React.Component {
       let away_p = a_lineup[i]!=undefined ? a_lineup[i] : false;
       let scored_h_count = this.scorers_h.filter(function(item) {return item === home_p.lineup_player}).length;
       let scored_a_count = this.scorers_a.filter(function(item) {return item === away_p.lineup_player}).length;
-      let scored_h = this.scorers_h && home_p && this.scorers_h.includes(home_p.lineup_player) ? "⚽".repeat(scored_h_count):"";
-      let scored_a = this.scorers_a && away_p && this.scorers_a.includes(away_p.lineup_player) ? "⚽".repeat(scored_a_count):"";
+      let scored_h = this.scorers_h && home_p && this.scorers_h.includes(home_p.lineup_player) ? this.symbol_goal.repeat(scored_h_count):"";
+      let scored_a = this.scorers_a && away_p && this.scorers_a.includes(away_p.lineup_player) ? this.symbol_goal.repeat(scored_a_count):"";
+
+      let rcards_h = this.rcards_h && home_p && this.rcards_h.includes(home_p.lineup_player) ? this.symbol_redcard:"";
+      let rcards_a = this.rcards_a && away_p && this.rcards_a.includes(away_p.lineup_player) ? this.symbol_redcard:"";
+      let ycards_h = this.ycards_h && home_p && this.ycards_h.includes(home_p.lineup_player) ? this.symbol_yallowcard:"";
+      let ycards_a = this.ycards_a && away_p && this.ycards_a.includes(away_p.lineup_player) ? this.symbol_yallowcard:"";
+
 
       let assist_h_count = this.assist_h.filter(function(item) {return item === home_p.lineup_player}).length;
       let assist_a_count = this.assist_a.filter(function(item) {return item === away_p.lineup_player}).length;
@@ -483,7 +492,7 @@ class Matchcreen extends React.Component {
               onPress={()=>this.get_player_info({player_id:away_p.player_key})}
               style={[this.state.dynamic_style.lineup2_lr_container ]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_l_ :this.state.dynamic_style.lineup2_l, away_pl_tyle]} numberOfLines={1}>
-                {away_p && away_p.lineup_player? subout_a+" "+scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
+                {away_p && away_p.lineup_player? subout_a+" "+ycards_a+" "+rcards_a+" "+scored_a+" "+assist_a+" "+away_p.lineup_player : ""}
               </Text>
             </TouchableOpacity>
 
@@ -494,7 +503,7 @@ class Matchcreen extends React.Component {
               onPress={()=>this.get_player_info({player_id:home_p.player_key})}
               style={[this.state.dynamic_style.lineup2_lr_container]}>
               <Text style={[i==0?this.state.dynamic_style.stats_frag_r_ :this.state.dynamic_style.lineup2_r,home_pl_tyle]} numberOfLines={1}>
-                {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h+" "+subout_h : ""}
+                {home_p && home_p.lineup_player? home_p.lineup_player+" "+assist_h+" "+scored_h+" "+rcards_h+" "+ycards_h+" "+subout_h : ""}
               </Text>
             </TouchableOpacity>
             <Text style={[this.state.dynamic_style.lineup2_number,style_sub_h,home_pl_tyle]}>{home_p && home_p.lineup_number? home_p.lineup_number : ""}</Text>
@@ -590,27 +599,25 @@ class Matchcreen extends React.Component {
     let style_class = type_=="home"? this.state.dynamic_style.match_results_team_name_r : this.state.dynamic_style.match_results_team_name_l ;
     if(this.state.matche_details.goal_scorer){
       this.state.matche_details.goal_scorer = this.state.matche_details.goal_scorer.sort((a,b)=>{
-        const a_time = !isNaN(a.time) ? parseInt(a.time) : a.time;
-        const b_time = !isNaN(b.time) ? parseInt(b.time) : b.time;
-        return a_time<b_time?-1:1
+        return a.time<b.time?-1:1
       });
       let res = this.state.matche_details.goal_scorer.map(elm=>{
         if(elm[type_+"_scorer"]==undefined || elm[type_+"_scorer"]=="" || elm[type_+"_scorer"]==null) return false;
         let text = "";
         if(type_=="away"){
           if(API_.is_ascii(elm[type_+"_scorer"]) == false){
-            text = (elm.time ? elm.time+'"' : "-") +" "+ elm[type_+"_scorer"];
+            text = this.symbol_goal + " " +(elm.time ? elm.time+'"' : "-") +" "+ elm[type_+"_scorer"];
           }else{
-            text = elm[type_+"_scorer"]+" "+(elm.time ? elm.time+'"' : "-");
+            text = elm[type_+"_scorer"]+" "+(elm.time ? elm.time+'"' : "-") +" "+this.symbol_goal;
           }
           this.scorers_a.push(elm[type_+"_scorer"]);
           this.assist_a.push(elm[type_+"_assist"]);
           
         }else{
           if(API_.is_ascii(elm[type_+"_scorer"]) == false){
-            text = elm[type_+"_scorer"] +" "+(elm.time ? elm.time+'"' : "-");
+            text = elm[type_+"_scorer"] +" "+(elm.time ? elm.time+'"' : "-") +" "+this.symbol_goal;
           }else{
-            text = (elm.time ? elm.time+'"' : "-") +" " +elm[type_+"_scorer"];
+            text = this.symbol_goal + " " +(elm.time ? elm.time+'"' : "-") +" " +elm[type_+"_scorer"];
           }
           this.scorers_h.push(elm[type_+"_scorer"]);
           this.assist_h.push(elm[type_+"_assist"]);
@@ -624,6 +631,60 @@ class Matchcreen extends React.Component {
       );
     }
   }
+
+  get_cards(type_="home"){
+    if(type_=="home"){
+      this.ycards_h =[];
+      this.rcards_h =[];
+    }else{
+      this.ycards_a =[];
+      this.rcards_a =[];
+    }
+    let style_class = type_=="home"? this.state.dynamic_style.match_results_team_name_r : this.state.dynamic_style.match_results_team_name_l ;
+    if(this.state.matche_details.cards){
+      this.state.matche_details.cards = this.state.matche_details.cards.sort((a,b)=>{
+        return a.time<b.time?-1:1
+      });
+      let res = this.state.matche_details.cards.map(elm=>{
+        const __key = type_+"_card";
+        if(elm[__key]==undefined || elm[__key]=="" || elm[__key]==null) return false;
+        let text = "";
+        const card_type = elm.type=="r" ? this.symbol_redcard : this.symbol_yallowcard ;
+        if(type_=="away"){
+          if(API_.is_ascii(elm[__key]) == false){
+            text = card_type + " " + (elm.time ? elm.time+'"' : "-") +" "+ elm[__key];
+          }else{
+            text = elm[__key]+" "+(elm.time ? elm.time+'"' : "-") + " " + card_type;
+          }
+          if(elm.type=="r"){
+            this.rcards_a.push(elm[__key]);
+          }else{
+            this.ycards_a.push(elm[__key]);
+          }
+          
+          
+        }else{
+          if(API_.is_ascii(elm[__key]) == false){
+            text = elm[__key] +" "+(elm.time ? elm.time+'"' : "-") + " " + card_type;
+          }else{
+            text = card_type + " " + (elm.time ? elm.time+'"' : "-") +" " +elm[__key];
+          }
+          if(elm.type=="r"){
+            this.rcards_h.push(elm[__key]);
+          }else{
+            this.ycards_h.push(elm[__key]);
+          }
+        }
+        return <Text style={[style_class,this.state.dynamic_style.match_results_scorer_text]} key={text}>{text}</Text>;
+      });
+      return(
+          <View style={[style_class]}>
+            {res ? res :null}
+          </View>
+      );
+    }
+  }
+  
   render() {
     if (this.state.matche_details == undefined ||this.state.matche_details.id ==undefined){
       return <Loading/>;
@@ -634,6 +695,10 @@ class Matchcreen extends React.Component {
     let away_style =this.state.dynamic_style.match_results_drawer;
     let scores_home = this.get_scores("home");
     let scores_away = this.get_scores("away");
+
+    let cards_home = this.get_cards("home");
+    let cards_away = this.get_cards("away");
+    
     try{
       home_sc = this.state.matche_details.home_team_score && this.state.matche_details.home_team_score!="-" ? parseInt(this.state.matche_details.home_team_score) : "-";
       away_sc = this.state.matche_details.away_team_score && this.state.matche_details.away_team_score!="-" ? parseInt(this.state.matche_details.away_team_score) : "-";
@@ -699,6 +764,7 @@ class Matchcreen extends React.Component {
             { this.state.show_res ?
             <View style={{}}>
               {scores_away}
+              {cards_away}
             </View>
             :null}
           </View>
@@ -723,6 +789,8 @@ class Matchcreen extends React.Component {
             { this.state.show_res ?
             <View style={{}}>
               {scores_home}
+
+              {cards_home}
             </View>
             :null}
           </View>

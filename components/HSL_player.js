@@ -52,10 +52,11 @@ class HLSP extends React.Component {
       hls_configs.maxBufferSize = 0.1*1000*1000;
       console.log(url , this.playerRef);
       //hlsConfig={{maxBufferSize: 120*1000*1000}}
-      if (this.state.player_type == 1){
+      if (this.state.player_type == 1 && API_.isWeb){
         return <HLSPlayer dom_id={"hls_video"} url={url}/>;
       }else{
         return (<Video 
+                  style={{width:"98%",height:"95%",backgroundColor:"red"}}
                   source={{uri: url}}   
                   ref={(ref) => {
                     this.player = ref

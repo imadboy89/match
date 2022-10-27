@@ -69,11 +69,11 @@ class ChannelScreen extends React.Component {
       API_.saveLink(serv.SecureUrl,this.state.channel["name"],API_.domain_o+this.channel_photo).then(out=>API_.showMsg("تمت إضافة القناة!"));
       
     }else if (this.state.actionType=="PLAYER"){
-      if(API_.isWeb){
+      //if(API_.isWeb){
         this.setState({p_url:serv.SecureUrl,modalVisible_hlsp:true});
-        return;
-      }
-      API_.open_ext_url(serv.SecureUrl);
+      //  return;
+      //}
+      //API_.open_ext_url(serv.SecureUrl);
 
     }else if(this.state.actionType=="inApp-IPTV"){
       const ch = JSON.parse(JSON.stringify(this.state.channel));

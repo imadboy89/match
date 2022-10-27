@@ -201,6 +201,7 @@ class CategoriesScreen extends React.Component {
     >
       <Picker.Item label="Almtch" value={1} />
       <Picker.Item label="Radio" value={6} />
+      <Picker.Item label="IPTV" value={5} />
   </Picker>);
   /*
       <Picker.Item label="kora-live" value={2} />
