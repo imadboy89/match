@@ -133,14 +133,16 @@ async function registerForPushNotificationsAsync() {
     return new Promise(function(){return []});
   }
   if (Constants.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const notif_perms = await Notifications.getPermissionsAsync();
+    //{ status: existingStatus } =
+    const existingStatus = notif_perms.status;
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
+      alert('Failed to get push token for push notification!'+JSON.stringify(notif_perms));
       return;
     }
     backup.PushToken = await Notifications.getExpoPushTokenAsync({experienceId: '@imadboss/almatch',});
