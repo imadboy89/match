@@ -614,7 +614,7 @@ class API {
   load_teams_ls = async()=>{
     let teams_info = {};
     for(let i=0;i<100000;i++){
-      const teams_info_chunk = await AsyncStorage.getItem('teams_info_k_'+i);
+      let teams_info_chunk = await AsyncStorage.getItem('teams_info_k_'+i);
       if(teams_info_chunk){
         teams_info_chunk = JSON.parse(teams_info_chunk);
         //teams_info_chunk = teams_info_chunk.map(t=> t.team_logo = t.l && t.l.slice(0,4)!="http"?  "https://img.kooora.com/" : t.l );

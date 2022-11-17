@@ -31,12 +31,16 @@ class ItemsList extends React.Component {
     this._isMounted=true;
     getTheme("styles_list").then(theme=>this.setState({dynamic_style:theme}));
     //AppState.addEventListener("resize", this.check_width.bind(this));
-    Dimensions.addEventListener("change",this.check_width)
+    if(API_.isWeb && Dimensions && Dimensions.addEventListener){
+      Dimensions.addEventListener("change",this.check_width);
+    }
   }
   componentWillUnmount(){
     //alert("componentWillUnmount");
     this._isMounted=false;
-    Dimensions.removeEventListener("change",this.check_width);
+    if(API_.isWeb && Dimensions && Dimensions.removeEventListener){
+      Dimensions.removeEventListener("change",this.check_width);
+    }
     try {
       this.ScrollNav.unsubscribe();
     } catch (error) {}

@@ -43,33 +43,7 @@ class TVScreen extends React.Component {
   }
   init_cnx = async()=>{
       return false;
-      API_.showMsg("Initialising cnx ...","info",undefined, 800);
 
-      const SamsungRemote = require('samsung-remote');
-      this.remote = new SamsungRemote({ip: this.state.tv_ip});
-
-      this.remote.send('KEY_VOLUP', (err) => {
-        if (err) {
-            API_.showMsg(err+"","danger",undefined, 800);
-        } else {
-            API_.showMsg("command has been successfully transmitted","success",undefined, 800);
-            // command has been successfully transmitted to your tv
-        }
-    });
-      return ;
-      try {
-        this.control = new Samsung(this.get_conf());
-        await this.control.turnOn();
-      } catch (error) {
-          console.log(error);
-          API_.showMsg(error+"","danger");
-          return false;
-      }
-      const isavailable = await this.control.isAvailable();
-      let tv_token = await this.control.getTokenPromise()
-      tv_token = tv_token ? tv_token : "";
-      API_.showMsg("Token : "+tv_token,"info",undefined,1000);
-      this.setState({tv_token:token});
   }
   sendKey = async(key)=>{
     API_.showMsg("Sending key ["+key+"] ...","info",undefined, 800);
