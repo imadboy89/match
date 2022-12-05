@@ -1,5 +1,5 @@
 import React from "react";
-import {  View, StyleSheet, Modal, Button, Linking, Picker,ScrollView, Image , ImageBackground, ActivityIndicator, TouchableOpacity} from 'react-native';
+import {  View, Linking,ScrollView , ImageBackground, ActivityIndicator} from 'react-native';
 import Constants from 'expo-constants';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import Loader from "../components/Loader";
@@ -7,6 +7,7 @@ import {styles_article,getTheme, global_theme,globalView_style} from "../compone
 import { WebView } from 'react-native-webview';
 import IconButton from "../components/IconButton";
 import HLSP from "../components/HSL_player";
+import {Picker} from '@react-native-picker/picker';
 
 class VideoScreen extends React.Component {
   constructor(props) {
@@ -155,13 +156,16 @@ class VideoScreen extends React.Component {
               domStorageEnabled={true}
               ref={(ref) => (this.webview = ref)}
               onShouldStartLoadWithRequest={(request) => {
-                const request_url_domain = request.url.replace("/m.","/").replace("/www.","/").split("/")[2].trim() ;
-                //this.webview.injectJavaScript(this.js_setIframeWidth);
-                //alert("loading : "+request.url);
-                if(request_url_domain != uri_origin_domain && !this.whitelisted_redirection.includes(request_url_domain) ){
-                  //alert("stopLoading : -"+ request_url_domain +"-"+ uri_origin_domain+"-");
-                  return false;
+                if(request && request.url && request.url.replace){
+                  try {
+                    const request_url_domain = request.url.replace("/m.","/").replace("/www.","/").split("/")[2].trim() ;
+                    if(request_url_domain != uri_origin_domain && !this.whitelisted_redirection.includes(request_url_domain) ){
+                      return false;
+                    }
+                  } catch (error) {}
+
                 }
+
                 this.state.history_urls.push(request.url);
                 this.setState({});
                 return true;

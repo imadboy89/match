@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Button, Picker, TouchableOpacity, Image, ScrollView, ImageBackground} from 'react-native';
+import { View, Button, TouchableOpacity, Image, ScrollView, ImageBackground} from 'react-native';
 import ItemsList from '../components/list';
 import Loading from '../components/Loader';
 import {styles_league,getTheme,global_theme} from "../components/Themes";
@@ -7,6 +7,8 @@ import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif"
 import Player from "../components/Player";
 import Team from "../components/Team";
 import IconButton from "../components/IconButton";
+import {Picker} from '@react-native-picker/picker';
+
 
 let list = [
 

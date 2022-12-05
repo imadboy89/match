@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Button, Picker,ScrollView, Image } from 'react-native';
+import { View, Button, ScrollView, Image } from 'react-native';
 import Loading from "../components/Loader";
 import {styles_channel,getTheme,globalView_style,styles_home} from "../components/Themes";
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -8,6 +8,8 @@ import ItemsList from '../components/list';
 import IconButton from "../components/IconButton";
 import { WebView } from 'react-native-webview';
 import ScrollNav from "../Libs/scrollNav";
+import {Picker} from '@react-native-picker/picker';
+
 class ChannelScreen extends React.Component {
   constructor(props) {
     super(props);

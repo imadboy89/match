@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Button, Picker,ScrollView, Image } from 'react-native';
+import { View, Button, ScrollView, Image } from 'react-native';
 import Loading from "../components/Loader";
 import {styles_channel,getTheme,globalView_style} from "../components/Themes";
 import * as ScreenOrientation from 'expo-screen-orientation';
 import HLSP from "../components/HSL_player";
+import {Picker} from '@react-native-picker/picker';
 
 
 class ChannelScreen extends React.Component {

@@ -1,11 +1,13 @@
 import React from "react";
-import { View, TouchableHighlight, Modal, Button, Switch, Picker, TouchableOpacity,Image, ImageBackground, ScrollView, RefreshControl} from 'react-native';
+import { View, TouchableHighlight, Modal, Button, Switch, TouchableOpacity,Image, ImageBackground, ScrollView, RefreshControl} from 'react-native';
 import Loading from '../components/Loader';
 import {styles_match,getTheme,global_theme} from "../components/Themes";
 import IconButton from "../components/IconButton";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Player from "../components/Player";
 import Team from "../components/Team";
+import {Picker} from '@react-native-picker/picker';
+
 let list = [
 
           ];

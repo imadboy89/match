@@ -1,6 +1,7 @@
 import React from "react";
-import {  View, TextInput, Modal, Button, Linking, ScrollView, Picker , ImageBackground, ActivityIndicator, Switch} from 'react-native';
+import {  View, TextInput, Modal, Button, Linking, ScrollView , ImageBackground, ActivityIndicator, Switch} from 'react-native';
 import {styles_settings,getTheme, themes_list} from "../components/Themes";
+import {Picker} from '@react-native-picker/picker';
 
 
 class TVScreen extends React.Component {

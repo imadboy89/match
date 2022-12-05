@@ -2,7 +2,7 @@
   "expo": {
     "name": "AlMatch",
     "slug": "almatch",
-    "version": "3.0.0",
+    "version": "4.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "privacy": "public",
@@ -13,7 +13,8 @@
       "backgroundColor": "#000"
     },
     "updates": {
-      "fallbackToCacheTimeout": 2
+      "fallbackToCacheTimeout": 2,
+      "url": "https://u.expo.dev/b2a8f791-6a5a-4355-9350-d24199fddb3a"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -27,7 +28,7 @@
     "android": {
       "package": "com.imados.almatch",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000"
@@ -73,6 +74,9 @@
       "eas": {
         "projectId": "b2a8f791-6a5a-4355-9350-d24199fddb3a"
       }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }
