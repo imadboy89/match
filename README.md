@@ -1,3 +1,14 @@
+-------------------------------------------------------------------
+
+you don't have my permission to use my App for comercial perposes.
+
+contact me in here (github)
+
+-------------------------------------------------------------------
+
+
+
+
 fixes for upgrading
 
 node_modeles :
