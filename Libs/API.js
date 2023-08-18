@@ -772,6 +772,7 @@ class API {
     });
 
   }
+
   get_article(link,source_id=1){
     //https://www.hesport.com/akhbar/122520.html
     let url = "https://m.kooora.com/?"+link+"&arabic";
@@ -791,6 +792,9 @@ class API {
       }
       try {
         article  = scrap.get_article(html, article);
+        if(article==[]){
+          API_.showMsg("Article empty !","warning");
+        }
       } catch (error) {console.log(error)}
       try{
         article.url= url;

@@ -34,6 +34,8 @@ class Scrap {
       _article.he_article_date = this.get_var(html,"he_article_date");
       _article.he_article_title = this.get_var(html,"he_article_title");
       _article.article_content = body;
+    }else{
+      return [];
     }
     const article = {}
     article.related        = _article.article_links;
