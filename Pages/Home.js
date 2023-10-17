@@ -140,6 +140,7 @@ class HomeScreen extends React.Component {
       API_.setDate = this.onChange;
       //this.promtInstallWPA();
       this.promtSignUp();
+      /*
       if(navigator && navigator.serviceWorker && navigator.serviceWorker.addEventListener){
         navigator.serviceWorker.removeEventListener('message',()=>{});
         navigator.serviceWorker.addEventListener('message', event => {
@@ -152,6 +153,7 @@ class HomeScreen extends React.Component {
           }
         });
       }
+      */
       //document.addEventListener("keydown", this.escFunction, false);
     }
 
@@ -198,7 +200,6 @@ class HomeScreen extends React.Component {
       })
     }
     if(API_.get_date(this.state.matches_date)==API_.get_date(new Date())){
-      console.log("get_matches loading");
       this.get_matches(null,true);
     }
   }
@@ -381,58 +382,54 @@ class HomeScreen extends React.Component {
       this.is_focused = false;
     }));
   }
-  get_matches = (date_obj=null,setloading=true,next=false)=>{
-    if(this.is_focused==false){console.log("get_matches not focused");return;}
+  get_matches = async(date_obj=null,setloading=true,next=false)=>{
+    if(this.is_focused==false){return;}
     if(this.state.loading==false && setloading){this.setState({loading:true});}
     if(this.state.source_id!=0){
       return this.get_matches_koora(date_obj,next);
     }
     date_obj = date_obj==null ? this.state.matches_date :date_obj; 
-
-    API_.getConfig("favorite_leagues",this.state.favorite).then(favorite=>{
-      get_notifications_matches().then(_notifications_matches=>{
-        API_.getLeagues().then(leagues_dict=>{
-          API_.get_matches(date_obj,this.state.page).then(resp=>{
-            const matches_list = resp ? resp : {};
-            let data = [];
-          if(matches_list && Object.keys(matches_list).length){
-            let list = [];
-            data = Object.keys(matches_list).map(k =>{
-              let row = matches_list[k] ;
-              let img = row && row.length>0 && row[0]["league_badge"] && row[0]["league_badge"]["path"] 
-                        ? row[0]["league_badge"]["path"] : false;
-              let league_id=0; 
-              try{league_id= leagues_dict && leagues_dict[k]? leagues_dict[k].league_id :0;}catch(e){console.log(e);}
-              for(let i=0;i<row.length;i++){
-                row[i].time = API_.convert_time(row[i].time);
-                row[i].league_id = league_id
-                if(row[i].live){
-                  const played_time = API_.convert_time_spent(row[i].date + " "+row[i].time) ;
-                  row[i].time_played = played_time ? played_time : "";
-                  if(played_time==false || played_time<-10){
-                    row[i].live = 0;
-                  }
-                }
-              }
-              if(this.state.is_only_live){
-                row = row.filter(o=>o.live);
-              }
-              return {"title":k,"img":img, data:row,"id":league_id}; 
-            });
-            data = data.filter(o=>o.data.length>0);
-            try{
-              data = data.sort((a,b)=>{return (favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
-            }catch(e){console.log(e);}
+    
+    const favorite = await API_.getConfig("favorite_leagues",this.state.favorite);
+    const _notifications_matches = await get_notifications_matches();
+    const leagues_dict = await API_.getLeagues();
+    const resp = await API_.get_matches(date_obj,this.state.page);
+    const matches_list = resp ? resp : {};
+    let data = [];
+    if(matches_list && Object.keys(matches_list).length){
+      let list = [];
+      data = Object.keys(matches_list).map(k =>{
+        let row = matches_list[k] ;
+        let img = row && row.length>0 && row[0]["league_badge"] && row[0]["league_badge"]["path"] 
+                  ? row[0]["league_badge"]["path"] : false;
+        let league_id=0; 
+        try{league_id= leagues_dict && leagues_dict[k]? leagues_dict[k].league_id :0;}catch(e){console.log(e);}
+        for(let i=0;i<row.length;i++){
+          row[i].time = API_.convert_time(row[i].time);
+          row[i].league_id = league_id
+          if(row[i].live){
+            const played_time = API_.convert_time_spent(row[i].date + " "+row[i].time) ;
+            row[i].time_played = played_time ? played_time : "";
+            if(played_time==false || played_time<-10){
+              row[i].live = 0;
+            }
           }
-          //this.end = data.length == 0 ? true : false;
-          //data = this.state.page>1 ? this.state.list.concat(data) : data;
-          if(this._isMounted){
-            this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
-          }
-        });
-        });
-    });
-  });
+        }
+        if(this.state.is_only_live){
+          row = row.filter(o=>o.live);
+        }
+        return {"title":k,"img":img, data:row,"id":league_id}; 
+      });
+      data = data.filter(o=>o.data.length>0);
+      try{
+        data = data.sort((a,b)=>{return (favorite && favorite.indexOf(a.id)>favorite.indexOf(b.id))?-1:1;});
+      }catch(e){console.log(e);}
+    }
+    //this.end = data.length == 0 ? true : false;
+    //data = this.state.page>1 ? this.state.list.concat(data) : data;
+    if(this._isMounted){
+      this.setState({list:data,loading:false,favorite:favorite,notifications_matches:_notifications_matches});
+    }
 }
 refresh_leagues = async()=>{
   this.state.list = await this.get_favs(this.state.list);
@@ -499,20 +496,27 @@ get_matches_koora = async(date_obj=null,next=false)=>{
   date_obj = date_obj==null ? this.state.matches_date :date_obj; 
   //API_.notifications_matches = await get_notifications_matches(date_obj);
   //API_.load_leagues(this.refresh_leagues);
+  console.log("get_matches 1");
   get_notifications_matches().then(o=>{
     API_.notifications_matches=o;
     this.refresh_leagues();
   });
+  console.log("get_matches 2");
   API_.favorite_leagues = await API_.getConfig("favorite_leagues",this.state.favorite);
+  console.log("get_matches 3");
   let resp = [];
   resp = await API_.get_matches_k(date_obj,this.state.is_only_live,this.state.source_id,next,this.state.category);
   let data = resp && resp.length>0 ? resp : [];
+  console.log("get_matches 4",data.length);
   //alert("HOME->get_matches_koora -> 1 "+data.length);
   data = await this.get_favs(data);
+  console.log("get_matches 5",data.length);
   //alert("HOME->get_matches_koora ->2"+data.length);
   data = await API_.set_logos(data);
+  console.log("get_matches 6",data.length);
   //alert("HOME->get_matches_koora ->3   "+data.length);
   if(this._isMounted){
+    console.log("get_matches 7",data.length);
     this.setState({list:data,loading:false});
   }
 

@@ -180,8 +180,9 @@ class BackUp{
       try{
         client = Stitch.defaultAppClient;
        }catch(err){
-         //console.log(err);
+         console.log("get_default_appClient", err);
           client = await Stitch.initializeDefaultAppClient("ba9al-xpsly");
+          console.log("get_default_appClient", client);
        }
        return client;
     }

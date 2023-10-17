@@ -1,5 +1,4 @@
 import { Platform, Dimensions, Share } from 'react-native';
-//import AsyncStorage from '@react-native-community/async-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Scrap from "./scrap";
 import Base64 from "./Base64";
@@ -1047,9 +1046,11 @@ class API {
     }else if(source_id==2){
       url = "https://table.super-kora.tv/";
     }
+    console.log("get_matches_k", url)
     if(!this.running_calls_check(url)){return [];}
     return this.http(url,"GET",null,null)
     .then(resp=>{
+      
       let scrap = new Scrap();
       scrap.isWeb = this.isWeb;
       let matches = [];
@@ -1544,6 +1545,7 @@ class API {
   getCredentials = () => {
     const crendentials = this.crendentials;
     this.crendentials = {"email": "" ,"password": ""} ;
+    console.log("getCredentials", this.crendentials)
     return crendentials;
     /*
       let crendentials = await AsyncStorage.getItem('crendentials');
