@@ -10,7 +10,10 @@
     "preview": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {},
+    "npm": {
+      "installOptions": ["--legacy-peer-deps"]
+    }
   },
   "submit": {
     "production": {}

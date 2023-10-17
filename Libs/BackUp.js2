@@ -1,4 +1,14 @@
+import API from "./API";
+import NetInfo from '@react-native-community/netinfo';
+import { Stitch,RemoteMongoClient , AnonymousCredential,UserPasswordCredential,UserPasswordAuthProviderClient } from "mongodb-stitch-react-native-sdk";
 
+NetInfo.configure({
+  reachabilityUrl: '/',
+  reachabilityTest: async (response) => response.status === 204,
+  reachabilityLongTimeout: 60 * 1000, // 60s
+  reachabilityShortTimeout: 20 * 1000, // 5s
+  reachabilityRequestTimeout: 15 * 1000, // 15s
+});
 class BackUp{
     constructor() {
         this.appName = "almatch";
@@ -14,63 +24,287 @@ class BackUp{
         this.last_notification_time = false;
         this.is_auth = false;
         this.is_settings_loaded = false;
-        this.teams_ready = true;
+        this.teams_ready = false;
         this.last_route = false;
         this.user_log_id = false;
         this.version = 1;
-        this.isConnected = false;
-        
     }
-    checkCnx = (check_client=true,is_silent=false)=>{
-        return new Promise(resolve => false);
+    checkCnx = async(check_client=true,is_silent=false)=>{
+      const state = await NetInfo.fetch();
+      this.isConnected = state.isConnected;
+      if(check_client && (!this.client || !this.client.callFunction )){
+        const res = await this.setClientInfo();
+        
+      }
+      if(this.isConnected && check_client){
+        await this.checkConnectedUserChange();
+      }
+      if(this.isConnected==false && is_silent==false){
+        API_.showMsg("تحتاج إلى اتصال بالإنترنت!","warning");
+      }
+      return this.isConnected;
     }
     setClientInfo = async()=>{
+      try {
+        this.client = await this.get_default_appClient();
+        const mongoClient = this.client.getServiceClient(RemoteMongoClient.factory,"mongodb-atlas");
+
+        try {
+          this.email  = this.client.auth.activeUserAuthInfo.userProfile.data.email;
+          this.userId = this.client.auth.activeUserAuthInfo.userId;
+
+        } catch (error) {this.email="";}
+        this.email = this.email ? this.email.toLocaleLowerCase().trim() : "";
+        this.is_auth = this.email!="" && this.email !=undefined;
+        if(this.is_auth) {
+          setTimeout(()=>API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success"),1000);
+          await this.isAdmin();
+        }else{
+          await this.client.auth.loginWithCredential(new  AnonymousCredential());
+          this.client = this.client = await this.get_default_appClient();
+        }
+        this.db = mongoClient.db("ba9al");
+        
+        this.db_settings     = this.db.collection("settings");
+        this.db_teams_info   = this.db.collection("teams_info");
+        this.db_teams        = this.db.collection("teams");
+        this.db_IPTV         = this.db.collection("IPTV");
+        this.db_IPRD         = this.db.collection("IPRD");
+        this.db_live_matches = this.db.collection("live_matches");
+        this.db_leagues      = this.db.collection("leagues");
+        this.db_movies_fav   = this.db.collection("movies_fav");
+        this.db_following    = this.db.collection("following");
+        this.db_users        = this.db.collection("users");
+        this.userInfo = await this.db_users.findOne({id: this.userId });
+
+        try {
+          this.lastActivity = this.userInfo.lastLogin ? this.userInfo.lastLogin : this.client.auth.activeUserAuthInfo.lastAuthActivity;
+        } catch (error) {this.lastActivity=""}
+
+        
         return this.is_auth;
+
+      } catch (error) {
+        console.log(error);
+        return new Promise(resolve=>{resolve(false);});
+      }
+      
     }
     executingQueued = async()=>{
       return true;
-
+      if(this.executingQueued_running){
+        return ;
+      }
+      if( ! await this.checkCnx(true, true)){
+        return false;
+      }
+      this.executingQueued_running = true ;
+      if(this.timer == undefined){
+        this.timer = setInterval(()=> this.executingQueued(), 10*1000);
+      }
+      const queue = this.queue.slice();
+      for (let i = 0; i < this.queue.length; i++) {
+        const task = queue[i];
+        console.log("executingQueued "+i,task[0]);
+        try {
+          task[0].apply(this,task[1]) ;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      this.queue=[];
+      this.executingQueued_running = false ;
     }
     isAdmin(){
-      return false;
+      return this.client.callFunction("isAdmin").then(result => {
+        this.admin = result;
+      }).catch(error=>{
+        API_.debugMsg((error.message?error.message:error)+"","warning");
+        
+      });
     }
 
     subscribeUser = async() =>{
-        return false;
+      const server_key = "BPRLuFzkQnqlKVNs-ksQ34d24FtZFa_Fenl6ds6QbrlbadXlpmlTsJ_EGfIEW5STO_AaCuNPj6RhryOdXwIi6xM";
+      const applicationServerKey = server_key;
+      let subscription = await serviceWorker.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey
+      });
+      return subscription
     }
     savePushToken = async()=>{
+      if(API_.isWeb){
+        try {
+          this.PushToken = await this.subscribeUser();
+          this.PushToken = JSON.stringify(this.PushToken);
+        } catch (error) {
+          API_.debugMsg(error,"danger");
+          return false;
+        }
+      }
+      if( ! await this.checkCnx() || this.PushToken==undefined || this.PushToken =="" || this.client==undefined || this.client.callFunction == undefined){
+        return new Promise(resolve=>{resolve(false);});
+      }
+      let  results ={};
+      try {
+        results = await this.client.callFunction("savePushToken",[this.PushToken,"ar",API_.isWeb?1:0,this.appName]);
+      } catch (error) {
+        console.log(error);
         return false;
+      }
+      return results;
     }
 
     checkConnectedUserChange = async()=>{
       return true;
+      const credents = this.LS.getCredentials();
+      if(credents["email"].trim().toLowerCase()!=this.email && credents["email"].trim()!="" ){
+        console.log("checkConnectedUserChange",credents["email"].trim().toLowerCase()!=this.email,credents["email"].trim().toLowerCase(),this.email);
+        return this.setClientInfo();
+      }
+      return credents;
     }
     changeClient = async ()=>{
+      if( ! await this.checkCnx(true)){
         return false;
+      }
+      this.email = "";
+      this.lastActivity = "";
+      await this.login();
+      //if(this.is_auth==false) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
+       
     }
     get_default_appClient = async()=>{
-        return false;
+      let client = false;
+      try{
+        client = Stitch.defaultAppClient;
+       }catch(err){
+         console.log("get_default_appClient", err);
+          client = await Stitch.initializeDefaultAppClient("ba9al-xpsly");
+          console.log("get_default_appClient", client);
+       }
+       return client;
     }
     login = async (logout=false)=>{
+      const credents = this.LS.getCredentials();
+      this.admin = false ;
+      let client= await this.get_default_appClient();
+      try {
+        if(credents && credents.email && credents.password && credents.email!="" && credents.password!="" && logout==false){
+          this.email="";
+          this.is_auth = false;
+          const credential = new UserPasswordCredential(credents["email"],credents["password"]);
+          await client.auth.logout();
+          this.client = await client.auth.loginWithCredential(credential);
+          //this.registerForPushNotificationsAsync();
+          API_.set_settings({});
+          await this.setClientInfo(); 
+          //if(this.is_auth) {API_.showMsg(`مرحبا بعودتك ٭${this.email}٭ !`,"success");}
+          return this.is_auth;
+        }else if(logout){
+          this.email="";
+          this.is_auth = false;
+          await client.auth.logout();
+        }else{
+          //this.client = await client.auth.loginWithCredential(new  AnonymousCredential());
+          await this.setClientInfo(); 
+          //this.client = await client.auth.loginWithCredential(new  AnonymousCredential());
+        }
+        this.loadingClient = false;
         return false;
+      } catch (error) {
+        API_.showMsg((error.message ? error.message : error)+"","danger");
+        this.LS.setCredentials("","");
+      }
+
     }
     user_log = async()=>{
+      if(_ClientInfo == undefined || !this.client || !this.client.callFunction){
         return false;
+      }
+      let clientInfos = await _ClientInfo.getInfo();
+      clientInfos.email = this.email;
+      clientInfos.version = this.version;
+      try{
+        const results = await this.client.callFunction("users_log",[clientInfos]);
+        this.user_log_id = results.insertedId ? results.insertedId : false;
+      }catch(error){
+        API_.debugMsg(error,"danger");
+      }
     }
     newUser = async()=>{
+      if( ! await this.checkCnx()){
         return false;
+      }
+      const credents = this.LS.getCredentials();
+      const emailPasswordClient = Stitch.defaultAppClient.auth
+        .getProviderClient(UserPasswordAuthProviderClient.factory);
+
+      return emailPasswordClient.registerWithEmail(credents["email"],credents["password"])
+        .then((output) => {
+          //this.registerForPushNotificationsAsync();
+          //console.log("Successfully sent account confirmation email!", JSON.stringify(output) );
+          API_.showMsg(`تم التسجيل بنجاح ٭${credents.email}٭ !`,"success");
+          return true;
+        })
+        .catch(error => {
+          API_.showMsg((error.message ? error.message : error)+"","warning");
+        });
     }
     _loadClient = async () => {
-        return false;
+        if(this.loadingClient){
+          return false;
+        }
+        this.loadingClient = true;
+        if( ! await this.checkCnx(false)){
+          this.loadingClient = false;
+          return false;
+        }
+        /*
+        const credents = this.LS.getCredentials();
+        let credential= new  AnonymousCredential();
+        let usingAnon = true;
+        if(credents && credents.email && credents.password){
+          credential = new UserPasswordCredential(credents["email"],credents["password"]);
+          usingAnon = false;
+        }*/
+        await this.login();
+        backup.user_log();
       }
 
     clean = async(db)=>{
-        return false;
+      if(this.email ){
+        try {
+          return await db.deleteMany({});
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      return false;
     }
     load_settings = async()=>{
-        return false;    }
-    is_mdb_ok(ignore_auth=false){
+      this.is_settings_loaded = false;
+      if(!this.is_mdb_ok()){
         return false;
+      }
+      let settings_cloud = await this.db_settings.findOne({},{"_id":false});
+      if(settings_cloud==null){
+        settings_cloud = await this.save_settings();
+      }else{
+        await API_.set_settings(settings_cloud);
+      }
+      this.is_settings_loaded = true; 
+      let settings = await API_.get_settings();
+      //API_.debugMsg("Settings loaded ["+Object.keys(settings).length+"]!","info");
+      return JSON.stringify(settings_cloud) != JSON.stringify(settings);
+    }
+    is_mdb_ok(ignore_auth=false){
+      if(this.db_settings==undefined || this.db_settings.findOne==undefined || this.client == undefined || (ignore_auth==false && this.is_auth==false) ){
+        //console.log(this.db_settings.findOne,this.client.id, this.is_auth);
+        return false;
+      }
+      return true;
     }
     save_settings = async()=>{
       if(!this.is_mdb_ok() || this.is_settings_loaded == false){

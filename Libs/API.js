@@ -203,7 +203,9 @@ class API {
     }
     configs.headers = configs.headers==undefined ? {} : configs.headers ;
     try {
-      configs.headers["almatch_session_id"] = backup.client.auth.activeUserAuthInfo.userId;
+      if(backup && backup.client){
+        configs.headers["almatch_session_id"] = backup.client.auth.activeUserAuthInfo.userId;
+      }
     } catch (error) {
       return this.sleep(2).then(o=>this.http(url,method,data,headers,is_json, use_proxy, use_proxy_utf,force_origin));
     }
