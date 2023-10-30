@@ -10,9 +10,8 @@
     "preview": {
       "distribution": "internal"
     },
-    "production": {},
-    "npm": {
-      "installOptions": ["--legacy-peer-deps"]
+    "production": {
+      "channel": "6"
     }
   },
   "submit": {

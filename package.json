@@ -14,7 +14,8 @@
     "web": "expo start:web",
     "eject": "expo eject",
     "doall": "powershell -File generate_updates_info.ps1 && git add . && git commit -a -m \"fix bugs and more ..DOALL\" && git push origin main  && eas update && npm run deploy",
-    "git": "git commit -a -m \"fix bugs and more ..DOALL\" && git push origin"
+    "git": "git commit -a -m \"fix bugs and more ..DOALL\" && git push origin",
+    "eas-build-pre-install": "npm config set legacy-peer-deps true"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.18.2",

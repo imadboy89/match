@@ -2,7 +2,7 @@
   "expo": {
     "name": "AlMatch",
     "slug": "almatch",
-    "version": "5.0.0",
+    "version": "6.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "privacy": "public",
@@ -28,7 +28,7 @@
     "android": {
       "package": "com.imados.almatch",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 5,
+      "versionCode": 6,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000"

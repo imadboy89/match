@@ -188,7 +188,7 @@ class CategoriesScreen extends React.Component {
   render() {
     this.have_access = backup&&backup.userInfo&&backup.userInfo.iptv? backup.userInfo.iptv:false;
     if(styles.constructor === Object && Object.entries(styles).length==0){Styles();}
-    if(backup.admin!=true && !this.have_access){
+    if(!API_.isWeb && backup.admin!=true && !this.have_access){
       return (<View style={styles.container}>
         <Text style={{fontSize:20,color:"#dfe6e9" }}>Comming soon...</Text>
       </View>);
