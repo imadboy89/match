@@ -2,7 +2,7 @@
   "expo": {
     "name": "AlMatch",
     "slug": "almatch",
-    "version": "6.0.0",
+    "version": "7.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "privacy": "public",
@@ -28,7 +28,7 @@
     "android": {
       "package": "com.imados.almatch",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 6,
+      "versionCode": 7,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000"
@@ -70,6 +70,16 @@
       "web"
     ],
     "description": "real time macthes events, live streaming and more...",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraProguardRules": "-keep class com.google.android.gms.internal.consent_sdk.** { *; }"
+          }
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "b2a8f791-6a5a-4355-9350-d24199fddb3a"
@@ -78,5 +88,11 @@
     "runtimeVersion": {
       "policy": "sdkVersion"
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-5231842333475288~9865312966",
+    "ios_app_id": "ca-app-pub-5231842333475288~9865312966",
+    "delay_app_measurement_init": true,
+    "user_tracking_usage_description": "This identifier will be used to deliver personalized ads to you."
   }
 }

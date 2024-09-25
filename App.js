@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
-
-import {  View, StyleSheet, ToastAndroid,Platform,Alert  , Text } from 'react-native';
+import {  Platform,Alert  , Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer  } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -34,6 +32,34 @@ import * as Notifications from 'expo-notifications';
 import backUp from "./Libs/BackUp";
 import ToastMsg from "./components/ToastMsg";
 import ClientInfo from "./Libs/ClientInfo";
+
+global.adUnitId_banner = "ca-app-pub-5231842333475288/5527484848"
+global.adUnitId_inters = "ca-app-pub-5231842333475288/5656860240"
+
+global.adUnitId_banner_ios = "ca-app-pub-5231842333475288/5527484848"
+global.adUnitId_inters_ios = "ca-app-pub-5231842333475288/5656860240"
+
+global.BannerAd = ()=>{return null};
+if (!__DEV__){
+    const {Admob_init,BannerAd2,Interstitial_load} = require('./Libs/admobs');
+    //Admob_init will be activated when 'user consent" is required
+    //Admob_init();
+    BannerAd = BannerAd2;
+    let interstitial = Interstitial_load();
+    setTimeout(()=>{
+      try {
+          interstitial.show();
+          interstitial = Interstitial_load();
+      } catch (error) {console.log(error);}
+      setInterval(()=>{
+        try {
+            interstitial.show();
+            interstitial = Interstitial_load();
+        } catch (error) {console.log(error);}
+      }, 100000);
+    }, 30000);
+
+}
 
 global.navigationRef = React.createRef();
 global.g = null;
@@ -86,7 +112,10 @@ if(API_.isWeb){
 }
 
 //tmp
-let versionCode = Constants&&Constants.manifest&&Constants.manifest.android&&Constants.manifest.android.versionCode?Constants.manifest.android.versionCode:0;
+let versionCode  = 0;
+try {
+  versionCode = Constants.expoConfig.android.package 
+} catch (error) {}
 versionCode = parseInt(versionCode);
 
 if(versionCode>3){
@@ -142,14 +171,14 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!'+JSON.stringify(notif_perms));
+      //alert('Failed to get push token for push notification!'+JSON.stringify(notif_perms));
       return;
     }
     backup.PushToken = await Notifications.getExpoPushTokenAsync({experienceId: '@imadboss/almatch',});
     backup.PushToken = backup.PushToken.data;
     
   } else {
-    alert('Must use physical device for Push Notifications');
+    //alert('Must use physical device for Push Notifications');
   }
 
   if (Platform.OS === 'android') {

@@ -366,7 +366,7 @@ class SettingsScreen extends React.Component {
           </View>
           <View style={this.state.dynamic_style.settings_row}>
             <Text style={this.state.dynamic_style.settings_row_label}>Update Channel </Text> 
-            <Text style={this.state.dynamic_style.settings_row_input}>{Updates.releaseChannel}</Text>
+            <Text style={this.state.dynamic_style.settings_row_input}>-</Text>
           </View>
           </>
           

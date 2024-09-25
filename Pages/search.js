@@ -1,5 +1,5 @@
 import React from "react";
-import {  View, Dimensions, keyboard , Button, Linking, ScrollView , RefreshControl, ActivityIndicator, TextInput} from 'react-native';
+import {  View, Dimensions, Button, Linking, ScrollView , RefreshControl, ActivityIndicator, TextInput} from 'react-native';
 import {styles_settings,getTheme, themes_list} from "../components/Themes";
 import ItemsList from '../components/list';
 import Player from "../components/Player";
@@ -84,7 +84,7 @@ class SearchScreen extends React.Component {
     this.setState({list:list, loading:false});
     //squad_club
     if(API_.isWeb != false){
-      keyboard.dismiss(); 
+      //keyboard.dismiss(); 
     }
   }
   get_player_info=(player)=>{

@@ -9,7 +9,6 @@ import ExpoCustomUpdater from '../Libs/update';
 import * as Notifications from 'expo-notifications';
 import Loader from "../components/Loader";
 import {onMatch_LongPressed,get_notifications_matches} from "../Libs/localNotif";
-import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import User_log from "../components/User_log";
 import {Picker} from '@react-native-picker/picker';
 
@@ -672,6 +671,7 @@ show_DateP(){
 
       { this.state.show_datPicker===true ? this.show_DateP() : null }
 
+      <BannerAd />
       <User_log 
           user_log={this.state.user_log} 
           modal_visible={this.state.show_user_log && this.state.user_log} 

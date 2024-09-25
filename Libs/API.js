@@ -203,7 +203,7 @@ class API {
     }
     configs.headers = configs.headers==undefined ? {} : configs.headers ;
     try {
-      if(backup && backup.client){
+      if(backup && backup.client && backup.client.auth){
         configs.headers["almatch_session_id"] = backup.client.auth.activeUserAuthInfo.userId;
       }
     } catch (error) {
