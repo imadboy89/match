@@ -4,10 +4,11 @@
 
 window.onload = function() {
     setTimeout(()=>{
-      API_.proxy_scrp = API_.proxy_scrp.replace("imad.is-a.dev","sportsevents.geekspro.us")
-      API_.proxy_post = API_.proxy_post.replace("imad.is-a.dev","sportsevents.geekspro.us")
-      API_.proxy_get = API_.proxy_get.replace("imad.is-a.dev","sportsevents.geekspro.us")
-      API_.server_url = API_.server_url.replace("imad.is-a.dev","sportsevents.geekspro.us")
+        console.log("FIXING dom");
+        API_.proxy_scrp = API_.proxy_scrp.replace("imad.is-a.dev","sportsevents.geekspro.us")
+        API_.proxy_post = API_.proxy_post.replace("imad.is-a.dev","sportsevents.geekspro.us")
+        API_.proxy_get = API_.proxy_get.replace("imad.is-a.dev","sportsevents.geekspro.us")
+        API_.server_url = API_.server_url.replace("imad.is-a.dev","sportsevents.geekspro.us")
     }, 2000);
 };
 
